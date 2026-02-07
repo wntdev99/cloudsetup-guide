@@ -1,0 +1,39 @@
+{
+  "name": "cloudsetup-guide",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "postbuild": "npm run validate",
+    "start": "next start",
+    "lint": "next lint",
+    "format": "prettier --write .",
+    "type-check": "tsc --noEmit",
+    "validate": "echo 'Guide validation placeholder'"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "gray-matter": "^4.0.3",
+    "next": "^14.2.18",
+    "next-intl": "^3.25.1",
+    "next-mdx-remote": "^5.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwind-merge": "^3.4.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.15",
+    "@types/node": "^20",
+    "@types/react": "^18.3.28",
+    "@types/react-dom": "^18.3.7",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^8",
+    "eslint-config-next": "^14.2.18",
+    "eslint-config-prettier": "^9.1.0",
+    "postcss": "^8",
+    "prettier": "^3.4.2",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
+  }
+}

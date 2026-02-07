@@ -1,0 +1,39 @@
+{
+  "common": {
+    "search": "검색",
+    "home": "홈",
+    "guides": "가이드",
+    "platforms": "플랫폼",
+    "tools": "도구",
+    "language": "언어"
+  },
+  "guide": {
+    "difficulty": {
+      "beginner": "초급",
+      "intermediate": "중급",
+      "advanced": "고급"
+    },
+    "estimatedTime": "예상 소요 시간",
+    "minutes": "분",
+    "steps": "단계",
+    "prerequisites": "선행 가이드",
+    "nextGuides": "다음 추천 가이드",
+    "lastVerified": "마지막 검증",
+    "copy": "복사",
+    "copied": "복사됨",
+    "checkpoint": "확인하기",
+    "freeTier": "무료 한도"
+  },
+  "freeTier": {
+    "status": {
+      "generous": "넉넉함",
+      "moderate": "보통",
+      "limited": "제한적",
+      "none": "없음"
+    }
+  },
+  "footer": {
+    "description": "클라우드 API 세팅, 이제 쉽게 시작하세요",
+    "copyright": "All rights reserved."
+  }
+}

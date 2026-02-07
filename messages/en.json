@@ -1,0 +1,39 @@
+{
+  "common": {
+    "search": "Search",
+    "home": "Home",
+    "guides": "Guides",
+    "platforms": "Platforms",
+    "tools": "Tools",
+    "language": "Language"
+  },
+  "guide": {
+    "difficulty": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced"
+    },
+    "estimatedTime": "Estimated Time",
+    "minutes": "min",
+    "steps": "steps",
+    "prerequisites": "Prerequisites",
+    "nextGuides": "Next Guides",
+    "lastVerified": "Last Verified",
+    "copy": "Copy",
+    "copied": "Copied",
+    "checkpoint": "Checkpoint",
+    "freeTier": "Free Tier"
+  },
+  "freeTier": {
+    "status": {
+      "generous": "Generous",
+      "moderate": "Moderate",
+      "limited": "Limited",
+      "none": "None"
+    }
+  },
+  "footer": {
+    "description": "Start setting up cloud APIs easily",
+    "copyright": "All rights reserved."
+  }
+}

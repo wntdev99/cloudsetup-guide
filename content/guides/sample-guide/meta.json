@@ -1,0 +1,31 @@
+{
+  "slug": "sample-guide",
+  "platform": "gcp",
+  "service": "Sample Service",
+  "category": "general",
+  "difficulty": "beginner",
+  "estimatedMinutes": 10,
+  "totalSteps": 3,
+  "freeTier": {
+    "service": "Sample API",
+    "limit": "1,000 requests",
+    "period": "month",
+    "status": "generous"
+  },
+  "seo": {
+    "ko": {
+      "title": "샘플 가이드 - 클라우드 API 세팅",
+      "description": "이것은 샘플 가이드입니다",
+      "keywords": ["샘플", "가이드", "테스트"]
+    },
+    "en": {
+      "title": "Sample Guide - Cloud API Setup",
+      "description": "This is a sample guide",
+      "keywords": ["sample", "guide", "test"]
+    }
+  },
+  "createdAt": "2025-02-07",
+  "updatedAt": "2025-02-07",
+  "lastVerified": "2025-02-07",
+  "published": true
+}

@@ -1,0 +1,67 @@
+[
+  {
+    "id": "gcp",
+    "name": "Google Cloud Platform",
+    "logo": "/images/platforms/gcp.svg",
+    "description": {
+      "ko": "구글의 클라우드 서비스로 AI/ML API가 강력합니다",
+      "en": "Google's cloud service with powerful AI/ML APIs"
+    },
+    "freeCredit": {
+      "amount": "$300",
+      "duration": "90일",
+      "conditions": ["신규 계정", "신용카드 등록 필요"]
+    },
+    "website": "https://cloud.google.com",
+    "docsUrl": "https://cloud.google.com/docs",
+    "guideCount": 0
+  },
+  {
+    "id": "aws",
+    "name": "Amazon Web Services",
+    "logo": "/images/platforms/aws.svg",
+    "description": {
+      "ko": "가장 많이 사용되는 클라우드 플랫폼",
+      "en": "The most widely used cloud platform"
+    },
+    "website": "https://aws.amazon.com",
+    "docsUrl": "https://docs.aws.amazon.com",
+    "guideCount": 0
+  },
+  {
+    "id": "supabase",
+    "name": "Supabase",
+    "logo": "/images/platforms/supabase.svg",
+    "description": {
+      "ko": "오픈소스 Firebase 대안, PostgreSQL 기반",
+      "en": "Open-source Firebase alternative with PostgreSQL"
+    },
+    "website": "https://supabase.com",
+    "docsUrl": "https://supabase.com/docs",
+    "guideCount": 0
+  },
+  {
+    "id": "vercel",
+    "name": "Vercel",
+    "logo": "/images/platforms/vercel.svg",
+    "description": {
+      "ko": "Next.js 배포에 최적화된 플랫폼",
+      "en": "Platform optimized for Next.js deployment"
+    },
+    "website": "https://vercel.com",
+    "docsUrl": "https://vercel.com/docs",
+    "guideCount": 0
+  },
+  {
+    "id": "firebase",
+    "name": "Firebase",
+    "logo": "/images/platforms/firebase.svg",
+    "description": {
+      "ko": "구글의 모바일/웹 앱 개발 플랫폼",
+      "en": "Google's platform for mobile and web apps"
+    },
+    "website": "https://firebase.google.com",
+    "docsUrl": "https://firebase.google.com/docs",
+    "guideCount": 0
+  }
+]

@@ -1,0 +1,62 @@
+[
+  {
+    "id": "ai-ml",
+    "name": {
+      "ko": "AI/ML",
+      "en": "AI/ML"
+    },
+    "description": {
+      "ko": "이미지 인식, 번역, 음성 인식 등 AI 서비스",
+      "en": "AI services like image recognition, translation, speech-to-text"
+    },
+    "icon": "brain"
+  },
+  {
+    "id": "compute",
+    "name": {
+      "ko": "컴퓨팅",
+      "en": "Compute"
+    },
+    "description": {
+      "ko": "서버, 컨테이너, 서버리스 함수 실행",
+      "en": "Servers, containers, serverless function execution"
+    },
+    "icon": "cpu"
+  },
+  {
+    "id": "database",
+    "name": {
+      "ko": "데이터베이스",
+      "en": "Database"
+    },
+    "description": {
+      "ko": "관계형 DB, NoSQL, 실시간 DB",
+      "en": "Relational DB, NoSQL, realtime databases"
+    },
+    "icon": "database"
+  },
+  {
+    "id": "storage",
+    "name": {
+      "ko": "스토리지",
+      "en": "Storage"
+    },
+    "description": {
+      "ko": "파일 저장 및 CDN",
+      "en": "File storage and CDN"
+    },
+    "icon": "hard-drive"
+  },
+  {
+    "id": "auth",
+    "name": {
+      "ko": "인증",
+      "en": "Authentication"
+    },
+    "description": {
+      "ko": "로그인, 회원가입, 소셜 로그인",
+      "en": "Login, signup, social authentication"
+    },
+    "icon": "shield"
+  }
+]
