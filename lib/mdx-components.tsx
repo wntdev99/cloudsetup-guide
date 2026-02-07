@@ -4,6 +4,8 @@ import { Screenshot } from '@/components/guide/Screenshot';
 import { CopyBlock } from '@/components/guide/CopyBlock';
 import { Callout } from '@/components/guide/Callout';
 import { FreeTierInfo } from '@/components/guide/FreeTierInfo';
+import { DevTip } from '@/components/guide/DevTip';
+import { Checkpoint } from '@/components/guide/Checkpoint';
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
@@ -12,6 +14,8 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     CopyBlock,
     Callout,
     FreeTierInfo,
+    DevTip,
+    Checkpoint,
     ...components,
   };
 }
