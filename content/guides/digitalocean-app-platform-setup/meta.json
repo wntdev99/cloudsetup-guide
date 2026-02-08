@@ -1,0 +1,60 @@
+{
+  "slug": "digitalocean-app-platform-setup",
+  "platform": "digitalocean",
+  "service": "DigitalOcean App Platform",
+  "category": "compute",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 30,
+  "totalSteps": 5,
+  "freeTier": {
+    "service": "DigitalOcean App Platform",
+    "limit": "$200 credits included",
+    "period": "trial",
+    "amount": "Free with credits",
+    "status": "generous",
+    "conditions": [
+      "Deploy from GitHub",
+      "Automatic deployments on push",
+      "Custom domains",
+      "Free SSL certificates",
+      "Built-in environment variables",
+      "Included with $200 credit trial"
+    ]
+  },
+  "prerequisites": [
+    "digitalocean-account-setup"
+  ],
+  "nextGuides": [],
+  "seo": {
+    "ko": {
+      "title": "DigitalOcean App Platform 설정 - 앱 배포 자동화 | CloudSetup.guide",
+      "description": "DigitalOcean App Platform으로 GitHub에서 애플리케이션을 배포하고 자동 배포를 설정하는 방법을 배워봅시다. 30분 안에 완료할 수 있습니다.",
+      "keywords": [
+        "App Platform",
+        "자동 배포",
+        "GitHub 연동",
+        "앱 배포",
+        "CI/CD",
+        "클라우드 배포",
+        "서버리스 배포"
+      ]
+    },
+    "en": {
+      "title": "DigitalOcean App Platform Setup - Automate App Deployment | CloudSetup.guide",
+      "description": "Learn how to deploy your application from GitHub to DigitalOcean App Platform and set up automatic deployments. Complete setup in 30 minutes.",
+      "keywords": [
+        "App Platform",
+        "automatic deployment",
+        "GitHub integration",
+        "app deployment",
+        "CI/CD",
+        "cloud deployment",
+        "serverless deployment"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z",
+  "published": true
+}

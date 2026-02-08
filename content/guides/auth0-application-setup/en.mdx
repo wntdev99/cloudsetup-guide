@@ -1,0 +1,265 @@
+# Configure Auth0 Application - Set Up Login and Signup
+
+Now that you have an Auth0 account, let's configure an application and add login/signup to your website. This guide covers setting up a web application with Auth0's Universal Login. Estimated time: 25 minutes.
+
+<FreeTierInfo
+  service="Auth0"
+  limit="7,000 active users/month"
+  period="monthly"
+  status="generous"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Completed Auth0 account setup", required: true },
+  { text: "Your Auth0 Domain (e.g., mycompany.us.auth0.com)", required: true },
+  { text: "Your website URL (http://localhost:3000 for development)", required: true }
+]} />
+
+<Callout type="info">
+🎯 **What is an Auth0 Application?** An Auth0 Application represents your website or app. You register it with Auth0 so users can authenticate through Auth0's login page.
+</Callout>
+
+---
+
+<Step number={1} title="Create New Application in Auth0 Dashboard">
+
+1. Log in to your **Auth0 Dashboard**.
+2. Click **Applications** in the left sidebar.
+3. Click **Create Application** button.
+4. Enter your **Application name** (e.g., "My Website", "My App").
+5. Select **Regular Web Application** as the application type.
+6. Click **Create**.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/auth0/app-step1-create-app-en.png"
+  alt="Create Auth0 application dialog"
+  caption="Select Regular Web Application for websites and web apps"
+  priority={true}
+/>
+
+<Callout type="tip">
+💡 **Application Types**: Regular Web App (websites), Single Page App (React/Vue), Native (mobile), Machine-to-Machine (servers). Choose the type that matches your project.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Configure Application Settings">
+
+1. Click the **Settings** tab for your new application.
+2. Note your **Client ID** and **Client Secret** (you'll need these for your code).
+3. Set **Application URIs**:
+   - **Allowed Callback URLs**: `http://localhost:3000/callback` (for development)
+   - **Allowed Logout URLs**: `http://localhost:3000` (for development)
+   - **Allowed Web Origins**: `http://localhost:3000` (for development)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/auth0/app-step2-settings-en.png"
+  alt="Auth0 application settings"
+  caption="Configure your application URIs for development and production"
+/>
+
+<DevTip>
+For production, replace localhost:3000 with your actual domain (e.g., https://myapp.com, https://myapp.com/callback). Always use HTTPS for production.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="Choose Your Tech Stack - Install SDKs">
+
+Auth0 supports most programming languages and frameworks. Choose yours:
+
+**React/Next.js:**
+
+<CopyBlock
+  code="npm install @auth0/auth0-react"
+  language="bash"
+/>
+
+**Node.js/Express:**
+
+<CopyBlock
+  code="npm install express-openid-connect"
+  language="bash"
+/>
+
+**Python/Flask:**
+
+<CopyBlock
+  code="pip install flask-pyoidc"
+  language="bash"
+/>
+
+**PHP/Laravel:**
+
+<CopyBlock
+  code="composer require auth0/auth0-php"
+  language="bash"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/auth0/app-step3-install-sdks-en.png"
+  alt="Auth0 SDK installation"
+  caption="Install Auth0 SDK for your technology stack"
+/>
+
+<Callout type="info">
+📚 **Full documentation**: Visit [Auth0 Documentation](https://auth0.com/docs) for your specific framework. Auth0 has official SDKs for most popular frameworks.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="Initialize Auth0 in Your Application">
+
+Here's a basic example using Node.js/Express. For other frameworks, see Auth0 docs:
+
+<CopyBlock
+  code="const { auth } = require('express-openid-connect');
+const express = require('express');
+
+const app = express();
+
+// Configure Auth0
+app.use(auth({
+  authRequired: false,
+  auth0Logout: true,
+  secret: process.env.AUTH0_SECRET,
+  baseURL: process.env.AUTH0_BASE_URL,
+  clientID: process.env.AUTH0_CLIENT_ID,
+  issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL,
+}));
+
+// Login route
+app.get('/login', (req, res) = {
+  res.oidc.login({ returnTo: '/' });
+});
+
+// Logout route
+app.get('/logout', (req, res) = {
+  res.oidc.logout({ returnTo: '/' });
+});
+
+// Protected route - requires login
+app.get('/profile', (req, res) = {
+  if (req.oidc.isAuthenticated()) {
+    res.send('Welcome ' + req.oidc.user.name);
+  } else {
+    res.send('Please log in');
+  }
+});
+
+app.listen(3000, () = console.log('App running on 3000'));"
+  language="javascript"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/auth0/app-step4-init-en.png"
+  alt="Auth0 initialization code"
+  caption="Initialize Auth0 in your application"
+/>
+
+</Step>
+
+---
+
+<Step number={5} title="Test Login and Signup">
+
+1. Start your application: `npm start` (or your startup command).
+2. Navigate to `http://localhost:3000/login`.
+3. You'll see **Auth0's login screen**.
+4. Click **Sign Up** to create a test user.
+5. Enter email and password.
+6. After signup, you'll be redirected to your app.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/auth0/app-step5-login-screen-en.png"
+  alt="Auth0 Universal Login screen"
+  caption="Auth0's Universal Login page - users see this to login/signup"
+/>
+
+<Checkpoint
+  title="Verify Application Setup"
+  items={[
+    "Can you see the Auth0 login page?",
+    "Can you create a new user?",
+    "Are you redirected back to your app after login?",
+    "Can you access your user profile information?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **Complete!** You've successfully configured Auth0 and added login/signup to your website. Users can now sign up and log in through Auth0.
+</Callout>
+
+</Step>
+
+---
+
+## Next Steps
+
+1. **Add social login** - Enable Google, GitHub, Facebook login
+2. **Customize login page** - Add your logo and branding
+3. **Implement user roles** - Control what authenticated users can access
+4. **Set up multi-factor authentication** - Enhance security
+
+---
+
+## Frequently Asked Questions
+
+<Callout type="info">
+**Q. Where do user passwords get stored?**
+
+A. Auth0 stores all user passwords securely encrypted in Auth0's database. Your app never sees the passwords - Auth0 handles all password hashing and verification.
+</Callout>
+
+<Callout type="info">
+**Q. Can I customize the login page?**
+
+A. Yes! You can customize Auth0's login page (Universal Login) with your branding, colors, and custom HTML. See the Customize section in Auth0 Dashboard.
+</Callout>
+
+<Callout type="info">
+**Q. How do I get user information after login?**
+
+A. Auth0 provides user information in `user` object after login. This includes name, email, picture, and custom user metadata you add.
+</Callout>
+
+<Callout type="info">
+**Q. What if my app uses a different programming language?**
+
+A. Auth0 supports virtually all popular languages (Python, PHP, Java, Ruby, Go, etc.). Find your official SDK in Auth0 documentation.
+</Callout>
+
+---
+
+## Troubleshooting
+
+### Login redirect doesn't work
+
+- Verify your Callback URLs in Auth0 Settings match your code
+- For development, use `http://localhost:3000/callback`
+- For production, use `https://yourdomain.com/callback`
+- Make sure you're using http (not https) for localhost
+
+### Users not created
+
+- Check that signup is enabled in Auth0 Dashboard
+- Go to Authentication > Connections > Username-Password
+- Ensure the Database connection is enabled for your application
+
+### User data not showing
+
+- Verify the user is logged in (check if `oidc.isAuthenticated()` is true)
+- Try logging out and back in
+- Check browser console for errors
+
+---
+
+**Congratulations!** Your application now has secure authentication. Next, customize the login experience and add social logins! 🎉

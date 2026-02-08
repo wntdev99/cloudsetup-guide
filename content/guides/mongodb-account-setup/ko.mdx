@@ -1,0 +1,221 @@
+# MongoDB 계정 만들기 - 무료 클라우드 데이터베이스 설정
+
+MongoDB Atlas는 **완전히 관리되는 클라우드 데이터베이스**로서 너무나 관대한 무료 요금제를 제공합니다. 15분 안에 프로덕션 준비가 된 데이터베이스 클러스터를 갖게 됩니다. 신용카드가 필요 없습니다!
+
+<FreeTierInfo
+  service="MongoDB Atlas"
+  limit="512 MB 저장소"
+  period="월간"
+  status="generous"
+/>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "이메일 주소", required: true },
+  { text: "확인용 유효한 이메일", required: true }
+]} />
+
+<Callout type="info">
+🛢️ **MongoDB란 무엇인가요?** MongoDB는 JSON 같은 문서에 데이터를 저장하는 NoSQL 데이터베이스입니다. 고정 테이블을 가진 전통적인 SQL 데이터베이스와 달리 MongoDB는 유연하고 확장 가능합니다 - 웹 애플리케이션, 모바일 앱, API에 완벽합니다.
+</Callout>
+
+---
+
+<Step number={1} title="MongoDB Atlas에 가입">
+
+1. [MongoDB.com](https://www.mongodb.com/cloud/atlas/register)을 방문합니다.
+2. **가입** 버튼을 클릭합니다.
+3. 가입 방법을 선택합니다:
+   - 이메일과 비밀번호
+   - Google 계정
+   - GitHub 계정
+4. 세부 정보를 입력하거나 소셜 로그인을 선택합니다.
+5. **가입** 버튼을 클릭합니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/mongodb/step1-signup-ko.png"
+  alt="MongoDB Atlas 가입 페이지"
+  caption="MongoDB Atlas 계정을 만드세요 - 신용카드가 필요 없습니다"
+  priority={true}
+/>
+
+<Callout type="tip">
+💡 **팁**: Google 또는 GitHub로 가입하면 더 빠릅니다.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="이메일 확인 및 계정 세부 정보 설정">
+
+1. **MongoDB 확인 메시지**에 대한 이메일을 확인합니다.
+2. 이메일의 **확인 링크**를 클릭합니다.
+3. MongoDB로 돌아오면 계정 세부 정보를 입력합니다:
+   - **이름**과 **성**
+   - **회사** (선택사항)
+   - **직무** (예: 개발자, 창업자)
+4. **동의 및 마침** 버튼을 클릭합니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/mongodb/step2-verify-email-ko.png"
+  alt="MongoDB 계정 세부 정보 양식"
+  caption="프로필 정보를 완성하세요"
+/>
+
+<Callout type="warning">
+⚠️ **중요**: 확인 이메일이 도착하지 않으면 스팸 폴더를 확인합니다. 필요하면 새로운 확인 이메일을 요청합니다.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="첫 데이터베이스 클러스터 생성">
+
+1. 대시보드에서 **생성** 버튼을 클릭합니다.
+2. **요금제 선택**:
+   - **M0 Free** (무료 요금제)를 선택합니다
+   - 결제 수단이 필요 없습니다
+3. **클라우드 공급자 및 지역 선택**:
+   - AWS, Azure, 또는 GCP
+   - 가장 가까운 지역 선택 (us-east, eu-west 등)
+4. **클러스터 생성** 버튼을 클릭합니다 (1-3분 소요).
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/mongodb/step3-cluster-creation-ko.png"
+  alt="MongoDB 클러스터 생성 화면"
+  caption="무료 M0 클러스터 - 개발 및 테스트에 완벽합니다"
+/>
+
+<DevTip>
+M0 클러스터는 공유 인프라입니다. 높은 트래픽을 가진 프로덕션 앱의 경우 유료 M10 클러스터로 업그레이드합니다. 하지만 M0는 개발, 학습, MVP 테스팅에 훌륭합니다.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={4} title="데이터베이스 사용자 생성 및 연결 문자열 가져오기">
+
+클러스터가 생성되면:
+
+1. 좌측 사이드바의 **데이터베이스 액세스**를 클릭합니다.
+2. **새 데이터베이스 사용자 추가**를 클릭합니다.
+3. **사용자 이름**을 입력합니다 (예: "dbuser").
+4. **비밀번호**를 입력합니다 (안전하게 저장하세요!).
+5. **데이터베이스 사용자** 역할을 선택합니다.
+6. **사용자 추가** 버튼을 클릭합니다.
+7. **네트워크 액세스** > **IP 주소 추가**로 이동합니다.
+8. **어디서나 액세스 허용** 선택 (개발용).
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/mongodb/step4-connection-ko.png"
+  alt="데이터베이스 사용자 생성 및 연결"
+  caption="데이터베이스 사용자를 만들고 네트워크 액세스를 구성합니다"
+/>
+
+<Callout type="warning">
+🔒 **보안 참고**: "어디서나 액세스 허용"은 개발 전용입니다. 프로덕션의 경우 앱의 IP 주소를 지정합니다.
+</Callout>
+
+<CopyBlock
+  code="// 연결 문자열은 다음과 같습니다:
+// mongodb+srv://username:password@cluster0.xxxxx.mongodb.net/dbname
+
+// 이것을 안전하게 보관하세요 - 데이터베이스 비밀번호처럼 취급하세요!
+// .env 파일에 저장합니다: MONGODB_URI=mongodb+srv://..."
+  language="text"
+/>
+
+</Step>
+
+---
+
+<Step number={5} title="연결 테스트">
+
+**클러스터** 탭으로 돌아가 **연결**을 클릭합니다.
+
+<Checkpoint
+  title="계정 설정 확인"
+  items={[
+    "이메일이 확인되었나요?",
+    "M0 클러스터가 실행 중인가요?",
+    "데이터베이스 사용자를 만들었나요?",
+    "연결 문자열을 볼 수 있나요?",
+    "네트워크 액세스가 구성되어 있나요?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **완료!** MongoDB 계정이 설정되었고 사용할 준비가 되었습니다. 클라우드에서 실행 중인 무료 512 MB 데이터베이스 클러스터가 있습니다. 다음 가이드에서는 첫 데이터베이스와 컬렉션을 생성합니다.
+</Callout>
+
+</Step>
+
+---
+
+## 다음 단계
+
+MongoDB 계정이 생성되었으니:
+
+1. **[MongoDB 데이터베이스 설정](../mongodb-database-setup)** - 데이터베이스 및 컬렉션 생성
+2. **[MongoDB에 연결](https://docs.mongodb.com/drivers/)** - Node.js, Python 등 공식 드라이버 사용
+3. **[MongoDB 쿼리 언어](https://docs.mongodb.com/manual/reference/method/db.collection.find/)** - 데이터를 쿼리하고 삽입하는 방법 배우기
+
+---
+
+## 자주 묻는 질문
+
+<Callout type="info">
+**Q. MongoDB와 SQL 데이터베이스의 차이점은 무엇인가요?**
+
+A. MongoDB는 유연한 JSON 문서를 저장 (NoSQL)하고 SQL 데이터베이스는 고정 테이블을 사용합니다. MongoDB는 유연한 스키마와 빠른 개발에 더 좋습니다. SQL은 엄격한 데이터 구조와 복잡한 조인에 더 좋습니다.
+</Callout>
+
+<Callout type="info">
+**Q. 무료 요금제에 얼마나 저장할 수 있나요?**
+
+A. 512 MB의 데이터입니다. 이것은 개발, 테스트, 소규모 프로젝트에 충분합니다. 데이터가 가득 차면 유료 요금제로 업그레이드하거나 오래된 데이터를 삭제할 수 있습니다.
+</Callout>
+
+<Callout type="info">
+**Q. 프로덕션에 MongoDB를 사용할 수 있나요?**
+
+A. 네! MongoDB Atlas는 수천 개의 프로덕션 앱에서 사용됩니다. 무료 M0 요금제는 개발에 최적입니다. 프로덕션 트래픽의 경우 유료 요금제 (M10, M20 등)로 업그레이드합니다.
+</Callout>
+
+<Callout type="info">
+**Q. 비밀번호를 잃어버린 경우 어떻게 하나요?**
+
+A. MongoDB Atlas의 데이터베이스 액세스에서 비밀번호를 재설정할 수 있습니다. 새 비밀번호로 새 사용자를 만들고 오래된 사용자를 삭제합니다.
+</Callout>
+
+---
+
+## 문제 해결
+
+### 확인 이메일을 받지 못했습니다
+
+- 스팸/정크 폴더를 확인합니다
+- 이메일 배송을 위해 몇 분 기다립니다
+- 가입 페이지에서 "확인 이메일 다시 보내기"를 클릭합니다
+- 다른 이메일로 다시 가입해봅시다
+
+### 클러스터 생성이 느립니다
+
+- 클러스터 프로비저닝은 1-3분이 걸릴 수 있습니다
+- 페이지를 새로고침하지 마세요 - 완료될 때까지 기다립니다
+- 5분 이상 지속되면 페이지를 새로고침해봅시다
+
+### 데이터베이스에 연결할 수 없습니다
+
+- 연결 문자열이 올바른지 확인합니다
+- 네트워크 액세스가 허용되는지 확인합니다
+- 데이터베이스 사용자가 존재하고 비밀번호가 올바른지 확인합니다
+- 프로덕션의 경우 어디서나 허용하는 대신 IP 화이트리스트를 구성합니다
+
+---
+
+**좋습니다!** MongoDB 데이터베이스가 준비되었습니다. 다음으로 첫 데이터베이스를 설정하고 데이터를 저장하기 시작합니다! 🚀

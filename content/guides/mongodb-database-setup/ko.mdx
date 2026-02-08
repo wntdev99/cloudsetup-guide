@@ -1,0 +1,299 @@
+# MongoDB 데이터베이스 설정 - 컬렉션 생성 및 데이터 삽입
+
+MongoDB 클러스터가 준비되었으니 이제 데이터베이스와 컬렉션을 만들어봅시다. 이 가이드에서는 데이터를 구조화하고 첫 문서를 삽입하는 방법을 배워봅니다. 소요 시간: 25분.
+
+<FreeTierInfo
+  service="MongoDB Atlas"
+  limit="512 MB 저장소"
+  period="월간"
+  status="generous"
+/>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "MongoDB 계정 설정 완료", required: true },
+  { text: "M0 클러스터 실행 중", required: true },
+  { text: "데이터베이스 사용자 생성", required: true },
+  { text: "연결 문자열", required: true }
+]} />
+
+<Callout type="info">
+📊 **MongoDB 구조**: MongoDB 계층구조: 클러스터 > 데이터베이스 > 컬렉션 > 문서. 데이터베이스는 컬렉션의 컨테이너이고 컬렉션은 JSON 문서를 포함합니다.
+</Callout>
+
+---
+
+<Step number={1} title="MongoDB 데이터 도구에 접근">
+
+1. **MongoDB Atlas 대시보드**에 로그인합니다.
+2. **클러스터 이름** (예: "Cluster0")을 클릭합니다.
+3. **컬렉션 찾아보기** 버튼을 클릭합니다.
+4. **MongoDB 데이터 도구** (시각적 데이터베이스 에디터)가 열립니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/mongodb/db-step1-data-tools-ko.png"
+  alt="MongoDB 데이터 도구 인터페이스"
+  caption="컬렉션 찾아보기는 시각적 데이터베이스 에디터를 엽니다"
+  priority={true}
+/>
+
+<Callout type="tip">
+💡 **팁**: MongoDB Shell이나 Compass (데스크톱 앱)를 사용하여 데이터베이스를 관리할 수도 있습니다. 데이터 도구는 초보자에게 가장 간단합니다.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="첫 데이터베이스 생성">
+
+1. **데이터베이스 생성** 버튼을 클릭합니다.
+2. **데이터베이스 이름**을 입력합니다 (예: "myshop").
+3. **컬렉션 이름**을 입력합니다 (예: "products").
+4. **생성** 버튼을 클릭합니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/mongodb/db-step2-create-db-ko.png"
+  alt="데이터베이스 생성 대화"
+  caption="초기 컬렉션이 있는 데이터베이스 생성"
+/>
+
+<DevTip>
+데이터베이스 이름은 소문자이고 설명적이어야 합니다. 컬렉션 이름은 복수형 명사여야 합니다 (products, users, orders, not product, user, order).
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="컬렉션에 샘플 문서 추가">
+
+이제 첫 데이터를 삽입할 것입니다. 컬렉션은 **문서** (JSON 객체)를 포함합니다.
+
+1. 컬렉션의 **문서 삽입** 버튼을 클릭합니다.
+2. 기본 내용을 당신의 문서로 바꿉니다. 다음은 예제 **제품**입니다:
+
+<CopyBlock
+  code="{
+  '_id': { '$oid': '507f1f77bcf86cd799439011' },
+  'name': '노트북',
+  'price': 999.99,
+  'category': '전자기기',
+  'inStock': true,
+  'tags': ['컴퓨터', '휴대용'],
+  'reviews': [
+    {
+      'author': 'John',
+      'rating': 5,
+      'comment': '훌륭한 제품'
+    }
+  ]
+}"
+  language="json"
+/>
+
+3. **삽입** 버튼을 클릭합니다.
+4. 첫 문서가 저장됩니다!
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/mongodb/db-step3-insert-doc-ko.png"
+  alt="MongoDB 문서 에디터"
+  caption="JSON 문서 - 유연한 구조, 고정 스키마 없음"
+/>
+
+<Callout type="info">
+ℹ️ **_id 필드**: 모든 문서에는 _id가 필요합니다. MongoDB가 자동으로 생성하지만 커스텀 ID를 설정할 수 있습니다.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="코드를 통해 더 많은 문서 삽입">
+
+컬렉션이 있으면 프로그래매틱하게 문서를 삽입할 수 있습니다. Node.js에서 연결하는 방법입니다:
+
+<CopyBlock
+  code="const { MongoClient } = require('mongodb');
+
+const uri = process.env.MONGODB_URI;
+const client = new MongoClient(uri);
+
+async function insertProducts() {
+  try {
+    await client.connect();
+    const db = client.db('myshop');
+    const collection = db.collection('products');
+
+    // 한 문서 삽입
+    const result = await collection.insertOne({
+      name: '키보드',
+      price: 89.99,
+      category: '전자기기',
+      inStock: true
+    });
+
+    console.log('삽입된 ID:', result.insertedId);
+
+    // 여러 문서 삽입
+    const results = await collection.insertMany([
+      { name: '마우스', price: 49.99, inStock: true },
+      { name: '모니터', price: 399.99, inStock: false }
+    ]);
+
+    console.log('삽입된 ID들:', results.insertedIds);
+  } finally {
+    await client.close();
+  }
+}
+
+insertProducts();"
+  language="javascript"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/mongodb/db-step4-code-insert-ko.png"
+  alt="Node.js MongoDB 삽입 코드"
+  caption="애플리케이션에서 프로그래매틱하게 문서 삽입"
+/>
+
+</Step>
+
+---
+
+<Step number={5} title="데이터 쿼리">
+
+찾기 쿼리를 사용하여 문서를 검색합니다. MongoDB 데이터 도구에서:
+
+1. 컬렉션 옆의 **찾기** 아이콘을 클릭합니다.
+2. (선택사항) 필터를 추가합니다. 예를 들어:
+
+<CopyBlock
+  code="{ 'inStock': true }"
+  language="json"
+/>
+
+3. **찾기**를 클릭하여 결과를 봅니다.
+
+**Node.js에서:**
+
+<CopyBlock
+  code="const { MongoClient } = require('mongodb');
+
+async function queryProducts() {
+  const client = new MongoClient(uri);
+  try {
+    await client.connect();
+    const db = client.db('myshop');
+    const products = db.collection('products');
+
+    // 모든 제품 찾기
+    const all = await products.find({}).toArray();
+    console.log('모든 제품:', all);
+
+    // 재고 있는 제품 찾기
+    const inStock = await products.find({ inStock: true }).toArray();
+    console.log('재고 있음:', inStock);
+
+    // 가격 범위로 찾기
+    const expensive = await products.find({
+      price: { '$gte': 500 }
+    }).toArray();
+    console.log('비싼 제품들:', expensive);
+  } finally {
+    await client.close();
+  }
+}
+
+queryProducts();"
+  language="javascript"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/mongodb/db-step5-query-ko.png"
+  alt="MongoDB 쿼리 결과"
+  caption="데이터를 쿼리하고 필터링"
+/>
+
+<Checkpoint
+  title="데이터베이스 설정 확인"
+  items={[
+    "데이터베이스를 만들었나요?",
+    "컬렉션을 볼 수 있나요?",
+    "문서를 삽입할 수 있나요?",
+    "문서를 쿼리할 수 있나요?",
+    "모든 제품을 볼 수 있나요?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **완료!** 이제 데이터가 있는 작동하는 MongoDB 데이터베이스가 있습니다. 문서를 삽입, 쿼리, 업데이트, 삭제할 수 있습니다. 데이터베이스는 프로덕션 사용 준비가 되었습니다 (무료 요금제의 소규모 프로젝트).
+</Callout>
+
+</Step>
+
+---
+
+## 다음 단계
+
+1. **MongoDB 쿼리 언어 배우기** - 복잡한 쿼리, 집계, 인덱싱
+2. **인덱스 설정** - 자주 쿼리되는 필드를 빠르게 합니다
+3. **트랜잭션 구현** - 여러 작업에 걸쳐 데이터 일관성 보장
+4. **모니터링 및 백업** - 백업 일정 및 모니터링 설정
+
+---
+
+## 자주 묻는 질문
+
+<Callout type="info">
+**Q. 데이터베이스와 컬렉션의 차이점은 무엇인가요?**
+
+A. 데이터베이스는 컬렉션의 컨테이너입니다. 컬렉션은 문서의 컨테이너입니다. 계층구조: 클러스터 > 데이터베이스 > 컬렉션 > 문서.
+</Callout>
+
+<Callout type="info">
+**Q. 컬렉션의 모든 문서가 같은 구조를 가져야 하나요?**
+
+A. 아니요! MongoDB는 스키마가 없습니다. 각 문서는 다른 필드를 가질 수 있습니다. 이 유연성은 MongoDB의 강점이지만 애플리케이션 코드에서 구조를 적용하세요.
+</Callout>
+
+<Callout type="info">
+**Q. 기존 문서를 어떻게 업데이트하나요?**
+
+A. updateOne 또는 updateMany를 사용합니다. 예: `db.products.updateOne({_id: id}, {$set: {price: 899}})`. MongoDB에는 다양한 업데이트 작업을 위해 $inc, $push, $pull 같은 연산자도 있습니다.
+</Callout>
+
+<Callout type="info">
+**Q. 문서를 어떻게 삭제하나요?**
+
+A. deleteOne 또는 deleteMany를 사용합니다. 예: `db.products.deleteOne({_id: id})`. deleteMany를 주의하세요 - 일치하는 모든 문서를 삭제합니다!
+</Callout>
+
+---
+
+## 문제 해결
+
+### 문서를 삽입할 수 없습니다
+
+- 연결 문자열이 올바른지 확인합니다
+- 데이터베이스 사용자에게 올바른 권한이 있는지 확인합니다
+- MongoDB Atlas에서 네트워크 액세스가 허용되는지 확인합니다
+- 먼저 데이터 도구에서 삽입해봅시다 (디버깅하기 더 쉬움)
+
+### 쿼리가 결과를 반환하지 않습니다
+
+- 필터가 데이터와 일치하는지 확인합니다
+- 문서 필드 이름을 확인합니다 (대소문자 구분)
+- 모든 문서를 보려면 간단한 find({})를 시도합니다
+- 컬렉션이 존재하는지 확인합니다
+
+### 앱에서 연결이 거부됩니다
+
+- MONGODB_URI 환경 변수가 올바르게 설정되어 있는지 확인합니다
+- MongoDB Atlas의 네트워크 액세스에서 IP가 화이트리스트에 있는지 확인합니다
+- 개발의 경우 IP를 명시적으로 추가하거나 "어디서나 허용" 사용
+
+---
+
+**좋은 일입니다!** MongoDB 데이터베이스가 완전히 작동합니다. 이 데이터로 애플리케이션을 구축하기 시작하세요! 🎉

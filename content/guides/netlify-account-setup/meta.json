@@ -1,0 +1,59 @@
+{
+  "slug": "netlify-account-setup",
+  "platform": "netlify",
+  "service": "Netlify Web Hosting",
+  "category": "deployment",
+  "difficulty": "beginner",
+  "estimatedMinutes": 10,
+  "totalSteps": 4,
+  "freeTier": {
+    "service": "Netlify",
+    "limit": "100 GB bandwidth/month",
+    "period": "monthly",
+    "amount": "Free",
+    "status": "generous",
+    "conditions": [
+      "100 GB bandwidth per month",
+      "Unlimited sites",
+      "Continuous deployment from Git",
+      "Free SSL certificates",
+      "Custom domains support",
+      "Environment variables",
+      "Redirect and rewrite rules"
+    ]
+  },
+  "prerequisites": [],
+  "nextGuides": [
+    "netlify-continuous-deployment-setup"
+  ],
+  "seo": {
+    "ko": {
+      "title": "Netlify 계정 만들기 - 웹사이트 배포 호스팅 | CloudSetup.guide",
+      "description": "Netlify 무료 계정을 만들고 GitHub과 연결하는 방법을 배워봅시다. 10분 안에 웹사이트 배포 준비를 할 수 있습니다.",
+      "keywords": [
+        "Netlify 계정",
+        "웹사이트 호스팅",
+        "정적 사이트 호스팅",
+        "GitHub 배포",
+        "CI/CD",
+        "무료 웹 호스팅"
+      ]
+    },
+    "en": {
+      "title": "Create Netlify Account - Web Hosting and Deployment | CloudSetup.guide",
+      "description": "Step-by-step guide to create a Netlify account and connect GitHub. Get started in 10 minutes.",
+      "keywords": [
+        "Netlify account",
+        "web hosting",
+        "static site hosting",
+        "GitHub deployment",
+        "CI/CD deployment",
+        "free web hosting"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z",
+  "published": true
+}

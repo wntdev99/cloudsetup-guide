@@ -1,0 +1,58 @@
+{
+  "slug": "mongodb-database-setup",
+  "platform": "mongodb",
+  "service": "MongoDB Databases and Collections",
+  "category": "database",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 25,
+  "totalSteps": 5,
+  "freeTier": {
+    "service": "MongoDB Atlas",
+    "limit": "512 MB storage",
+    "period": "monthly",
+    "amount": "Free",
+    "status": "generous",
+    "conditions": [
+      "Unlimited databases",
+      "Unlimited collections",
+      "Automatic backups",
+      "Query monitoring",
+      "Full MongoDB features",
+      "Connection pooling support"
+    ]
+  },
+  "prerequisites": [
+    "mongodb-account-setup"
+  ],
+  "nextGuides": [],
+  "seo": {
+    "ko": {
+      "title": "MongoDB 데이터베이스 설정 - 컬렉션 생성 및 데이터 삽입 | CloudSetup.guide",
+      "description": "MongoDB Atlas에서 데이터베이스를 만들고 컬렉션을 생성한 후 첫 데이터를 삽입하는 방법을 배워봅시다. 25분 안에 완료할 수 있습니다.",
+      "keywords": [
+        "MongoDB 데이터베이스",
+        "컬렉션 생성",
+        "데이터 삽입",
+        "MongoDB 설정",
+        "NoSQL 데이터",
+        "문서 지향 데이터베이스"
+      ]
+    },
+    "en": {
+      "title": "MongoDB Database Setup - Create Collections and Insert Data | CloudSetup.guide",
+      "description": "Learn how to create databases and collections in MongoDB Atlas and insert your first data. Complete setup in 25 minutes.",
+      "keywords": [
+        "MongoDB database",
+        "create collections",
+        "insert data",
+        "MongoDB setup",
+        "NoSQL data",
+        "document database"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z",
+  "published": true
+}

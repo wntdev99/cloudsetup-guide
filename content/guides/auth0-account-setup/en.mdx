@@ -1,0 +1,192 @@
+# Create Auth0 Account - Set Up Identity Management
+
+Auth0 is the **easiest way to add secure authentication** to your applications. The free tier supports up to 7,000 active users per month. Follow this guide to set up your account in 15 minutes.
+
+<FreeTierInfo
+  service="Auth0"
+  limit="7,000 active users/month"
+  period="monthly"
+  status="generous"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Email address", required: true },
+  { text: "Phone number (optional, for SMS MFA)", required: false }
+]} />
+
+<Callout type="info">
+🔐 **What is Auth0?** Auth0 is an authentication-as-a-service platform. Instead of building login yourself, Auth0 handles user signup, login, password resets, social logins (Google, GitHub, etc.), multi-factor authentication, and more.
+</Callout>
+
+---
+
+<Step number={1} title="Sign Up for Auth0">
+
+1. Visit [Auth0.com](https://auth0.com).
+2. Click **Sign Up** button.
+3. Choose how to sign up:
+   - Email address
+   - Google account
+   - GitHub account
+4. Enter your email and password (if using email).
+5. Click **Continue**.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/auth0/step1-signup-en.png"
+  alt="Auth0 signup page"
+  caption="Create your Auth0 account with email or social login"
+  priority={true}
+/>
+
+<Callout type="tip">
+💡 **Tip**: Using Google or GitHub signup is faster - no password to remember!
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Verify Your Email">
+
+1. Check your email inbox for the **Auth0 verification message**.
+2. Click the **Verify Your Email** link.
+3. You'll be redirected back to Auth0 - verification is complete!
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/auth0/step2-verify-email-en.png"
+  alt="Email verification screen"
+  caption="Auth0 sends a verification email - click the link to confirm"
+/>
+
+<Callout type="info">
+📧 **Email verification**: This confirms you own the email address. You won't receive marketing emails unless you opt in.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="Create Your Auth0 Tenant">
+
+After email verification, you'll be asked to create a **tenant** (your Auth0 account namespace).
+
+1. Enter your **tenant name** (e.g., "mycompany", "my-app").
+   - Must be unique across all Auth0 users
+   - Will be part of your Auth0 domain
+2. Select your **region**:
+   - US East
+   - Europe
+   - Australia
+3. Click **Create Tenant**.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/auth0/step3-tenant-en.png"
+  alt="Tenant creation form"
+  caption="Create your Auth0 tenant - this is your unique namespace"
+/>
+
+<DevTip>
+Choose a region close to where your users are located for better performance. You can have multiple tenants for development, staging, and production.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={4} title="Access Your Auth0 Dashboard">
+
+Congratulations! Your Auth0 account is ready.
+
+1. You'll see the **Auth0 Dashboard** - your management console.
+2. Your unique **Auth0 Domain** is displayed (e.g., `mycompany.us.auth0.com`).
+3. Note your **Client ID** - you'll need it when setting up applications.
+4. Start exploring the dashboard.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/auth0/step4-dashboard-en.png"
+  alt="Auth0 Dashboard home screen"
+  caption="Your Auth0 Dashboard - manage all authentication from here"
+/>
+
+<Checkpoint
+  title="Verify Account Creation"
+  items={[
+    "Is your email verified?",
+    "Did you create your Auth0 tenant?",
+    "Can you see your Auth0 Domain?",
+    "Do you see your Client ID in the dashboard?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **Complete!** Your Auth0 account is set up. In the next guide, you'll connect an application and set up login/signup flows.
+</Callout>
+
+</Step>
+
+---
+
+## What's Next
+
+Now that your Auth0 account is created:
+
+1. **[Auth0 Application Setup](../auth0-application-setup)** - Configure your first application
+2. **[Add Social Login](https://auth0.com/docs/connections/social)** - Enable Google, GitHub, etc.
+3. **[Customize Login Pages](https://auth0.com/docs/customize/universal-login)** - Brand your login experience
+
+---
+
+## Frequently Asked Questions
+
+<Callout type="info">
+**Q. How many users can I have on the free plan?**
+
+A. Up to 7,000 **active users per month**. This means users who log in during the month. It resets monthly, so you can have more than 7,000 total registered users.
+</Callout>
+
+<Callout type="info">
+**Q. What payment method is required?**
+
+A. No payment method is required for the free tier. The free plan is completely free with no credit card needed. Auth0 only charges if you exceed free tier limits.
+</Callout>
+
+<Callout type="info">
+**Q. Can I use Auth0 for a production app?**
+
+A. Yes! The free tier is perfect for production. Auth0 is used by major companies for production authentication.
+</Callout>
+
+<Callout type="info">
+**Q. What's a tenant?**
+
+A. A tenant is your isolated Auth0 account namespace. You can have multiple tenants for different environments (dev, staging, production) or different projects. Each tenant is completely separate.
+</Callout>
+
+---
+
+## Troubleshooting
+
+### Verification email not received
+
+- Check spam/junk folder
+- Wait a few minutes - email can be delayed
+- Click "Resend verification email" in the signup form
+- Make sure you entered the correct email address
+
+### Tenant name not available
+
+- The tenant name must be unique across all Auth0 users
+- Try adding numbers or hyphens: "mycompany-2", "mycompany-dev"
+- Check that you're entering it correctly (lowercase, no spaces)
+
+### Can't see Client ID
+
+- Go to Applications in the left sidebar
+- Click the "Default App" (created automatically)
+- The Client ID is in the Settings tab
+
+---
+
+**Great start!** You now have Auth0 ready. Next, set up your first application to add login to your website. 🚀

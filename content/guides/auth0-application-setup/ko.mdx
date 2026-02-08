@@ -1,0 +1,265 @@
+# Auth0 애플리케이션 설정 - 로그인 및 가입 구성
+
+Auth0 계정이 준비되었으니 이제 애플리케이션을 구성하고 웹사이트에 로그인/가입을 추가해봅시다. 이 가이드는 Auth0의 Universal Login으로 웹 애플리케이션을 설정하는 방법을 다룹니다. 소요 시간: 25분.
+
+<FreeTierInfo
+  service="Auth0"
+  limit="월 7,000명 활성 사용자"
+  period="월간"
+  status="generous"
+/>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "Auth0 계정 설정 완료", required: true },
+  { text: "Auth0 도메인 (예: mycompany.us.auth0.com)", required: true },
+  { text: "웹사이트 URL (개발용: http://localhost:3000)", required: true }
+]} />
+
+<Callout type="info">
+🎯 **Auth0 애플리케이션이란?** Auth0 애플리케이션은 웹사이트나 앱을 나타냅니다. Auth0에 등록하면 사용자가 Auth0의 로그인 페이지를 통해 인증할 수 있습니다.
+</Callout>
+
+---
+
+<Step number={1} title="Auth0 대시보드에서 새 애플리케이션 생성">
+
+1. **Auth0 대시보드**에 로그인합니다.
+2. 좌측 사이드바의 **애플리케이션**을 클릭합니다.
+3. **애플리케이션 생성** 버튼을 클릭합니다.
+4. **애플리케이션 이름**을 입력합니다 (예: "내 웹사이트", "내 앱").
+5. 애플리케이션 유형으로 **Regular Web Application**을 선택합니다.
+6. **생성** 버튼을 클릭합니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/auth0/app-step1-create-app-ko.png"
+  alt="Auth0 애플리케이션 생성 대화"
+  caption="웹사이트와 웹 앱에는 Regular Web Application을 선택합니다"
+  priority={true}
+/>
+
+<Callout type="tip">
+💡 **애플리케이션 유형**: Regular Web App (웹사이트), Single Page App (React/Vue), Native (모바일), Machine-to-Machine (서버). 프로젝트에 맞는 유형을 선택합니다.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="애플리케이션 설정 구성">
+
+1. 새 애플리케이션의 **설정** 탭을 클릭합니다.
+2. **클라이언트 ID**와 **클라이언트 시크릿**을 기록합니다 (코드에서 필요함).
+3. **애플리케이션 URI** 설정:
+   - **허용된 콜백 URL**: `http://localhost:3000/callback` (개발용)
+   - **허용된 로그아웃 URL**: `http://localhost:3000` (개발용)
+   - **허용된 웹 오리진**: `http://localhost:3000` (개발용)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/auth0/app-step2-settings-ko.png"
+  alt="Auth0 애플리케이션 설정"
+  caption="개발 및 프로덕션을 위해 애플리케이션 URI를 구성합니다"
+/>
+
+<DevTip>
+프로덕션의 경우 localhost:3000을 실제 도메인 (예: https://myapp.com, https://myapp.com/callback)으로 바꿉니다. 프로덕션에서는 항상 HTTPS를 사용합니다.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="기술 스택 선택 - SDK 설치">
+
+Auth0는 대부분의 프로그래밍 언어와 프레임워크를 지원합니다. 당신의 것을 선택합니다:
+
+**React/Next.js:**
+
+<CopyBlock
+  code="npm install @auth0/auth0-react"
+  language="bash"
+/>
+
+**Node.js/Express:**
+
+<CopyBlock
+  code="npm install express-openid-connect"
+  language="bash"
+/>
+
+**Python/Flask:**
+
+<CopyBlock
+  code="pip install flask-pyoidc"
+  language="bash"
+/>
+
+**PHP/Laravel:**
+
+<CopyBlock
+  code="composer require auth0/auth0-php"
+  language="bash"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/auth0/app-step3-install-sdks-ko.png"
+  alt="Auth0 SDK 설치"
+  caption="기술 스택에 맞는 Auth0 SDK를 설치합니다"
+/>
+
+<Callout type="info">
+📚 **전체 설명서**: 특정 프레임워크를 위해 [Auth0 설명서](https://auth0.com/docs)를 방문합니다. Auth0에는 대부분의 인기 프레임워크를 위한 공식 SDK가 있습니다.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="애플리케이션에서 Auth0 초기화">
+
+다음은 Node.js/Express를 사용한 기본 예제입니다. 다른 프레임워크는 Auth0 문서를 참조합니다:
+
+<CopyBlock
+  code="const { auth } = require('express-openid-connect');
+const express = require('express');
+
+const app = express();
+
+// Auth0 구성
+app.use(auth({
+  authRequired: false,
+  auth0Logout: true,
+  secret: process.env.AUTH0_SECRET,
+  baseURL: process.env.AUTH0_BASE_URL,
+  clientID: process.env.AUTH0_CLIENT_ID,
+  issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL,
+}));
+
+// 로그인 경로
+app.get('/login', (req, res) = {
+  res.oidc.login({ returnTo: '/' });
+});
+
+// 로그아웃 경로
+app.get('/logout', (req, res) = {
+  res.oidc.logout({ returnTo: '/' });
+});
+
+// 보호된 경로 - 로그인 필수
+app.get('/profile', (req, res) = {
+  if (req.oidc.isAuthenticated()) {
+    res.send('환영합니다 ' + req.oidc.user.name);
+  } else {
+    res.send('로그인 해주세요');
+  }
+});
+
+app.listen(3000, () = console.log('앱이 3000에서 실행 중'));"
+  language="javascript"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/auth0/app-step4-init-ko.png"
+  alt="Auth0 초기화 코드"
+  caption="애플리케이션에서 Auth0를 초기화합니다"
+/>
+
+</Step>
+
+---
+
+<Step number={5} title="로그인 및 가입 테스트">
+
+1. 애플리케이션을 시작합니다: `npm start` (또는 시작 명령).
+2. `http://localhost:3000/login`으로 이동합니다.
+3. **Auth0의 로그인 화면**이 표시됩니다.
+4. **가입**을 클릭하여 테스트 사용자를 생성합니다.
+5. 이메일과 비밀번호를 입력합니다.
+6. 가입 후 앱으로 리다이렉트됩니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/auth0/app-step5-login-screen-ko.png"
+  alt="Auth0 Universal Login 화면"
+  caption="Auth0의 Universal Login 페이지 - 사용자가 이를 통해 로그인/가입합니다"
+/>
+
+<Checkpoint
+  title="애플리케이션 설정 확인"
+  items={[
+    "Auth0 로그인 페이지를 볼 수 있나요?",
+    "새 사용자를 만들 수 있나요?",
+    "로그인 후 앱으로 리다이렉트되나요?",
+    "사용자 프로필 정보에 접근할 수 있나요?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **완료!** Auth0를 성공적으로 구성하고 웹사이트에 로그인/가입을 추가했습니다. 이제 사용자가 Auth0를 통해 가입하고 로그인할 수 있습니다.
+</Callout>
+
+</Step>
+
+---
+
+## 다음 단계
+
+1. **소셜 로그인 추가** - Google, GitHub, Facebook 로그인 활성화
+2. **로그인 페이지 커스터마이징** - 로고와 브랜딩 추가
+3. **사용자 역할 구현** - 인증된 사용자가 접근할 수 있는 내용 제어
+4. **다중 인증 설정** - 보안 강화
+
+---
+
+## 자주 묻는 질문
+
+<Callout type="info">
+**Q. 사용자 비밀번호는 어디에 저장되나요?**
+
+A. Auth0는 모든 사용자 비밀번호를 Auth0 데이터베이스에 안전하게 암호화하여 저장합니다. 앱은 비밀번호를 절대 볼 수 없습니다 - Auth0가 모든 비밀번호 해싱과 검증을 처리합니다.
+</Callout>
+
+<Callout type="info">
+**Q. 로그인 페이지를 커스터마이징할 수 있나요?**
+
+A. 예! Auth0의 로그인 페이지 (Universal Login)를 브랜딩, 색상, 커스텀 HTML로 커스터마이징할 수 있습니다. Auth0 대시보드의 커스터마이징 섹션을 참조합니다.
+</Callout>
+
+<Callout type="info">
+**Q. 로그인 후 사용자 정보를 어떻게 얻나요?**
+
+A. Auth0는 로그인 후 사용자 정보를 `user` 객체에 제공합니다. 이것에는 이름, 이메일, 사진 및 추가하는 커스텀 사용자 메타데이터가 포함됩니다.
+</Callout>
+
+<Callout type="info">
+**Q. 내 앱이 다른 프로그래밍 언어를 사용하는 경우 어떻게 하나요?**
+
+A. Auth0는 실질적으로 모든 인기 언어 (Python, PHP, Java, Ruby, Go 등)를 지원합니다. Auth0 설명서에서 공식 SDK를 찾습니다.
+</Callout>
+
+---
+
+## 문제 해결
+
+### 로그인 리다이렉트가 작동하지 않습니다
+
+- Auth0 설정의 콜백 URL이 코드와 일치하는지 확인합니다
+- 개발의 경우 `http://localhost:3000/callback` 사용
+- 프로덕션의 경우 `https://yourdomain.com/callback` 사용
+- localhost에는 http를 사용합니다 (https 아님)
+
+### 사용자가 생성되지 않습니다
+
+- Auth0 대시보드에서 가입이 활성화되어 있는지 확인합니다
+- 인증 > 연결 > 사용자 이름-비밀번호로 이동합니다
+- 데이터베이스 연결이 애플리케이션에 대해 활성화되어 있는지 확인합니다
+
+### 사용자 데이터가 표시되지 않습니다
+
+- 사용자가 로그인했는지 확인합니다 (`oidc.isAuthenticated()`가 참인지 확인)
+- 로그아웃 후 다시 로그인해봅시다
+- 브라우저 콘솔에서 오류를 확인합니다
+
+---
+
+**축하합니다!** 애플리케이션에 이제 안전한 인증이 있습니다. 다음으로 로그인 환경을 커스터마이징하고 소셜 로그인을 추가합니다! 🎉

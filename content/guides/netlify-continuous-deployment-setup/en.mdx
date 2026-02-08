@@ -1,0 +1,235 @@
+# Netlify Continuous Deployment - Set Up Automatic GitHub Deployments
+
+Netlify makes deployment **automatic and seamless**. Every time you push code to GitHub, your website automatically updates. Set up continuous deployment in just 20 minutes.
+
+<FreeTierInfo
+  service="Netlify"
+  limit="100 GB bandwidth/month"
+  period="monthly"
+  status="generous"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Netlify account set up", required: true },
+  { text: "GitHub account with a repository", required: true },
+  { text: "Repository with HTML/React/Next.js code", required: true }
+]} />
+
+<Callout type="info">
+🔄 **What is Continuous Deployment?** Every time you push code to GitHub, Netlify automatically builds and deploys your website. No manual steps needed - push and your site updates instantly.
+</Callout>
+
+---
+
+<Step number={1} title="Connect Your GitHub Repository to Netlify">
+
+1. Log in to **Netlify Dashboard**.
+2. Click **Add new site** button.
+3. Select **Import an existing project**.
+4. Choose **GitHub** as your Git provider.
+5. Select your **repository** from the list.
+6. Click **Deploy site**.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/netlify/deploy-step1-import-en.png"
+  alt="Import GitHub repository to Netlify"
+  caption="Select your repository from GitHub"
+  priority={true}
+/>
+
+<Callout type="tip">
+💡 **Tip**: If your repository doesn't appear, make sure GitHub access is authorized in your Netlify account settings.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Configure Build Settings">
+
+Netlify will auto-detect your build settings based on your project. Review them:
+
+1. **Base directory**: Usually blank (root of repo).
+2. **Build command**:
+   - React/Next.js: `npm run build`
+   - Static HTML: Leave blank
+   - Hugo: `hugo`
+3. **Publish directory**:
+   - React/Next.js: `out` or `build`
+   - Static HTML: `public` or `.`
+4. Click **Deploy site**.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/netlify/deploy-step2-settings-en.png"
+  alt="Build settings configuration"
+  caption="Configure build command and output directory"
+/>
+
+<CopyBlock
+  code="// Typical build settings for different frameworks:
+// React: npm run build - Output: build
+// Next.js: npm run build - Output: .next
+// Hugo: hugo - Output: public
+// Vue: npm run build - Output: dist
+// Static HTML: (no build) - Output: . or public"
+  language="text"
+/>
+
+</Step>
+
+---
+
+<Step number={3} title="Wait for Initial Deployment">
+
+Netlify starts building your site automatically. You'll see:
+
+1. **Build log** showing the deployment progress.
+2. **Status** changes from "Building" to "Published".
+3. Your **live URL** appears (e.g., `happy-kangaroo-123.netlify.app`).
+4. Click the **live URL** to view your deployed site.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/netlify/deploy-step3-building-en.png"
+  alt="Deployment build status"
+  caption="Watch your site build and deploy in real-time"
+/>
+
+<Callout type="info">
+⏳ **Build time**: First deployment takes 1-5 minutes depending on your project. Subsequent deployments are usually faster with caching.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="Test Automatic Deployments">
+
+Now test that deployments work automatically:
+
+1. Go back to your **GitHub repository**.
+2. Make a **small change** to your code (e.g., change a title in HTML).
+3. **Commit and push** to main branch:
+
+<CopyBlock
+  code="git add .
+git commit -m 'Test automatic deployment'
+git push origin main"
+  language="bash"
+/>
+
+4. Go back to Netlify dashboard.
+5. You should see a **new deployment started** automatically!
+6. Wait for it to complete (1-2 minutes).
+7. Refresh your live site - you'll see your changes!
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/netlify/deploy-step4-auto-deploy-en.png"
+  alt="Automatic deployment in progress"
+  caption="Every push to GitHub triggers automatic deployment"
+/>
+
+</Step>
+
+---
+
+<Step number={5} title="Configure Custom Domain and Production Settings">
+
+1. Click **Domain settings** in your Netlify site dashboard.
+2. (Optional) Click **Add custom domain** to use your own domain (mysite.com).
+3. Update DNS records with your domain provider.
+4. Netlify provides **free HTTPS** - enabled automatically.
+5. Your site is now production-ready!
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/netlify/deploy-step5-domain-en.png"
+  alt="Domain configuration"
+  caption="Add custom domain and enable HTTPS"
+/>
+
+<Checkpoint
+  title="Verify Continuous Deployment"
+  items={[
+    "Did your site deploy successfully?",
+    "Can you access the live URL?",
+    "Did automatic deployment trigger on your push?",
+    "Are HTTPS and SSL enabled?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **Complete!** Your site is now deployed on Netlify with automatic deployments from GitHub. Every push triggers a new deployment - no manual steps needed!
+</Callout>
+
+</Step>
+
+---
+
+## What's Next
+
+1. **Add custom domain** - Point your domain to Netlify
+2. **Set up environment variables** - Store API keys and secrets securely
+3. **Enable branch deployments** - Preview pull requests before merging
+4. **Configure redirects** - Set up URL rewrites and redirects
+
+---
+
+## Frequently Asked Questions
+
+<Callout type="info">
+**Q. How often are deployments triggered?**
+
+A. Every time you push to the main branch. Each push triggers a new build and deployment within seconds.
+</Callout>
+
+<Callout type="info">
+**Q. Can I test changes before deploying?**
+
+A. Yes! Netlify creates **preview deployments** for pull requests. You can test your changes before merging to main.
+</Callout>
+
+<Callout type="info">
+**Q. What if a deployment fails?**
+
+A. You can **instantly rollback** to a previous deployment. Just click "Trigger deploy" on any previous build in your deployment history.
+</Callout>
+
+<Callout type="info">
+**Q. Can I deploy from other branches?**
+
+A. Yes! Configure different branches to deploy to different URLs. Great for staging environments.
+</Callout>
+
+---
+
+## Troubleshooting
+
+### Build failed - needs npm dependencies
+
+- Make sure `package.json` is in your repository root
+- Ensure all dependencies are listed (npm install works locally)
+- Check build logs for specific error messages
+
+### Site shows 404 error after deploy
+
+- Verify your publish directory is correct
+- Check that the build output directory exists
+- For React/Next.js, confirm build command ran successfully
+
+### Automatic deployment didn't trigger
+
+- Verify GitHub integration is still authorized
+- Check that you pushed to the correct branch (main/master)
+- Look at "Deploys" tab for push event history
+- Try manually triggering deployment: click "Trigger deploy"
+
+### HTTPS not working
+
+- Wait a few minutes - SSL certificate generation takes time
+- Go to Domain settings and check HTTPS status
+- If manual domain, ensure DNS is pointing to Netlify
+
+---
+
+**Congratulations!** Your website is now deployed with continuous integration. Every push automatically updates your site! 🚀

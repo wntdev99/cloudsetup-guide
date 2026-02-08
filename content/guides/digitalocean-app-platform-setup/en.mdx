@@ -1,0 +1,229 @@
+# DigitalOcean App Platform Setup - Deploy Your App Automatically
+
+DigitalOcean App Platform makes it easy to **deploy applications directly from GitHub** without managing servers. Your app automatically deploys when you push code. Set up automatic deployment in 30 minutes.
+
+<FreeTierInfo
+  service="DigitalOcean App Platform"
+  limit="Included with $200 credits"
+  period="trial"
+  status="generous"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "DigitalOcean account with credits", required: true },
+  { text: "GitHub account with a repository", required: true },
+  { text: "Application code (Node.js, Python, etc.)", required: true }
+]} />
+
+<Callout type="info">
+🚀 **What is App Platform?** DigitalOcean App Platform is a Platform-as-a-Service (PaaS). You push code to GitHub, and App Platform automatically builds and deploys it. No server management needed.
+</Callout>
+
+---
+
+<Step number={1} title="Create New App in DigitalOcean">
+
+1. Log in to **DigitalOcean Control Panel**.
+2. Click **Apps** in the left sidebar.
+3. Click **Create App** button.
+4. You'll see the **app creation wizard**.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/digitalocean/app-step1-create-app-en.png"
+  alt="DigitalOcean App Platform creation"
+  caption="Start creating your app in DigitalOcean"
+  priority={true}
+/>
+
+<Callout type="tip">
+💡 **Tip**: App Platform requires your code to be in GitHub. Make sure your repository is public or you've connected your GitHub account.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Connect GitHub Repository">
+
+1. Select **GitHub** as your source.
+2. Authorize DigitalOcean to access your GitHub account.
+3. Select your **GitHub organization** or personal account.
+4. Choose your **repository**.
+5. Select the **branch** to deploy (usually "main" or "master").
+6. Click **Next**.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/digitalocean/app-step2-github-en.png"
+  alt="GitHub repository connection"
+  caption="Connect your GitHub repository to App Platform"
+/>
+
+<DevTip>
+Make sure your repository is public or DigitalOcean has access via GitHub authorization. Private repositories require proper OAuth setup.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="Configure App Settings">
+
+1. **Choose your application type**:
+   - Web Service (default)
+   - Static Site (HTML, CSS, JS)
+   - Workers (background jobs)
+2. **Set environment variables**:
+   - Database URLs
+   - API keys
+   - Other sensitive data
+3. **Configure build command** (if needed):
+   - For Node.js: `npm install && npm run build`
+   - For Python: `pip install -r requirements.txt`
+4. **Configure run command**:
+   - For Node.js: `npm start`
+   - For Python: `gunicorn app:app`
+5. Click **Next**.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/digitalocean/app-step3-config-en.png"
+  alt="App configuration settings"
+  caption="Configure build and run commands"
+/>
+
+<CopyBlock
+  code="// Example environment variables to set
+DATABASE_URL=postgresql://user:password@host:5432/dbname
+API_KEY=your_api_key_here
+NODE_ENV=production
+DEBUG=false"
+  language="text"
+/>
+
+</Step>
+
+---
+
+<Step number={4} title="Set App Name and Plan">
+
+1. Enter your **app name** (e.g., "my-awesome-app").
+2. Select your **region** (choose closest to your users).
+3. Choose the **plan**:
+   - Free plan (included with $200 credit)
+   - Starter plan ($12/month)
+4. Review your configuration.
+5. Click **Create Resources**.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/digitalocean/app-step4-plan-en.png"
+  alt="App name and plan selection"
+  caption="Choose app name, region, and plan"
+/>
+
+<Callout type="info">
+⏳ **Deployment time**: First deployment takes 5-10 minutes. DigitalOcean automatically builds your app and deploys it.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={5} title="View Deployed App and Set Custom Domain">
+
+1. Once deployment is complete, you'll see your app's **live URL**.
+2. Click the **Live App** link to view your deployed application.
+3. (Optional) Add a **custom domain**:
+   - Click **Domains** tab
+   - Click **Add Domain**
+   - Enter your domain (e.g., myapp.com)
+   - Follow DNS instructions
+4. Your app is live and **automatically redeploys** when you push to GitHub!
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/digitalocean/app-step5-deployed-en.png"
+  alt="Deployed app dashboard"
+  caption="Your app is live and ready to use"
+/>
+
+<Checkpoint
+  title="Verify App Deployment"
+  items={[
+    "Did the build complete successfully?",
+    "Can you see the Live App URL?",
+    "Does your app load in the browser?",
+    "Can you access the app's features?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **Complete!** Your app is deployed and live on DigitalOcean App Platform. Every time you push code to GitHub, it automatically rebuilds and redeploys. No manual deployments needed!
+</Callout>
+
+</Step>
+
+---
+
+## Next Steps
+
+1. **Push code to GitHub** - Watch automatic deployments happen
+2. **Add custom domain** - Use your own domain name
+3. **Set up databases** - Connect PostgreSQL or MySQL
+4. **View logs** - Debug issues with built-in logging
+
+---
+
+## Frequently Asked Questions
+
+<Callout type="info">
+**Q. Does it cost money after the trial?**
+
+A. Yes. After your $200 trial credits expire (in 60 days), App Platform charges $5-10 per month depending on your plan. You can delete your app to stop charges.
+</Callout>
+
+<Callout type="info">
+**Q. How do automatic deployments work?**
+
+A. When you push code to GitHub, a webhook notifies App Platform. App Platform automatically builds and deploys your code. Usually takes 2-5 minutes.
+</Callout>
+
+<Callout type="info">
+**Q. Can I use my own domain?**
+
+A. Yes! Add your domain in the Domains tab. You'll need to update your domain's DNS records to point to DigitalOcean.
+</Callout>
+
+<Callout type="info">
+**Q. What languages does App Platform support?**
+
+A. Node.js, Python, Go, Ruby, Java, PHP, and more. It detects your language from package.json, requirements.txt, etc.
+</Callout>
+
+---
+
+## Troubleshooting
+
+### Build failed
+
+- Check your build command in configuration
+- Verify all dependencies are in package.json or requirements.txt
+- Check app logs for specific error messages
+- Common issue: Missing environment variables
+
+### App not deploying on push
+
+- Verify GitHub authorization is still valid
+- Check that you're pushing to the correct branch
+- View deployment logs in App Platform
+- Trigger manual redeploy from dashboard
+
+### App deployed but showing error
+
+- Check app logs for runtime errors
+- Verify environment variables are set
+- Ensure database connections are correct
+- Test locally before pushing to GitHub
+
+---
+
+**Congratulations!** Your app is live on DigitalOcean. Every push to GitHub automatically deploys. Welcome to automated deployment! 🎉

@@ -1,0 +1,287 @@
+# 웹사이트에 Stripe 결제 통합하기
+
+Stripe 계정이 준비되었으니 이제 **웹사이트에 결제 기능**을 추가해봅시다. 이 가이드는 안전한 원클릭 결제를 위해 Stripe Checkout을 통합하는 방법을 다룹니다. 소요 시간: 30분.
+
+<FreeTierInfo
+  service="Stripe"
+  limit="거래당 2.9% + $0.30"
+  period="거래당"
+  status="standard"
+/>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "Stripe 계정 설정 완료", required: true },
+  { text: "Stripe 대시보드의 API 키", required: true },
+  { text: "기본 웹 개발 지식", required: false },
+  { text: "Node.js + Express (또는 웹 프레임워크)", required: false }
+]} />
+
+<Callout type="info">
+📝 **어떤 통합 방식을 선택할까요?** Stripe는 여러 결제 방식을 제공합니다. 이 가이드는 **Stripe Checkout** (가장 쉬움, 초보자 권장)을 다룹니다. 필요에 따라 Stripe Elements를 선택할 수 있습니다.
+</Callout>
+
+---
+
+<Step number={1} title="Stripe 대시보드에서 API 키 얻기">
+
+1. **Stripe 대시보드**에 로그인합니다.
+2. 좌측 사이드바의 **개발자** 메뉴를 클릭합니다.
+3. 개발자 메뉴에서 **API 키**를 클릭합니다.
+4. 두 가지 키를 볼 수 있습니다:
+   - **공개 가능 키** (pk_로 시작)
+   - **비밀 키** (sk_로 시작)
+5. **공개 가능 키**를 복사하여 웹사이트에서 사용합니다.
+6. **비밀 키는 절대 공개하지 마세요** - 서버에만 보관하세요.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/stripe/integration-step1-api-keys-ko.png"
+  alt="Stripe 대시보드의 API 키"
+  caption="API 키는 개발자 메뉴에 있습니다 - 비밀 키는 항상 보호하세요"
+/>
+
+<Callout type="warning">
+🔒 **보안 경고**: 비밀 키는 모든 Stripe 데이터에 접근할 수 있습니다. 공개 코드에 절대 넣지 마세요. 환경 변수로 서버에 저장하세요.
+</Callout>
+
+<CopyBlock
+  code="// 공개 코드에서 절대 하지 마세요
+const secretKey = 'sk_live_xxxxx'; // 잘못됨!
+
+// 대신 환경 변수를 사용하세요
+const secretKey = process.env.STRIPE_SECRET_KEY; // 올바름"
+  language="javascript"
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="Stripe 라이브러리 설치">
+
+기술 스택을 선택하고 해당하는 Stripe 라이브러리를 설치합니다.
+
+**Node.js/Express:**
+
+<CopyBlock
+  code="npm install stripe"
+  language="bash"
+/>
+
+**Next.js:**
+
+<CopyBlock
+  code="npm install @stripe/react-stripe-js @stripe/js"
+  language="bash"
+/>
+
+**일반 JavaScript:**
+
+<CopyBlock
+  code="// CDN을 통해 Stripe.js 포함
+script src='https://js.stripe.com/v3/' /script"
+  language="html"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/stripe/integration-step2-install-ko.png"
+  alt="NPM install stripe 명령"
+  caption="프로젝트에 Stripe 라이브러리 설치"
+/>
+
+<DevTip>
+공식 Stripe 라이브러리(stripe, @stripe/react-stripe-js)를 사용하면 최신 보안과 기능을 보장합니다.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="간단한 Checkout 세션 생성">
+
+Stripe Checkout 세션을 생성하는 백엔드 끝점을 만듭니다. Express를 사용한 기본 예제입니다:
+
+<CopyBlock
+  code="const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const express = require('express');
+const app = express();
+
+app.post('/create-checkout-session', async (req, res) = {
+  try {
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: 'T-Shirt',
+            },
+            unit_amount: 2000, // 20달러
+          },
+          quantity: 1,
+        },
+      ],
+      mode: 'payment',
+      success_url: 'https://yourdomain.com/success',
+      cancel_url: 'https://yourdomain.com/cancel',
+    });
+    res.json({ id: session.id });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.listen(3000, () = console.log('Server running'));"
+  language="javascript"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/stripe/integration-step3-checkout-ko.png"
+  alt="Checkout 세션 생성 코드"
+  caption="Stripe checkout 세션을 생성하는 백엔드 끝점"
+/>
+
+<Callout type="tip">
+💡 **Checkout 세션이란?** Stripe가 호스팅하는 안전한 결제 양식의 URL입니다. 고객은 절대 당신의 웹사이트에 카드 정보를 입력하지 않습니다.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="웹사이트에 Checkout 버튼 추가">
+
+프론트엔드에서 사용자를 checkout 세션으로 리다이렉트하는 버튼을 추가합니다:
+
+<CopyBlock
+  code="// Stripe 초기화
+const stripe = Stripe('pk_test_xxxxx'); // 공개 가능 키
+
+// checkout 버튼 클릭 처리
+document.getElementById('checkout-btn').addEventListener('click', async () = {
+  const response = await fetch('/create-checkout-session', {
+    method: 'POST',
+  });
+  const data = await response.json();
+
+  // Stripe Checkout으로 리다이렉트
+  await stripe.redirectToCheckout({ sessionId: data.id });
+});
+
+// HTML
+button id='checkout-btn' 지금 구매 button"
+  language="javascript"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/stripe/integration-step4-button-ko.png"
+  alt="Checkout 버튼 구현"
+  caption="Stripe Checkout으로 리다이렉트하는 버튼 추가"
+/>
+
+<Callout type="info">
+✅ **Checkout 테스트하기**: 테스트 모드에서는 카드 번호 **4242 4242 4242 4242**를 사용합니다.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={5} title="결제 테스트 및 주문 모니터링">
+
+1. 테스트 웹사이트의 **Checkout 버튼**을 클릭합니다.
+2. 테스트 카드 입력: `4242 4242 4242 4242`
+3. 미래 만료 날짜 입력 (예: 12/26).
+4. 임의의 3자리 CVC 입력 (예: 123).
+5. **결제** 버튼을 클릭합니다.
+6. 성공 페이지를 볼 수 있어야 합니다.
+7. Stripe 대시보드에서 **결제**로 이동하여 테스트 거래를 확인합니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/stripe/integration-step5-payments-ko.png"
+  alt="Stripe 대시보드 결제 목록"
+  caption="모든 결제가 결제 섹션에 나타납니다"
+/>
+
+<Checkpoint
+  title="통합 확인"
+  items={[
+    "테스트 결제가 완료되었나요?",
+    "Stripe 대시보드에서 결제를 볼 수 있나요?",
+    "결제 후 성공 페이지가 로드되었나요?",
+    "결제가 20달러(또는 설정 금액)로 표시되나요?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **결제 통합 완료!** 웹사이트에 Stripe 결제를 성공적으로 추가했습니다. 실제 고객을 받을 준비가 되면 라이브 모드로 전환하세요.
+</Callout>
+
+</Step>
+
+---
+
+## 다음 단계
+
+1. **웹훅 설정** - 성공한 결제, 실패, 환불 등의 결제 이벤트 처리
+2. **에러 처리 구현** - 결제 실패 시 명확한 메시지 표시
+3. **주문 추적 추가** - 주문을 데이터베이스에 저장
+4. **라이브 전환** - 테스트 모드에서 라이브 모드로 전환
+
+---
+
+## 자주 묻는 질문
+
+<Callout type="info">
+**Q. 테스트 모드와 라이브 모드의 차이점은 뭔가요?**
+
+A. 테스트 모드는 개발을 위해 가짜 결제를 사용합니다. 라이브 모드는 실제 신용카드를 처리하고 실제 돈을 청구합니다. 실제 고객을 받을 준비가 될 때만 라이브 모드로 전환하세요.
+</Callout>
+
+<Callout type="info">
+**Q. 결제가 실패하면 어떻게 처리하나요?**
+
+A. Stripe의 에러 처리와 웹훅을 사용합니다. 결제가 실패하면 Stripe가 에러 코드를 반환합니다. 재시도 로직을 구현하고 사용자에게 문제를 알립니다.
+</Callout>
+
+<Callout type="info">
+**Q. 고객이 나중에 사용할 수 있도록 카드를 저장할 수 있나요?**
+
+A. 예! Stripe Checkout에서 [카드 저장 옵션]을 활성화하거나 Payment Methods API를 사용하세요. 추가 설정이 필요합니다.
+</Callout>
+
+<Callout type="info">
+**Q. 환불을 어떻게 처리하나요?**
+
+A. Stripe 대시보드에서 결제를 클릭하고 **환불** 버튼을 클릭합니다. 부분 환불 또는 전체 환불을 할 수 있습니다. 프로그래매틱 환불은 Stripe API를 사용합니다.
+</Callout>
+
+---
+
+## 문제 해결
+
+### 결제 버튼이 작동하지 않습니다
+
+- 공개 가능 키가 올바른지 확인하세요
+- 백엔드 끝점이 실행 중이고 접근 가능한지 확인하세요
+- 브라우저 콘솔에서 JavaScript 오류를 확인하세요
+- 프론트엔드와 백엔드가 다른 도메인에 있는 경우 CORS 설정을 확인하세요
+
+### Stripe.js가 정의되지 않습니다
+
+- CDN 또는 npm을 통해 Stripe.js 라이브러리를 포함했는지 확인하세요
+- 스크립트 태그 또는 import 문이 올바른지 확인하세요
+- Next.js에서는 @stripe/react-stripe-js 라이브러리를 사용하세요
+
+### Checkout 세션이 생성되지 않습니다
+
+- 환경 변수의 비밀 키가 올바른지 확인하세요
+- 백엔드 끝점이 POST 요청을 받고 있는지 확인하세요
+- 서버 로그에서 오류 메시지를 확인하세요
+- curl로 테스트: `curl -X POST http://localhost:3000/create-checkout-session`
+
+---
+
+**축하합니다!** 이제 작동하는 Stripe 결제 시스템이 있습니다. 다음으로 웹훅을 설정하여 모든 결제 이벤트를 자동으로 처리하세요. 🎉

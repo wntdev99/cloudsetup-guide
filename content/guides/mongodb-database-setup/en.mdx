@@ -1,0 +1,299 @@
+# MongoDB Database Setup - Create Collections and Insert Data
+
+Now that you have a MongoDB cluster, let's create databases and collections. In this guide, you'll learn to structure your data and insert your first documents. Estimated time: 25 minutes.
+
+<FreeTierInfo
+  service="MongoDB Atlas"
+  limit="512 MB storage"
+  period="monthly"
+  status="generous"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Completed MongoDB account setup", required: true },
+  { text: "M0 cluster running", required: true },
+  { text: "Database user created", required: true },
+  { text: "Connection string", required: true }
+]} />
+
+<Callout type="info">
+📊 **MongoDB Structure**: MongoDB hierarchy: Cluster > Database > Collection > Document. A database is a container for collections, and a collection contains JSON documents.
+</Callout>
+
+---
+
+<Step number={1} title="Access MongoDB Data Tools">
+
+1. Log in to **MongoDB Atlas Dashboard**.
+2. Click on your **cluster name** (e.g., "Cluster0").
+3. Click the **Browse Collections** button.
+4. This opens **MongoDB Data Tools** - your visual database editor.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/mongodb/db-step1-data-tools-en.png"
+  alt="MongoDB Data Tools interface"
+  caption="Browse Collections opens the visual database editor"
+  priority={true}
+/>
+
+<Callout type="tip">
+💡 **Tip**: You can also use MongoDB Shell or Compass (desktop app) to manage databases. Data Tools is the simplest for beginners.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Create Your First Database">
+
+1. Click **Create Database** button.
+2. Enter **Database name** (e.g., "myshop").
+3. Enter **Collection name** (e.g., "products").
+4. Click **Create**.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/mongodb/db-step2-create-db-en.png"
+  alt="Create database dialog"
+  caption="Create database with initial collection"
+/>
+
+<DevTip>
+Database names should be lowercase and descriptive. Collection names should be plural nouns (products, users, orders, not product, user, order).
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="Add Sample Documents to Your Collection">
+
+Now you'll insert your first data. Collections contain **documents** (JSON objects).
+
+1. Click **Insert Document** button in your collection.
+2. Replace the default content with your document. Here's an example **product**:
+
+<CopyBlock
+  code="{
+  '_id': { '$oid': '507f1f77bcf86cd799439011' },
+  'name': 'Laptop',
+  'price': 999.99,
+  'category': 'electronics',
+  'inStock': true,
+  'tags': ['computers', 'portable'],
+  'reviews': [
+    {
+      'author': 'John',
+      'rating': 5,
+      'comment': 'Great product'
+    }
+  ]
+}"
+  language="json"
+/>
+
+3. Click **Insert** button.
+4. Your first document is saved!
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/mongodb/db-step3-insert-doc-en.png"
+  alt="MongoDB document editor"
+  caption="JSON documents - flexible structure, no fixed schema"
+/>
+
+<Callout type="info">
+ℹ️ **_id field**: Every document needs an _id. MongoDB generates it automatically, but you can set custom IDs.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="Insert More Documents via Code">
+
+Once you have a collection, you can insert documents programmatically. Here's how to connect from Node.js:
+
+<CopyBlock
+  code="const { MongoClient } = require('mongodb');
+
+const uri = process.env.MONGODB_URI;
+const client = new MongoClient(uri);
+
+async function insertProducts() {
+  try {
+    await client.connect();
+    const db = client.db('myshop');
+    const collection = db.collection('products');
+
+    // Insert one document
+    const result = await collection.insertOne({
+      name: 'Keyboard',
+      price: 89.99,
+      category: 'electronics',
+      inStock: true
+    });
+
+    console.log('Inserted ID:', result.insertedId);
+
+    // Insert multiple documents
+    const results = await collection.insertMany([
+      { name: 'Mouse', price: 49.99, inStock: true },
+      { name: 'Monitor', price: 399.99, inStock: false }
+    ]);
+
+    console.log('Inserted IDs:', results.insertedIds);
+  } finally {
+    await client.close();
+  }
+}
+
+insertProducts();"
+  language="javascript"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/mongodb/db-step4-code-insert-en.png"
+  alt="Node.js MongoDB insert code"
+  caption="Insert documents programmatically from your application"
+/>
+
+</Step>
+
+---
+
+<Step number={5} title="Query Your Data">
+
+Retrieve documents using find queries. In MongoDB Data Tools:
+
+1. Click the **Find** icon next to your collection.
+2. (Optional) Add a filter for example:
+
+<CopyBlock
+  code="{ 'inStock': true }"
+  language="json"
+/>
+
+3. Click **Find** to see results.
+
+**From Node.js:**
+
+<CopyBlock
+  code="const { MongoClient } = require('mongodb');
+
+async function queryProducts() {
+  const client = new MongoClient(uri);
+  try {
+    await client.connect();
+    const db = client.db('myshop');
+    const products = db.collection('products');
+
+    // Find all products
+    const all = await products.find({}).toArray();
+    console.log('All products:', all);
+
+    // Find inStock products
+    const inStock = await products.find({ inStock: true }).toArray();
+    console.log('In stock:', inStock);
+
+    // Find by price range
+    const expensive = await products.find({
+      price: { '$gte': 500 }
+    }).toArray();
+    console.log('Expensive products:', expensive);
+  } finally {
+    await client.close();
+  }
+}
+
+queryProducts();"
+  language="javascript"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/mongodb/db-step5-query-en.png"
+  alt="MongoDB query results"
+  caption="Query and filter your data"
+/>
+
+<Checkpoint
+  title="Verify Database Setup"
+  items={[
+    "Did you create a database?",
+    "Can you see your collection?",
+    "Can you insert a document?",
+    "Can you query documents?",
+    "Can you see all your products?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **Complete!** You now have a working MongoDB database with data. You can insert, query, update, and delete documents. Your database is ready for production use (for small projects on free tier).
+</Callout>
+
+</Step>
+
+---
+
+## Next Steps
+
+1. **Learn MongoDB Query Language** - Complex queries, aggregation, indexing
+2. **Set up indexes** - Speed up frequently queried fields
+3. **Implement transactions** - For data consistency across multiple operations
+4. **Monitor and backup** - Set up backup schedules and monitoring
+
+---
+
+## Frequently Asked Questions
+
+<Callout type="info">
+**Q. What's the difference between a database and a collection?**
+
+A. Database is a container for collections. Collection is a container for documents. Hierarchy: Cluster > Database > Collection > Document.
+</Callout>
+
+<Callout type="info">
+**Q. Do all documents in a collection need the same structure?**
+
+A. No! MongoDB is schema-less. Each document can have different fields. This flexibility is MongoDB's strength, but enforce structure in your application code.
+</Callout>
+
+<Callout type="info">
+**Q. How do I update an existing document?**
+
+A. Use updateOne or updateMany. Example: `db.products.updateOne({_id: id}, {$set: {price: 899}})`. MongoDB also has operators like $inc, $push, $pull for different update operations.
+</Callout>
+
+<Callout type="info">
+**Q. How do I delete documents?**
+
+A. Use deleteOne or deleteMany. Example: `db.products.deleteOne({_id: id})`. Be careful with deleteMany - it deletes all matching documents!
+</Callout>
+
+---
+
+## Troubleshooting
+
+### Can't insert documents
+
+- Verify your connection string is correct
+- Check that your database user has the right permissions
+- Ensure network access is allowed in MongoDB Atlas
+- Try inserting from Data Tools first (easier to debug)
+
+### Query returns no results
+
+- Verify the filter matches your data
+- Check document field names (case-sensitive)
+- Try a simple find({}) to see all documents
+- Check if the collection exists
+
+### Connection refused from my app
+
+- Verify MONGODB_URI environment variable is set correctly
+- Check that your IP is whitelisted in Network Access
+- For development, add your IP explicitly or use "Allow anywhere"
+
+---
+
+**Great job!** Your MongoDB database is fully functional. Start building your application with this data! 🎉

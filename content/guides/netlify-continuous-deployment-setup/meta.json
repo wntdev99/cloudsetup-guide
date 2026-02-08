@@ -1,0 +1,61 @@
+{
+  "slug": "netlify-continuous-deployment-setup",
+  "platform": "netlify",
+  "service": "Netlify Continuous Deployment",
+  "category": "deployment",
+  "difficulty": "beginner",
+  "estimatedMinutes": 20,
+  "totalSteps": 5,
+  "freeTier": {
+    "service": "Netlify",
+    "limit": "100 GB bandwidth/month",
+    "period": "monthly",
+    "amount": "Free",
+    "status": "generous",
+    "conditions": [
+      "Automatic Git deployments",
+      "100 GB bandwidth per month",
+      "Pull request previews",
+      "Instant rollbacks",
+      "Environment variables",
+      "Netlify CLI for local testing",
+      "Build hooks and webhooks"
+    ]
+  },
+  "prerequisites": [
+    "netlify-account-setup"
+  ],
+  "nextGuides": [],
+  "seo": {
+    "ko": {
+      "title": "Netlify 연속 배포 설정 - GitHub 자동 배포 | CloudSetup.guide",
+      "description": "Netlify와 GitHub을 연결하여 자동 배포를 설정하는 방법을 배워봅시다. 20분 안에 완료할 수 있습니다.",
+      "keywords": [
+        "연속 배포",
+        "GitHub 배포",
+        "자동 배포",
+        "CI/CD",
+        "Netlify 배포",
+        "웹사이트 배포",
+        "Git 배포"
+      ]
+    },
+    "en": {
+      "title": "Netlify Continuous Deployment - Automatic GitHub Deployment | CloudSetup.guide",
+      "description": "Learn how to set up automatic deployments from GitHub to Netlify. Complete setup in 20 minutes.",
+      "keywords": [
+        "continuous deployment",
+        "GitHub deployment",
+        "automatic deployment",
+        "CI/CD",
+        "Netlify deployment",
+        "website deployment",
+        "Git deployment"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z",
+  "published": true
+}

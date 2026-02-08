@@ -1,0 +1,60 @@
+{
+  "slug": "auth0-application-setup",
+  "platform": "auth0",
+  "service": "Auth0 Application Configuration",
+  "category": "auth",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 25,
+  "totalSteps": 5,
+  "freeTier": {
+    "service": "Auth0",
+    "limit": "7,000 active users per month",
+    "period": "monthly",
+    "amount": "Free",
+    "status": "generous",
+    "conditions": [
+      "Unlimited applications",
+      "Multi-factor authentication",
+      "Social login support",
+      "Custom domain support",
+      "Rules and actions for custom logic",
+      "Community support"
+    ]
+  },
+  "prerequisites": [
+    "auth0-account-setup"
+  ],
+  "nextGuides": [],
+  "seo": {
+    "ko": {
+      "title": "Auth0 애플리케이션 설정 - 로그인 및 가입 구성 | CloudSetup.guide",
+      "description": "Auth0 애플리케이션을 설정하고 웹사이트에 로그인 및 가입 플로우를 추가하는 방법을 배워봅시다. 25분 안에 완료할 수 있습니다.",
+      "keywords": [
+        "Auth0 애플리케이션",
+        "로그인 설정",
+        "사용자 가입",
+        "Auth0 통합",
+        "Universal Login",
+        "사용자 인증 플로우",
+        "웹 애플리케이션 설정"
+      ]
+    },
+    "en": {
+      "title": "Configure Auth0 Application - Set Up Login and Signup | CloudSetup.guide",
+      "description": "Learn how to configure an Auth0 application and add login/signup flows to your website. Complete setup in 25 minutes.",
+      "keywords": [
+        "Auth0 application setup",
+        "login configuration",
+        "user signup",
+        "Auth0 integration",
+        "Universal Login",
+        "authentication flow",
+        "web application setup"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z",
+  "published": true
+}

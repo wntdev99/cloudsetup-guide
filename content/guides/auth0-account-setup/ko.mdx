@@ -1,0 +1,192 @@
+# Auth0 계정 만들기 - ID 관리 플랫폼 설정
+
+Auth0는 **애플리케이션에 안전한 인증을 추가하는 가장 쉬운 방법**입니다. 무료 요금제는 월 최대 7000명의 활성 사용자를 지원합니다. 이 가이드를 따라 15분 안에 계정을 설정합니다.
+
+<FreeTierInfo
+  service="Auth0"
+  limit="월 7,000명 활성 사용자"
+  period="월간"
+  status="generous"
+/>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "이메일 주소", required: true },
+  { text: "전화번호 (선택, SMS 다중 인증용)", required: false }
+]} />
+
+<Callout type="info">
+🔐 **Auth0란 무엇인가요?** Auth0는 인증-as-a-서비스 플랫폼입니다. 직접 로그인을 만드는 대신 Auth0가 사용자 가입, 로그인, 비밀번호 재설정, 소셜 로그인 (Google, GitHub 등), 다중 인증 등을 처리합니다.
+</Callout>
+
+---
+
+<Step number={1} title="Auth0에 가입">
+
+1. [Auth0.com](https://auth0.com)을 방문합니다.
+2. **가입** 버튼을 클릭합니다.
+3. 가입 방법을 선택합니다:
+   - 이메일 주소
+   - Google 계정
+   - GitHub 계정
+4. 이메일과 비밀번호를 입력합니다 (이메일 사용 시).
+5. **계속** 버튼을 클릭합니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/auth0/step1-signup-ko.png"
+  alt="Auth0 가입 페이지"
+  caption="이메일 또는 소셜 로그인으로 Auth0 계정을 만드세요"
+  priority={true}
+/>
+
+<Callout type="tip">
+💡 **팁**: Google 또는 GitHub로 가입하면 더 빠릅니다 - 비밀번호를 기억할 필요가 없습니다!
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="이메일 확인">
+
+1. 이메일 받은편지함에서 **Auth0 확인 메시지**를 확인합니다.
+2. **이메일 확인** 링크를 클릭합니다.
+3. Auth0으로 리다이렉트됩니다 - 확인이 완료됩니다!
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/auth0/step2-verify-email-ko.png"
+  alt="이메일 확인 화면"
+  caption="Auth0가 확인 이메일을 보냅니다 - 링크를 클릭하여 확인하세요"
+/>
+
+<Callout type="info">
+📧 **이메일 확인**: 이메일 주소 소유권을 확인합니다. 옵트인하지 않으면 마케팅 이메일을 받지 않습니다.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="Auth0 테넌트 생성">
+
+이메일 확인 후 **테넌트** (Auth0 계정 네임스페이스) 생성을 요청받습니다.
+
+1. **테넌트 이름**을 입력합니다 (예: "mycompany", "my-app").
+   - 모든 Auth0 사용자에 대해 고유해야 합니다
+   - Auth0 도메인의 일부가 됩니다
+2. **지역**을 선택합니다:
+   - US East
+   - Europe
+   - Australia
+3. **테넌트 생성** 버튼을 클릭합니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/auth0/step3-tenant-ko.png"
+  alt="테넌트 생성 양식"
+  caption="Auth0 테넌트를 생성하세요 - 이것이 고유한 네임스페이스입니다"
+/>
+
+<DevTip>
+사용자가 많은 지역에 가까운 지역을 선택하면 더 나은 성능을 얻을 수 있습니다. 개발, 스테이징, 프로덕션을 위해 여러 테넌트를 가질 수 있습니다.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={4} title="Auth0 대시보드 접근">
+
+축하합니다! Auth0 계정이 준비되었습니다.
+
+1. **Auth0 대시보드** - 관리 콘솔을 볼 수 있습니다.
+2. 고유한 **Auth0 도메인**이 표시됩니다 (예: `mycompany.us.auth0.com`).
+3. **클라이언트 ID**를 기록하세요 - 애플리케이션을 설정할 때 필요합니다.
+4. 대시보드를 둘러보세요.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/auth0/step4-dashboard-ko.png"
+  alt="Auth0 대시보드 홈 화면"
+  caption="Auth0 대시보드 - 여기서 모든 인증을 관리합니다"
+/>
+
+<Checkpoint
+  title="계정 생성 확인"
+  items={[
+    "이메일이 확인되었나요?",
+    "Auth0 테넌트를 만들었나요?",
+    "Auth0 도메인을 볼 수 있나요?",
+    "대시보드에 클라이언트 ID가 표시되나요?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **완료!** Auth0 계정이 설정되었습니다. 다음 가이드에서는 애플리케이션을 연결하고 로그인/가입 플로우를 설정합니다.
+</Callout>
+
+</Step>
+
+---
+
+## 다음 단계
+
+Auth0 계정이 생성되었으니:
+
+1. **[Auth0 애플리케이션 설정](../auth0-application-setup)** - 첫 애플리케이션 구성하기
+2. **[소셜 로그인 추가](https://auth0.com/docs/connections/social)** - Google, GitHub 등 활성화
+3. **[로그인 페이지 커스터마이징](https://auth0.com/docs/customize/universal-login)** - 로그인 환경을 브랜드합니다
+
+---
+
+## 자주 묻는 질문
+
+<Callout type="info">
+**Q. 무료 요금제에 사용자는 몇 명까지 가능한가요?**
+
+A. 월 최대 7,000명의 **활성 사용자**입니다. 이것은 그 달에 로그인한 사용자를 의미합니다. 월간으로 재설정되므로 총 7,000명 이상의 등록 사용자를 가질 수 있습니다.
+</Callout>
+
+<Callout type="info">
+**Q. 무료 요금제에서 결제 방법이 필요한가요?**
+
+A. 아니요. 무료 요금제는 완전히 무료이며 신용카드가 필요하지 않습니다. Auth0는 무료 요금제 제한을 초과할 때만 비용을 청구합니다.
+</Callout>
+
+<Callout type="info">
+**Q. 프로덕션 앱에 Auth0를 사용할 수 있나요?**
+
+A. 네! 무료 요금제는 프로덕션에 완벽합니다. Auth0는 주요 회사들이 프로덕션 인증에 사용합니다.
+</Callout>
+
+<Callout type="info">
+**Q. 테넌트란 무엇인가요?**
+
+A. 테넌트는 격리된 Auth0 계정 네임스페이스입니다. 다른 환경 (개발, 스테이징, 프로덕션) 또는 다른 프로젝트를 위해 여러 테넌트를 가질 수 있습니다. 각 테넌트는 완전히 분리되어 있습니다.
+</Callout>
+
+---
+
+## 문제 해결
+
+### 확인 이메일을 받지 못했습니다
+
+- 스팸/정크 폴더를 확인합니다
+- 잠시 기다립니다 - 이메일은 지연될 수 있습니다
+- 가입 양식에서 "확인 이메일 다시 보내기"를 클릭합니다
+- 올바른 이메일 주소를 입력했는지 확인합니다
+
+### 테넌트 이름을 사용할 수 없습니다
+
+- 테넌트 이름은 모든 Auth0 사용자에 대해 고유해야 합니다
+- 숫자나 하이픈을 추가해 봅시다: "mycompany-2", "mycompany-dev"
+- 올바르게 입력했는지 확인하세요 (소문자, 공백 없음)
+
+### 클라이언트 ID를 볼 수 없습니다
+
+- 좌측 사이드바의 애플리케이션으로 이동합니다
+- "기본 앱" (자동으로 생성됨)을 클릭합니다
+- 클라이언트 ID는 설정 탭에 있습니다
+
+---
+
+**좋은 시작입니다!** 이제 Auth0이 준비되었습니다. 다음으로 첫 애플리케이션을 설정하여 웹사이트에 로그인을 추가합니다. 🚀

@@ -1,0 +1,60 @@
+{
+  "slug": "mongodb-account-setup",
+  "platform": "mongodb",
+  "service": "MongoDB Atlas",
+  "category": "database",
+  "difficulty": "beginner",
+  "estimatedMinutes": 15,
+  "totalSteps": 4,
+  "freeTier": {
+    "service": "MongoDB Atlas",
+    "limit": "512 MB storage",
+    "period": "monthly",
+    "amount": "Free",
+    "status": "generous",
+    "conditions": [
+      "512 MB storage free",
+      "Shared cluster (multi-tenant)",
+      "Automatic backups",
+      "Basic monitoring",
+      "Up to 3 databases",
+      "Cloud storage across AWS, Azure, GCP"
+    ]
+  },
+  "prerequisites": [],
+  "nextGuides": [
+    "mongodb-database-setup"
+  ],
+  "seo": {
+    "ko": {
+      "title": "MongoDB 계정 만들기 - 무료 클라우드 데이터베이스 | CloudSetup.guide",
+      "description": "MongoDB Atlas 무료 계정을 만들고 클라우드 데이터베이스를 설정하는 방법을 배워봅시다. 15분 안에 완료할 수 있습니다.",
+      "keywords": [
+        "MongoDB 계정",
+        "MongoDB Atlas",
+        "클라우드 데이터베이스",
+        "무료 데이터베이스",
+        "NoSQL 데이터베이스",
+        "MongoDB 가입",
+        "클라우드 데이터 저장소"
+      ]
+    },
+    "en": {
+      "title": "Create MongoDB Account - Free Cloud Database | CloudSetup.guide",
+      "description": "Step-by-step guide to create a MongoDB Atlas account and set up your cloud database. Get started in 15 minutes.",
+      "keywords": [
+        "MongoDB account",
+        "MongoDB Atlas",
+        "cloud database",
+        "free database",
+        "NoSQL database",
+        "MongoDB signup",
+        "cloud data storage"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z",
+  "published": true
+}

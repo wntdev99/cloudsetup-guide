@@ -1,0 +1,190 @@
+# Create Netlify Account - Set Up Web Hosting and Git Integration
+
+Netlify is the **easiest way to deploy websites**. Connect your GitHub repository, and Netlify automatically deploys your site when you push code. Set up your account in just 10 minutes.
+
+<FreeTierInfo
+  service="Netlify"
+  limit="100 GB bandwidth/month"
+  period="monthly"
+  status="generous"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Email address", required: true },
+  { text: "GitHub account (optional, but recommended)", required: false }
+]} />
+
+<Callout type="info">
+🚀 **What is Netlify?** Netlify is a platform for hosting and deploying websites. It's particularly great for static sites (HTML, CSS, JS), Next.js, React, Vue, and more. Free tier includes 100GB bandwidth monthly.
+</Callout>
+
+---
+
+<Step number={1} title="Sign Up for Netlify">
+
+1. Visit [Netlify.com](https://www.netlify.com).
+2. Click **Sign Up** button (top right).
+3. Choose how to sign up:
+   - Email and password
+   - GitHub account
+   - GitLab account
+   - Bitbucket account
+4. Click your preferred sign-up method.
+5. If using email: enter email and password, then click **Sign Up**.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/netlify/step1-signup-en.png"
+  alt="Netlify signup page"
+  caption="Create your Netlify account with email or Git provider"
+  priority={true}
+/>
+
+<Callout type="tip">
+💡 **Tip**: Sign up with GitHub for seamless Git integration - no need to separately authorize GitHub later.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Verify Email (if using email signup)">
+
+1. If you signed up with email, check your email inbox for **Netlify verification**.
+2. Click the **verification link**.
+3. You'll be redirected to Netlify - verification complete!
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/netlify/step2-verify-email-en.png"
+  alt="Email verification screen"
+  caption="Click the verification link to confirm your email"
+/>
+
+<Callout type="info">
+📧 **Note**: If you signed up with GitHub/GitLab/Bitbucket, email verification may be skipped.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="Authorize GitHub (if not already done)">
+
+1. In your Netlify dashboard, click **Add new site**.
+2. Select **Import an existing project**.
+3. Choose **GitHub** as your Git provider.
+4. Click **Authorize Netlify** to connect your GitHub account.
+5. A GitHub popup appears - click **Authorize** to grant Netlify access.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/netlify/step3-github-auth-en.png"
+  alt="GitHub authorization"
+  caption="Grant Netlify access to your GitHub repositories"
+/>
+
+<Callout type="warning">
+🔐 **Permissions**: Netlify will ask for repository access. This is normal - Netlify needs to access your code to deploy it.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="Access Your Netlify Dashboard">
+
+1. After authorization, you're in your **Netlify dashboard**.
+2. You can now:
+   - Create a new site from a template
+   - Deploy an existing Git repository
+   - Upload files manually
+3. Your unique **Netlify subdomain** will be assigned automatically.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/netlify/step4-dashboard-en.png"
+  alt="Netlify dashboard"
+  caption="Your Netlify dashboard - ready to deploy"
+/>
+
+<Checkpoint
+  title="Verify Account Setup"
+  items={[
+    "Is your email verified?",
+    "Is GitHub authorized (if applicable)?",
+    "Can you see your Netlify dashboard?",
+    "Do you see deployment options?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **Complete!** Your Netlify account is ready. In the next guide, you'll connect a GitHub repository and set up continuous deployment.
+</Callout>
+
+</Step>
+
+---
+
+## What's Next
+
+Now that your Netlify account is set up:
+
+1. **[Netlify Continuous Deployment](../netlify-continuous-deployment-setup)** - Deploy from GitHub automatically
+2. **[Add Custom Domain](https://docs.netlify.com/domains-https/custom-domains/)** - Use your own domain name
+3. **[Enable HTTPS](https://docs.netlify.com/domains-https/https-ssl/)** - Free SSL certificates for security
+
+---
+
+## Frequently Asked Questions
+
+<Callout type="info">
+**Q. Does Netlify have a free tier?**
+
+A. Yes! Free tier includes 100GB bandwidth per month, unlimited sites, and continuous deployment. No credit card required.
+</Callout>
+
+<Callout type="info">
+**Q. What types of sites can I host?**
+
+A. Static sites (HTML/CSS/JS), React, Vue, Next.js, Angular, Hugo, Jekyll, and more. Basically any frontend framework or static site.
+</Callout>
+
+<Callout type="info">
+**Q. Can I use my own domain?**
+
+A. Yes! You can add your custom domain to any Netlify site. Netlify provides free SSL certificates.
+</Callout>
+
+<Callout type="info">
+**Q. What Git providers does Netlify support?**
+
+A. GitHub, GitLab, Bitbucket, and Azure DevOps. You can use any of these to trigger deployments.
+</Callout>
+
+---
+
+## Troubleshooting
+
+### Can't find verification email
+
+- Check spam/junk folder
+- Wait a few minutes for email delivery
+- Click "Resend verification" on the signup page
+- Try signing up with a different email
+
+### GitHub authorization failed
+
+- Make sure you're using the correct GitHub account
+- Check that your GitHub account email is verified
+- Try disconnecting and reconnecting in account settings
+- Clear browser cache and try again
+
+### Can't see dashboard after signup
+
+- If redirected to a blank page, try refreshing
+- Check that you're logged in (look for your profile icon)
+- Try clearing cookies and logging in again
+- Use incognito/private browsing to test
+
+---
+
+**Great!** Your Netlify account is ready. Next, deploy your first site from GitHub! 🚀

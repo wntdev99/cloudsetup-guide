@@ -1,0 +1,59 @@
+{
+  "slug": "digitalocean-account-setup",
+  "platform": "digitalocean",
+  "service": "DigitalOcean Cloud Platform",
+  "category": "compute",
+  "difficulty": "beginner",
+  "estimatedMinutes": 15,
+  "totalSteps": 4,
+  "freeTier": {
+    "service": "DigitalOcean",
+    "limit": "$200 credits for 60 days",
+    "period": "trial",
+    "amount": "$200",
+    "status": "generous",
+    "conditions": [
+      "$200 in free credits for new users",
+      "Valid for 60 days",
+      "Use on any DigitalOcean product",
+      "No credit card for first month",
+      "Basic Droplet $5 per month"
+    ]
+  },
+  "prerequisites": [],
+  "nextGuides": [
+    "digitalocean-app-platform-setup"
+  ],
+  "seo": {
+    "ko": {
+      "title": "DigitalOcean 계정 만들기 - 클라우드 서버 호스팅 | CloudSetup.guide",
+      "description": "DigitalOcean 무료 계정을 만들고 $200 크레딧을 받는 방법을 배워봅시다. 15분 안에 클라우드 서버 호스팅을 시작할 수 있습니다.",
+      "keywords": [
+        "DigitalOcean 계정",
+        "클라우드 서버",
+        "VPS 호스팅",
+        "DigitalOcean 가입",
+        "클라우드 컴퓨팅",
+        "Droplet 생성",
+        "웹 호스팅"
+      ]
+    },
+    "en": {
+      "title": "Create DigitalOcean Account - Cloud Server Hosting | CloudSetup.guide",
+      "description": "Step-by-step guide to create a DigitalOcean account and get $200 in free credits. Get started in 15 minutes.",
+      "keywords": [
+        "DigitalOcean account",
+        "cloud server",
+        "VPS hosting",
+        "DigitalOcean signup",
+        "cloud computing",
+        "Droplet creation",
+        "web hosting"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z",
+  "published": true
+}

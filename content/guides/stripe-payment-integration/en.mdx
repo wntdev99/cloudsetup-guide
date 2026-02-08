@@ -1,0 +1,287 @@
+# Integrate Stripe Payments Into Your Website
+
+Now that you have a Stripe account, let's add **payment functionality** to your website. This guide covers integrating Stripe Checkout for secure, one-click payments. Estimated time: 30 minutes.
+
+<FreeTierInfo
+  service="Stripe"
+  limit="Pay per transaction"
+  period="unlimited"
+  status="standard"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Completed Stripe account setup", required: true },
+  { text: "API keys from Stripe Dashboard", required: true },
+  { text: "Basic web development knowledge", required: false },
+  { text: "Node.js + Express (or your web framework)", required: false }
+]} />
+
+<Callout type="info">
+📝 **Which integration method?** Stripe offers multiple ways to accept payments. This guide covers **Stripe Checkout** (easiest, recommended for beginners) and **Stripe Elements** (more customizable). Choose based on your needs.
+</Callout>
+
+---
+
+<Step number={1} title="Get Your API Keys from Stripe Dashboard">
+
+1. Log in to your **Stripe Dashboard**.
+2. Click **Developers** in the left sidebar.
+3. Click **API Keys** under the Developers menu.
+4. You'll see two keys:
+   - **Publishable Key** (starts with `pk_`)
+   - **Secret Key** (starts with `sk_`)
+5. Copy your **Publishable Key** to use in your website.
+6. **NEVER share your Secret Key** - keep it secret on your server only.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/stripe/integration-step1-api-keys-en.png"
+  alt="Stripe API keys in Dashboard"
+  caption="Your API keys are under Developers menu - keep Secret Key private"
+/>
+
+<Callout type="warning">
+🔒 **Security Alert**: Your Secret Key can access all your Stripe data. Never put it in your website code. Store it in environment variables on your server.
+</Callout>
+
+<CopyBlock
+  code="// Never do this in public code
+const secretKey = 'sk_live_xxxxx'; // WRONG!
+
+// Instead, use environment variables
+const secretKey = process.env.STRIPE_SECRET_KEY; // CORRECT"
+  language="javascript"
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="Install Stripe Libraries">
+
+Choose your technology stack and install the appropriate Stripe library.
+
+**For Node.js/Express:**
+
+<CopyBlock
+  code="npm install stripe"
+  language="bash"
+/>
+
+**For Next.js:**
+
+<CopyBlock
+  code="npm install @stripe/react-stripe-js @stripe/js"
+  language="bash"
+/>
+
+**For Frontend (Vanilla JavaScript):**
+
+<CopyBlock
+  code="// Include Stripe.js via CDN
+script src='https://js.stripe.com/v3/' /script"
+  language="html"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/stripe/integration-step2-install-en.png"
+  alt="NPM install stripe command"
+  caption="Install Stripe library to your project"
+/>
+
+<DevTip>
+Use the official Stripe libraries (stripe, @stripe/react-stripe-js) for the most up-to-date security and features.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="Create a Simple Checkout Session">
+
+Create a backend endpoint that creates a Stripe Checkout session. Here's a basic example using Express:
+
+<CopyBlock
+  code="const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const express = require('express');
+const app = express();
+
+app.post('/create-checkout-session', async (req, res) = {
+  try {
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: 'T-Shirt',
+            },
+            unit_amount: 2000, // $20.00
+          },
+          quantity: 1,
+        },
+      ],
+      mode: 'payment',
+      success_url: 'https://yourdomain.com/success',
+      cancel_url: 'https://yourdomain.com/cancel',
+    });
+    res.json({ id: session.id });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.listen(3000, () = console.log('Server running'));"
+  language="javascript"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/stripe/integration-step3-checkout-en.png"
+  alt="Checkout session creation code"
+  caption="Backend endpoint for creating Stripe checkout sessions"
+/>
+
+<Callout type="tip">
+💡 **What is a Checkout Session?** It's a URL to a secure Stripe-hosted payment form. Your customer never enters card details on your website.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="Add Checkout Button to Your Website">
+
+On the frontend, add a button that redirects users to the checkout session:
+
+<CopyBlock
+  code="// Initialize Stripe
+const stripe = Stripe('pk_test_xxxxx'); // Your Publishable Key
+
+// Handle checkout button click
+document.getElementById('checkout-btn').addEventListener('click', async () = {
+  const response = await fetch('/create-checkout-session', {
+    method: 'POST',
+  });
+  const data = await response.json();
+
+  // Redirect to Stripe Checkout
+  await stripe.redirectToCheckout({ sessionId: data.id });
+});
+
+// HTML
+button id='checkout-btn' Buy Now button"
+  language="javascript"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/stripe/integration-step4-button-en.png"
+  alt="Checkout button implementation"
+  caption="Add a button that redirects to Stripe Checkout"
+/>
+
+<Callout type="info">
+✅ **Test Your Checkout**: In Test Mode, use card number **4242 4242 4242 4242** with any future expiration date.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={5} title="Test Payment and Monitor Orders">
+
+1. Click your **Checkout Button** on your test website.
+2. Enter test card: `4242 4242 4242 4242`
+3. Enter any future expiration date (e.g., 12/26).
+4. Enter any 3-digit CVC (e.g., 123).
+5. Click **Pay**.
+6. You should see the success page.
+7. In Stripe Dashboard, go to **Payments** to see your test transaction.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/stripe/integration-step5-payments-en.png"
+  alt="Stripe Dashboard payments list"
+  caption="All your payments appear in the Payments section"
+/>
+
+<Checkpoint
+  title="Verify Integration"
+  items={[
+    "Did your test payment go through?",
+    "Can you see the payment in Stripe Dashboard?",
+    "Did the success page load after payment?",
+    "Is the payment shown as $20.00 (or your amount)?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **Payment integration complete!** You've successfully added Stripe payments to your website. When you're ready for real customers, switch to Live Mode and use your live API keys.
+</Callout>
+
+</Step>
+
+---
+
+## Next Steps
+
+1. **Set up Webhooks** - Handle payment events like successful charges, failures, and refunds
+2. **Implement error handling** - Show clear messages if payments fail
+3. **Add order tracking** - Store orders in your database
+4. **Go live** - Switch from Test Mode to Live Mode with real API keys
+
+---
+
+## Frequently Asked Questions
+
+<Callout type="info">
+**Q. What's the difference between Test Mode and Live Mode?**
+
+A. Test Mode uses fake payments for development. Live Mode processes real credit cards and charges actual money. Switch to Live Mode only when you're ready for real customers.
+</Callout>
+
+<Callout type="info">
+**Q. How do I handle failed payments?**
+
+A. Use Stripe's error handling and webhooks. When a payment fails, Stripe returns an error code. Implement retry logic and notify users of payment issues.
+</Callout>
+
+<Callout type="info">
+**Q. Can customers save their card for future purchases?**
+
+A. Yes! Enable **Save this card for future use** in Stripe Checkout, or use Payment Methods API for more control. This requires additional setup.
+</Callout>
+
+<Callout type="info">
+**Q. How do I handle refunds?**
+
+A. In Stripe Dashboard, go to a payment and click **Refund**. You can refund partial or full amounts. Use Stripe API for programmatic refunds.
+</Callout>
+
+---
+
+## Troubleshooting
+
+### Payment button doesn't work
+
+- Check that your Publishable Key is correct
+- Ensure your backend endpoint is running and accessible
+- Check browser console for JavaScript errors
+- Verify CORS settings if frontend and backend are on different domains
+
+### Stripe.js is not defined
+
+- Make sure you've included the Stripe.js library via CDN or npm
+- Check the script tag or import statement is correct
+- In Next.js, use @stripe/react-stripe-js library
+
+### Checkout session not created
+
+- Verify your Secret Key is correct in environment variables
+- Check that your backend endpoint is receiving POST requests
+- Look at server logs for error messages
+- Test with curl: `curl -X POST http://localhost:3000/create-checkout-session`
+
+---
+
+**Congratulations!** You now have a working Stripe payment system. Next, set up webhooks to handle all payment events automatically. 🎉
