@@ -1,0 +1,55 @@
+{
+  "slug": "aws-iam-user-create",
+  "platform": "aws",
+  "service": "IAM (Identity and Access Management)",
+  "category": "auth",
+  "difficulty": "beginner",
+  "estimatedMinutes": 15,
+  "totalSteps": 6,
+  "freeTier": {
+    "limit": "무제한",
+    "period": "영구",
+    "amount": "무료",
+    "status": "available",
+    "conditions": [
+      "IAM 사용자 및 그룹 생성 무료",
+      "정책 및 역할 관리 무료",
+      "MFA 설정 무료",
+      "액세스 키 생성 무료"
+    ]
+  },
+  "prerequisites": ["aws-account-setup"],
+  "nextGuides": ["aws-s3-bucket-setup", "aws-lambda-setup"],
+  "tags": ["iam", "security", "user-management", "access-control", "mfa"],
+  "seo": {
+    "ko": {
+      "title": "AWS IAM 사용자 생성 및 설정 가이드 - CloudSetup.guide",
+      "description": "AWS IAM 사용자를 생성하고 권한을 설정하는 방법을 단계별로 안내합니다. 보안 모범 사례를 따라 액세스 키와 MFA를 설정하세요.",
+      "keywords": [
+        "AWS IAM",
+        "IAM 사용자 생성",
+        "AWS 권한 설정",
+        "AWS 액세스 키",
+        "AWS MFA 설정",
+        "AWS 보안",
+        "IAM 정책"
+      ]
+    },
+    "en": {
+      "title": "AWS IAM User Creation and Setup Guide - CloudSetup.guide",
+      "description": "Step-by-step guide to creating AWS IAM users and configuring permissions. Follow security best practices with access keys and MFA setup.",
+      "keywords": [
+        "AWS IAM",
+        "IAM user creation",
+        "AWS permissions",
+        "AWS access keys",
+        "AWS MFA setup",
+        "AWS security",
+        "IAM policies"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08"
+}

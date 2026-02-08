@@ -1,0 +1,297 @@
+---
+title: "Create and Configure AWS IAM Users"
+description: "Learn how to securely create IAM users and manage permissions using AWS IAM"
+---
+
+# Create and Configure AWS IAM Users
+
+AWS Identity and Access Management (IAM) is a service that helps you securely control access to AWS resources. This guide walks you through creating IAM users and granting appropriate permissions step by step.
+
+<FreeTierInfo />
+
+<Callout type="info" title="Why Create IAM Users?">
+The root account has full permissions and is extremely risky to use. AWS security best practices recommend minimizing root account use and using IAM users with only the necessary permissions for daily tasks.
+</Callout>
+
+<PrerequisiteCheck prerequisites={["aws-account-setup"]} />
+
+---
+
+<Step number={1} title="Navigate to IAM Service">
+
+After logging into the AWS Management Console, navigate to the IAM service.
+
+1. Enter **"IAM"** in the search bar at the top of the AWS Management Console
+2. Click **IAM** from the search results
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-iam-user-create/step1-iam-console-en.png"
+  alt="Search for IAM in AWS Console"
+  caption="Find and click IAM from the search bar"
+/>
+
+<Checkpoint>
+Are you on the IAM dashboard? You should see menu items like "Users", "Groups", and "Roles" in the left sidebar.
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={2} title="Start Creating a New IAM User">
+
+Create a new user from the IAM dashboard.
+
+1. Click **"Users"** in the left sidebar
+2. Click the **"Add users"** button in the top right
+3. Enter a **User name** (e.g., `developer-user`)
+4. Check **"Provide user access to the AWS Management Console"** (if console access is needed)
+5. Select **"Users must create a new password at next sign-in"** to require password reset (recommended)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-iam-user-create/step2-create-user-en.png"
+  alt="IAM user creation page"
+  caption="Set the username and access options"
+/>
+
+<Callout type="tip" title="Username Conventions">
+Use usernames that clearly indicate their purpose. Examples: `dev-frontend`, `ci-cd-deploy`, `backup-admin`
+</Callout>
+
+<DevTip title="Programmatic Access Only">
+If you only need API, CLI, or SDK access, you don't need to check "Provide user access to the AWS Management Console". In this case, only access keys will be created.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="Set Permissions">
+
+Grant the user necessary permissions. AWS provides three methods.
+
+1. **Choose permission option**:
+   - **Add user to group**: Inherit permissions from existing group (recommended)
+   - **Copy permissions from existing user**: Grant same permissions as another user
+   - **Attach policies directly**: Select specific policies directly
+
+2. For beginners, select **"Attach policies directly"**
+3. Search and select needed policies from the policy list:
+   - **`ReadOnlyAccess`**: Read-only permissions (safe starting point)
+   - **`PowerUserAccess`**: Most permissions except administrative ones
+   - **`AdministratorAccess`**: All permissions (use with caution)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-iam-user-create/step3-set-permissions-en.png"
+  alt="IAM permissions setup screen"
+  caption="Select the permission policies needed for the user"
+/>
+
+<Callout type="warning" title="Principle of Least Privilege">
+It's a security best practice to grant users only the minimum permissions required to perform their tasks. Start with fewer permissions and add more as needed.
+</Callout>
+
+<DevTip title="Creating Custom Policies">
+For more granular permission control, you can create custom policies in JSON format. For example, you can create a policy that grants access only to a specific S3 bucket.
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:PutObject"],
+      "Resource": "arn:aws:s3:::my-bucket/*"
+    }
+  ]
+}
+```
+</DevTip>
+
+<Checkpoint>
+Have you selected at least one permission policy? The list of selected policies should be displayed on the screen.
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={4} title="Review and Create User">
+
+Review the settings and create the user.
+
+1. Click **"Next"** to go to the tags page (optional)
+2. Add tags if needed (e.g., `Environment: Production`, `Team: Backend`)
+3. Click **"Next"** to go to the review page
+4. Verify username, permissions, and access settings
+5. Click **"Create user"**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-iam-user-create/step4-review-create-en.png"
+  alt="IAM user creation review"
+  caption="Review settings and create the user"
+/>
+
+<Callout type="info" title="User Creation Complete">
+Once the user is created, you'll see the console login URL and temporary password. Save this information securely and share it with the user.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={5} title="Create Access Keys (For Programmatic Access)">
+
+Access keys are required to use API, CLI, or SDK.
+
+1. Click the created user name
+2. Select the **"Security credentials"** tab
+3. Click **"Create access key"** button
+4. Select use case:
+   - **Local code**: Local development environment
+   - **CLI**: AWS CLI usage
+   - **Third-party service**: External service integration
+5. Click **"Next"**
+6. Add description tag (optional, e.g., "Local development key")
+7. Click **"Create access key"**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-iam-user-create/step5-create-access-key-en.png"
+  alt="Access key creation screen"
+  caption="Create access keys for programmatic access"
+/>
+
+<Callout type="danger" title="Access Key Security Warning">
+The access key ID and secret access key are shown **only once**. Be sure to save them in a secure location. Never commit them to Git repositories or public places!
+</Callout>
+
+<CopyBlock language="bash" title="AWS CLI Credential Configuration">
+{`# Configure credentials after installing AWS CLI
+aws configure
+
+# Enter the following:
+# AWS Access Key ID: YOUR_ACCESS_KEY_ID
+# AWS Secret Access Key: YOUR_SECRET_ACCESS_KEY
+# Default region name: us-east-1  # or your preferred region
+# Default output format: json`}
+</CopyBlock>
+
+<DevTip title="Using Credentials with Environment Variables">
+Don't hardcode credentials directly in your code. Use environment variables:
+
+```bash
+export AWS_ACCESS_KEY_ID=your_access_key_id
+export AWS_SECRET_ACCESS_KEY=your_secret_access_key
+export AWS_DEFAULT_REGION=us-east-1
+```
+
+Or use a `.env` file:
+```env
+AWS_ACCESS_KEY_ID=your_access_key_id
+AWS_SECRET_ACCESS_KEY=your_secret_access_key
+AWS_REGION=us-east-1
+```
+</DevTip>
+
+<Checkpoint>
+Have you saved the access key ID and secret access key in a secure location? Download the CSV file or save them in a password manager.
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={6} title="Set Up MFA (Multi-Factor Authentication) - Recommended">
+
+Set up MFA to enhance security.
+
+1. In the **"Security credentials"** tab of the user details page
+2. Find the **"Assign MFA device"** section
+3. Click the **"Assign MFA device"** button
+4. Select MFA device type:
+   - **Authenticator app** (recommended): Google Authenticator, Authy, etc.
+   - **Security key**: USB security key (YubiKey, etc.)
+   - **Hardware TOTP token**: Physical token device
+5. Select **"Authenticator app"** and click **"Next"**
+6. Scan the QR code with Google Authenticator or Authy
+7. Enter two consecutive 6-digit codes displayed in the app (30-second interval)
+8. Click **"Add MFA"**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-iam-user-create/step6-setup-mfa-en.png"
+  alt="MFA setup screen"
+  caption="Enhance security by setting up MFA with an authenticator app"
+/>
+
+<Callout type="tip" title="Recommended MFA Apps">
+- **Google Authenticator**: Free iOS and Android app
+- **Authy**: Supports multi-device synchronization
+- **1Password**: Password manager + MFA integration
+</Callout>
+
+<DevTip title="Enable MFA for Root Account Too">
+You must set up MFA not only for IAM users but also for the root account. Root account security is critical to your entire AWS account security.
+
+Root account MFA setup:
+1. Click your account name in the top right
+2. Select "Security credentials"
+3. Click "Activate MFA" in the "MFA" section
+</DevTip>
+
+<Checkpoint>
+Is MFA successfully set up? Check the "Assigned MFA device" status in the "Security credentials" tab.
+</Checkpoint>
+
+</Step>
+
+---
+
+## Next Steps
+
+You've completed IAM user creation! Now you can proceed with:
+
+- **[Create AWS S3 Bucket](/guides/aws-s3-bucket-setup)**: Get started with object storage service
+- **[Create AWS Lambda Function](/guides/aws-lambda-setup)**: Get started with serverless computing
+
+<Callout type="info" title="IAM User Management Tips">
+- Regularly delete unused access keys
+- Rotate access keys every 90 days
+- Use IAM Access Analyzer to detect excessive permissions
+- Monitor IAM user activity with AWS CloudTrail
+</Callout>
+
+## Troubleshooting
+
+### I Lost My Access Key
+
+Secret access keys cannot be retrieved. You must deactivate the old key and create a new one.
+
+<CopyBlock language="bash" title="Manage Access Keys with AWS CLI">
+{`# List current access keys
+aws iam list-access-keys --user-name developer-user
+
+# Deactivate old key
+aws iam update-access-key --access-key-id OLD_KEY_ID --status Inactive --user-name developer-user
+
+# Create new key
+aws iam create-access-key --user-name developer-user`}
+</CopyBlock>
+
+### "Access Denied" Error
+
+This means you lack permissions for the required action. Request from an administrator or add permissions yourself:
+
+1. Select the user in the IAM console
+2. Click "Add permissions" in the "Permissions" tab
+3. Select needed policies and click "Add permissions"
+
+### I Lost My MFA Device
+
+If you have administrator permissions:
+
+1. Select the user in the IAM console
+2. Go to "Security credentials" tab
+3. Click "Remove" in the "Assigned MFA device" section
+4. Set up a new MFA device
+
+If you lost root account MFA, you must contact AWS customer support.

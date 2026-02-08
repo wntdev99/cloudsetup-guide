@@ -1,0 +1,297 @@
+---
+title: "AWS IAM 사용자 생성 및 권한 설정하기"
+description: "AWS IAM을 사용하여 안전하게 사용자를 생성하고 권한을 관리하는 방법을 배워보세요"
+---
+
+# AWS IAM 사용자 생성 및 권한 설정하기
+
+AWS Identity and Access Management(IAM)는 AWS 리소스에 대한 액세스를 안전하게 제어할 수 있는 서비스입니다. 이 가이드에서는 IAM 사용자를 생성하고 적절한 권한을 부여하는 방법을 단계별로 안내합니다.
+
+<FreeTierInfo />
+
+<Callout type="info" title="왜 IAM 사용자를 만들어야 하나요?">
+루트 계정은 모든 권한을 가지고 있어 매우 위험합니다. AWS 보안 모범 사례는 루트 계정 사용을 최소화하고, 일상적인 작업에는 필요한 권한만 가진 IAM 사용자를 사용하는 것입니다.
+</Callout>
+
+<PrerequisiteCheck prerequisites={["aws-account-setup"]} />
+
+---
+
+<Step number={1} title="IAM 서비스로 이동">
+
+AWS Management Console에 로그인한 후 IAM 서비스로 이동합니다.
+
+1. AWS Management Console 상단의 검색창에 **"IAM"** 입력
+2. 검색 결과에서 **IAM** 클릭
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-iam-user-create/step1-iam-console-ko.png"
+  alt="AWS Console에서 IAM 검색"
+  caption="검색창에서 IAM을 찾아 클릭합니다"
+/>
+
+<Checkpoint>
+IAM 대시보드에 접속했나요? 왼쪽 사이드바에 "사용자", "그룹", "역할" 등의 메뉴가 보여야 합니다.
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={2} title="새 IAM 사용자 생성 시작">
+
+IAM 대시보드에서 새 사용자를 생성합니다.
+
+1. 왼쪽 사이드바에서 **"사용자"** 클릭
+2. 오른쪽 상단의 **"사용자 추가"** 버튼 클릭
+3. **사용자 이름** 입력 (예: `developer-user`)
+4. **"AWS Management Console 액세스 권한 제공"** 체크박스 선택 (콘솔 접속이 필요한 경우)
+5. 사용자가 직접 암호를 설정하도록 **"사용자가 다음 로그인 시 새 암호를 생성해야 함"** 선택 (권장)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-iam-user-create/step2-create-user-ko.png"
+  alt="IAM 사용자 생성 페이지"
+  caption="사용자 이름과 액세스 옵션을 설정합니다"
+/>
+
+<Callout type="tip" title="사용자 이름 규칙">
+사용자 이름은 용도를 명확히 나타내는 것이 좋습니다. 예: `dev-frontend`, `ci-cd-deploy`, `backup-admin` 등
+</Callout>
+
+<DevTip title="프로그래매틱 액세스만 필요한 경우">
+API, CLI, SDK만 사용한다면 "AWS Management Console 액세스 권한 제공"을 체크하지 않아도 됩니다. 이 경우 액세스 키만 생성됩니다.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="권한 설정">
+
+사용자에게 필요한 권한을 부여합니다. AWS는 세 가지 방식을 제공합니다.
+
+1. **권한 옵션 선택**:
+   - **그룹에 사용자 추가**: 기존 그룹의 권한 상속 (권장)
+   - **기존 사용자에서 권한 복사**: 다른 사용자와 동일한 권한 부여
+   - **정책 직접 연결**: 특정 정책을 직접 선택
+
+2. 초보자는 **"정책 직접 연결"** 선택
+3. 정책 목록에서 필요한 정책 검색 및 선택:
+   - **`ReadOnlyAccess`**: 읽기 전용 권한 (안전한 시작점)
+   - **`PowerUserAccess`**: 관리 권한 제외한 대부분의 권한
+   - **`AdministratorAccess`**: 모든 권한 (주의해서 사용)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-iam-user-create/step3-set-permissions-ko.png"
+  alt="IAM 권한 설정 화면"
+  caption="사용자에게 필요한 권한 정책을 선택합니다"
+/>
+
+<Callout type="warning" title="최소 권한 원칙">
+사용자에게 작업 수행에 필요한 최소한의 권한만 부여하는 것이 보안 모범 사례입니다. 처음에는 적은 권한으로 시작해서 필요에 따라 추가하세요.
+</Callout>
+
+<DevTip title="커스텀 정책 생성">
+더 세밀한 권한 제어가 필요하다면 JSON 형식으로 커스텀 정책을 만들 수 있습니다. 예를 들어, 특정 S3 버킷에만 접근 권한을 주는 정책을 만들 수 있습니다.
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:PutObject"],
+      "Resource": "arn:aws:s3:::my-bucket/*"
+    }
+  ]
+}
+```
+</DevTip>
+
+<Checkpoint>
+권한 정책을 하나 이상 선택했나요? 선택한 정책 목록이 화면에 표시되어야 합니다.
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={4} title="검토 및 사용자 생성">
+
+설정을 검토하고 사용자를 생성합니다.
+
+1. **"다음"** 버튼 클릭하여 태그 설정 페이지로 이동 (선택사항)
+2. 필요시 태그 추가 (예: `Environment: Production`, `Team: Backend`)
+3. **"다음"** 버튼 클릭하여 검토 페이지로 이동
+4. 사용자 이름, 권한, 액세스 설정 확인
+5. **"사용자 생성"** 버튼 클릭
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-iam-user-create/step4-review-create-ko.png"
+  alt="IAM 사용자 생성 검토"
+  caption="설정을 최종 확인하고 사용자를 생성합니다"
+/>
+
+<Callout type="info" title="사용자 생성 완료">
+사용자가 생성되면 콘솔 로그인 URL과 임시 비밀번호가 표시됩니다. 이 정보를 안전하게 저장하고 사용자에게 전달하세요.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={5} title="액세스 키 생성 (프로그래매틱 액세스용)">
+
+API, CLI, SDK를 사용하려면 액세스 키가 필요합니다.
+
+1. 생성된 사용자 이름 클릭
+2. **"보안 자격 증명"** 탭 선택
+3. **"액세스 키 만들기"** 버튼 클릭
+4. 사용 사례 선택:
+   - **로컬 코드**: 로컬 개발 환경
+   - **CLI**: AWS CLI 사용
+   - **타사 서비스**: 외부 서비스 연동
+5. **"다음"** 클릭
+6. 설명 태그 추가 (선택사항, 예: "Local development key")
+7. **"액세스 키 만들기"** 클릭
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-iam-user-create/step5-create-access-key-ko.png"
+  alt="액세스 키 생성 화면"
+  caption="프로그래매틱 액세스를 위한 액세스 키를 생성합니다"
+/>
+
+<Callout type="danger" title="액세스 키 보안 주의사항">
+액세스 키 ID와 시크릿 액세스 키는 **단 한 번만** 표시됩니다. 반드시 안전한 곳에 저장하세요. Git 저장소나 공개된 곳에 커밋하지 마세요!
+</Callout>
+
+<CopyBlock language="bash" title="AWS CLI 자격 증명 설정">
+{`# AWS CLI 설치 후 자격 증명 구성
+aws configure
+
+# 입력 내용:
+# AWS Access Key ID: YOUR_ACCESS_KEY_ID
+# AWS Secret Access Key: YOUR_SECRET_ACCESS_KEY
+# Default region name: ap-northeast-2  # 서울 리전
+# Default output format: json`}
+</CopyBlock>
+
+<DevTip title="환경 변수로 자격 증명 사용">
+코드에서 직접 자격 증명을 하드코딩하지 말고 환경 변수를 사용하세요:
+
+```bash
+export AWS_ACCESS_KEY_ID=your_access_key_id
+export AWS_SECRET_ACCESS_KEY=your_secret_access_key
+export AWS_DEFAULT_REGION=ap-northeast-2
+```
+
+또는 `.env` 파일 사용:
+```env
+AWS_ACCESS_KEY_ID=your_access_key_id
+AWS_SECRET_ACCESS_KEY=your_secret_access_key
+AWS_REGION=ap-northeast-2
+```
+</DevTip>
+
+<Checkpoint>
+액세스 키 ID와 시크릿 액세스 키를 안전한 곳에 저장했나요? CSV 파일로 다운로드하거나 비밀번호 관리자에 저장하세요.
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={6} title="MFA(다중 인증) 설정 (권장)">
+
+보안을 강화하기 위해 MFA를 설정합니다.
+
+1. 사용자 상세 페이지의 **"보안 자격 증명"** 탭에서
+2. **"MFA 디바이스 할당"** 섹션 찾기
+3. **"MFA 디바이스 할당"** 버튼 클릭
+4. MFA 디바이스 유형 선택:
+   - **인증 관리자 앱** (권장): Google Authenticator, Authy 등
+   - **보안 키**: USB 보안 키 (YubiKey 등)
+   - **하드웨어 TOTP 토큰**: 물리적 토큰 디바이스
+5. **"인증 관리자 앱"** 선택 후 **"다음"** 클릭
+6. QR 코드를 Google Authenticator나 Authy로 스캔
+7. 앱에 표시된 6자리 코드 2개를 연속으로 입력 (30초 간격)
+8. **"MFA 추가"** 클릭
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-iam-user-create/step6-setup-mfa-ko.png"
+  alt="MFA 설정 화면"
+  caption="인증 앱을 사용한 MFA 설정으로 보안을 강화합니다"
+/>
+
+<Callout type="tip" title="MFA 앱 추천">
+- **Google Authenticator**: iOS, Android 무료 앱
+- **Authy**: 멀티 디바이스 동기화 지원
+- **1Password**: 비밀번호 관리자 + MFA 통합
+</Callout>
+
+<DevTip title="루트 계정에도 MFA 설정 필수">
+IAM 사용자뿐만 아니라 루트 계정에도 반드시 MFA를 설정하세요. 루트 계정 보안은 AWS 계정 전체의 보안과 직결됩니다.
+
+루트 계정 MFA 설정:
+1. 오른쪽 상단 계정 이름 클릭
+2. "보안 자격 증명" 선택
+3. "MFA" 섹션에서 "MFA 활성화" 클릭
+</DevTip>
+
+<Checkpoint>
+MFA가 성공적으로 설정되었나요? "보안 자격 증명" 탭에서 "할당된 MFA 디바이스" 상태를 확인하세요.
+</Checkpoint>
+
+</Step>
+
+---
+
+## 다음 단계
+
+IAM 사용자 생성을 완료했습니다! 이제 다음을 진행할 수 있습니다:
+
+- **[AWS S3 버킷 생성](/guides/aws-s3-bucket-setup)**: 객체 스토리지 서비스 시작하기
+- **[AWS Lambda 함수 생성](/guides/aws-lambda-setup)**: 서버리스 컴퓨팅 시작하기
+
+<Callout type="info" title="IAM 사용자 관리 팁">
+- 사용하지 않는 액세스 키는 정기적으로 삭제하세요
+- 90일마다 액세스 키를 로테이션하는 것이 좋습니다
+- IAM Access Analyzer를 사용해 과도한 권한을 탐지하세요
+- AWS CloudTrail로 IAM 사용자 활동을 모니터링하세요
+</Callout>
+
+## 문제 해결
+
+### 액세스 키를 분실했어요
+
+시크릿 액세스 키는 재확인할 수 없습니다. 기존 키를 비활성화하고 새 키를 생성해야 합니다.
+
+<CopyBlock language="bash" title="AWS CLI로 액세스 키 관리">
+{`# 현재 액세스 키 목록 확인
+aws iam list-access-keys --user-name developer-user
+
+# 기존 키 비활성화
+aws iam update-access-key --access-key-id OLD_KEY_ID --status Inactive --user-name developer-user
+
+# 새 키 생성
+aws iam create-access-key --user-name developer-user`}
+</CopyBlock>
+
+### "권한이 부족합니다" 오류
+
+필요한 작업에 대한 권한이 없는 경우입니다. 관리자에게 요청하거나, 직접 권한을 추가하세요:
+
+1. IAM 콘솔에서 해당 사용자 선택
+2. "권한" 탭에서 "권한 추가" 클릭
+3. 필요한 정책 선택 후 "권한 추가" 클릭
+
+### MFA 디바이스를 분실했어요
+
+관리자 권한이 있다면:
+
+1. IAM 콘솔에서 사용자 선택
+2. "보안 자격 증명" 탭
+3. "할당된 MFA 디바이스" 섹션에서 "제거" 클릭
+4. 새 MFA 디바이스 재설정
+
+루트 계정 MFA를 분실한 경우 AWS 고객 지원팀에 문의해야 합니다.
