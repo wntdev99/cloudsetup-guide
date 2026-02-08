@@ -1,0 +1,63 @@
+{
+  "slug": "gcp-translation-api-setup",
+  "platform": "gcp",
+  "service": "Cloud Translation API",
+  "category": "ai-ml",
+  "difficulty": "beginner",
+  "estimatedMinutes": 12,
+  "totalSteps": 5,
+  "freeTier": {
+    "service": "Cloud Translation API",
+    "limit": "월 500,000자",
+    "period": "month",
+    "amount": "무료",
+    "status": "generous",
+    "conditions": [
+      "월 500,000자 무료 번역",
+      "초과 시 100만자당 $20",
+      "언어 감지는 무료"
+    ]
+  },
+  "prerequisites": [
+    "gcp-account-setup",
+    "gcp-project-create"
+  ],
+  "nextGuides": [
+    "gcp-speech-to-text-setup",
+    "gcp-text-to-speech-setup"
+  ],
+  "seo": {
+    "ko": {
+      "title": "GCP Translation API 설정 - 100개 언어 자동 번역 | CloudSetup.guide",
+      "description": "Google Cloud Translation API를 활성화하고 첫 번째 번역을 실행하는 방법을 5단계로 배워보세요. API 키 생성부터 실제 테스트까지 완벽 가이드.",
+      "keywords": [
+        "GCP Translation API",
+        "Google Cloud Translation",
+        "번역 API",
+        "자동 번역",
+        "다국어 번역",
+        "Translation API 설정",
+        "GCP API 키",
+        "클라우드 번역"
+      ]
+    },
+    "en": {
+      "title": "Setup GCP Translation API - Auto-Translate 100+ Languages | CloudSetup.guide",
+      "description": "Learn how to enable Google Cloud Translation API and run your first translation in 5 easy steps. Complete guide from API key creation to testing.",
+      "keywords": [
+        "GCP Translation API",
+        "Google Cloud Translation",
+        "translation API",
+        "auto translate",
+        "multilingual translation",
+        "Translation API setup",
+        "GCP API key",
+        "cloud translation"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T03:30:00.000Z",
+  "updatedAt": "2026-02-08T03:30:00.000Z",
+  "lastVerified": "2026-02-08T03:30:00.000Z",
+  "published": true
+}

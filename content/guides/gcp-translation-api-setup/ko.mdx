@@ -1,0 +1,533 @@
+# GCP Translation API 설정 - 100개 언어 자동 번역 시작하기
+
+Google Cloud Translation API는 **100개 이상의 언어**를 자동으로 번역하고, **언어를 감지**하며, **지원 언어 목록을 조회**할 수 있는 강력한 AI 서비스를 제공합니다. 이 가이드를 따라 Translation API를 활성화하고 첫 번째 번역을 12분 안에 실행해보세요!
+
+<FreeTierInfo
+  service="Cloud Translation API"
+  limit="월 500,000자"
+  period="월간"
+  status="generous"
+/>
+
+## Translation API로 무엇을 할 수 있나요?
+
+<Callout type="info">
+🌍 **주요 Translation API 기능**
+
+- **텍스트 번역**: 100개 이상 언어 간 자동 번역
+- **언어 감지**: 입력 텍스트의 언어 자동 인식
+- **지원 언어 목록**: 번역 가능한 모든 언어 조회
+- **HTML 번역**: HTML 태그 보존하며 번역
+- **용어집 지원**: 특정 용어의 번역 방식 지정 (고급)
+
+**사용 사례**:
+- 다국어 웹사이트 자동 번역
+- 고객 지원 메시지 실시간 번역
+- 문서 번역 자동화
+- 채팅 앱 실시간 통역
+</Callout>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "GCP 계정 및 프로젝트 생성 완료", required: true },
+  { text: "결제 계정 연결 완료", required: true },
+  { text: "번역할 샘플 텍스트 준비", required: false }
+]} />
+
+<Callout type="tip">
+💡 **무료 체험**: 매월 500,000자까지 무료로 번역 가능합니다. 학습과 소규모 프로젝트에 충분합니다!
+</Callout>
+
+---
+
+<Step number={1} title="Translation API 활성화">
+
+1. [Google Cloud Console](https://console.cloud.google.com)에 로그인합니다.
+2. 올바른 프로젝트가 선택되었는지 확인하세요.
+3. 상단 검색창에 **"Translation API"**를 입력합니다.
+4. 검색 결과에서 **Cloud Translation API**를 클릭합니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-translation-api-step1-ko.png"
+  alt="Translation API 검색"
+  caption="검색창에서 Translation API를 찾으세요"
+/>
+
+5. **사용 설정(ENABLE)** 버튼을 클릭합니다.
+6. API 활성화에 몇 초 정도 소요됩니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-translation-api-step1b-ko.png"
+  alt="Translation API 활성화"
+  caption="사용 설정 버튼을 클릭하여 API를 활성화하세요"
+/>
+
+<Checkpoint
+  title="API 활성화 확인"
+  items={[
+    "API가 활성화되었나요?",
+    "'API 사용 설정됨' 페이지로 이동했나요?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="API 키 준비">
+
+Translation API를 사용하려면 **API 키** 또는 **서비스 계정**이 필요합니다.
+
+### 2-1. 기존 API 키 재사용 (Vision API 키가 있는 경우)
+
+이미 Vision API나 다른 GCP API를 위해 API 키를 만든 경우:
+
+1. 왼쪽 메뉴에서 **사용자 인증 정보(Credentials)** 클릭
+2. 기존 API 키 확인
+3. API 키의 **API 제한사항(API restrictions)** 섹션에 **Cloud Translation API**가 포함되어 있는지 확인
+4. 포함되어 있지 않다면:
+   - API 키 이름 클릭
+   - **API 제한사항** 섹션에서 **키 제한**을 선택
+   - **Cloud Translation API** 체크박스 선택
+   - **저장** 클릭
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-translation-api-step2a-ko.png"
+  alt="기존 API 키에 Translation API 추가"
+  caption="API 제한사항에 Translation API를 추가하세요"
+/>
+
+### 2-2. 새 API 키 만들기 (API 키가 없는 경우)
+
+1. 왼쪽 메뉴에서 **사용자 인증 정보(Credentials)** 클릭
+2. 상단 **+ 사용자 인증 정보 만들기** 버튼 클릭
+3. 드롭다운에서 **API 키** 선택
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-translation-api-step2b-ko.png"
+  alt="API 키 생성"
+  caption="새 API 키를 생성하세요"
+/>
+
+4. 생성된 API 키를 **복사**하여 안전한 곳에 보관합니다.
+5. **키 제한** 버튼을 클릭하여 보안 설정을 합니다:
+   - **API 제한사항**: "키 제한" 선택
+   - **Cloud Translation API**만 체크
+   - **저장** 클릭
+
+<Callout type="warning">
+⚠️ **API 키 보안**
+
+API 키는 누구나 사용할 수 있는 비밀번호와 같습니다:
+- GitHub, 블로그, 공개 저장소에 절대 업로드하지 마세요
+- 환경 변수나 설정 파일에 저장하고 .gitignore에 추가하세요
+- 프로덕션에서는 서비스 계정을 사용하세요
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="Translation API 테스트 - 웹 콘솔">
+
+가장 쉬운 방법은 GCP 콘솔에서 직접 테스트하는 것입니다.
+
+1. Translation API 페이지로 돌아갑니다.
+2. **이 API 사용해 보기(TRY THIS API)** 버튼을 클릭합니다.
+3. 오른쪽 패널이 열립니다.
+
+### 3-1. 샘플 텍스트로 테스트
+
+1. **Request body** 섹션에 다음 JSON을 입력합니다:
+
+<CopyBlock
+  code='{
+  "q": "Hello, how are you?",
+  "target": "ko"
+}'
+  language="json"
+/>
+
+2. 아래로 스크롤하여 **실행(EXECUTE)** 버튼을 클릭합니다.
+3. Google 계정 권한 요청이 나타나면 **허용(Allow)** 클릭합니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-translation-api-step3-ko.png"
+  alt="Translation API 테스트"
+  caption="샘플 요청을 실행하여 API를 테스트하세요"
+/>
+
+### 3-2. 결과 확인
+
+다음과 같은 응답을 받게 됩니다:
+
+<CopyBlock
+  code='{
+  "data": {
+    "translations": [
+      {
+        "translatedText": "안녕하세요, 어떻게 지내세요?",
+        "detectedSourceLanguage": "en"
+      }
+    ]
+  }
+}'
+  language="json"
+/>
+
+<Callout type="success">
+✅ **성공!** Translation API가 영어 텍스트를 한국어로 자동 번역했습니다!
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="Translation API 테스트 - cURL (명령줄)">
+
+실제 개발에서는 코드나 명령줄에서 API를 호출하게 됩니다. cURL로 테스트해봅시다.
+
+### 4-1. 텍스트 번역하기
+
+터미널이나 명령 프롬프트를 열고 다음을 실행하세요:
+
+<CopyBlock
+  code='curl -X POST \
+  -H "Content-Type: application/json" \
+  "https://translation.googleapis.com/language/translate/v2?key=YOUR_API_KEY" \
+  -d "{
+    \"q\": \"Hello, World!\",
+    \"target\": \"ko\"
+  }"'
+  language="bash"
+/>
+
+**주의**: `YOUR_API_KEY`를 Step 2에서 받은 실제 API 키로 바꾸세요!
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-translation-api-step4a-ko.png"
+  alt="cURL로 API 호출"
+  caption="터미널에서 직접 Translation API를 호출하세요"
+/>
+
+### 4-2. 응답 확인
+
+다음과 같은 JSON 응답을 받게 됩니다:
+
+<CopyBlock
+  code='{
+  "data": {
+    "translations": [
+      {
+        "translatedText": "안녕하세요, 세계!",
+        "detectedSourceLanguage": "en"
+      }
+    ]
+  }
+}'
+  language="json"
+/>
+
+### 4-3. 언어 감지하기
+
+입력 텍스트의 언어를 자동으로 감지할 수 있습니다:
+
+<CopyBlock
+  code='curl -X POST \
+  -H "Content-Type: application/json" \
+  "https://translation.googleapis.com/language/translate/v2/detect?key=YOUR_API_KEY" \
+  -d "{
+    \"q\": \"Bonjour le monde\"
+  }"'
+  language="bash"
+/>
+
+응답:
+
+<CopyBlock
+  code='{
+  "data": {
+    "detections": [
+      [
+        {
+          "language": "fr",
+          "isReliable": true,
+          "confidence": 0.99
+        }
+      ]
+    ]
+  }
+}'
+  language="json"
+/>
+
+프랑스어(fr)로 정확히 감지했습니다!
+
+### 4-4. 지원 언어 목록 조회
+
+번역 가능한 모든 언어를 확인할 수 있습니다:
+
+<CopyBlock
+  code='curl -X GET \
+  "https://translation.googleapis.com/language/translate/v2/languages?key=YOUR_API_KEY&target=ko"'
+  language="bash"
+/>
+
+<Checkpoint
+  title="API 테스트 성공 확인"
+  items={[
+    "cURL 명령이 오류 없이 실행되었나요?",
+    "JSON 응답에 translatedText가 포함되어 있나요?",
+    "번역된 텍스트가 올바르게 표시되나요?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={5} title="실제 코드에서 사용하기">
+
+이제 프로그래밍 언어에서 Translation API를 호출해봅시다.
+
+### 5-1. Python 예제
+
+<CopyBlock
+  code='import requests
+import json
+
+API_KEY = "YOUR_API_KEY"
+url = f"https://translation.googleapis.com/language/translate/v2?key={API_KEY}"
+
+# 텍스트 번역
+request_body = {
+    "q": "Hello, how are you today?",
+    "target": "ko",
+    "format": "text"
+}
+
+response = requests.post(url, json=request_body)
+result = response.json()
+
+translated_text = result["data"]["translations"][0]["translatedText"]
+detected_lang = result["data"]["translations"][0].get("detectedSourceLanguage", "unknown")
+
+print(f"원본 언어: {detected_lang}")
+print(f"번역 결과: {translated_text}")
+
+# 출력:
+# 원본 언어: en
+# 번역 결과: 안녕하세요, 오늘 어떻게 지내세요?'
+  language="python"
+/>
+
+### 5-2. Node.js 예제
+
+<CopyBlock
+  code='const axios = require("axios");
+
+const API_KEY = "YOUR_API_KEY";
+const url = `https://translation.googleapis.com/language/translate/v2?key=${API_KEY}`;
+
+// 텍스트 번역
+const requestBody = {
+  q: "Good morning!",
+  target: "ko",
+  format: "text"
+};
+
+axios.post(url, requestBody)
+  .then(response => {
+    const translation = response.data.data.translations[0];
+    console.log("번역 결과:", translation.translatedText);
+    console.log("원본 언어:", translation.detectedSourceLanguage);
+  })
+  .catch(error => console.error("Error:", error));
+
+// 출력:
+// 번역 결과: 좋은 아침!
+// 원본 언어: en'
+  language="javascript"
+/>
+
+### 5-3. 여러 텍스트 동시 번역
+
+한 번의 요청으로 여러 텍스트를 번역할 수 있습니다:
+
+<CopyBlock
+  code='import requests
+
+API_KEY = "YOUR_API_KEY"
+url = f"https://translation.googleapis.com/language/translate/v2?key={API_KEY}"
+
+request_body = {
+    "q": [
+        "Hello",
+        "How are you?",
+        "Thank you"
+    ],
+    "target": "ko"
+}
+
+response = requests.post(url, json=request_body)
+result = response.json()
+
+for i, translation in enumerate(result["data"]["translations"]):
+    print(f"{i+1}. {translation[\"translatedText\"]}")
+
+# 출력:
+# 1. 안녕하세요
+# 2. 어떻게 지내세요?
+# 3. 감사합니다'
+  language="python"
+/>
+
+### 5-4. HTML 번역 (태그 보존)
+
+HTML 태그를 보존하면서 텍스트만 번역할 수 있습니다:
+
+<CopyBlock
+  code='const requestBody = {
+  q: "<h1>Welcome</h1><p>This is a <strong>test</strong> page.</p>",
+  target: "ko",
+  format: "html"  // HTML 형식 지정
+};
+
+axios.post(url, requestBody)
+  .then(response => {
+    console.log(response.data.data.translations[0].translatedText);
+  });
+
+// 출력:
+// <h1>환영합니다</h1><p>이것은 <strong>테스트</strong> 페이지입니다.</p>'
+  language="javascript"
+/>
+
+<Callout type="success">
+🎉 **완료!** Translation API를 활성화하고 성공적으로 텍스트를 번역했습니다!
+</Callout>
+
+</Step>
+
+---
+
+## 비용 관리
+
+<Callout type="info">
+💰 **Translation API 가격 정책**
+
+- **무료 티어**: 월 500,000자까지 무료
+- **초과 시 요금**:
+  - 기본 번역: 100만자당 $20
+  - 언어 감지: 무료 (무제한)
+  - 지원 언어 목록: 무료 (무제한)
+
+**예시**: 월 1,500,000자 번역
+- 무료: 500,000자
+- 유료: 1,000,000자 × ($20 / 1,000,000자) = **$20**
+</Callout>
+
+---
+
+## 다음 단계
+
+Translation API를 마스터했으니, 다른 AI API도 사용해보세요:
+
+1. **[Speech-to-Text API 설정](../gcp-speech-to-text-setup)** - 음성을 텍스트로 변환
+2. **[Text-to-Speech API 설정](../gcp-text-to-speech-setup)** - 텍스트를 음성으로 변환
+3. **[Vision API 설정](../gcp-vision-api-setup)** - 이미지 분석 AI
+
+---
+
+## 자주 묻는 질문
+
+<Callout type="info">
+**Q. 어떤 언어를 지원하나요?**
+
+A. 100개 이상의 언어를 지원합니다. 주요 언어:
+- 한국어 (ko), 영어 (en), 일본어 (ja), 중국어 간체 (zh-CN), 중국어 번체 (zh-TW)
+- 스페인어 (es), 프랑스어 (fr), 독일어 (de), 러시아어 (ru), 아랍어 (ar)
+- 힌디어 (hi), 베트남어 (vi), 태국어 (th), 인도네시아어 (id) 등
+
+전체 목록: `languages` API 엔드포인트로 조회 가능
+</Callout>
+
+<Callout type="info">
+**Q. 번역 품질은 어떤가요?**
+
+A. Google Translate와 동일한 엔진을 사용합니다:
+- 일반 텍스트: 매우 높은 품질
+- 전문 용어: 용어집 기능으로 개선 가능 (고급 기능)
+- 문맥 이해: 긴 문장일수록 더 정확
+- 실시간 대화: 충분히 활용 가능
+</Callout>
+
+<Callout type="info">
+**Q. 문자 수는 어떻게 계산되나요?**
+
+A. 요청에 포함된 모든 문자를 계산합니다:
+- 공백, 특수문자, 줄바꿈 모두 포함
+- HTML 태그는 제외 (format: "html"인 경우)
+- 여러 텍스트 배열 요청 시 모든 텍스트의 합계
+
+예시:
+- "Hello World" = 11자 (공백 포함)
+- ["Hi", "Bye"] = 5자
+</Callout>
+
+<Callout type="info">
+**Q. 언어 코드를 어떻게 알 수 있나요?**
+
+A. ISO 639-1 표준을 사용합니다:
+- `ko`: 한국어
+- `en`: 영어
+- `ja`: 일본어
+- `zh-CN`: 중국어 간체
+- `zh-TW`: 중국어 번체
+- `es`: 스페인어
+- `fr`: 프랑스어
+- `de`: 독일어
+
+전체 목록은 `/languages` API로 조회하거나 [공식 문서](https://cloud.google.com/translate/docs/languages)를 참고하세요.
+</Callout>
+
+---
+
+## 문제 해결
+
+### "API key not valid" 오류
+
+- API 키가 정확히 복사되었는지 확인
+- API 키 제한사항에 Translation API가 허용되어 있는지 확인
+- API 키가 비활성화되지 않았는지 확인
+
+### "Permission denied" 오류
+
+- Translation API가 활성화되어 있는지 확인
+- 올바른 프로젝트에서 작업 중인지 확인
+- 결제 계정이 연결되어 있는지 확인
+
+### 번역 결과가 이상해요
+
+- 원본 텍스트가 올바른지 확인
+- `source` 언어를 명시적으로 지정해보세요:
+  ```json
+  {
+    "q": "text",
+    "source": "en",
+    "target": "ko"
+  }
+  ```
+- 긴 텍스트는 문맥이 더 잘 반영됩니다
+- 전문 용어는 용어집 기능 활용 (고급)
+
+### 응답이 없거나 느려요
+
+- 네트워크 연결 확인
+- API 키 할당량 초과 여부 확인
+- 요청 크기 확인 (최대 102,400자/요청)
+
+---
+
+**Translation API 설정 완료!** 🎊 이제 자유롭게 다국어 번역 서비스를 활용하세요!
