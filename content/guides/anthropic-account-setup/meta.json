@@ -1,0 +1,60 @@
+{
+  "slug": "anthropic-account-setup",
+  "platform": "anthropic",
+  "service": "Claude API",
+  "category": "ai-ml",
+  "difficulty": "beginner",
+  "estimatedMinutes": 15,
+  "totalSteps": 4,
+  "freeTier": {
+    "service": "Anthropic Claude API",
+    "limit": "Pay-as-you-go, no free tier",
+    "period": "usage-based",
+    "amount": "Starting at $0.80 per 1M input tokens",
+    "status": "affordable",
+    "conditions": [
+      "Pay only for what you use",
+      "No monthly minimum",
+      "No hidden fees",
+      "Competitive pricing",
+      "Support for all Claude models",
+      "Rate limits based on usage tier"
+    ]
+  },
+  "prerequisites": [],
+  "nextGuides": [
+    "anthropic-api-integration"
+  ],
+  "seo": {
+    "ko": {
+      "title": "Anthropic Claude API 계정 설정하기 | CloudSetup.guide",
+      "description": "Claude API 계정을 생성하고 API 키를 얻는 방법을 배웁니다. 몇 분 안에 시작할 수 있습니다.",
+      "keywords": [
+        "Claude API",
+        "Anthropic",
+        "AI API",
+        "API 키",
+        "LLM",
+        "인공지능",
+        "대언어모델"
+      ]
+    },
+    "en": {
+      "title": "Set Up Anthropic Claude API Account | CloudSetup.guide",
+      "description": "Learn how to create a Claude API account and get your API key. Get started in minutes.",
+      "keywords": [
+        "Claude API",
+        "Anthropic",
+        "AI API",
+        "API key",
+        "LLM",
+        "artificial intelligence",
+        "large language model"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z",
+  "published": false
+}

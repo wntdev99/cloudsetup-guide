@@ -1,0 +1,416 @@
+# Elasticsearch 인덱싱 및 검색하기
+
+이제 Elasticsearch에 **데이터를 저장하고 전문검색을 수행**하는 방법을 배웁니다. 실전 예제로 문서를 인덱싱하고 검색 쿼리를 작성합니다.
+
+<FreeTierInfo
+  service="Elasticsearch"
+  limit="무제한 인덱싱 및 검색"
+  period="unlimited"
+  status="generous"
+/>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "Elasticsearch 설치됨", required: true },
+  { text: "Elasticsearch 서버 실행 중", required: true },
+  { text: "curl 또는 API 클라이언트 (Postman, Thunder Client)", required: true },
+  { text: "기본적인 JSON 문법 이해", required: false }
+]} />
+
+<Callout type="info">
+📚 **인덱싱이란?** 인덱싱은 데이터베이스에 문서를 저장하는 과정입니다. Elasticsearch는 JSON 형식의 문서를 저장하고 빠르게 검색하기 위해 역 인덱스[inverted index]를 사용합니다.
+</Callout>
+
+---
+
+<Step number={1} title="인덱스 생성하기">
+
+인덱스는 Elasticsearch의 **데이터베이스**처럼 작동합니다. 문서들을 저장하는 공간입니다.
+
+### 기본 인덱스 생성
+
+<CopyBlock language="bash" title="인덱스 생성">
+curl -X PUT http://localhost:9200/products
+</CopyBlock>
+
+응답:
+```json
+{
+  "acknowledged": true,
+  "shards_acknowledged": true,
+  "index": "products"
+}
+```
+
+### 설정을 포함한 인덱스 생성
+
+더 자세한 설정과 함께:
+
+<CopyBlock language="bash" title="매핑 정보를 포함한 인덱스 생성">
+curl -X PUT http://localhost:9200/articles \
+  -H "Content-Type: application/json" \
+  -d '{
+    "mappings": {
+      "properties": {
+        "title": { "type": "text" },
+        "content": { "type": "text" },
+        "author": { "type": "keyword" },
+        "published_date": { "type": "date" },
+        "tags": { "type": "keyword" }
+      }
+    }
+  }'
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/elasticsearch/step1-create-index-ko.png"
+  alt="인덱스 생성"
+  caption="curl로 Elasticsearch 인덱스를 생성합니다"
+  priority={true}
+/>
+
+<Callout type="tip">
+💡 **필드 타입**: `text`는 전문검색용 (단어 분석), `keyword`는 정확한 일치용입니다.
+</Callout>
+
+<Checkpoint>
+인덱스 생성 응답에서 "acknowledged": true가 보이나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={2} title="문서 인덱싱하기">
+
+인덱스에 문서[documents]를 추가합니다.
+
+### 단일 문서 추가
+
+<CopyBlock language="bash" title="문서 추가">
+curl -X POST http://localhost:9200/products/_doc \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "노트북",
+    "price": 1200000,
+    "category": "전자제품",
+    "in_stock": true,
+    "description": "고성능 노트북, 8코어 프로세서, 16GB RAM"
+  }'
+</CopyBlock>
+
+응답에서 생성된 ID를 확인합니다:
+```json
+{
+  "_index": "products",
+  "_type": "_doc",
+  "_id": "abc123",
+  "_version": 1,
+  "result": "created"
+}
+```
+
+### 여러 문서 한번에 추가 (벌크 인덱싱)
+
+대량의 문서를 빠르게 추가할 때:
+
+<CopyBlock language="bash" title="벌크 인덱싱">
+curl -X POST http://localhost:9200/products/_bulk \
+  -H "Content-Type: application/json" \
+  -d '{
+    "index": {}
+  }
+  {
+    "name": "마우스",
+    "price": 50000,
+    "category": "액세서리"
+  }
+  {
+    "index": {}
+  }
+  {
+    "name": "키보드",
+    "price": 150000,
+    "category": "액세서리"
+  }
+  {
+    "index": {}
+  }
+  {
+    "name": "모니터",
+    "price": 350000,
+    "category": "전자제품"
+  }
+  '
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/elasticsearch/step2-index-documents-ko.png"
+  alt="문서 인덱싱"
+  caption="JSON 문서를 Elasticsearch에 추가합니다"
+/>
+
+<DevTip>
+벌크 인덱싱은 대량 데이터 삽입 시 훨씬 빠릅니다. 매번 한 문서씩 추가하는 것보다 수백배 빠를 수 있습니다.
+</DevTip>
+
+<Checkpoint>
+문서가 성공적으로 추가되었나요? _id 값이 반환되었나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={3} title="검색 쿼리 작성하기">
+
+### 매치 쿼리 (전문검색)
+
+특정 단어를 포함하는 문서를 검색합니다:
+
+<CopyBlock language="bash" title="매치 쿼리로 검색">
+curl -X GET http://localhost:9200/products/_search \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": {
+      "match": {
+        "description": "프로세서"
+      }
+    }
+  }'
+</CopyBlock>
+
+### 용어 쿼리 (정확 일치)
+
+정확한 값을 검색합니다:
+
+<CopyBlock language="bash" title="용어 쿼리로 검색">
+curl -X GET http://localhost:9200/products/_search \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": {
+      "term": {
+        "category": "액세서리"
+      }
+    }
+  }'
+</CopyBlock>
+
+### 범위 쿼리 (부등호)
+
+가격이 100,000원 이상 500,000원 이하인 제품 검색:
+
+<CopyBlock language="bash" title="범위 쿼리">
+curl -X GET http://localhost:9200/products/_search \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": {
+      "range": {
+        "price": {
+          "gte": 100000,
+          "lte": 500000
+        }
+      }
+    }
+  }'
+</CopyBlock>
+
+### Bool 쿼리 (복합 조건)
+
+여러 조건을 함께 사용:
+
+<CopyBlock language="bash" title="Bool 쿼리">
+curl -X GET http://localhost:9200/products/_search \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": {
+      "bool": {
+        "must": [
+          { "match": { "category": "전자제품" } }
+        ],
+        "filter": [
+          { "range": { "price": { "gte": 1000000 } } }
+        ]
+      }
+    }
+  }'
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/elasticsearch/step3-search-queries-ko.png"
+  alt="검색 쿼리"
+  caption="다양한 쿼리 타입으로 데이터를 검색합니다"
+/>
+
+<Checkpoint>
+검색 결과가 나오나요? hits 배열에 문서들이 포함되어 있나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={4} title="검색 결과 정렬 및 필터링">
+
+### 결과 정렬
+
+가격순으로 정렬하여 검색:
+
+<CopyBlock language="bash" title="가격순 정렬">
+curl -X GET http://localhost:9200/products/_search \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": { "match_all": {} },
+    "sort": [
+      { "price": { "order": "desc" } }
+    ]
+  }'
+</CopyBlock>
+
+### 페이지네이션
+
+from과 size로 결과를 페이지 단위로 나눕니다:
+
+<CopyBlock language="bash" title="페이지네이션">
+curl -X GET http://localhost:9200/products/_search \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": { "match_all": {} },
+    "from": 0,
+    "size": 10
+  }'
+</CopyBlock>
+
+### 특정 필드만 반환
+
+불필요한 필드는 제외하고 필요한 필드만 반환:
+
+<CopyBlock language="bash" title="특정 필드만 선택">
+curl -X GET http://localhost:9200/products/_search \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": { "match_all": {} },
+    "_source": ["name", "price", "category"]
+  }'
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/elasticsearch/step4-sorting-ko.png"
+  alt="정렬 및 필터링"
+  caption="정렬, 페이지네이션, 필드 선택으로 결과를 최적화합니다"
+/>
+
+</Step>
+
+---
+
+<Step number={5} title="집계 및 분석">
+
+### 카테고리별 문서 수 계산
+
+<CopyBlock language="bash" title="집계 쿼리">
+curl -X GET http://localhost:9200/products/_search \
+  -H "Content-Type: application/json" \
+  -d '{
+    "aggs": {
+      "category_counts": {
+        "terms": {
+          "field": "category"
+        }
+      }
+    }
+  }'
+</CopyBlock>
+
+응답:
+```json
+{
+  "aggregations": {
+    "category_counts": {
+      "buckets": [
+        {
+          "key": "전자제품",
+          "doc_count": 2
+        },
+        {
+          "key": "액세서리",
+          "doc_count": 3
+        }
+      ]
+    }
+  }
+}
+```
+
+### 평균 가격 계산
+
+<CopyBlock language="bash" title="평균 계산">
+curl -X GET http://localhost:9200/products/_search \
+  -H "Content-Type: application/json" \
+  -d '{
+    "aggs": {
+      "avg_price": {
+        "avg": {
+          "field": "price"
+        }
+      }
+    }
+  }'
+</CopyBlock>
+
+<Callout type="success">
+✅ **축하합니다!** 이제 Elasticsearch에서 데이터를 인덱싱하고 검색하는 방법을 알게 되었습니다.
+</Callout>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/elasticsearch/step5-aggregations-ko.png"
+  alt="집계"
+  caption="집계로 데이터의 통계 정보를 얻습니다"
+/>
+
+</Step>
+
+---
+
+## 실전 팁
+
+### 인덱스 정보 확인
+
+<CopyBlock language="bash" title="인덱스 매핑 확인">
+curl http://localhost:9200/products/_mapping
+</CopyBlock>
+
+### 인덱스 삭제
+
+<CopyBlock language="bash" title="인덱스 삭제">
+curl -X DELETE http://localhost:9200/products
+</CopyBlock>
+
+### 모든 인덱스 확인
+
+<CopyBlock language="bash" title="인덱스 목록">
+curl http://localhost:9200/_cat/indices
+</CopyBlock>
+
+---
+
+## 문제 해결
+
+### 검색 결과가 없습니다
+
+1. 인덱스에 문서가 있는지 확인:
+   ```bash
+   curl http://localhost:9200/products/_count
+   ```
+
+2. 매핑 확인 - 필드 타입이 올바른지 확인합니다
+
+3. 쿼리 문법 확인 - JSON이 유효한지 확인합니다
+
+### 성능이 느립니다
+
+1. 인덱스 설정 최적화
+2. 불필요한 필드는 제외
+3. 쿼리 캐싱 활용
+4. 샤드 개수 조정

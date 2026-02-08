@@ -1,0 +1,560 @@
+# Claude API 통합하기 - 애플리케이션에 AI 추가
+
+이제 **애플리케이션에 Claude API를 통합**하여 AI 기능을 추가합니다. 텍스트 생성, 질문 답변, 이미지 분석 등 다양한 작업을 수행할 수 있습니다.
+
+<FreeTierInfo
+  service="Claude API"
+  limit="종량제 결제 (저렴한 가격)"
+  period="usage-based"
+  status="affordable"
+/>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "Anthropic API 키", required: true },
+  { text: "Python 3.8+ 또는 Node.js 14+", required: true },
+  { text: "pip 또는 npm", required: true }
+]} />
+
+<Callout type="info">
+🔗 **API 통합이란?** API 통합은 외부 서비스의 기능을 자신의 애플리케이션에 추가하는 것입니다. Claude API를 통합하면 애플리케이션에서 직접 Claude 기능을 사용할 수 있습니다.
+</Callout>
+
+---
+
+<Step number={1} title="Python SDK 설치 및 기본 사용">
+
+### anthropic 라이브러리 설치
+
+<CopyBlock language="bash" title="Anthropic Python SDK 설치">
+pip install anthropic
+</CopyBlock>
+
+### 기본 텍스트 생성
+
+<CopyBlock language="python" title="Claude로 텍스트 생성 (Python)">
+import anthropic
+
+client = anthropic.Anthropic()
+
+message = client.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=1024,
+    messages=[
+        {
+            "role": "user",
+            "content": "안녕하세요! 당신은 누구인가요?"
+        }
+    ]
+)
+
+print(message.content[0].text)
+</CopyBlock>
+
+### 다중 턴 대화
+
+<CopyBlock language="python" title="대화형 상호작용">
+import anthropic
+
+client = anthropic.Anthropic()
+
+messages = [
+    {
+        "role": "user",
+        "content": "파이썬에 대해 알려주세요"
+    }
+]
+
+response = client.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=1024,
+    messages=messages
+)
+
+assistant_message = response.content[0].text
+messages.append({"role": "assistant", "content": assistant_message})
+
+messages.append({
+    "role": "user",
+    "content": "그럼 자주 쓰는 라이브러리는?"
+})
+
+response2 = client.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=1024,
+    messages=messages
+)
+
+print(response2.content[0].text)
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/anthropic/step1-python-integration-ko.png"
+  alt="Python Claude 통합"
+  caption="Anthropic SDK를 설치하고 기본적인 텍스트 생성을 수행합니다"
+  priority={true}
+/>
+
+<Checkpoint>
+Claude로부터 응답이 나왔나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={2} title="Node.js SDK 설치 및 사용">
+
+### @anthropic-ai/sdk 설치
+
+<CopyBlock language="bash" title="Anthropic Node.js SDK 설치">
+npm install @anthropic-ai/sdk
+</CopyBlock>
+
+### 기본 텍스트 생성
+
+<CopyBlock language="javascript" title="Claude로 텍스트 생성 (Node.js)">
+import Anthropic from "@anthropic-ai/sdk";
+
+const client = new Anthropic({
+    apiKey: process.env.ANTHROPIC_API_KEY
+});
+
+const message = await client.messages.create({
+    model: "claude-3-5-sonnet-20241022",
+    max_tokens: 1024,
+    messages: [
+        {
+            role: "user",
+            content: "안녕하세요! JavaScript로 웹앱을 만드는 방법을 알려주세요"
+        }
+    ]
+});
+
+console.log(message.content[0].type === 'text' ? message.content[0].text : 'No text response');
+</CopyBlock>
+
+### 스트리밍 응답
+
+실시간으로 응답을 받습니다:
+
+<CopyBlock language="javascript" title="스트리밍 응답 (Node.js)">
+import Anthropic from "@anthropic-ai/sdk";
+
+const client = new Anthropic();
+
+const stream = await client.messages.stream({
+    model: "claude-3-5-sonnet-20241022",
+    max_tokens: 1024,
+    messages: [
+        {
+            role: "user",
+            content: "아주 긴 이야기를 지어주세요"
+        }
+    ]
+});
+
+for await (const chunk of stream) {
+    if (chunk.type === 'content_block_delta' && chunk.delta.type === 'text_delta') {
+        process.stdout.write(chunk.delta.text);
+    }
+}
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/anthropic/step2-nodejs-integration-ko.png"
+  alt="Node.js Claude 통합"
+  caption="Node.js에서 Claude API를 사용하고 스트리밍 응답을 받습니다"
+/>
+
+</Step>
+
+---
+
+<Step number={3} title="이미지 분석 및 시각 데이터 처리">
+
+### Python에서 이미지 분석
+
+<CopyBlock language="python" title="이미지 분석 (Python)">
+import anthropic
+import base64
+
+client = anthropic.Anthropic()
+
+with open("image.jpg", "rb") as image_file:
+    image_data = base64.standard_b64encode(image_file.read()).decode("utf-8")
+
+message = client.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=1024,
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "image",
+                    "source": {
+                        "type": "base64",
+                        "media_type": "image/jpeg",
+                        "data": image_data,
+                    }
+                },
+                {
+                    "type": "text",
+                    "text": "이 이미지에 무엇이 있는지 설명해주세요"
+                }
+            ]
+        }
+    ]
+)
+
+print(message.content[0].text)
+</CopyBlock>
+
+### URL로부터 이미지 분석
+
+<CopyBlock language="python" title="URL 이미지 분석">
+import anthropic
+
+client = anthropic.Anthropic()
+
+message = client.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=1024,
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "image",
+                    "source": {
+                        "type": "url",
+                        "url": "https://example.com/image.jpg"
+                    }
+                },
+                {
+                    "type": "text",
+                    "text": "이미지를 분석해주세요"
+                }
+            ]
+        }
+    ]
+)
+
+print(message.content[0].text)
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/anthropic/step3-vision-ko.png"
+  alt="이미지 분석"
+  caption="Claude의 비전 능력으로 이미지를 분석합니다"
+/>
+
+</Step>
+
+---
+
+<Step number={4} title="토큰 계산 및 비용 추정">
+
+### Python에서 토큰 계산
+
+<CopyBlock language="python" title="토큰 계산">
+import anthropic
+
+client = anthropic.Anthropic()
+
+text = "안녕하세요! 이것은 테스트 메시지입니다."
+
+count = client.messages.count_tokens(
+    model="claude-3-5-sonnet-20241022",
+    messages=[
+        {
+            "role": "user",
+            "content": text
+        }
+    ]
+)
+
+print(f"입력 토큰: {count.input_tokens}")
+print(f"총 토큰: {count.input_tokens}")
+
+estimated_cost = (count.input_tokens / 1_000_000) * 3
+print(f"예상 비용: ${estimated_cost:.6f}")
+</CopyBlock>
+
+### 응답 토큰 확인
+
+<CopyBlock language="python" title="응답 토큰 포함 확인">
+import anthropic
+
+client = anthropic.Anthropic()
+
+response = client.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=100,
+    messages=[
+        {
+            "role": "user",
+            "content": "간단한 답변을 해주세요"
+        }
+    ]
+)
+
+input_tokens = response.usage.input_tokens
+output_tokens = response.usage.output_tokens
+
+input_cost = (input_tokens / 1_000_000) * 3
+output_cost = (output_tokens / 1_000_000) * 9
+
+total_cost = input_cost + output_cost
+
+print(f"입력: {input_tokens} 토큰 (${input_cost:.6f})")
+print(f"출력: {output_tokens} 토큰 (${output_cost:.6f})")
+print(f"총 비용: ${total_cost:.6f}")
+</CopyBlock>
+
+<Callout type="tip">
+💡 **토큰이란?** 토큰은 텍스트의 작은 단위입니다. 평균적으로 4개 문자가 1 토큰입니다. "안녕하세요"는 약 2-3 토큰입니다.
+</Callout>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/anthropic/step4-token-counting-ko.png"
+  alt="토큰 계산"
+  caption="API 비용을 추정하기 위해 토큰을 계산합니다"
+/>
+
+</Step>
+
+---
+
+<Step number={5} title="시스템 프롬프트 및 고급 기능">
+
+### 시스템 프롬프트 사용
+
+Claude의 동작을 정의합니다:
+
+<CopyBlock language="python" title="시스템 프롬프트">
+import anthropic
+
+client = anthropic.Anthropic()
+
+message = client.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=1024,
+    system="당신은 친절한 파이썬 전문 튜터입니다. 사용자의 질문에 단계별로 설명하고 코드 예제를 제공하세요.",
+    messages=[
+        {
+            "role": "user",
+            "content": "파이썬 리스트를 어떻게 사용하는지 설명해주세요"
+        }
+    ]
+)
+
+print(message.content[0].text)
+</CopyBlock>
+
+### JSON 응답 포맷
+
+구조화된 데이터를 받습니다:
+
+<CopyBlock language="python" title="JSON 응답">
+import anthropic
+import json
+
+client = anthropic.Anthropic()
+
+message = client.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=1024,
+    messages=[
+        {
+            "role": "user",
+            "content": 'JSON 형식으로 {이름, 나이, 직업}을 가진 가짜 사용자 정보 3개를 만들어주세요'
+        }
+    ]
+)
+
+response_text = message.content[0].text
+
+try:
+    start_idx = response_text.find('[')
+    end_idx = response_text.rfind(']') + 1
+    json_str = response_text[start_idx:end_idx]
+    data = json.loads(json_str)
+    print(json.dumps(data, indent=2, ensure_ascii=False))
+except json.JSONDecodeError:
+    print("JSON 파싱 실패")
+    print(response_text)
+</CopyBlock>
+
+### 배치 처리
+
+많은 요청을 효율적으로 처리합니다:
+
+<CopyBlock language="python" title="배치 처리">
+import anthropic
+
+client = anthropic.Anthropic()
+
+prompts = [
+    "파이썬이란 뭔가요?",
+    "자바스크립트의 특징은?",
+    "Go 언어를 언제 사용하나요?"
+]
+
+responses = []
+
+for prompt in prompts:
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=500,
+        messages=[
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ]
+    )
+    responses.append({
+        "question": prompt,
+        "answer": message.content[0].text
+    })
+
+for resp in responses:
+    print(f"Q: {resp['question']}")
+    print(f"A: {resp['answer']}")
+    print()
+</CopyBlock>
+
+<Callout type="success">
+✅ **완료!** Claude API를 애플리케이션에 통합했습니다. 이제 AI 기능으로 애플리케이션을 강화할 수 있습니다.
+</Callout>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/anthropic/step5-advanced-features-ko.png"
+  alt="고급 기능"
+  caption="시스템 프롬프트, JSON 응답, 배치 처리로 고급 기능을 구현합니다"
+/>
+
+</Step>
+
+---
+
+## 실전 사용 사례
+
+### 챗봇 애플리케이션
+
+<CopyBlock language="python" title="간단한 챗봇">
+import anthropic
+
+def chatbot():
+    client = anthropic.Anthropic()
+    messages = []
+
+    print("챗봇 시작 (종료하려면 'quit' 입력)")
+
+    while True:
+        user_input = input("당신: ")
+        if user_input.lower() == 'quit':
+            break
+
+        messages.append({
+            "role": "user",
+            "content": user_input
+        })
+
+        response = client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=1024,
+            messages=messages
+        )
+
+        assistant_message = response.content[0].text
+        messages.append({
+            "role": "assistant",
+            "content": assistant_message
+        })
+
+        print(f"챗봇: {assistant_message}")
+
+if __name__ == "__main__":
+    chatbot()
+</CopyBlock>
+
+### 텍스트 요약
+
+<CopyBlock language="python" title="문서 요약">
+import anthropic
+
+def summarize_text(text):
+    client = anthropic.Anthropic()
+
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=500,
+        system="당신은 문서 요약 전문가입니다. 주요 내용만 간결하게 요약하세요.",
+        messages=[
+            {
+                "role": "user",
+                "content": f"다음 텍스트를 요약해주세요:\n\n{text}"
+            }
+        ]
+    )
+
+    return message.content[0].text
+
+long_text = "..."
+summary = summarize_text(long_text)
+print(summary)
+</CopyBlock>
+
+---
+
+## 에러 처리
+
+### API 오류 처리
+
+<CopyBlock language="python" title="에러 처리">
+import anthropic
+
+try:
+    client = anthropic.Anthropic()
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": "안녕하세요"
+            }
+        ]
+    )
+    print(message.content[0].text)
+except anthropic.APIError as e:
+    print(f"API 오류: {e}")
+except anthropic.APIConnectionError as e:
+    print(f"연결 오류: {e}")
+except anthropic.RateLimitError as e:
+    print(f"레이트 제한: {e}")
+</CopyBlock>
+
+---
+
+## 문제 해결
+
+### API 키 오류
+
+API 키가 올바르게 설정되었는지 확인:
+
+<CopyBlock language="bash" title="환경 변수 확인">
+echo $ANTHROPIC_API_KEY
+</CopyBlock>
+
+### 토큰 제한 오류
+
+`max_tokens` 값이 너무 크면 오류가 발생합니다. 1024 이하로 설정하세요.
+
+### 응답 포맷 문제
+
+Claude의 응답이 예상과 다르면 시스템 프롬프트를 더 구체적으로 작성하세요.

@@ -1,0 +1,60 @@
+{
+  "slug": "elasticsearch-installation-setup",
+  "platform": "elasticsearch",
+  "service": "Elasticsearch Search Engine",
+  "category": "database",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 25,
+  "totalSteps": 5,
+  "freeTier": {
+    "service": "Elasticsearch",
+    "limit": "Full features on Elastic Cloud free tier",
+    "period": "monthly",
+    "amount": "Free",
+    "status": "generous",
+    "conditions": [
+      "Elastic Cloud free tier with 14-day trial",
+      "Up to 1 GB storage",
+      "Unlimited API calls",
+      "Full-text search capabilities",
+      "Open source version available",
+      "Self-hosted option with no restrictions"
+    ]
+  },
+  "prerequisites": [],
+  "nextGuides": [
+    "elasticsearch-indexing-search"
+  ],
+  "seo": {
+    "ko": {
+      "title": "Elasticsearch 설치 및 실행하기 | CloudSetup.guide",
+      "description": "Elasticsearch를 로컬에 설치하고 실행하는 방법을 단계별로 배웁니다. Docker로 쉽게 시작하거나 직접 설치할 수 있습니다.",
+      "keywords": [
+        "Elasticsearch 설치",
+        "검색 엔진",
+        "전문검색",
+        "Elasticsearch 셋업",
+        "Docker Elasticsearch",
+        "검색 데이터베이스",
+        "Elastic Stack"
+      ]
+    },
+    "en": {
+      "title": "Install and Run Elasticsearch Locally | CloudSetup.guide",
+      "description": "Step-by-step guide to install and run Elasticsearch on your machine. Get started with Docker or manual installation in 25 minutes.",
+      "keywords": [
+        "Elasticsearch installation",
+        "search engine setup",
+        "full-text search",
+        "Elasticsearch setup",
+        "Docker Elasticsearch",
+        "search database",
+        "Elastic Stack"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z",
+  "published": false
+}

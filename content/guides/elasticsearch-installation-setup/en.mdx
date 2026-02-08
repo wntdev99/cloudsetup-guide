@@ -1,0 +1,282 @@
+# Install and Run Elasticsearch Locally
+
+Elasticsearch is a **scalable open-source search and analytics engine**. It provides fast full-text search over logs, text, and structured data. Follow this guide to run Elasticsearch locally in 25 minutes.
+
+<FreeTierInfo
+  service="Elasticsearch"
+  limit="Elastic Cloud 14-day free trial"
+  period="trial"
+  status="generous"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Docker (recommended)", required: false },
+  { text: "Or Java 11 or higher", required: false },
+  { text: "Minimum 2GB RAM", required: true },
+  { text: "4GB free disk space", required: true }
+]} />
+
+<Callout type="info">
+🔍 **What is Elasticsearch?** Elasticsearch is a distributed search engine that indexes and searches JSON documents. It's used for log analysis, full-text search, analytics, and more.
+</Callout>
+
+---
+
+<Step number={1} title="Install with Docker (Recommended)">
+
+Docker makes it easy to get started without dependency issues.
+
+### Verify Docker is Installed
+
+Open a terminal and run:
+
+<CopyBlock language="bash" title="Check Docker version">
+docker --version
+</CopyBlock>
+
+If Docker is not installed, download it from the [Docker official website](https://www.docker.com/products/docker-desktop).
+
+### Run Elasticsearch with Docker
+
+<CopyBlock language="bash" title="Start Elasticsearch Docker container">
+docker run -d \
+  --name elasticsearch \
+  -e discovery.type=single-node \
+  -e xpack.security.enabled=false \
+  -p 9200:9200 \
+  -p 9300:9300 \
+  docker.elastic.co/elasticsearch/elasticsearch:8.13.0
+</CopyBlock>
+
+Command explanation:
+- `-d`: Run in background
+- `--name elasticsearch`: Container name
+- `-e discovery.type=single-node`: Single-node mode (development)
+- `-e xpack.security.enabled=false`: Disable security (development)
+- `-p 9200:9200`: REST API port
+- `-p 9300:9300`: Node communication port
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/elasticsearch/step1-docker-run-en.png"
+  alt="Run Elasticsearch with Docker"
+  caption="Start Elasticsearch container with Docker command"
+  priority={true}
+/>
+
+<Callout type="tip">
+💡 **Tip**: Image download may take a few minutes on first start.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Manual Installation (Optional)">
+
+You can install Elasticsearch directly without Docker.
+
+### Download Elasticsearch
+
+1. Visit the [Elastic Download Page](https://www.elastic.co/downloads/elasticsearch)
+2. Select the latest **Elasticsearch** version
+3. Download the version for your operating system (macOS, Linux, Windows)
+
+### Install
+
+For Linux/Mac:
+
+<CopyBlock language="bash" title="Extract and install Elasticsearch">
+cd ~/Downloads
+tar -xzf elasticsearch-8.13.0-linux-x86_64.tar.gz
+cd elasticsearch-8.13.0
+</CopyBlock>
+
+For Windows, download the ZIP file and extract it.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/elasticsearch/step2-download-en.png"
+  alt="Download Elasticsearch"
+  caption="Download the version matching your operating system"
+/>
+
+</Step>
+
+---
+
+<Step number={3} title="Start the Elasticsearch Server">
+
+### With Docker
+
+<CopyBlock language="bash" title="Check container status">
+docker ps | grep elasticsearch
+</CopyBlock>
+
+Verify the container is running. You should see `Up` status.
+
+### With Manual Installation
+
+<CopyBlock language="bash" title="Start Elasticsearch server">
+./bin/elasticsearch
+</CopyBlock>
+
+Or run in the background:
+
+<CopyBlock language="bash" title="Run in background">
+./bin/elasticsearch -d
+</CopyBlock>
+
+When the server starts, you'll see:
+```
+[INFO ][elasticsearch.node] [node-name] started
+```
+
+<Checkpoint>
+Is Elasticsearch running? We'll verify in the next step.
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={4} title="Verify Installation">
+
+Test that Elasticsearch is working by accessing its API.
+
+### Verify with curl
+
+In your terminal:
+
+<CopyBlock language="bash" title="Check Elasticsearch status">
+curl http://localhost:9200
+</CopyBlock>
+
+If successful, you'll see a response like:
+
+<CopyBlock language="json" title="Response example">
+{
+  "name" : "node-name",
+  "cluster_name" : "elasticsearch",
+  "cluster_uuid" : "uuid",
+  "version" : {
+    "number" : "8.13.0",
+    "build_flavor" : "default"
+  },
+  "tagline" : "You Know, for Search"
+}
+</CopyBlock>
+
+### Verify with Web Browser
+
+Open your browser and visit:
+```
+http://localhost:9200/_cat/health
+```
+
+You'll see the cluster health status.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/elasticsearch/step4-verify-en.png"
+  alt="Verify Elasticsearch status"
+  caption="Check Elasticsearch status via curl or web browser"
+/>
+
+<Checkpoint>
+Is the Elasticsearch API responding? If you see version info, it's working!
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={5} title="Optional: Install Kibana (Monitoring Tool)">
+
+Kibana is a visualization and management tool for Elasticsearch.
+
+### Run Kibana with Docker
+
+<CopyBlock language="bash" title="Start Kibana container">
+docker run -d \
+  --name kibana \
+  -p 5601:5601 \
+  -e ELASTICSEARCH_HOSTS=http://elasticsearch:9200 \
+  --network bridge \
+  docker.elastic.co/kibana/kibana:8.13.0
+</CopyBlock>
+
+Then open your browser:
+```
+http://localhost:5601
+```
+
+You'll access the Kibana dashboard.
+
+<DevTip>
+With Kibana, you can manage indexes, visualize queries, analyze logs, and more.
+</DevTip>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/elasticsearch/step5-kibana-en.png"
+  alt="Kibana Dashboard"
+  caption="Kibana is a management and monitoring tool for Elasticsearch"
+/>
+
+</Step>
+
+---
+
+## Next Steps
+
+You've installed Elasticsearch! Next, you can:
+
+<Callout type="success">
+✅ **Complete!** Elasticsearch is running. You're ready to index and search data.
+</Callout>
+
+- [Elasticsearch Indexing and Search](/guides/elasticsearch-indexing-search) - Learn how to add data and search
+- Official documentation: https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html
+- Kibana getting started: https://www.elastic.co/guide/en/kibana/current/index.html
+
+## Troubleshooting
+
+### Port 9200 Already in Use
+
+Change to a different port:
+
+<CopyBlock language="bash" title="Use different port">
+docker run -d \
+  --name elasticsearch \
+  -e discovery.type=single-node \
+  -e xpack.security.enabled=false \
+  -p 9201:9200 \
+  docker.elastic.co/elasticsearch/elasticsearch:8.13.0
+</CopyBlock>
+
+Then access at `http://localhost:9201`.
+
+### Out of Memory Error
+
+Elasticsearch allocates 2GB RAM by default. Adjust with environment variables:
+
+<CopyBlock language="bash" title="Adjust memory allocation">
+docker run -d \
+  --name elasticsearch \
+  -e discovery.type=single-node \
+  -e xpack.security.enabled=false \
+  -e "ES_JAVA_OPTS=-Xms512m -Xmx512m" \
+  -p 9200:9200 \
+  docker.elastic.co/elasticsearch/elasticsearch:8.13.0
+</CopyBlock>
+
+### Check Docker Logs
+
+<CopyBlock language="bash" title="View Docker logs">
+docker logs elasticsearch
+</CopyBlock>
+
+Check error messages to diagnose issues.
+
+### Firewall Issues
+
+Port 9200 might be blocked by firewall. For local development on localhost, this usually isn't an issue.

@@ -1,0 +1,60 @@
+{
+  "slug": "sentry-error-tracking",
+  "platform": "sentry",
+  "service": "Sentry Error Tracking",
+  "category": "monitoring",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 25,
+  "totalSteps": 5,
+  "freeTier": {
+    "service": "Sentry",
+    "limit": "5,000 events per month included",
+    "period": "monthly",
+    "amount": "Free",
+    "status": "generous",
+    "conditions": [
+      "Automatic exception tracking",
+      "Stack trace capture",
+      "Session tracking",
+      "Performance monitoring",
+      "Release tracking",
+      "Basic issue grouping"
+    ]
+  },
+  "prerequisites": [
+    "sentry-account-setup"
+  ],
+  "nextGuides": [],
+  "seo": {
+    "ko": {
+      "title": "Sentry로 에러 추적 통합하기 | CloudSetup.guide",
+      "description": "애플리케이션에 Sentry SDK를 통합하고 에러 추적을 시작합니다. Python, Node.js, JavaScript 예제 포함.",
+      "keywords": [
+        "Sentry 통합",
+        "에러 추적",
+        "예외 처리",
+        "Sentry SDK",
+        "오류 모니터링",
+        "스택 트레이스",
+        "사용자 세션"
+      ]
+    },
+    "en": {
+      "title": "Integrate Sentry Error Tracking | CloudSetup.guide",
+      "description": "Integrate Sentry SDK into your application and start tracking errors. Includes Python, Node.js, and JavaScript examples.",
+      "keywords": [
+        "Sentry integration",
+        "error tracking",
+        "exception handling",
+        "Sentry SDK",
+        "error monitoring",
+        "stack trace",
+        "user session"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z",
+  "published": false
+}

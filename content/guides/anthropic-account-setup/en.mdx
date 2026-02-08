@@ -1,0 +1,287 @@
+# Set Up Anthropic Claude API Account
+
+**Claude API** provides access to Anthropic's advanced large language model. Use it for text generation, analysis, coding support, and more. Follow this guide to set up your account in 15 minutes.
+
+<FreeTierInfo
+  service="Claude API"
+  limit="Pay-as-you-go (no free trial)"
+  period="usage-based"
+  status="affordable"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Email address", required: true },
+  { text: "Credit or debit card", required: true },
+  { text: "Web browser", required: true }
+]} />
+
+<Callout type="info">
+🤖 **What is Claude?** Claude is a large language model (LLM) developed by Anthropic. It's similar to ChatGPT but known to be more accurate and safer. Latest model is Claude 3 with versions like Opus, Sonnet, and Haiku.
+</Callout>
+
+---
+
+<Step number={1} title="Visit Anthropic Website">
+
+### Access Console
+
+1. Go to [console.anthropic.com](https://console.anthropic.com)
+2. Look for **Create Account** or **Sign In** button
+3. Click **Create Account** if you don't have one
+
+### Enter Signup Information
+
+1. Enter email address
+2. Set password (minimum 8 characters)
+3. Accept terms
+4. Click **Create Account** or **Sign Up**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/anthropic/step1-signup-en.png"
+  alt="Anthropic signup"
+  caption="Create account on Anthropic console"
+  priority={true}
+/>
+
+<Callout type="tip">
+💡 **Tip**: Using a business email allows you to register as a business account.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Verify Email and Add Payment Method">
+
+### Verify Email
+
+1. Check your email inbox
+2. Open **verification email** from Anthropic
+3. Click **Verify email** link
+
+### Set Up Payment
+
+Claude API is pay-as-you-go, so payment info is required:
+
+1. Select **Billing** or **Payment Settings**
+2. Click **Add payment method**
+3. Enter card details:
+   - Card number
+   - Expiration date
+   - CVV
+   - Billing address
+4. Click **Save**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/anthropic/step2-billing-en.png"
+  alt="Set up payment"
+  caption="Add payment method after email verification"
+/>
+
+<Callout type="warning">
+⚠️ **Important**: Payment info is required. However, creating an API key without using it won't incur charges.
+</Callout>
+
+<Checkpoint>
+Is payment info saved?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={3} title="Generate API Key">
+
+### Go to API Keys Page
+
+1. Log in to Anthropic console
+2. Select **API Keys** from left menu
+3. Click **Create new API key** button
+
+### Create and Save API Key
+
+1. Enter API key name (optional, e.g., "My App API Key")
+2. Click **Create**
+3. API key is displayed (shown only once)
+
+<CopyBlock language="text" title="API key example">
+sk-ant-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+</CopyBlock>
+
+**Important**: Save your API key in a secure location. Keep it private!
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/anthropic/step3-api-key-en.png"
+  alt="Generate API key"
+  caption="Create new API key from Anthropic console"
+/>
+
+<Callout type="danger">
+⚠️ **Security Warning**: Never commit API key to public repositories. Use environment variables!
+</Callout>
+
+<Checkpoint>
+Did you save your API key securely?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={4} title="Set API Key as Environment Variable">
+
+### Set Environment Variable
+
+Store API key as environment variable.
+
+#### macOS/Linux
+
+<CopyBlock language="bash" title="Set environment variable">
+export ANTHROPIC_API_KEY="sk-ant-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+</CopyBlock>
+
+Or permanently in `~/.bashrc` or `~/.zshrc`:
+
+<CopyBlock language="bash" title="Add to .bashrc or .zshrc">
+echo 'export ANTHROPIC_API_KEY="sk-ant-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"' >> ~/.bashrc
+source ~/.bashrc
+</CopyBlock>
+
+#### Windows (PowerShell)
+
+<CopyBlock language="powershell" title="Set in PowerShell">
+$env:ANTHROPIC_API_KEY="sk-ant-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+</CopyBlock>
+
+Or permanently:
+
+<CopyBlock language="powershell" title="Set permanently">
+[System.Environment]::SetEnvironmentVariable(
+  'ANTHROPIC_API_KEY',
+  'sk-ant-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+  'User'
+)
+</CopyBlock>
+
+### Use .env File (Recommended)
+
+Use `.env` file in your project:
+
+<CopyBlock language="bash" title=".env file">
+ANTHROPIC_API_KEY=sk-ant-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+</CopyBlock>
+
+Load with python-dotenv or similar:
+
+<CopyBlock language="python" title="Load .env in Python">
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+api_key = os.getenv('ANTHROPIC_API_KEY')
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/anthropic/step4-env-setup-en.png"
+  alt="Set environment variable"
+  caption="Set API key as environment variable for security"
+/>
+
+<Callout type="success">
+✅ **Complete!** Anthropic Claude API account is set up. Ready to use Claude API.
+</Callout>
+
+</Step>
+
+---
+
+## Next Steps
+
+- [Integrate Claude API](/guides/anthropic-api-integration) - Add Claude to your application
+- [Anthropic Official Documentation](https://docs.anthropic.com)
+- [API Reference](https://docs.anthropic.com/reference/getting-started-with-the-api)
+
+## Claude Model Information
+
+Claude comes in several versions:
+
+### Claude 3 Opus (Most Powerful)
+- Best for complex tasks
+- Highest latency
+- $15 per 1M input tokens
+
+### Claude 3 Sonnet (Balanced)
+- Recommended for most tasks
+- Mid-range pricing
+- $3 per 1M input tokens
+
+### Claude 3 Haiku (Fastest)
+- Fast response needed
+- Most affordable
+- $0.80 per 1M input tokens
+
+## Billing Information
+
+### Pricing Structure
+
+Claude API charges based on tokens:
+
+<CopyBlock language="text" title="Pricing example">
+Process 1,000 input tokens + generate 200 output tokens
+
+Claude 3 Haiku pricing:
+Input: 1,000 × ($0.80 / 1,000,000) = $0.0008
+Output: 200 × ($2.40 / 1,000,000) = $0.00048
+Total: approximately $0.0013
+</CopyBlock>
+
+### Free Trial Policy
+
+- Anthropic currently offers no free trial
+- Payment required to start immediately
+- Creating API key without usage incurs no charges
+
+### Monitor Usage
+
+1. Go to **Billing** tab in Anthropic console
+2. Check **Usage**
+3. Track monthly costs
+
+## Security Tips
+
+### Protect API Keys
+
+1. Never commit to public repositories
+2. Add `.env` file to `.gitignore`
+3. Delete unused keys regularly
+4. Use separate keys for team members
+
+### Rate Limits
+
+Each API key has rate limits:
+- Default: hundreds of requests per second
+- High usage: request increase through priority support
+
+---
+
+## Troubleshooting
+
+### API Key Not Working
+
+1. Verify API key copied correctly
+2. Check environment variable is set properly
+3. Verify API key isn't disabled
+
+### Payment Error
+
+1. Verify card info is accurate
+2. Check card expiration
+3. Confirm auto-pay is enabled
+
+### Usage Higher Than Expected
+
+1. Check logs for unnecessary API calls
+2. Improve token efficiency with batching
+3. Use caching to prevent duplicate requests

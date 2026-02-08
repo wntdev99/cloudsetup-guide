@@ -1,0 +1,560 @@
+# Integrate Claude API - Add AI to Your App
+
+Now you'll **integrate Claude API into your application** to add AI capabilities. Perform text generation, question answering, image analysis, and more.
+
+<FreeTierInfo
+  service="Claude API"
+  limit="Pay-as-you-go pricing (affordable)"
+  period="usage-based"
+  status="affordable"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Anthropic API key", required: true },
+  { text: "Python 3.8+ or Node.js 14+", required: true },
+  { text: "pip or npm", required: true }
+]} />
+
+<Callout type="info">
+🔗 **What is API Integration?** API integration means adding external service features to your application. Integrating Claude API lets your app use Claude capabilities directly.
+</Callout>
+
+---
+
+<Step number={1} title="Install Python SDK and Basic Usage">
+
+### Install anthropic Library
+
+<CopyBlock language="bash" title="Install Anthropic Python SDK">
+pip install anthropic
+</CopyBlock>
+
+### Basic Text Generation
+
+<CopyBlock language="python" title="Generate text with Claude (Python)">
+import anthropic
+
+client = anthropic.Anthropic()
+
+message = client.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=1024,
+    messages=[
+        {
+            "role": "user",
+            "content": "Hello! Who are you?"
+        }
+    ]
+)
+
+print(message.content[0].text)
+</CopyBlock>
+
+### Multi-turn Conversation
+
+<CopyBlock language="python" title="Conversational interaction">
+import anthropic
+
+client = anthropic.Anthropic()
+
+messages = [
+    {
+        "role": "user",
+        "content": "Tell me about Python"
+    }
+]
+
+response = client.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=1024,
+    messages=messages
+)
+
+assistant_message = response.content[0].text
+messages.append({"role": "assistant", "content": assistant_message})
+
+messages.append({
+    "role": "user",
+    "content": "What are commonly used libraries?"
+})
+
+response2 = client.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=1024,
+    messages=messages
+)
+
+print(response2.content[0].text)
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/anthropic/step1-python-integration-en.png"
+  alt="Python Claude integration"
+  caption="Install SDK and perform basic text generation"
+  priority={true}
+/>
+
+<Checkpoint>
+Did you receive a response from Claude?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={2} title="Install Node.js SDK and Usage">
+
+### Install @anthropic-ai/sdk
+
+<CopyBlock language="bash" title="Install Anthropic Node.js SDK">
+npm install @anthropic-ai/sdk
+</CopyBlock>
+
+### Basic Text Generation
+
+<CopyBlock language="javascript" title="Generate text with Claude (Node.js)">
+import Anthropic from "@anthropic-ai/sdk";
+
+const client = new Anthropic({
+    apiKey: process.env.ANTHROPIC_API_KEY
+});
+
+const message = await client.messages.create({
+    model: "claude-3-5-sonnet-20241022",
+    max_tokens: 1024,
+    messages: [
+        {
+            role: "user",
+            content: "Hello! Tell me how to build web apps with JavaScript"
+        }
+    ]
+});
+
+console.log(message.content[0].type === 'text' ? message.content[0].text : 'No text response');
+</CopyBlock>
+
+### Streaming Responses
+
+Receive responses in real-time:
+
+<CopyBlock language="javascript" title="Streaming response (Node.js)">
+import Anthropic from "@anthropic-ai/sdk";
+
+const client = new Anthropic();
+
+const stream = await client.messages.stream({
+    model: "claude-3-5-sonnet-20241022",
+    max_tokens: 1024,
+    messages: [
+        {
+            role: "user",
+            content: "Tell me a very long story"
+        }
+    ]
+});
+
+for await (const chunk of stream) {
+    if (chunk.type === 'content_block_delta' && chunk.delta.type === 'text_delta') {
+        process.stdout.write(chunk.delta.text);
+    }
+}
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/anthropic/step2-nodejs-integration-en.png"
+  alt="Node.js Claude integration"
+  caption="Use Claude API in Node.js and receive streaming responses"
+/>
+
+</Step>
+
+---
+
+<Step number={3} title="Image Analysis and Vision">
+
+### Image Analysis in Python
+
+<CopyBlock language="python" title="Analyze image (Python)">
+import anthropic
+import base64
+
+client = anthropic.Anthropic()
+
+with open("image.jpg", "rb") as image_file:
+    image_data = base64.standard_b64encode(image_file.read()).decode("utf-8")
+
+message = client.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=1024,
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "image",
+                    "source": {
+                        "type": "base64",
+                        "media_type": "image/jpeg",
+                        "data": image_data,
+                    }
+                },
+                {
+                    "type": "text",
+                    "text": "What is in this image?"
+                }
+            ]
+        }
+    ]
+)
+
+print(message.content[0].text)
+</CopyBlock>
+
+### Analyze Image from URL
+
+<CopyBlock language="python" title="Analyze URL image">
+import anthropic
+
+client = anthropic.Anthropic()
+
+message = client.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=1024,
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "image",
+                    "source": {
+                        "type": "url",
+                        "url": "https://example.com/image.jpg"
+                    }
+                },
+                {
+                    "type": "text",
+                    "text": "Analyze this image"
+                }
+            ]
+        }
+    ]
+)
+
+print(message.content[0].text)
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/anthropic/step3-vision-en.png"
+  alt="Image analysis"
+  caption="Analyze images with Claude's vision capabilities"
+/>
+
+</Step>
+
+---
+
+<Step number={4} title="Token Counting and Cost Estimation">
+
+### Count Tokens in Python
+
+<CopyBlock language="python" title="Count tokens">
+import anthropic
+
+client = anthropic.Anthropic()
+
+text = "Hello! This is a test message."
+
+count = client.messages.count_tokens(
+    model="claude-3-5-sonnet-20241022",
+    messages=[
+        {
+            "role": "user",
+            "content": text
+        }
+    ]
+)
+
+print(f"Input tokens: {count.input_tokens}")
+print(f"Total tokens: {count.input_tokens}")
+
+estimated_cost = (count.input_tokens / 1_000_000) * 3
+print(f"Estimated cost: ${estimated_cost:.6f}")
+</CopyBlock>
+
+### Check Response Tokens
+
+<CopyBlock language="python" title="Check response tokens">
+import anthropic
+
+client = anthropic.Anthropic()
+
+response = client.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=100,
+    messages=[
+        {
+            "role": "user",
+            "content": "Give me a simple answer"
+        }
+    ]
+)
+
+input_tokens = response.usage.input_tokens
+output_tokens = response.usage.output_tokens
+
+input_cost = (input_tokens / 1_000_000) * 3
+output_cost = (output_tokens / 1_000_000) * 9
+
+total_cost = input_cost + output_cost
+
+print(f"Input: {input_tokens} tokens (${input_cost:.6f})")
+print(f"Output: {output_tokens} tokens (${output_cost:.6f})")
+print(f"Total cost: ${total_cost:.6f}")
+</CopyBlock>
+
+<Callout type="tip">
+💡 **What are tokens?** Tokens are small units of text. On average, 4 characters equal 1 token. "Hello" is about 1 token.
+</Callout>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/anthropic/step4-token-counting-en.png"
+  alt="Token counting"
+  caption="Count tokens to estimate API costs"
+/>
+
+</Step>
+
+---
+
+<Step number={5} title="System Prompts and Advanced Features">
+
+### Use System Prompt
+
+Define Claude's behavior:
+
+<CopyBlock language="python" title="System prompt">
+import anthropic
+
+client = anthropic.Anthropic()
+
+message = client.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=1024,
+    system="You are a friendly Python programming tutor. Explain user questions step-by-step with code examples.",
+    messages=[
+        {
+            "role": "user",
+            "content": "How do I use Python lists?"
+        }
+    ]
+)
+
+print(message.content[0].text)
+</CopyBlock>
+
+### JSON Response Format
+
+Get structured data:
+
+<CopyBlock language="python" title="JSON response">
+import anthropic
+import json
+
+client = anthropic.Anthropic()
+
+message = client.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=1024,
+    messages=[
+        {
+            "role": "user",
+            "content": 'Create 3 fake users in JSON format with name, age, and job fields'
+        }
+    ]
+)
+
+response_text = message.content[0].text
+
+try:
+    start_idx = response_text.find('[')
+    end_idx = response_text.rfind(']') + 1
+    json_str = response_text[start_idx:end_idx]
+    data = json.loads(json_str)
+    print(json.dumps(data, indent=2))
+except json.JSONDecodeError:
+    print("JSON parsing failed")
+    print(response_text)
+</CopyBlock>
+
+### Batch Processing
+
+Process many requests efficiently:
+
+<CopyBlock language="python" title="Batch processing">
+import anthropic
+
+client = anthropic.Anthropic()
+
+prompts = [
+    "What is Python?",
+    "What are JavaScript features?",
+    "When should I use Go?"
+]
+
+responses = []
+
+for prompt in prompts:
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=500,
+        messages=[
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ]
+    )
+    responses.append({
+        "question": prompt,
+        "answer": message.content[0].text
+    })
+
+for resp in responses:
+    print(f"Q: {resp['question']}")
+    print(f"A: {resp['answer']}")
+    print()
+</CopyBlock>
+
+<Callout type="success">
+✅ **Complete!** You've integrated Claude API into your application. Now enhance your app with AI capabilities.
+</Callout>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/anthropic/step5-advanced-features-en.png"
+  alt="Advanced features"
+  caption="Implement advanced features with system prompts, JSON responses, and batch processing"
+/>
+
+</Step>
+
+---
+
+## Practical Use Cases
+
+### Chatbot Application
+
+<CopyBlock language="python" title="Simple chatbot">
+import anthropic
+
+def chatbot():
+    client = anthropic.Anthropic()
+    messages = []
+
+    print("Chatbot started (type 'quit' to exit)")
+
+    while True:
+        user_input = input("You: ")
+        if user_input.lower() == 'quit':
+            break
+
+        messages.append({
+            "role": "user",
+            "content": user_input
+        })
+
+        response = client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=1024,
+            messages=messages
+        )
+
+        assistant_message = response.content[0].text
+        messages.append({
+            "role": "assistant",
+            "content": assistant_message
+        })
+
+        print(f"Claude: {assistant_message}")
+
+if __name__ == "__main__":
+    chatbot()
+</CopyBlock>
+
+### Text Summarization
+
+<CopyBlock language="python" title="Document summarization">
+import anthropic
+
+def summarize_text(text):
+    client = anthropic.Anthropic()
+
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=500,
+        system="You are a document summarization expert. Summarize concisely covering only key points.",
+        messages=[
+            {
+                "role": "user",
+                "content": f"Summarize this text:\n\n{text}"
+            }
+        ]
+    )
+
+    return message.content[0].text
+
+long_text = "..."
+summary = summarize_text(long_text)
+print(summary)
+</CopyBlock>
+
+---
+
+## Error Handling
+
+### Handle API Errors
+
+<CopyBlock language="python" title="Error handling">
+import anthropic
+
+try:
+    client = anthropic.Anthropic()
+    message = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[
+            {
+                "role": "user",
+                "content": "Hello"
+            }
+        ]
+    )
+    print(message.content[0].text)
+except anthropic.APIError as e:
+    print(f"API Error: {e}")
+except anthropic.APIConnectionError as e:
+    print(f"Connection Error: {e}")
+except anthropic.RateLimitError as e:
+    print(f"Rate Limit: {e}")
+</CopyBlock>
+
+---
+
+## Troubleshooting
+
+### API Key Error
+
+Verify API key is set correctly:
+
+<CopyBlock language="bash" title="Check environment variable">
+echo $ANTHROPIC_API_KEY
+</CopyBlock>
+
+### Token Limit Error
+
+`max_tokens` too high causes error. Keep it below 1024.
+
+### Response Format Issues
+
+If Claude's response doesn't match expectations, make your system prompt more specific.

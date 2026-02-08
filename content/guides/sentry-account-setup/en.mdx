@@ -1,0 +1,227 @@
+# Create Sentry Account and Set Up Projects
+
+Sentry is an **error monitoring platform that tracks errors and performance issues in real-time**. Start free with 5,000 events per month. Follow this guide to set up your account in 15 minutes.
+
+<FreeTierInfo
+  service="Sentry"
+  limit="5,000 events per month"
+  period="monthly"
+  status="generous"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Email address", required: true },
+  { text: "Password", required: true },
+  { text: "Web browser", required: true }
+]} />
+
+<Callout type="info">
+🔍 **What is Sentry?** Sentry is an error tracking platform. It automatically detects exceptions in your application and collects stack traces, user info, and environment data to alert developers.
+</Callout>
+
+---
+
+<Step number={1} title="Sign Up for Sentry">
+
+### Visit Sentry Website
+
+1. Go to [Sentry.io](https://sentry.io)
+2. Click **Sign Up** button
+3. Choose signup method:
+   - Email address
+   - GitHub account
+   - Google account
+
+### Sign Up with Email
+
+1. Enter your email address
+2. Create a password (minimum 8 characters)
+3. Click **Sign Up**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/sentry/step1-signup-en.png"
+  alt="Sentry signup page"
+  caption="Sign up for Sentry"
+  priority={true}
+/>
+
+<Callout type="tip">
+💡 **Tip**: Using GitHub or Google signup is faster and easier. No password to remember!
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Verify Email and Set Up Organization">
+
+### Click Verification Email
+
+1. Check your email inbox
+2. Open the **verification email** from Sentry
+3. Click the **Verify Email** link
+
+### Enter Organization Information
+
+Sentry manages projects within **organizations**:
+
+1. Enter organization name (e.g., "My Company", "Personal Projects")
+2. Organization slug [URL] is auto-generated
+3. Click **Create Organization**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/sentry/step2-email-org-en.png"
+  alt="Email verification and organization setup"
+  caption="Verify email and create organization"
+/>
+
+<Checkpoint>
+Were you redirected to Sentry dashboard?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={3} title="Create Your First Project">
+
+### Project Creation Page
+
+After organization creation, you're redirected to **Create Project** page.
+
+1. Click **Create Project** button
+2. Select your platform:
+   - JavaScript / React / Vue
+   - Python / Django / Flask
+   - Node.js / Express
+   - Java / Spring
+   - Go
+   - Ruby
+   - .NET
+   - PHP
+   - Other platforms
+
+### Configure Project
+
+In the project creation dialog:
+
+1. Enter **project name** (e.g., "My Web App", "API Server")
+2. Select **platform** (your programming language)
+3. Click **Create Project**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/sentry/step3-create-project-en.png"
+  alt="Create project"
+  caption="Select platform and create project"
+/>
+
+<Callout type="success">
+✅ Project created! Now you see the project settings page.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="Configure Project and Get DSN">
+
+### Find DSN (Data Source Name)
+
+After project creation, find DSN in the **Settings** page.
+
+DSN looks like:
+```
+https://key@sentry.io/projectid
+```
+
+### Locate DSN
+
+1. Click **Settings** in left navigation
+2. Select **Client Keys**
+3. DSN is displayed
+
+### Review Settings
+
+In **Project Settings** page:
+
+1. **General** - Project name, team info
+2. **Error Reporting** - Error filter settings
+3. **Performance** - Enable performance monitoring
+4. **Releases** - Version management
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/sentry/step4-dsn-config-en.png"
+  alt="Get DSN and configure project"
+  caption="Get DSN and complete project setup"
+/>
+
+<DevTip>
+DSN is safe to share publicly. However, be careful not to commit it to version control. Store it in environment variables.
+</DevTip>
+
+<Checkpoint>
+Did you get your DSN? You're ready to integrate Sentry into your app.
+</Checkpoint>
+
+</Step>
+
+---
+
+## Next Steps
+
+<Callout type="success">
+✅ **Complete!** Your Sentry account and project are ready.
+</Callout>
+
+- [Integrate Sentry Error Tracking](/guides/sentry-error-tracking) - Add Sentry to your application
+- [Sentry Documentation](https://docs.sentry.io/)
+- [Sentry Python SDK](https://docs.sentry.io/platforms/python/)
+- [Sentry JavaScript SDK](https://docs.sentry.io/platforms/javascript/)
+
+## Tips and Best Practices
+
+### Invite Team Members
+
+1. Go to **Settings** > **Team**
+2. Click **Invite Team Members**
+3. Enter team member email
+4. Select role:
+   - Owner - Full permissions
+   - Manager - Project management
+   - Member - Read-only
+
+### Separate Environments
+
+Create separate projects for different environments:
+- **Production** - Live environment
+- **Staging** - Pre-production
+- **Development** - Development environment
+
+### Set Up Alerts
+
+1. Access **Alerts** menu
+2. Create **Alert Rules**
+3. Set notifications by severity or frequency
+4. Receive notifications via Slack, email, etc.
+
+---
+
+## Troubleshooting
+
+### Verification Email Didn't Arrive
+
+1. Check **Spam folder**
+2. Use **[Sentry password reset](https://sentry.io/account/password/reset/)**
+3. Try signing up with different email
+
+### Can't See Projects
+
+1. Verify correct **organization** is selected
+2. Check **Projects** menu in left navigation
+3. Refresh the page
+
+### Already Have Sentry Account
+
+If you already have an account, sign in at [Sentry.io](https://sentry.io) and choose **Create Project**.

@@ -1,0 +1,399 @@
+# Sentry로 에러 추적 통합하기
+
+이제 **애플리케이션에 Sentry를 통합하고 자동으로 에러를 추적**합니다. Sentry SDK를 설치하면 예외가 자동으로 감지되고 대시보드에 표시됩니다.
+
+<FreeTierInfo
+  service="Sentry"
+  limit="월 5,000 이벤트 (무료)"
+  period="monthly"
+  status="generous"
+/>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "Sentry 프로젝트 DSN", required: true },
+  { text: "Python 또는 Node.js", required: true },
+  { text: "프로젝트 코드", required: true }
+]} />
+
+<Callout type="info">
+⚙️ **Sentry SDK란?** SDK는 Software Development Kit의 약자입니다. Sentry SDK는 애플리케이션에 설치되어 에러를 감지하고 Sentry 서버로 전송합니다.
+</Callout>
+
+---
+
+<Step number={1} title="Python에 Sentry 통합">
+
+### sentry-sdk 라이브러리 설치
+
+<CopyBlock language="bash" title="Sentry Python SDK 설치">
+pip install sentry-sdk
+</CopyBlock>
+
+### 기본 설정
+
+<CopyBlock language="python" title="Python에서 Sentry 초기화">
+import sentry_sdk
+
+sentry_sdk.init(
+    dsn="https://YOUR_KEY@sentry.io/YOUR_PROJECT_ID",
+    traces_sample_rate=1.0
+)
+</CopyBlock>
+
+DSN을 자신의 프로젝트 DSN으로 바꿉니다.
+
+### Django 통합
+
+Django 애플리케이션의 경우:
+
+<CopyBlock language="python" title="Django settings.py">
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
+sentry_sdk.init(
+    dsn="https://YOUR_KEY@sentry.io/YOUR_PROJECT_ID",
+    integrations=[DjangoIntegration()],
+    traces_sample_rate=1.0,
+    send_default_pii=True
+)
+</CopyBlock>
+
+### Flask 통합
+
+Flask 애플리케이션의 경우:
+
+<CopyBlock language="python" title="Flask 앱 초기화">
+import sentry_sdk
+from sentry_sdk.integrations.flask import FlaskIntegration
+
+sentry_sdk.init(
+    dsn="https://YOUR_KEY@sentry.io/YOUR_PROJECT_ID",
+    integrations=[FlaskIntegration()],
+    traces_sample_rate=1.0
+)
+
+from flask import Flask
+app = Flask(__name__)
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/sentry/step1-python-integration-ko.png"
+  alt="Python Sentry 통합"
+  caption="sentry-sdk를 설치하고 초기화합니다"
+  priority={true}
+/>
+
+<Checkpoint>
+Sentry가 정상적으로 초기화되었나요? 오류가 없었나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={2} title="Node.js에 Sentry 통합">
+
+### sentry SDK 설치
+
+<CopyBlock language="bash" title="Sentry Node SDK 설치">
+npm install @sentry/node @sentry/tracing
+</CopyBlock>
+
+### 기본 설정
+
+<CopyBlock language="javascript" title="Node.js에서 Sentry 초기화">
+import * as Sentry from "@sentry/node";
+
+Sentry.init({
+  dsn: "https://YOUR_KEY@sentry.io/YOUR_PROJECT_ID",
+  tracesSampleRate: 1.0,
+});
+</CopyBlock>
+
+### Express 통합
+
+Express 서버의 경우:
+
+<CopyBlock language="javascript" title="Express 미들웨어">
+import * as Sentry from "@sentry/node";
+import express from "express";
+
+const app = express();
+
+Sentry.init({
+  dsn: "https://YOUR_KEY@sentry.io/YOUR_PROJECT_ID",
+  tracesSampleRate: 1.0,
+});
+
+app.use(Sentry.Handlers.requestHandler());
+
+app.get("/", (req, res) => {
+  res.send("Hello World");
+});
+
+app.use(Sentry.Handlers.errorHandler());
+
+app.listen(3000);
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/sentry/step2-nodejs-integration-ko.png"
+  alt="Node.js Sentry 통합"
+  caption="@sentry/node로 Express 앱을 설정합니다"
+/>
+
+<DevTip>
+Express의 경우 반드시 `requestHandler()` 미들웨어를 먼저, `errorHandler()` 미들웨어를 마지막에 추가해야 합니다.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="JavaScript/React에 Sentry 통합">
+
+### @sentry/react 설치
+
+<CopyBlock language="bash" title="Sentry React 설치">
+npm install @sentry/react @sentry/tracing
+</CopyBlock>
+
+### React 애플리케이션 설정
+
+<CopyBlock language="javascript" title="React 앱 설정">
+import React from "react";
+import * as Sentry from "@sentry/react";
+import { BrowserTracing } from "@sentry/tracing";
+
+Sentry.init({
+  dsn: "https://YOUR_KEY@sentry.io/YOUR_PROJECT_ID",
+  integrations: [
+    new BrowserTracing(),
+  ],
+  tracesSampleRate: 1.0,
+});
+
+const SentryRoutes = Sentry.withSentryRouting(Routes);
+
+export default Sentry.withProfiler(App);
+</CopyBlock>
+
+### 사용자 정보 추적
+
+사용자 정보를 기록하여 이슈를 추적합니다:
+
+<CopyBlock language="javascript" title="사용자 정보 설정">
+import * as Sentry from "@sentry/react";
+
+Sentry.setUser({
+  id: "123",
+  email: "user@example.com",
+  username: "john_doe"
+});
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/sentry/step3-react-integration-ko.png"
+  alt="React Sentry 통합"
+  caption="@sentry/react로 React 애플리케이션을 설정합니다"
+/>
+
+</Step>
+
+---
+
+<Step number={4} title="에러 테스트하기">
+
+### 의도적으로 에러 발생시키기
+
+SDK가 정상적으로 작동하는지 확인하기 위해 에러를 발생시킵니다.
+
+#### Python
+
+<CopyBlock language="python" title="Python 테스트 에러">
+import sentry_sdk
+
+sentry_sdk.init("YOUR_DSN")
+
+try:
+    1 / 0
+except Exception as e:
+    sentry_sdk.capture_exception(e)
+</CopyBlock>
+
+#### Node.js
+
+<CopyBlock language="javascript" title="Node.js 테스트 에러">
+import * as Sentry from "@sentry/node";
+
+Sentry.init({ dsn: "YOUR_DSN" });
+
+try {
+  throw new Error("Test error");
+} catch (error) {
+  Sentry.captureException(error);
+}
+</CopyBlock>
+
+#### JavaScript/React
+
+<CopyBlock language="javascript" title="React 테스트 에러">
+import * as Sentry from "@sentry/react";
+
+try {
+  throw new Error("Test error");
+} catch (error) {
+  Sentry.captureException(error);
+}
+</CopyBlock>
+
+### Sentry 대시보드 확인
+
+1. [Sentry.io](https://sentry.io)에 로그인
+2. 프로젝트로 이동
+3. **이슈[Issues]** 탭에서 에러가 표시됩니다
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/sentry/step4-test-error-ko.png"
+  alt="에러 테스트"
+  caption="의도적으로 에러를 발생시키고 Sentry에서 확인합니다"
+/>
+
+<Checkpoint>
+Sentry 대시보드에서 이슈가 표시되었나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={5} title="고급 기능 설정">
+
+### 사용자 지정 태그 추가
+
+에러에 메타데이터를 추가합니다:
+
+<CopyBlock language="python" title="Python 태그 설정">
+import sentry_sdk
+
+sentry_sdk.init("YOUR_DSN")
+
+with sentry_sdk.push_scope() as scope:
+    scope.set_tag("environment", "production")
+    scope.set_tag("request_id", "12345")
+    sentry_sdk.capture_message("User action")
+</CopyBlock>
+
+### 성능 모니터링
+
+특정 작업의 성능을 추적합니다:
+
+<CopyBlock language="python" title="Python 성능 추적">
+import sentry_sdk
+
+sentry_sdk.init("YOUR_DSN", traces_sample_rate=1.0)
+
+with sentry_sdk.start_transaction(
+    op="database_query", name="get_users"
+):
+    users = get_users_from_database()
+</CopyBlock>
+
+### 릴리스 추적
+
+애플리케이션 버전 정보를 포함:
+
+<CopyBlock language="python" title="Python 릴리스 설정">
+import sentry_sdk
+
+sentry_sdk.init(
+    dsn="YOUR_DSN",
+    release="1.0.0",
+    environment="production"
+)
+</CopyBlock>
+
+### 민감한 데이터 필터링
+
+개인 정보를 자동으로 제거합니다:
+
+<CopyBlock language="python" title="Python 데이터 필터">
+import sentry_sdk
+
+def before_send(event, hint):
+    if 'request' in event:
+        if 'cookies' in event['request']:
+            del event['request']['cookies']
+    return event
+
+sentry_sdk.init(
+    "YOUR_DSN",
+    before_send=before_send
+)
+</CopyBlock>
+
+<Callout type="warning">
+⚠️ **주의**: `send_default_pii=True`를 사용 시 이메일, IP 주소 등이 전송됩니다. GDPR 등의 규정을 확인하세요.
+</Callout>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/sentry/step5-advanced-features-ko.png"
+  alt="고급 기능"
+  caption="태그, 성능 추적, 릴리스 정보를 추가합니다"
+/>
+
+</Step>
+
+---
+
+## Sentry 대시보드 사용하기
+
+### 이슈 확인 및 관리
+
+1. **이슈[Issues]** 탭 - 발생한 모든 에러 목록
+2. 에러를 클릭하면 상세 정보 확인:
+   - 스택 트레이스
+   - 환경 정보
+   - 사용자 정보
+   - 발생 빈도
+
+### 이슈 상태 관리
+
+- **Resolved** - 해결됨 (다시 발생하면 Unresolved로 변함)
+- **Ignored** - 무시함 (더 이상 알림을 받지 않음)
+- **Regression** - 재발생 (이미 해결한 이슈가 다시 발생)
+
+### 스타 이슈 추가
+
+중요한 이슈에 별을 추가하여 추적합니다.
+
+---
+
+## 문제 해결
+
+### SDK가 에러를 감지하지 못합니다
+
+1. DSN이 올바른지 확인
+2. SDK 버전이 최신인지 확인: `pip install -U sentry-sdk`
+3. Sentry 초기화가 애플리케이션 시작 시 호출되는지 확인
+
+### 에러가 감지되지만 정보가 부족합니다
+
+1. Breadcrumbs 활성화 확인
+2. `traces_sample_rate` 값 확인 (1.0이 최대)
+3. 커스텀 컨텍스트 추가
+
+### Sentry 대시보드가 느립니다
+
+많은 이벤트가 발생 중입니다. 샘플링 레이트를 낮추세요:
+
+<CopyBlock language="python" title="샘플링 레이트 조정">
+sentry_sdk.init(
+    dsn="YOUR_DSN",
+    traces_sample_rate=0.1
+)
+</CopyBlock>
+
+0.1은 10%의 트레이스만 수집한다는 의미입니다.

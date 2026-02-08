@@ -1,0 +1,282 @@
+# Elasticsearch 설치 및 실행하기
+
+Elasticsearch는 **확장 가능한 오픈소스 검색 및 분석 엔진**입니다. 로그, 텍스트, 구조화된 데이터에 대한 빠른 전문검색을 제공합니다. 이 가이드를 따라 25분 안에 로컬 Elasticsearch를 실행합니다.
+
+<FreeTierInfo
+  service="Elasticsearch"
+  limit="Elastic Cloud 14일 무료 체험"
+  period="trial"
+  status="generous"
+/>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "Docker (권장)", required: false },
+  { text: "또는 Java 11 이상", required: false },
+  { text: "최소 2GB RAM", required: true },
+  { text: "4GB 여유 디스크 공간", required: true }
+]} />
+
+<Callout type="info">
+🔍 **Elasticsearch란 무엇인가요?** Elasticsearch는 JSON 문서를 인덱싱하고 검색하는 분산 검색 엔진입니다. 로그 분석, 전문검색, 분석 등에 사용됩니다.
+</Callout>
+
+---
+
+<Step number={1} title="Docker를 사용한 설치 (권장)">
+
+Docker를 사용하면 의존성 문제 없이 쉽게 시작할 수 있습니다.
+
+### Docker가 설치되어 있는지 확인하기
+
+터미널을 열고 다음 명령어를 실행합니다:
+
+<CopyBlock language="bash" title="Docker 버전 확인">
+docker --version
+</CopyBlock>
+
+Docker가 설치되지 않았다면 [Docker 공식 사이트](https://www.docker.com/products/docker-desktop)에서 설치하세요.
+
+### Docker로 Elasticsearch 실행하기
+
+<CopyBlock language="bash" title="Elasticsearch Docker 컨테이너 실행">
+docker run -d \
+  --name elasticsearch \
+  -e discovery.type=single-node \
+  -e xpack.security.enabled=false \
+  -p 9200:9200 \
+  -p 9300:9300 \
+  docker.elastic.co/elasticsearch/elasticsearch:8.13.0
+</CopyBlock>
+
+명령어 설명:
+- `-d`: 백그라운드에서 실행
+- `--name elasticsearch`: 컨테이너 이름 지정
+- `-e discovery.type=single-node`: 단일 노드 모드 (개발용)
+- `-e xpack.security.enabled=false`: 보안 기능 비활성화 (개발용)
+- `-p 9200:9200`: REST API 포트
+- `-p 9300:9300`: 노드 통신 포트
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/elasticsearch/step1-docker-run-ko.png"
+  alt="Docker로 Elasticsearch 실행"
+  caption="Docker 명령어로 Elasticsearch 컨테이너를 시작합니다"
+  priority={true}
+/>
+
+<Callout type="tip">
+💡 **팁**: 처음 시작할 때 이미지 다운로드에 수 분 소요될 수 있습니다.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="수동 설치 (선택사항)">
+
+Docker를 사용하지 않으려면 직접 설치할 수 있습니다.
+
+### Elasticsearch 다운로드
+
+1. [Elastic 다운로드 페이지](https://www.elastic.co/downloads/elasticsearch)에 방문합니다
+2. **Elasticsearch** 최신 버전을 선택합니다
+3. 운영체제에 맞는 버전을 다운로드합니다 (macOS, Linux, Windows)
+
+### 설치하기
+
+Linux/Mac의 경우:
+
+<CopyBlock language="bash" title="Elasticsearch 추출 및 설치">
+cd ~/Downloads
+tar -xzf elasticsearch-8.13.0-linux-x86_64.tar.gz
+cd elasticsearch-8.13.0
+</CopyBlock>
+
+Windows의 경우 ZIP 파일을 다운로드하고 압축을 해제합니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/elasticsearch/step2-download-ko.png"
+  alt="Elasticsearch 다운로드"
+  caption="운영체제에 맞는 버전을 다운로드합니다"
+/>
+
+</Step>
+
+---
+
+<Step number={3} title="Elasticsearch 서버 시작하기">
+
+### Docker 사용 시
+
+<CopyBlock language="bash" title="컨테이너 상태 확인">
+docker ps | grep elasticsearch
+</CopyBlock>
+
+컨테이너가 실행 중인지 확인합니다. `Up` 상태가 보이면 성공입니다.
+
+### 수동 설치 시
+
+<CopyBlock language="bash" title="Elasticsearch 서버 시작">
+./bin/elasticsearch
+</CopyBlock>
+
+또는 백그라운드에서 실행:
+
+<CopyBlock language="bash" title="백그라운드 실행">
+./bin/elasticsearch -d
+</CopyBlock>
+
+서버가 시작되면 다음 메시지가 표시됩니다:
+```
+[INFO ][elasticsearch.node] [node-name] started
+```
+
+<Checkpoint>
+Elasticsearch 서버가 실행 중인가요? 다음 섹션에서 확인합니다.
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={4} title="설치 확인하기">
+
+Elasticsearch API에 접속하여 정상 작동하는지 확인합니다.
+
+### curl을 사용한 확인
+
+터미널에서:
+
+<CopyBlock language="bash" title="Elasticsearch 상태 확인">
+curl http://localhost:9200
+</CopyBlock>
+
+다음과 같은 응답이 나오면 성공입니다:
+
+<CopyBlock language="json" title="응답 예시">
+{
+  "name" : "node-name",
+  "cluster_name" : "elasticsearch",
+  "cluster_uuid" : "uuid",
+  "version" : {
+    "number" : "8.13.0",
+    "build_flavor" : "default"
+  },
+  "tagline" : "You Know, for Search"
+}
+</CopyBlock>
+
+### 웹 브라우저로 확인
+
+웹 브라우저 주소창에 다음을 입력합니다:
+```
+http://localhost:9200/_cat/health
+```
+
+클러스터 상태가 표시됩니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/elasticsearch/step4-verify-ko.png"
+  alt="Elasticsearch 상태 확인"
+  caption="curl 또는 웹 브라우저로 Elasticsearch 상태를 확인합니다"
+/>
+
+<Checkpoint>
+Elasticsearch API가 응답하는가요? 버전 정보가 보이면 성공입니다.
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={5} title="선택사항: Kibana 설치 (모니터링용)">
+
+Kibana는 Elasticsearch를 시각화하고 관리하는 도구입니다.
+
+### Docker로 Kibana 실행
+
+<CopyBlock language="bash" title="Kibana 컨테이너 시작">
+docker run -d \
+  --name kibana \
+  -p 5601:5601 \
+  -e ELASTICSEARCH_HOSTS=http://elasticsearch:9200 \
+  --network bridge \
+  docker.elastic.co/kibana/kibana:8.13.0
+</CopyBlock>
+
+그 다음 웹 브라우저에서:
+```
+http://localhost:5601
+```
+
+Kibana 대시보드에 접속합니다.
+
+<DevTip>
+Kibana를 사용하면 인덱스 관리, 쿼리 시각화, 로그 분석 등을 쉽게 할 수 있습니다.
+</DevTip>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/elasticsearch/step5-kibana-ko.png"
+  alt="Kibana 대시보드"
+  caption="Kibana는 Elasticsearch 관리 및 모니터링 도구입니다"
+/>
+
+</Step>
+
+---
+
+## 다음 단계
+
+이제 Elasticsearch를 설치했습니다! 다음으로:
+
+<Callout type="success">
+✅ **완료!** Elasticsearch가 실행 중입니다. 이제 데이터를 인덱싱하고 검색할 준비가 되었습니다.
+</Callout>
+
+- [Elasticsearch 인덱싱 및 검색](/guides/elasticsearch-indexing-search) - 데이터 추가 및 검색 방법 배우기
+- Elasticsearch 공식 문서: https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html
+- Kibana 시작 가이드: https://www.elastic.co/guide/en/kibana/current/index.html
+
+## 문제 해결
+
+### 포트 9200이 이미 사용 중인 경우
+
+다른 포트로 변경:
+
+<CopyBlock language="bash" title="다른 포트 사용">
+docker run -d \
+  --name elasticsearch \
+  -e discovery.type=single-node \
+  -e xpack.security.enabled=false \
+  -p 9201:9200 \
+  docker.elastic.co/elasticsearch/elasticsearch:8.13.0
+</CopyBlock>
+
+그 다음 `http://localhost:9201`로 접속합니다.
+
+### 메모리 부족 오류
+
+Elasticsearch는 기본적으로 2GB의 RAM을 할당합니다. 환경 변수로 조정:
+
+<CopyBlock language="bash" title="메모리 할당 조정">
+docker run -d \
+  --name elasticsearch \
+  -e discovery.type=single-node \
+  -e xpack.security.enabled=false \
+  -e "ES_JAVA_OPTS=-Xms512m -Xmx512m" \
+  -p 9200:9200 \
+  docker.elastic.co/elasticsearch/elasticsearch:8.13.0
+</CopyBlock>
+
+### Docker 로그 확인
+
+<CopyBlock language="bash" title="Docker 로그 보기">
+docker logs elasticsearch
+</CopyBlock>
+
+오류 메시지를 확인하여 문제를 파악합니다.
+
+### 방화벽 이슈
+
+포트 9200이 방화벽에서 차단되었을 수 있습니다. 로컬 개발 시에는 `localhost`에서만 접속하므로 보통 문제가 아닙니다.

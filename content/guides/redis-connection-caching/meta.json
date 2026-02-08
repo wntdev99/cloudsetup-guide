@@ -1,0 +1,59 @@
+{
+  "slug": "redis-connection-caching",
+  "platform": "redis",
+  "service": "Redis In-Memory Data Store",
+  "category": "database",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 30,
+  "totalSteps": 5,
+  "freeTier": {
+    "service": "Redis",
+    "limit": "Unlimited for self-hosted",
+    "period": "unlimited",
+    "amount": "Free",
+    "status": "generous",
+    "conditions": [
+      "Connect to Redis from applications",
+      "Implement caching patterns",
+      "Use Redis as session store",
+      "No limits on operations",
+      "Support for multiple programming languages"
+    ]
+  },
+  "prerequisites": [
+    "redis-installation-setup"
+  ],
+  "nextGuides": [],
+  "seo": {
+    "ko": {
+      "title": "Redis 연결 및 캐싱 구현하기 | CloudSetup.guide",
+      "description": "애플리케이션에서 Redis에 연결하고 캐싱 전략을 구현하는 방법을 배웁니다. Python, Node.js 예제 포함.",
+      "keywords": [
+        "Redis 캐싱",
+        "Redis 연결",
+        "Python Redis",
+        "Node.js Redis",
+        "캐시 전략",
+        "성능 최적화",
+        "데이터 캐싱"
+      ]
+    },
+    "en": {
+      "title": "Connect to Redis and Implement Caching | CloudSetup.guide",
+      "description": "Learn how to connect to Redis from your application and implement caching strategies. Includes Python and Node.js examples.",
+      "keywords": [
+        "Redis caching",
+        "Redis connection",
+        "Python Redis",
+        "Node.js Redis",
+        "caching strategy",
+        "performance optimization",
+        "data caching"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z",
+  "published": false
+}

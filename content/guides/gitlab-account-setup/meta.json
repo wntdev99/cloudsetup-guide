@@ -1,0 +1,60 @@
+{
+  "slug": "gitlab-account-setup",
+  "platform": "gitlab",
+  "service": "GitLab Version Control",
+  "category": "devops",
+  "difficulty": "beginner",
+  "estimatedMinutes": 15,
+  "totalSteps": 4,
+  "freeTier": {
+    "service": "GitLab",
+    "limit": "Unlimited public and private projects",
+    "period": "unlimited",
+    "amount": "Free",
+    "status": "generous",
+    "conditions": [
+      "Unlimited public and private repositories",
+      "Free CI/CD pipeline with 400 minutes per month",
+      "Issue tracking and project management",
+      "Merge requests with code review",
+      "Built-in wiki and pages",
+      "Community support"
+    ]
+  },
+  "prerequisites": [],
+  "nextGuides": [
+    "gitlab-cicd-pipeline"
+  ],
+  "seo": {
+    "ko": {
+      "title": "GitLab 계정 만들기 - 무료 Git 저장소 | CloudSetup.guide",
+      "description": "GitLab 계정을 만들고 첫 번째 프로젝트를 생성하는 방법을 배웁니다. 무료로 무제한의 비공개 저장소를 사용할 수 있습니다.",
+      "keywords": [
+        "GitLab 계정",
+        "Git 저장소",
+        "GitLab 가입",
+        "버전 관리",
+        "소스 코드 관리",
+        "프로젝트 호스팅",
+        "CI/CD"
+      ]
+    },
+    "en": {
+      "title": "Create GitLab Account - Free Git Repository | CloudSetup.guide",
+      "description": "Learn how to create a GitLab account and set up your first project. Use unlimited private repositories for free.",
+      "keywords": [
+        "GitLab account",
+        "Git repository",
+        "GitLab signup",
+        "version control",
+        "source code management",
+        "project hosting",
+        "CI/CD"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z",
+  "published": true
+}

@@ -1,0 +1,399 @@
+# Integrate Sentry Error Tracking
+
+Now you'll **integrate Sentry into your application and automatically track errors**. Install the Sentry SDK to automatically detect exceptions and display them on your dashboard.
+
+<FreeTierInfo
+  service="Sentry"
+  limit="5,000 events per month (free)"
+  period="monthly"
+  status="generous"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Sentry project DSN", required: true },
+  { text: "Python or Node.js", required: true },
+  { text: "Application code", required: true }
+]} />
+
+<Callout type="info">
+⚙️ **What is Sentry SDK?** SDK stands for Software Development Kit. Sentry SDK is installed in your application to detect errors and send them to Sentry servers.
+</Callout>
+
+---
+
+<Step number={1} title="Integrate Sentry with Python">
+
+### Install sentry-sdk Library
+
+<CopyBlock language="bash" title="Install Sentry Python SDK">
+pip install sentry-sdk
+</CopyBlock>
+
+### Basic Setup
+
+<CopyBlock language="python" title="Initialize Sentry in Python">
+import sentry_sdk
+
+sentry_sdk.init(
+    dsn="https://YOUR_KEY@sentry.io/YOUR_PROJECT_ID",
+    traces_sample_rate=1.0
+)
+</CopyBlock>
+
+Replace DSN with your project DSN.
+
+### Django Integration
+
+For Django applications:
+
+<CopyBlock language="python" title="Django settings.py">
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
+sentry_sdk.init(
+    dsn="https://YOUR_KEY@sentry.io/YOUR_PROJECT_ID",
+    integrations=[DjangoIntegration()],
+    traces_sample_rate=1.0,
+    send_default_pii=True
+)
+</CopyBlock>
+
+### Flask Integration
+
+For Flask applications:
+
+<CopyBlock language="python" title="Flask app initialization">
+import sentry_sdk
+from sentry_sdk.integrations.flask import FlaskIntegration
+
+sentry_sdk.init(
+    dsn="https://YOUR_KEY@sentry.io/YOUR_PROJECT_ID",
+    integrations=[FlaskIntegration()],
+    traces_sample_rate=1.0
+)
+
+from flask import Flask
+app = Flask(__name__)
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/sentry/step1-python-integration-en.png"
+  alt="Python Sentry integration"
+  caption="Install and initialize sentry-sdk"
+  priority={true}
+/>
+
+<Checkpoint>
+Did Sentry initialize without errors?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={2} title="Integrate Sentry with Node.js">
+
+### Install Sentry SDK
+
+<CopyBlock language="bash" title="Install Sentry Node SDK">
+npm install @sentry/node @sentry/tracing
+</CopyBlock>
+
+### Basic Setup
+
+<CopyBlock language="javascript" title="Initialize Sentry in Node.js">
+import * as Sentry from "@sentry/node";
+
+Sentry.init({
+  dsn: "https://YOUR_KEY@sentry.io/YOUR_PROJECT_ID",
+  tracesSampleRate: 1.0,
+});
+</CopyBlock>
+
+### Express Integration
+
+For Express servers:
+
+<CopyBlock language="javascript" title="Express middleware">
+import * as Sentry from "@sentry/node";
+import express from "express";
+
+const app = express();
+
+Sentry.init({
+  dsn: "https://YOUR_KEY@sentry.io/YOUR_PROJECT_ID",
+  tracesSampleRate: 1.0,
+});
+
+app.use(Sentry.Handlers.requestHandler());
+
+app.get("/", (req, res) => {
+  res.send("Hello World");
+});
+
+app.use(Sentry.Handlers.errorHandler());
+
+app.listen(3000);
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/sentry/step2-nodejs-integration-en.png"
+  alt="Node.js Sentry integration"
+  caption="Configure Express app with @sentry/node"
+/>
+
+<DevTip>
+For Express, always add `requestHandler()` first and `errorHandler()` last in middleware.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="Integrate Sentry with JavaScript/React">
+
+### Install @sentry/react
+
+<CopyBlock language="bash" title="Install Sentry React">
+npm install @sentry/react @sentry/tracing
+</CopyBlock>
+
+### React Application Setup
+
+<CopyBlock language="javascript" title="React app configuration">
+import React from "react";
+import * as Sentry from "@sentry/react";
+import { BrowserTracing } from "@sentry/tracing";
+
+Sentry.init({
+  dsn: "https://YOUR_KEY@sentry.io/YOUR_PROJECT_ID",
+  integrations: [
+    new BrowserTracing(),
+  ],
+  tracesSampleRate: 1.0,
+});
+
+const SentryRoutes = Sentry.withSentryRouting(Routes);
+
+export default Sentry.withProfiler(App);
+</CopyBlock>
+
+### Track User Information
+
+Record user info to track issues:
+
+<CopyBlock language="javascript" title="Set user information">
+import * as Sentry from "@sentry/react";
+
+Sentry.setUser({
+  id: "123",
+  email: "user@example.com",
+  username: "john_doe"
+});
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/sentry/step3-react-integration-en.png"
+  alt="React Sentry integration"
+  caption="Configure React application with @sentry/react"
+/>
+
+</Step>
+
+---
+
+<Step number={4} title="Test Error Tracking">
+
+### Trigger an Error Intentionally
+
+Test SDK functionality by triggering an error.
+
+#### Python
+
+<CopyBlock language="python" title="Python test error">
+import sentry_sdk
+
+sentry_sdk.init("YOUR_DSN")
+
+try:
+    1 / 0
+except Exception as e:
+    sentry_sdk.capture_exception(e)
+</CopyBlock>
+
+#### Node.js
+
+<CopyBlock language="javascript" title="Node.js test error">
+import * as Sentry from "@sentry/node";
+
+Sentry.init({ dsn: "YOUR_DSN" });
+
+try {
+  throw new Error("Test error");
+} catch (error) {
+  Sentry.captureException(error);
+}
+</CopyBlock>
+
+#### JavaScript/React
+
+<CopyBlock language="javascript" title="React test error">
+import * as Sentry from "@sentry/react";
+
+try {
+  throw new Error("Test error");
+} catch (error) {
+  Sentry.captureException(error);
+}
+</CopyBlock>
+
+### Check Sentry Dashboard
+
+1. Sign in to [Sentry.io](https://sentry.io)
+2. Go to your project
+3. Click **Issues** tab to see the error
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/sentry/step4-test-error-en.png"
+  alt="Test error"
+  caption="Trigger error intentionally and verify in Sentry"
+/>
+
+<Checkpoint>
+Did you see the issue appear on the Sentry dashboard?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={5} title="Configure Advanced Features">
+
+### Add Custom Tags
+
+Attach metadata to errors:
+
+<CopyBlock language="python" title="Python tag setup">
+import sentry_sdk
+
+sentry_sdk.init("YOUR_DSN")
+
+with sentry_sdk.push_scope() as scope:
+    scope.set_tag("environment", "production")
+    scope.set_tag("request_id", "12345")
+    sentry_sdk.capture_message("User action")
+</CopyBlock>
+
+### Performance Monitoring
+
+Track performance of specific operations:
+
+<CopyBlock language="python" title="Python performance tracking">
+import sentry_sdk
+
+sentry_sdk.init("YOUR_DSN", traces_sample_rate=1.0)
+
+with sentry_sdk.start_transaction(
+    op="database_query", name="get_users"
+):
+    users = get_users_from_database()
+</CopyBlock>
+
+### Release Tracking
+
+Include application version info:
+
+<CopyBlock language="python" title="Python release configuration">
+import sentry_sdk
+
+sentry_sdk.init(
+    dsn="YOUR_DSN",
+    release="1.0.0",
+    environment="production"
+)
+</CopyBlock>
+
+### Filter Sensitive Data
+
+Automatically remove personal information:
+
+<CopyBlock language="python" title="Python data filtering">
+import sentry_sdk
+
+def before_send(event, hint):
+    if 'request' in event:
+        if 'cookies' in event['request']:
+            del event['request']['cookies']
+    return event
+
+sentry_sdk.init(
+    "YOUR_DSN",
+    before_send=before_send
+)
+</CopyBlock>
+
+<Callout type="warning">
+⚠️ **Important**: Using `send_default_pii=True` sends email addresses and IP addresses. Check GDPR and similar regulations.
+</Callout>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/sentry/step5-advanced-features-en.png"
+  alt="Advanced features"
+  caption="Add tags, performance tracking, and release info"
+/>
+
+</Step>
+
+---
+
+## Using Sentry Dashboard
+
+### View and Manage Issues
+
+1. **Issues** tab - List of all errors
+2. Click an error to see details:
+   - Stack trace
+   - Environment info
+   - User information
+   - Frequency of occurrence
+
+### Manage Issue Status
+
+- **Resolved** - Fixed (becomes Unresolved if happens again)
+- **Ignored** - Ignored (stop receiving notifications)
+- **Regression** - Reappeared (previously fixed issue happened again)
+
+### Star Important Issues
+
+Add stars to important issues for tracking.
+
+---
+
+## Troubleshooting
+
+### SDK Doesn't Detect Errors
+
+1. Verify DSN is correct
+2. Check SDK version is latest: `pip install -U sentry-sdk`
+3. Verify Sentry initialization is called on app startup
+
+### Errors Detected But Missing Information
+
+1. Verify Breadcrumbs are enabled
+2. Check `traces_sample_rate` value (1.0 is maximum)
+3. Add custom context
+
+### Sentry Dashboard is Slow
+
+Too many events are being sent. Lower the sampling rate:
+
+<CopyBlock language="python" title="Adjust sampling rate">
+sentry_sdk.init(
+    dsn="YOUR_DSN",
+    traces_sample_rate=0.1
+)
+</CopyBlock>
+
+0.1 means collect only 10% of traces.

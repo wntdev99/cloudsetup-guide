@@ -1,0 +1,328 @@
+# Redis 설치 및 실행하기
+
+Redis는 **메모리에 저장되는 고속 데이터 저장소**입니다. 캐싱, 세션 저장, 실시간 분석 등에 널리 사용됩니다. 이 가이드를 따라 20분 안에 Redis를 로컬에서 실행합니다.
+
+<FreeTierInfo
+  service="Redis"
+  limit="무제한 자체 호스팅"
+  period="unlimited"
+  status="generous"
+/>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "Docker (권장)", required: false },
+  { text: "또는 Linux/macOS/Windows", required: false },
+  { text: "포트 6379 사용 가능", required: true },
+  { text: "최소 500MB 여유 공간", required: true }
+]} />
+
+<Callout type="info">
+⚡ **Redis란 무엇인가요?** Redis는 인메모리 데이터 저장소로, 문자열[string], 리스트[list], 집합[set], 정렬된 집합[sorted set], 해시[hash] 등의 자료구조를 지원합니다. 데이터를 메모리에 저장하므로 매우 빠릅니다.
+</Callout>
+
+---
+
+<Step number={1} title="Docker를 사용한 설치 (권장)">
+
+Docker를 사용하면 쉽고 빠르게 시작할 수 있습니다.
+
+### Docker 설치 확인
+
+터미널을 열고:
+
+<CopyBlock language="bash" title="Docker 버전 확인">
+docker --version
+</CopyBlock>
+
+Docker가 없다면 [Docker 공식 사이트](https://www.docker.com/products/docker-desktop)에서 설치하세요.
+
+### Docker로 Redis 실행
+
+<CopyBlock language="bash" title="Redis Docker 컨테이너 시작">
+docker run -d \
+  --name redis \
+  -p 6379:6379 \
+  redis:7-alpine
+</CopyBlock>
+
+명령어 설명:
+- `-d`: 백그라운드 실행
+- `--name redis`: 컨테이너 이름
+- `-p 6379:6379`: 포트 매핑
+- `redis:7-alpine`: 경량 Redis 이미지
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/redis/step1-docker-run-ko.png"
+  alt="Docker로 Redis 실행"
+  caption="Docker 명령어로 Redis를 빠르게 시작합니다"
+  priority={true}
+/>
+
+<Callout type="success">
+✅ Redis가 실행 중입니다! 다음 단계에서 연결을 확인합니다.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="수동 설치 - macOS">
+
+Homebrew를 사용한 설치:
+
+<CopyBlock language="bash" title="Redis 설치">
+brew install redis
+</CopyBlock>
+
+설치 후 서버 시작:
+
+<CopyBlock language="bash" title="Redis 서버 시작">
+redis-server
+</CopyBlock>
+
+또는 백그라운드 실행:
+
+<CopyBlock language="bash" title="백그라운드로 실행">
+brew services start redis
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/redis/step2-install-macos-ko.png"
+  alt="macOS Redis 설치"
+  caption="Homebrew로 Redis를 설치합니다"
+/>
+
+</Step>
+
+---
+
+<Step number={3} title="수동 설치 - Linux (Ubuntu/Debian)">
+
+### 패키지 설치
+
+<CopyBlock language="bash" title="Redis 패키지 설치">
+sudo apt-get update
+sudo apt-get install redis-server
+</CopyBlock>
+
+### Redis 서버 시작
+
+<CopyBlock language="bash" title="서비스 시작">
+sudo service redis-server start
+</CopyBlock>
+
+### 부팅 시 자동 시작 설정
+
+<CopyBlock language="bash" title="자동 시작 활성화">
+sudo update-rc.d redis-server defaults
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/redis/step3-install-linux-ko.png"
+  alt="Linux Redis 설치"
+  caption="apt-get으로 Redis를 설치합니다"
+/>
+
+<DevTip>
+시스템 관리자라면 `systemctl` 명령어를 사용할 수도 있습니다: `sudo systemctl start redis-server`
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={4} title="Redis 연결 확인하기">
+
+### redis-cli로 연결 테스트
+
+<CopyBlock language="bash" title="Redis CLI로 연결">
+redis-cli ping
+</CopyBlock>
+
+응답:
+```
+PONG
+```
+
+`PONG`이 반환되면 Redis가 정상적으로 작동하고 있습니다.
+
+### 대화형 모드로 연결
+
+<CopyBlock language="bash" title="대화형 모드">
+redis-cli
+</CopyBlock>
+
+그 다음 명령어를 입력할 수 있습니다:
+
+<CopyBlock language="bash" title="Redis 명령어 예시">
+SET mykey "Hello Redis"
+GET mykey
+</CopyBlock>
+
+응답:
+```
+OK
+"Hello Redis"
+```
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/redis/step4-verify-connection-ko.png"
+  alt="Redis 연결 확인"
+  caption="redis-cli로 Redis와 연결을 확인합니다"
+/>
+
+<Checkpoint>
+`PONG` 응답이 나왔나요? Redis가 정상적으로 작동합니다!
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={5} title="기본 Redis 명령어 배우기">
+
+Redis의 가장 기본적인 명령어들을 배웁니다.
+
+### 문자열 저장 및 조회
+
+<CopyBlock language="bash" title="문자열 작업">
+SET username "john"
+GET username
+</CopyBlock>
+
+응답:
+```
+OK
+"john"
+```
+
+### 만료 시간 설정 (TTL)
+
+10초 후에 자동으로 삭제되도록 설정:
+
+<CopyBlock language="bash" title="TTL 설정">
+SET session "abc123" EX 10
+GET session
+</CopyBlock>
+
+10초 후:
+```
+(nil)
+```
+
+### 리스트 작업
+
+<CopyBlock language="bash" title="리스트 작업">
+LPUSH messages "안녕하세요"
+LPUSH messages "Hello"
+LRANGE messages 0 -1
+</CopyBlock>
+
+응답:
+```
+(integer) 1
+(integer) 2
+1) "Hello"
+2) "안녕하세요"
+```
+
+### 해시 작업
+
+<CopyBlock language="bash" title="해시 작업">
+HSET user:1 name "John" age 30
+HGETALL user:1
+</CopyBlock>
+
+응답:
+```
+(integer) 2
+1) "name"
+2) "John"
+3) "age"
+4) "30"
+```
+
+### 집합 작업
+
+<CopyBlock language="bash" title="집합 작업">
+SADD tags "python" "redis" "database"
+SMEMBERS tags
+</CopyBlock>
+
+응답:
+```
+(integer) 3
+1) "python"
+2) "redis"
+3) "database"
+```
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/redis/step5-basic-commands-ko.png"
+  alt="Redis 기본 명령어"
+  caption="문자열, 리스트, 해시, 집합 등의 자료구조를 사용합니다"
+/>
+
+<Callout type="tip">
+💡 **팁**: Redis에서 모든 키-값은 바이너리 안전[binary safe]하므로 한국어를 포함한 모든 문자를 저장할 수 있습니다.
+</Callout>
+
+</Step>
+
+---
+
+## 다음 단계
+
+<Callout type="success">
+✅ **완료!** Redis가 실행 중이고 기본 명령어를 배웠습니다.
+</Callout>
+
+- [Redis로 캐싱 구현하기](/guides/redis-connection-caching) - 애플리케이션에서 Redis를 사용해보기
+- [Redis 공식 문서](https://redis.io/documentation)
+- [Redis 명령어 레퍼런스](https://redis.io/commands)
+
+## 문제 해결
+
+### 포트 6379가 이미 사용 중
+
+다른 포트로 실행:
+
+<CopyBlock language="bash" title="다른 포트 사용">
+docker run -d \
+  --name redis \
+  -p 6380:6379 \
+  redis:7-alpine
+</CopyBlock>
+
+그 다음 다른 포트로 연결:
+
+<CopyBlock language="bash" title="다른 포트로 연결">
+redis-cli -p 6380 ping
+</CopyBlock>
+
+### redis-cli를 찾을 수 없습니다
+
+Docker를 사용 중이라면:
+
+<CopyBlock language="bash" title="Docker 컨테이너에서 redis-cli 실행">
+docker exec -it redis redis-cli
+</CopyBlock>
+
+### Redis 서버가 응답하지 않습니다
+
+1. 서버가 실행 중인지 확인:
+   ```bash
+   docker ps | grep redis
+   ```
+
+2. 로그 확인:
+   ```bash
+   docker logs redis
+   ```
+
+3. 포트 확인:
+   ```bash
+   netstat -an | grep 6379
+   ```

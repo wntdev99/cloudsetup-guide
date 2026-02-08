@@ -1,0 +1,433 @@
+# Redis 연결 및 캐싱 구현하기
+
+이제 **애플리케이션에서 Redis에 연결하고 캐싱을 구현**하는 방법을 배웁니다. 캐싱은 데이터베이스 쿼리를 줄이고 애플리케이션 성능을 향상시킵니다.
+
+<FreeTierInfo
+  service="Redis"
+  limit="무제한 연결 및 캐싱"
+  period="unlimited"
+  status="generous"
+/>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "Redis 설치 및 실행", required: true },
+  { text: "Python 또는 Node.js", required: true },
+  { text: "Redis 클라이언트 라이브러리", required: false }
+]} />
+
+<Callout type="info">
+🚀 **캐싱이란?** 캐싱은 자주 사용되는 데이터를 빠르게 접근할 수 있는 저장소에 임시로 저장하는 기법입니다. Redis는 메모리 기반이므로 디스크 기반 데이터베이스보다 훨씬 빠릅니다.
+</Callout>
+
+---
+
+<Step number={1} title="Python에서 Redis 연결">
+
+### redis-py 라이브러리 설치
+
+<CopyBlock language="bash" title="redis-py 설치">
+pip install redis
+</CopyBlock>
+
+### 기본 연결 코드
+
+<CopyBlock language="python" title="Redis 연결 (Python)">
+import redis
+
+r = redis.Redis(host='localhost', port=6379, db=0)
+
+try:
+    result = r.ping()
+    print("Redis 연결 성공:", result)
+except Exception as e:
+    print("연결 실패:", e)
+</CopyBlock>
+
+### 데이터 저장 및 조회
+
+<CopyBlock language="python" title="데이터 저장 및 조회">
+import redis
+
+r = redis.Redis(host='localhost', port=6379, db=0)
+
+r.set('user:1:name', 'John')
+name = r.get('user:1:name')
+print(name.decode('utf-8'))
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/redis/step1-python-connection-ko.png"
+  alt="Python Redis 연결"
+  caption="redis-py 라이브러리로 Redis에 연결합니다"
+  priority={true}
+/>
+
+<Checkpoint>
+Redis 연결 성공 메시지가 나타났나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={2} title="Node.js에서 Redis 연결">
+
+### node-redis 라이브러리 설치
+
+<CopyBlock language="bash" title="node-redis 설치">
+npm install redis
+</CopyBlock>
+
+### 기본 연결 코드
+
+<CopyBlock language="javascript" title="Redis 연결 (Node.js)">
+import { createClient } from 'redis';
+
+const client = createClient({
+  host: 'localhost',
+  port: 6379
+});
+
+client.on('error', (err) => console.log('Redis Client Error', err));
+
+await client.connect();
+const pong = await client.ping();
+console.log('Redis 연결 성공:', pong);
+</CopyBlock>
+
+### 비동기 데이터 저장 및 조회
+
+<CopyBlock language="javascript" title="데이터 저장 및 조회">
+import { createClient } from 'redis';
+
+const client = createClient();
+await client.connect();
+
+await client.set('user:1:name', 'John');
+const name = await client.get('user:1:name');
+console.log('이름:', name);
+
+await client.disconnect();
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/redis/step2-nodejs-connection-ko.png"
+  alt="Node.js Redis 연결"
+  caption="node-redis로 Node.js에서 Redis를 사용합니다"
+/>
+
+<DevTip>
+Node.js는 비동기 특성을 가지고 있어서 모든 Redis 작업이 Promise를 반환합니다. async/await를 사용하여 코드를 간결하게 작성할 수 있습니다.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="캐싱 패턴 구현">
+
+### 캐시-애씬[Cache-Aside] 패턴
+
+데이터가 필요할 때마다 다음 절차를 따릅니다:
+1. 캐시에서 데이터를 찾습니다
+2. 없으면 데이터베이스에서 조회합니다
+3. 데이터를 캐시에 저장합니다
+
+#### Python 예제
+
+<CopyBlock language="python" title="Cache-Aside 패턴 (Python)">
+import redis
+import json
+
+r = redis.Redis(host='localhost', port=6379, db=0)
+
+def get_user_data(user_id):
+    cache_key = f'user:{user_id}'
+
+    cached_data = r.get(cache_key)
+    if cached_data:
+        print("캐시에서 조회")
+        return json.loads(cached_data)
+
+    print("데이터베이스에서 조회")
+    user_data = {
+        'id': user_id,
+        'name': 'John',
+        'email': 'john@example.com'
+    }
+
+    r.setex(cache_key, 3600, json.dumps(user_data))
+    return user_data
+
+result = get_user_data(1)
+print(result)
+</CopyBlock>
+
+#### Node.js 예제
+
+<CopyBlock language="javascript" title="Cache-Aside 패턴 (Node.js)">
+import { createClient } from 'redis';
+
+const client = createClient();
+await client.connect();
+
+async function getUserData(userId) {
+    const cacheKey = 'user:' + userId;
+
+    const cachedData = await client.get(cacheKey);
+    if (cachedData) {
+        console.log("캐시에서 조회");
+        return JSON.parse(cachedData);
+    }
+
+    console.log("데이터베이스에서 조회");
+    const userData = {
+        id: userId,
+        name: 'John',
+        email: 'john@example.com'
+    };
+
+    await client.setEx(cacheKey, 3600, JSON.stringify(userData));
+    return userData;
+}
+
+const result = await getUserData(1);
+console.log(result);
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/redis/step3-caching-pattern-ko.png"
+  alt="캐싱 패턴"
+  caption="Cache-Aside 패턴으로 성능을 개선합니다"
+/>
+
+<Callout type="tip">
+💡 **setex의 의미**: set + expire의 조합입니다. 데이터를 저장하면서 동시에 만료 시간을 지정합니다.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="세션 저장소로 Redis 활용">
+
+웹 애플리케이션의 사용자 세션을 Redis에 저장합니다.
+
+### Python Flask 예제
+
+<CopyBlock language="bash" title="Flask 및 redis 설치">
+pip install flask flask-session redis
+</CopyBlock>
+
+<CopyBlock language="python" title="Flask 세션 설정">
+from flask import Flask, session
+from flask_session import Session
+import redis
+
+app = Flask(__name__)
+app.config['SESSION_TYPE'] = 'redis'
+app.config['SESSION_REDIS'] = redis.from_url('redis://localhost:6379')
+
+Session(app)
+
+@app.route('/login', methods=['POST'])
+def login():
+    session['user_id'] = 123
+    session['username'] = 'john'
+    return 'Session saved'
+
+@app.route('/profile')
+def profile():
+    user_id = session.get('user_id')
+    username = session.get('username')
+    return f'User: {username}'
+
+if __name__ == '__main__':
+    app.run()
+</CopyBlock>
+
+### Node.js Express 예제
+
+<CopyBlock language="bash" title="Express 및 redis 설치">
+npm install express express-session connect-redis redis
+</CopyBlock>
+
+<CopyBlock language="javascript" title="Express 세션 설정">
+import express from 'express';
+import session from 'express-session';
+import { createClient } from 'redis';
+import RedisStore from 'connect-redis';
+
+const client = createClient();
+await client.connect();
+
+const app = express();
+
+app.use(
+  session({
+    store: new RedisStore({ client }),
+    secret: 'your-secret',
+    resave: false,
+    saveUninitialized: false
+  })
+);
+
+app.get('/login', (req, res) => {
+  req.session.userId = 123;
+  req.session.username = 'john';
+  res.send('Session saved');
+});
+
+app.get('/profile', (req, res) => {
+  const username = req.session.username;
+  res.send('User: ' + username);
+});
+
+app.listen(3000);
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/redis/step4-session-storage-ko.png"
+  alt="세션 저장소"
+  caption="Redis를 세션 저장소로 사용합니다"
+/>
+
+</Step>
+
+---
+
+<Step number={5} title="고급 캐싱 전략">
+
+### 캐시 무효화 (Invalidation)
+
+데이터가 변경되면 캐시도 업데이트합니다:
+
+<CopyBlock language="python" title="캐시 무효화">
+import redis
+
+r = redis.Redis(host='localhost', port=6379, db=0)
+
+def update_user(user_id, name):
+    cache_key = f'user:{user_id}'
+    r.delete(cache_key)
+
+    print("데이터베이스 업데이트")
+
+    return True
+
+update_user(1, 'Jane')
+</CopyBlock>
+
+### 캐시 워밍업 (Warming)
+
+애플리케이션 시작 시 자주 사용되는 데이터를 미리 로드:
+
+<CopyBlock language="python" title="캐시 워밍업">
+import redis
+import json
+
+r = redis.Redis(host='localhost', port=6379, db=0)
+
+def warm_cache():
+    users = [
+        {'id': 1, 'name': 'John'},
+        {'id': 2, 'name': 'Jane'},
+        {'id': 3, 'name': 'Bob'}
+    ]
+
+    for user in users:
+        key = f'user:{user["id"]}'
+        r.setex(key, 3600, json.dumps(user))
+
+    print("캐시 워밍 완료")
+
+warm_cache()
+</CopyBlock>
+
+### TTL 모니터링
+
+캐시 항목의 남은 시간을 확인:
+
+<CopyBlock language="python" title="TTL 확인">
+import redis
+
+r = redis.Redis(host='localhost', port=6379, db=0)
+
+r.set('mykey', 'value', ex=3600)
+ttl = r.ttl('mykey')
+print(f'남은 시간: {ttl}초')
+</CopyBlock>
+
+<Callout type="warning">
+⚠️ **주의**: 캐시 메모리가 가득 차면 Redis는 오래된 데이터를 자동으로 제거할 수 있습니다. 중요한 데이터는 TTL을 적절히 설정하세요.
+</Callout>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/redis/step5-advanced-caching-ko.png"
+  alt="고급 캐싱"
+  caption="캐시 무효화, 워밍, TTL 모니터링으로 캐시를 효과적으로 관리합니다"
+/>
+
+</Step>
+
+---
+
+## 실전 팁
+
+### Redis 모니터링
+
+실시간으로 Redis 명령어를 모니터링:
+
+<CopyBlock language="bash" title="Redis 모니터">
+redis-cli monitor
+</CopyBlock>
+
+### 메모리 사용량 확인
+
+<CopyBlock language="bash" title="메모리 정보">
+redis-cli info memory
+</CopyBlock>
+
+### 캐시 통계 수집
+
+<CopyBlock language="python" title="캐시 히트율 추적">
+import redis
+
+r = redis.Redis(host='localhost', port=6379, db=0)
+
+stats = r.info('stats')
+print(f"전체 명령어: {stats['total_commands_processed']}")
+print(f"접속 수: {stats['total_connections_received']}")
+</CopyBlock>
+
+<Callout type="success">
+✅ **완료!** Redis로 캐싱을 구현할 수 있습니다. 애플리케이션의 성능을 크게 향상시킬 수 있습니다.
+</Callout>
+
+---
+
+## 문제 해결
+
+### "Connection refused" 오류
+
+Redis 서버가 실행 중인지 확인:
+
+<CopyBlock language="bash" title="Redis 연결 확인">
+redis-cli ping
+</CopyBlock>
+
+### 메모리 부족 오류
+
+Redis 메모리 정책 확인 및 조정:
+
+<CopyBlock language="bash" title="메모리 정책 설정">
+redis-cli CONFIG GET maxmemory-policy
+</CopyBlock>
+
+### 느린 응답 시간
+
+1. 네트워크 연결 확인
+2. Redis 서버 부하 확인: `redis-cli info stats`
+3. 키 개수 확인: `redis-cli dbsize`

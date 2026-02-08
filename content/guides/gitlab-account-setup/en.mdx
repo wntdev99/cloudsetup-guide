@@ -1,0 +1,235 @@
+# Create GitLab Account and Set Up Projects
+
+GitLab is a **Git repository hosting and DevOps platform**. Like GitHub, you can store and manage code, and implement automated deployment with built-in CI/CD pipelines. Use unlimited private repositories for free.
+
+<FreeTierInfo
+  service="GitLab"
+  limit="Unlimited private repositories"
+  period="unlimited"
+  status="generous"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Email address", required: true },
+  { text: "Web browser", required: true },
+  { text: "Git installed (optional)", required: false }
+]} />
+
+<Callout type="info">
+🐙 **What is GitLab?** GitLab is an alternative to GitHub. It provides version control, project management, CI/CD pipelines, issue tracking, wiki, and more - all in an integrated DevOps platform.
+</Callout>
+
+---
+
+<Step number={1} title="Sign Up for GitLab">
+
+### Visit GitLab Website
+
+1. Go to [GitLab.com](https://gitlab.com)
+2. Click **Register** button
+3. Choose signup method:
+   - Email address
+   - GitHub account
+   - Google account
+   - Microsoft account
+
+### Sign Up with Email
+
+<CopyBlock language="text" title="Enter signup information">
+Username: john_dev
+Email: john@example.com
+Password: Enter a secure password
+</CopyBlock>
+
+Click the signup button and a verification email will be sent.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/gitlab/step1-signup-en.png"
+  alt="GitLab signup"
+  caption="Sign up for GitLab with email or social account"
+  priority={true}
+/>
+
+<Callout type="tip">
+💡 **Tip**: Choose username carefully as it's used in URLs. You can change it later.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Verify Email and Set Up Profile">
+
+### Click Verification Email
+
+1. Check your email inbox
+2. Open the **verification email** from GitLab
+3. Click the **Confirm your account** link
+
+### Enter Profile Information
+
+1. **Name**: Your real name or display name
+2. **Username**: Unique username (already selected)
+3. **Company** (optional): Company name
+4. **Website** (optional): Portfolio or blog URL
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/gitlab/step2-profile-en.png"
+  alt="Profile setup"
+  caption="Set up profile information after email verification"
+/>
+
+<Checkpoint>
+Were you redirected to GitLab dashboard?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={3} title="Create Your First Project">
+
+### Create New Project
+
+1. Click **Create Project** or **New Project** on GitLab dashboard
+2. Select **Create blank project**
+
+### Enter Project Information
+
+<CopyBlock language="text" title="Project configuration">
+Project name: my-first-app
+Description: My first GitLab project
+Visibility: Private
+Initialize with README: checked
+</CopyBlock>
+
+Option explanations:
+- **Project name**: Becomes part of project URL
+- **Description**: Project introduction
+- **Visibility**: Public or Private
+  - Private: Only invited users can view
+  - Public: Anyone can view
+- **Initialize with README**: Creates default README.md file
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/gitlab/step3-create-project-en.png"
+  alt="Create project"
+  caption="Set project name, description, and visibility"
+/>
+
+<Checkpoint>
+Is the project created? Can you see the project page?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={4} title="Set Up SSH Keys and Clone Repository">
+
+### Generate SSH Key
+
+Generate SSH key in terminal:
+
+<CopyBlock language="bash" title="Generate SSH key">
+ssh-keygen -t ed25519 -C "john@example.com"
+</CopyBlock>
+
+When prompted:
+- **File location**: Press Enter for default `~/.ssh/id_ed25519`
+- **Passphrase**: Can be empty but recommended for security
+
+### Get Public Key
+
+<CopyBlock language="bash" title="View public key content">
+cat ~/.ssh/id_ed25519.pub
+</CopyBlock>
+
+Copy the output.
+
+### Add SSH Key to GitLab
+
+1. Go to **Settings** > **SSH Keys**
+2. Click **Add new SSH key**
+3. Paste public key content
+4. Enter **Title** (e.g., "My Laptop")
+5. Click **Add key**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/gitlab/step4-ssh-setup-en.png"
+  alt="SSH key setup"
+  caption="Generate SSH key and register with GitLab"
+/>
+
+### Clone Repository
+
+<CopyBlock language="bash" title="Clone repository">
+git clone git@gitlab.com:username/my-first-app.git
+cd my-first-app
+</CopyBlock>
+
+<Callout type="success">
+✅ **Complete!** GitLab account is set up and repository is cloned.
+</Callout>
+
+</Step>
+
+---
+
+## Next Steps
+
+- [Set Up GitLab CI/CD Pipeline](/guides/gitlab-cicd-pipeline) - Configure automated build and deployment
+- [GitLab Official Documentation](https://docs.gitlab.com)
+- [Getting Started with Git](https://git-scm.com/book/en/v2)
+
+## Team Management
+
+### Invite Team Members
+
+1. Go to **Project Settings** > **Members**
+2. Click **Invite members**
+3. Enter email address
+4. Select role:
+   - **Guest** - Read-only
+   - **Reporter** - Report issues and comment
+   - **Developer** - Push code and make changes
+   - **Maintainer** - Full permissions
+
+### Create Groups
+
+To manage multiple projects together:
+
+1. Click **New Group** on GitLab main page
+2. Enter group name and slug
+3. Create and manage projects within group
+
+---
+
+## Troubleshooting
+
+### SSH Key Connection Error
+
+<CopyBlock language="bash" title="Test SSH connection">
+ssh -T git@gitlab.com
+</CopyBlock>
+
+Response should be:
+```
+Welcome to GitLab, @username!
+```
+
+### Use SSH Instead of HTTPS
+
+To use SSH instead of HTTPS when cloning:
+
+<CopyBlock language="bash" title="Change repository remote URL">
+git remote set-url origin git@gitlab.com:username/my-first-app.git
+</CopyBlock>
+
+### Repository Not Visible
+
+1. Verify you're logged in with correct account
+2. Check project visibility (Private/Public)
+3. Verify invitation was accepted

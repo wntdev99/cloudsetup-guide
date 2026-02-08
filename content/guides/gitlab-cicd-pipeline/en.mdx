@@ -1,0 +1,384 @@
+# Configure GitLab CI/CD Pipeline
+
+Now you'll set up **automated build, test, and deployment pipelines in GitLab**. With `.gitlab-ci.yml` file, you can automatically test and deploy code on every commit.
+
+<FreeTierInfo
+  service="GitLab CI/CD"
+  limit="400 free pipeline minutes per month"
+  period="monthly"
+  status="generous"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "GitLab project", required: true },
+  { text: "Repository cloned", required: true },
+  { text: "Node.js or Python project", required: false }
+]} />
+
+<Callout type="info">
+🚀 **What is CI/CD?** CI (Continuous Integration) automatically builds and tests code on every change. CD (Continuous Deployment) automatically deploys after tests pass.
+</Callout>
+
+---
+
+<Step number={1} title="Create .gitlab-ci.yml File">
+
+### Create File
+
+Create `.gitlab-ci.yml` file in project root:
+
+<CopyBlock language="bash" title="Create file">
+touch .gitlab-ci.yml
+</CopyBlock>
+
+### Basic Python Pipeline
+
+For Python projects:
+
+<CopyBlock language="yaml" title=".gitlab-ci.yml (Python)">
+stages:
+  - test
+  - build
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+test:
+  stage: test
+  image: python:3.11
+  script:
+    - pip install -r requirements.txt
+    - pytest tests/
+  cache:
+    paths:
+      - .cache/pip
+      - venv/
+
+build:
+  stage: build
+  image: python:3.11
+  script:
+    - pip install -r requirements.txt
+    - python setup.py build
+  artifacts:
+    paths:
+      - build/
+</CopyBlock>
+
+### Basic Node.js Pipeline
+
+For Node.js projects:
+
+<CopyBlock language="yaml" title=".gitlab-ci.yml (Node.js)">
+stages:
+  - install
+  - test
+  - build
+
+variables:
+  npm_config_cache: "$CI_PROJECT_DIR/.npm"
+
+install:
+  stage: install
+  image: node:18
+  script:
+    - npm install
+  cache:
+    paths:
+      - node_modules/
+      - .npm/
+
+test:
+  stage: test
+  image: node:18
+  script:
+    - npm install
+    - npm run test
+  cache:
+    paths:
+      - node_modules/
+
+build:
+  stage: build
+  image: node:18
+  script:
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - dist/
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/gitlab/step1-gitlab-ci-file-en.png"
+  alt=".gitlab-ci.yml file"
+  caption="Create .gitlab-ci.yml file in project root"
+  priority={true}
+/>
+
+<Callout type="tip">
+💡 **Caching**: Using `cache` key stores dependencies to reduce pipeline execution time.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Commit and Run Pipeline">
+
+### Add and Commit File
+
+<CopyBlock language="bash" title="Commit changes">
+git add .gitlab-ci.yml
+git commit -m "ci: add GitLab CI/CD pipeline"
+git push origin main
+</CopyBlock>
+
+### Monitor Pipeline
+
+1. Go to GitLab project page
+2. Select **CI/CD** > **Pipelines**
+3. Click the latest pipeline
+4. Monitor each stage progress
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/gitlab/step2-pipeline-execution-en.png"
+  alt="Pipeline execution"
+  caption="Pipeline automatically runs when code is pushed"
+/>
+
+<Checkpoint>
+Did the pipeline complete successfully?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={3} title="Set Environment Variables and Secrets">
+
+### Define Environment Variables
+
+Define variables in `.gitlab-ci.yml`:
+
+<CopyBlock language="yaml" title="Environment variables">
+variables:
+  NODE_ENV: production
+  DATABASE_URL: "postgres://user:pass@localhost/db"
+  API_KEY: "secret_key_value"
+
+stages:
+  - deploy
+
+deploy:
+  stage: deploy
+  image: node:18
+  script:
+    - echo "Deploying with NODE_ENV=$NODE_ENV"
+    - npm run deploy
+</CopyBlock>
+
+### Set Secret Variables
+
+Manage sensitive info with GitLab secret variables:
+
+1. Go to **Settings** > **CI/CD**
+2. In **Variables** section, click **Add variable**
+3. **Key**: `DATABASE_PASSWORD`
+4. **Value**: actual password
+5. Check **Protected** (use only on main branch)
+6. **Save**
+
+Then use in pipeline:
+
+<CopyBlock language="yaml" title="Use secret variables">
+deploy:
+  stage: deploy
+  script:
+    - echo "DB Password: $DATABASE_PASSWORD"
+  only:
+    - main
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/gitlab/step3-variables-en.png"
+  alt="Environment variables"
+  caption="Set environment variables and secrets to protect sensitive info"
+/>
+
+<Callout type="warning">
+⚠️ **Important**: Never include passwords or API keys directly in code. Always use secret variables.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="Add Deployment Stage">
+
+### Deploy to Development
+
+<CopyBlock language="yaml" title="Deployment configuration">
+stages:
+  - test
+  - build
+  - deploy_dev
+  - deploy_prod
+
+deploy_dev:
+  stage: deploy_dev
+  image: node:18
+  environment:
+    name: development
+    url: https://dev.example.com
+  script:
+    - npm install
+    - npm run build
+    - npm run deploy:dev
+  only:
+    - develop
+
+deploy_prod:
+  stage: deploy_prod
+  image: node:18
+  environment:
+    name: production
+    url: https://example.com
+  script:
+    - npm install
+    - npm run build
+    - npm run deploy:prod
+  only:
+    - main
+  when: manual
+</CopyBlock>
+
+Option explanations:
+- `environment.name`: Deployment environment name
+- `environment.url`: Deployed app URL
+- `only`: Run only on specific branches (develop, main)
+- `when: manual`: Manual approval before deploy
+
+### Deploy with Docker
+
+<CopyBlock language="yaml" title="Docker deployment">
+build_image:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    - docker build -t myapp:latest .
+    - docker tag myapp:latest registry.gitlab.com/user/myapp:latest
+    - docker push registry.gitlab.com/user/myapp:latest
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/gitlab/step4-deployment-en.png"
+  alt="Deployment stage"
+  caption="Automate deployment to dev, staging, and production"
+/>
+
+<DevTip>
+Automating multi-environment deployment reduces manual errors. Setting production deployment to `when: manual` ensures verification before deploying.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={5} title="Optimize and Monitor Pipeline">
+
+### Parallel Execution
+
+Run multiple jobs simultaneously:
+
+<CopyBlock language="yaml" title="Parallel execution">
+test_unit:
+  stage: test
+  script:
+    - npm run test:unit
+
+test_integration:
+  stage: test
+  script:
+    - npm run test:integration
+
+lint:
+  stage: test
+  script:
+    - npm run lint
+</CopyBlock>
+
+These three jobs run simultaneously, reducing total time.
+
+### Conditional Execution
+
+Run job only under specific conditions:
+
+<CopyBlock language="yaml" title="Conditional execution">
+deploy_prod:
+  stage: deploy
+  script:
+    - npm run deploy
+  only:
+    - tags
+  except:
+    - schedules
+</CopyBlock>
+
+- `only`: Run only under specific conditions
+- `except`: Exclude specific conditions
+
+### Schedule Pipelines
+
+Run jobs on a schedule:
+
+1. Go to **CI/CD** > **Schedules**
+2. Click **New schedule**
+3. Description: "Night build"
+4. Set variables
+5. Cron expression: `0 2 * * *` (every day at 2 AM)
+
+<Callout type="success">
+✅ **Complete!** GitLab CI/CD pipeline is configured. Code commits now automatically trigger testing and deployment.
+</Callout>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/gitlab/step5-optimization-en.png"
+  alt="Pipeline optimization"
+  caption="Use parallel execution, conditional execution, and scheduling to optimize pipeline"
+/>
+
+</Step>
+
+---
+
+## Troubleshooting
+
+### Pipeline Fails
+
+1. Click the pipeline
+2. Click the failed job
+3. Check error message in **Log** tab
+
+### Cache Not Working
+
+1. Verify `cache` settings in `.gitlab-ci.yml`
+2. Verify `cache:key` value is unique
+3. Check if cache quota exceeded
+
+### Deployment Fails
+
+1. Verify environment variables are set correctly
+2. Check deployment script syntax
+3. Verify server access permissions (SSH keys, API tokens)
+
+### Pipeline Takes Too Long
+
+1. Reduce time with parallel execution
+2. Use caching
+3. Remove unnecessary jobs
+4. Consider increasing resources

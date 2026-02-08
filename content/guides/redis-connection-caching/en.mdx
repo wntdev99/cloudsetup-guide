@@ -1,0 +1,433 @@
+# Connect to Redis and Implement Caching
+
+Now you'll learn how to **connect to Redis from your application and implement caching strategies**. Caching reduces database queries and improves application performance.
+
+<FreeTierInfo
+  service="Redis"
+  limit="Unlimited connections and caching"
+  period="unlimited"
+  status="generous"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Redis installed and running", required: true },
+  { text: "Python or Node.js", required: true },
+  { text: "Redis client library", required: false }
+]} />
+
+<Callout type="info">
+🚀 **What is Caching?** Caching stores frequently accessed data in a fast-access storage. Redis is memory-based, making it much faster than disk-based databases.
+</Callout>
+
+---
+
+<Step number={1} title="Connect to Redis from Python">
+
+### Install redis-py Library
+
+<CopyBlock language="bash" title="Install redis-py">
+pip install redis
+</CopyBlock>
+
+### Basic Connection Code
+
+<CopyBlock language="python" title="Connect to Redis (Python)">
+import redis
+
+r = redis.Redis(host='localhost', port=6379, db=0)
+
+try:
+    result = r.ping()
+    print("Redis connection successful:", result)
+except Exception as e:
+    print("Connection failed:", e)
+</CopyBlock>
+
+### Store and Retrieve Data
+
+<CopyBlock language="python" title="Store and retrieve data">
+import redis
+
+r = redis.Redis(host='localhost', port=6379, db=0)
+
+r.set('user:1:name', 'John')
+name = r.get('user:1:name')
+print(name.decode('utf-8'))
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/redis/step1-python-connection-en.png"
+  alt="Python Redis connection"
+  caption="Connect to Redis with redis-py library"
+  priority={true}
+/>
+
+<Checkpoint>
+Did you see the connection success message?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={2} title="Connect to Redis from Node.js">
+
+### Install node-redis Library
+
+<CopyBlock language="bash" title="Install node-redis">
+npm install redis
+</CopyBlock>
+
+### Basic Connection Code
+
+<CopyBlock language="javascript" title="Connect to Redis (Node.js)">
+import { createClient } from 'redis';
+
+const client = createClient({
+  host: 'localhost',
+  port: 6379
+});
+
+client.on('error', (err) => console.log('Redis Client Error', err));
+
+await client.connect();
+const pong = await client.ping();
+console.log('Redis connection successful:', pong);
+</CopyBlock>
+
+### Async Store and Retrieve Data
+
+<CopyBlock language="javascript" title="Store and retrieve data">
+import { createClient } from 'redis';
+
+const client = createClient();
+await client.connect();
+
+await client.set('user:1:name', 'John');
+const name = await client.get('user:1:name');
+console.log('Name:', name);
+
+await client.disconnect();
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/redis/step2-nodejs-connection-en.png"
+  alt="Node.js Redis connection"
+  caption="Use Redis in Node.js with node-redis"
+/>
+
+<DevTip>
+Node.js is asynchronous, so all Redis operations return Promises. Use async/await for clean code.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="Implement Caching Pattern">
+
+### Cache-Aside Pattern
+
+Follow these steps each time you need data:
+1. Look for data in cache
+2. If not found, query the database
+3. Store data in cache
+
+#### Python Example
+
+<CopyBlock language="python" title="Cache-Aside Pattern (Python)">
+import redis
+import json
+
+r = redis.Redis(host='localhost', port=6379, db=0)
+
+def get_user_data(user_id):
+    cache_key = f'user:{user_id}'
+
+    cached_data = r.get(cache_key)
+    if cached_data:
+        print("Retrieved from cache")
+        return json.loads(cached_data)
+
+    print("Retrieved from database")
+    user_data = {
+        'id': user_id,
+        'name': 'John',
+        'email': 'john@example.com'
+    }
+
+    r.setex(cache_key, 3600, json.dumps(user_data))
+    return user_data
+
+result = get_user_data(1)
+print(result)
+</CopyBlock>
+
+#### Node.js Example
+
+<CopyBlock language="javascript" title="Cache-Aside Pattern (Node.js)">
+import { createClient } from 'redis';
+
+const client = createClient();
+await client.connect();
+
+async function getUserData(userId) {
+    const cacheKey = 'user:' + userId;
+
+    const cachedData = await client.get(cacheKey);
+    if (cachedData) {
+        console.log("Retrieved from cache");
+        return JSON.parse(cachedData);
+    }
+
+    console.log("Retrieved from database");
+    const userData = {
+        id: userId,
+        name: 'John',
+        email: 'john@example.com'
+    };
+
+    await client.setEx(cacheKey, 3600, JSON.stringify(userData));
+    return userData;
+}
+
+const result = await getUserData(1);
+console.log(result);
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/redis/step3-caching-pattern-en.png"
+  alt="Caching pattern"
+  caption="Improve performance with Cache-Aside pattern"
+/>
+
+<Callout type="tip">
+💡 **setex**: Combination of set plus expire. Stores data while setting expiration time.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="Use Redis as Session Store">
+
+Store user sessions in Redis for web applications.
+
+### Python Flask Example
+
+<CopyBlock language="bash" title="Install Flask and redis">
+pip install flask flask-session redis
+</CopyBlock>
+
+<CopyBlock language="python" title="Flask session setup">
+from flask import Flask, session
+from flask_session import Session
+import redis
+
+app = Flask(__name__)
+app.config['SESSION_TYPE'] = 'redis'
+app.config['SESSION_REDIS'] = redis.from_url('redis://localhost:6379')
+
+Session(app)
+
+@app.route('/login', methods=['POST'])
+def login():
+    session['user_id'] = 123
+    session['username'] = 'john'
+    return 'Session saved'
+
+@app.route('/profile')
+def profile():
+    user_id = session.get('user_id')
+    username = session.get('username')
+    return f'User: {username}'
+
+if __name__ == '__main__':
+    app.run()
+</CopyBlock>
+
+### Node.js Express Example
+
+<CopyBlock language="bash" title="Install Express and redis">
+npm install express express-session connect-redis redis
+</CopyBlock>
+
+<CopyBlock language="javascript" title="Express session setup">
+import express from 'express';
+import session from 'express-session';
+import { createClient } from 'redis';
+import RedisStore from 'connect-redis';
+
+const client = createClient();
+await client.connect();
+
+const app = express();
+
+app.use(
+  session({
+    store: new RedisStore({ client }),
+    secret: 'your-secret',
+    resave: false,
+    saveUninitialized: false
+  })
+);
+
+app.get('/login', (req, res) => {
+  req.session.userId = 123;
+  req.session.username = 'john';
+  res.send('Session saved');
+});
+
+app.get('/profile', (req, res) => {
+  const username = req.session.username;
+  res.send('User: ' + username);
+});
+
+app.listen(3000);
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/redis/step4-session-storage-en.png"
+  alt="Session storage"
+  caption="Use Redis as session store"
+/>
+
+</Step>
+
+---
+
+<Step number={5} title="Advanced Caching Strategies">
+
+### Cache Invalidation
+
+Update cache when data changes:
+
+<CopyBlock language="python" title="Cache invalidation">
+import redis
+
+r = redis.Redis(host='localhost', port=6379, db=0)
+
+def update_user(user_id, name):
+    cache_key = f'user:{user_id}'
+    r.delete(cache_key)
+
+    print("Update database")
+
+    return True
+
+update_user(1, 'Jane')
+</CopyBlock>
+
+### Cache Warming
+
+Pre-load frequently used data on startup:
+
+<CopyBlock language="python" title="Cache warming">
+import redis
+import json
+
+r = redis.Redis(host='localhost', port=6379, db=0)
+
+def warm_cache():
+    users = [
+        {'id': 1, 'name': 'John'},
+        {'id': 2, 'name': 'Jane'},
+        {'id': 3, 'name': 'Bob'}
+    ]
+
+    for user in users:
+        key = f'user:{user["id"]}'
+        r.setex(key, 3600, json.dumps(user))
+
+    print("Cache warming complete")
+
+warm_cache()
+</CopyBlock>
+
+### Monitor TTL
+
+Check remaining time for cache items:
+
+<CopyBlock language="python" title="Check TTL">
+import redis
+
+r = redis.Redis(host='localhost', port=6379, db=0)
+
+r.set('mykey', 'value', ex=3600)
+ttl = r.ttl('mykey')
+print(f'Remaining time: {ttl} seconds')
+</CopyBlock>
+
+<Callout type="warning">
+⚠️ **Important**: When Redis memory is full, it may evict old data. Set TTL appropriately for important data.
+</Callout>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/redis/step5-advanced-caching-en.png"
+  alt="Advanced caching"
+  caption="Manage cache with invalidation, warming, and TTL monitoring"
+/>
+
+</Step>
+
+---
+
+## Practical Tips
+
+### Monitor Redis
+
+Monitor Redis commands in real-time:
+
+<CopyBlock language="bash" title="Redis monitor">
+redis-cli monitor
+</CopyBlock>
+
+### Check Memory Usage
+
+<CopyBlock language="bash" title="Memory info">
+redis-cli info memory
+</CopyBlock>
+
+### Collect Cache Statistics
+
+<CopyBlock language="python" title="Track cache hit rate">
+import redis
+
+r = redis.Redis(host='localhost', port=6379, db=0)
+
+stats = r.info('stats')
+print(f"Total commands: {stats['total_commands_processed']}")
+print(f"Total connections: {stats['total_connections_received']}")
+</CopyBlock>
+
+<Callout type="success">
+✅ **Complete!** You can now implement caching with Redis and significantly improve application performance.
+</Callout>
+
+---
+
+## Troubleshooting
+
+### "Connection refused" Error
+
+Check if Redis server is running:
+
+<CopyBlock language="bash" title="Verify Redis connection">
+redis-cli ping
+</CopyBlock>
+
+### Out of Memory Error
+
+Check and adjust Redis memory policy:
+
+<CopyBlock language="bash" title="Check memory policy">
+redis-cli CONFIG GET maxmemory-policy
+</CopyBlock>
+
+### Slow Response Time
+
+1. Verify network connection
+2. Check Redis server load: `redis-cli info stats`
+3. Check number of keys: `redis-cli dbsize`

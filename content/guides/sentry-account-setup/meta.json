@@ -1,0 +1,60 @@
+{
+  "slug": "sentry-account-setup",
+  "platform": "sentry",
+  "service": "Sentry Error Tracking",
+  "category": "monitoring",
+  "difficulty": "beginner",
+  "estimatedMinutes": 15,
+  "totalSteps": 4,
+  "freeTier": {
+    "service": "Sentry",
+    "limit": "5,000 events per month",
+    "period": "monthly",
+    "status": "generous",
+    "amount": "Free",
+    "conditions": [
+      "Up to 5,000 events per month",
+      "Unlimited projects",
+      "Basic error tracking",
+      "Performance monitoring",
+      "Release tracking",
+      "Community support"
+    ]
+  },
+  "prerequisites": [],
+  "nextGuides": [
+    "sentry-error-tracking"
+  ],
+  "seo": {
+    "ko": {
+      "title": "Sentry 계정 만들고 프로젝트 설정하기 | CloudSetup.guide",
+      "description": "Sentry에 가입하고 첫 번째 프로젝트를 생성하는 방법을 배웁니다. 에러 추적 시작은 15분이면 충분합니다.",
+      "keywords": [
+        "Sentry 계정",
+        "에러 추적",
+        "Sentry 프로젝트",
+        "Sentry 가입",
+        "오류 모니터링",
+        "예외 처리",
+        "에러 로깅"
+      ]
+    },
+    "en": {
+      "title": "Create Sentry Account and Set Up Projects | CloudSetup.guide",
+      "description": "Learn how to sign up for Sentry and create your first project. Get started with error tracking in 15 minutes.",
+      "keywords": [
+        "Sentry account",
+        "error tracking",
+        "Sentry project",
+        "Sentry signup",
+        "error monitoring",
+        "exception handling",
+        "error logging"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z",
+  "published": true
+}

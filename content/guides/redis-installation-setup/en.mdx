@@ -1,0 +1,328 @@
+# Install and Run Redis Locally
+
+Redis is a **fast in-memory data store** used for caching, session storage, real-time analytics, and more. Follow this guide to run Redis locally in 20 minutes.
+
+<FreeTierInfo
+  service="Redis"
+  limit="Unlimited self-hosted"
+  period="unlimited"
+  status="generous"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Docker (recommended)", required: false },
+  { text: "Or Linux/macOS/Windows", required: false },
+  { text: "Port 6379 available", required: true },
+  { text: "Minimum 500MB free space", required: true }
+]} />
+
+<Callout type="info">
+⚡ **What is Redis?** Redis is an in-memory data store supporting data structures like strings, lists, sets, sorted sets, and hashes. Because data is stored in memory, it's extremely fast.
+</Callout>
+
+---
+
+<Step number={1} title="Install with Docker (Recommended)">
+
+Docker makes it quick and easy to get started.
+
+### Check Docker Installation
+
+Open a terminal and run:
+
+<CopyBlock language="bash" title="Check Docker version">
+docker --version
+</CopyBlock>
+
+If Docker isn't installed, download it from the [Docker official website](https://www.docker.com/products/docker-desktop).
+
+### Run Redis with Docker
+
+<CopyBlock language="bash" title="Start Redis Docker container">
+docker run -d \
+  --name redis \
+  -p 6379:6379 \
+  redis:7-alpine
+</CopyBlock>
+
+Command explanation:
+- `-d`: Run in background
+- `--name redis`: Container name
+- `-p 6379:6379`: Port mapping
+- `redis:7-alpine`: Lightweight Redis image
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/redis/step1-docker-run-en.png"
+  alt="Run Redis with Docker"
+  caption="Quick start Redis using Docker"
+  priority={true}
+/>
+
+<Callout type="success">
+✅ Redis is running! Next step verifies the connection.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Manual Installation - macOS">
+
+Install using Homebrew:
+
+<CopyBlock language="bash" title="Install Redis">
+brew install redis
+</CopyBlock>
+
+Start the server:
+
+<CopyBlock language="bash" title="Start Redis server">
+redis-server
+</CopyBlock>
+
+Or run in the background:
+
+<CopyBlock language="bash" title="Run in background">
+brew services start redis
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/redis/step2-install-macos-en.png"
+  alt="macOS Redis installation"
+  caption="Install Redis with Homebrew"
+/>
+
+</Step>
+
+---
+
+<Step number={3} title="Manual Installation - Linux (Ubuntu/Debian)">
+
+### Install Package
+
+<CopyBlock language="bash" title="Install Redis package">
+sudo apt-get update
+sudo apt-get install redis-server
+</CopyBlock>
+
+### Start Redis Server
+
+<CopyBlock language="bash" title="Start service">
+sudo service redis-server start
+</CopyBlock>
+
+### Enable Auto-start on Boot
+
+<CopyBlock language="bash" title="Enable auto-start">
+sudo update-rc.d redis-server defaults
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/redis/step3-install-linux-en.png"
+  alt="Linux Redis installation"
+  caption="Install Redis with apt-get"
+/>
+
+<DevTip>
+System administrators can also use `systemctl`: `sudo systemctl start redis-server`
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={4} title="Verify Redis Connection">
+
+### Test Connection with redis-cli
+
+<CopyBlock language="bash" title="Test with redis-cli">
+redis-cli ping
+</CopyBlock>
+
+Response:
+```
+PONG
+```
+
+If you see `PONG`, Redis is working correctly.
+
+### Connect in Interactive Mode
+
+<CopyBlock language="bash" title="Interactive mode">
+redis-cli
+</CopyBlock>
+
+Then enter commands:
+
+<CopyBlock language="bash" title="Redis command examples">
+SET mykey "Hello Redis"
+GET mykey
+</CopyBlock>
+
+Response:
+```
+OK
+"Hello Redis"
+```
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/redis/step4-verify-connection-en.png"
+  alt="Verify Redis connection"
+  caption="Verify connection with redis-cli"
+/>
+
+<Checkpoint>
+Did you see the PONG response? Redis is working!
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={5} title="Learn Basic Redis Commands">
+
+Learn the most common Redis commands.
+
+### Store and Retrieve Strings
+
+<CopyBlock language="bash" title="String operations">
+SET username "john"
+GET username
+</CopyBlock>
+
+Response:
+```
+OK
+"john"
+```
+
+### Set Expiration Time (TTL)
+
+Automatically delete after 10 seconds:
+
+<CopyBlock language="bash" title="Set TTL">
+SET session "abc123" EX 10
+GET session
+</CopyBlock>
+
+After 10 seconds:
+```
+(nil)
+```
+
+### List Operations
+
+<CopyBlock language="bash" title="List operations">
+LPUSH messages "Hello"
+LPUSH messages "World"
+LRANGE messages 0 -1
+</CopyBlock>
+
+Response:
+```
+(integer) 1
+(integer) 2
+1) "World"
+2) "Hello"
+```
+
+### Hash Operations
+
+<CopyBlock language="bash" title="Hash operations">
+HSET user:1 name "John" age 30
+HGETALL user:1
+</CopyBlock>
+
+Response:
+```
+(integer) 2
+1) "name"
+2) "John"
+3) "age"
+4) "30"
+```
+
+### Set Operations
+
+<CopyBlock language="bash" title="Set operations">
+SADD tags "python" "redis" "database"
+SMEMBERS tags
+</CopyBlock>
+
+Response:
+```
+(integer) 3
+1) "python"
+2) "redis"
+3) "database"
+```
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/redis/step5-basic-commands-en.png"
+  alt="Basic Redis commands"
+  caption="Use data structures like strings, lists, hashes, and sets"
+/>
+
+<Callout type="tip">
+💡 **Tip**: Redis is binary safe, so you can store any data including all Unicode characters.
+</Callout>
+
+</Step>
+
+---
+
+## Next Steps
+
+<Callout type="success">
+✅ **Complete!** Redis is running and you've learned basic commands.
+</Callout>
+
+- [Implement Caching with Redis](/guides/redis-connection-caching) - Use Redis in your application
+- [Official Redis Documentation](https://redis.io/documentation)
+- [Redis Command Reference](https://redis.io/commands)
+
+## Troubleshooting
+
+### Port 6379 Already in Use
+
+Run on a different port:
+
+<CopyBlock language="bash" title="Use different port">
+docker run -d \
+  --name redis \
+  -p 6380:6379 \
+  redis:7-alpine
+</CopyBlock>
+
+Then connect to the different port:
+
+<CopyBlock language="bash" title="Connect to different port">
+redis-cli -p 6380 ping
+</CopyBlock>
+
+### redis-cli Not Found
+
+If using Docker:
+
+<CopyBlock language="bash" title="Run redis-cli in container">
+docker exec -it redis redis-cli
+</CopyBlock>
+
+### Redis Server Not Responding
+
+1. Check if server is running:
+   ```bash
+   docker ps | grep redis
+   ```
+
+2. Check logs:
+   ```bash
+   docker logs redis
+   ```
+
+3. Check port:
+   ```bash
+   netstat -an | grep 6379
+   ```

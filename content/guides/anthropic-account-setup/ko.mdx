@@ -1,0 +1,287 @@
+# Anthropic Claude API 계정 설정하기
+
+**Claude API**는 Anthropic의 고급 대언어모델[Large Language Model]에 대한 API입니다. 텍스트 생성, 분석, 코딩 지원 등 다양한 작업에 사용할 수 있습니다. 이 가이드를 따라 15분 안에 계정을 설정합니다.
+
+<FreeTierInfo
+  service="Claude API"
+  limit="종량제 결제 (무료 체험 없음)"
+  period="usage-based"
+  status="affordable"
+/>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "이메일 주소", required: true },
+  { text: "신용카드 또는 직불카드", required: true },
+  { text: "웹 브라우저", required: true }
+]} />
+
+<Callout type="info">
+🤖 **Claude란 무엇인가요?** Claude는 Anthropic이 개발한 대규모 언어 모델(LLM)입니다. ChatGPT와 유사하지만 더 정확하고 안전한 것으로 알려져 있습니다. 최신 모델은 Claude 3이며, Opus, Sonnet, Haiku 등 여러 버전이 있습니다.
+</Callout>
+
+---
+
+<Step number={1} title="Anthropic 웹사이트 방문">
+
+### 콘솔 접근
+
+1. [console.anthropic.com](https://console.anthropic.com)을 방문합니다
+2. **계정 만들기[Create Account]** 또는 **로그인[Sign In]** 버튼을 확인합니다
+3. 아직 계정이 없다면 **계정 만들기** 클릭
+
+### 가입 정보 입력
+
+1. 이메일 주소 입력
+2. 비밀번호 설정 (최소 8자 이상)
+3. 약관 동의
+4. **계정 만들기** 또는 **Sign Up** 클릭
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/anthropic/step1-signup-ko.png"
+  alt="Anthropic 가입"
+  caption="Anthropic 콘솔에 계정을 생성합니다"
+  priority={true}
+/>
+
+<Callout type="tip">
+💡 **팁**: 회사 이메일을 사용하면 비즈니스 계정으로 등록할 수 있습니다.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="이메일 확인 및 결제 정보 추가">
+
+### 이메일 확인
+
+1. 등록한 이메일 받은편지함 확인
+2. Anthropic의 **확인 이메일** 오픈
+3. **이메일 주소 확인[Verify email]** 또는 링크 클릭
+
+### 결제 정보 설정
+
+Claude API는 종량제이므로 결제 정보가 필요합니다:
+
+1. **결제 방법[Billing]** 또는 **결제 설정** 선택
+2. **신용카드 추가**
+3. 카드 정보 입력:
+   - 카드 번호
+   - 유효기간
+   - CVV
+   - 청구 주소
+4. **저장** 클릭
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/anthropic/step2-billing-ko.png"
+  alt="결제 정보 설정"
+  caption="이메일 확인 후 결제 방법을 추가합니다"
+/>
+
+<Callout type="warning">
+⚠️ **주의**: 결제 정보 설정은 필수입니다. 다만 API 키를 생성하기만 하고 사용하지 않으면 요금이 청구되지 않습니다.
+</Callout>
+
+<Checkpoint>
+결제 정보가 저장되었나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={3} title="API 키 생성">
+
+### API 키 페이지로 이동
+
+1. Anthropic 콘솔에 로그인
+2. 좌측 메뉴에서 **API 키[API Keys]** 선택
+3. **새 API 키 생성[Create new API key]** 버튼 클릭
+
+### API 키 생성 및 저장
+
+1. API 키 이름 입력 (선택사항, 예: "My App API Key")
+2. **생성[Create]** 클릭
+3. 생성된 API 키 표시됨 (한 번만 표시됨)
+
+<CopyBlock language="text" title="API 키 예시">
+sk-ant-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+</CopyBlock>
+
+**중요**: API 키를 안전한 곳에 저장하세요. 노출되지 않도록 주의합니다!
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/anthropic/step3-api-key-ko.png"
+  alt="API 키 생성"
+  caption="Anthropic 콘솔에서 새 API 키를 생성합니다"
+/>
+
+<Callout type="danger">
+⚠️ **보안 경고**: API 키를 공개 저장소에 커밋하지 마세요. 환경 변수로 관리하세요!
+</Callout>
+
+<Checkpoint>
+API 키를 안전한 장소에 저장했나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={4} title="API 키 환경 변수 설정">
+
+### 환경 변수 설정
+
+API 키를 환경 변수로 저장합니다.
+
+#### macOS/Linux
+
+<CopyBlock language="bash" title="환경 변수 설정">
+export ANTHROPIC_API_KEY="sk-ant-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+</CopyBlock>
+
+또는 영구적으로 설정하려면 `~/.bashrc` 또는 `~/.zshrc`에 추가:
+
+<CopyBlock language="bash" title=".bashrc 또는 .zshrc에 추가">
+echo 'export ANTHROPIC_API_KEY="sk-ant-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"' >> ~/.bashrc
+source ~/.bashrc
+</CopyBlock>
+
+#### Windows (PowerShell)
+
+<CopyBlock language="powershell" title="PowerShell에서 환경 변수 설정">
+$env:ANTHROPIC_API_KEY="sk-ant-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+</CopyBlock>
+
+또는 영구적으로 설정:
+
+<CopyBlock language="powershell" title="영구 환경 변수 설정">
+[System.Environment]::SetEnvironmentVariable(
+  'ANTHROPIC_API_KEY',
+  'sk-ant-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+  'User'
+)
+</CopyBlock>
+
+### .env 파일 사용 (권장)
+
+프로젝트에서 `.env` 파일을 사용합니다:
+
+<CopyBlock language="bash" title=".env 파일">
+ANTHROPIC_API_KEY=sk-ant-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+</CopyBlock>
+
+그 다음 `python-dotenv` 또는 유사 라이브러리로 로드:
+
+<CopyBlock language="python" title="Python에서 .env 로드">
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+api_key = os.getenv('ANTHROPIC_API_KEY')
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/anthropic/step4-env-setup-ko.png"
+  alt="환경 변수 설정"
+  caption="API 키를 환경 변수로 설정하여 안전하게 관리합니다"
+/>
+
+<Callout type="success">
+✅ **완료!** Anthropic Claude API 계정이 설정되었습니다. 이제 Claude API를 사용할 준비가 되었습니다.
+</Callout>
+
+</Step>
+
+---
+
+## 다음 단계
+
+- [Claude API 통합하기](/guides/anthropic-api-integration) - 애플리케이션에 Claude를 통합
+- [Anthropic 공식 문서](https://docs.anthropic.com)
+- [API 레퍼런스](https://docs.anthropic.com/reference/getting-started-with-the-api)
+
+## Claude 모델 정보
+
+Claude는 여러 버전이 있습니다:
+
+### Claude 3 Opus (가장 강력)
+- 복잡한 작업에 최적
+- 가장 높은 지연시간
+- $15 per 1M input tokens
+
+### Claude 3 Sonnet (균형)
+- 대부분의 작업에 권장
+- 중간 가격
+- $3 per 1M input tokens
+
+### Claude 3 Haiku (빠름)
+- 빠른 응답 필요
+- 가장 저렴
+- $0.80 per 1M input tokens
+
+## 결제 정보
+
+### 가격 구조
+
+Claude API는 토큰 기반으로 청구됩니다:
+
+<CopyBlock language="text" title="가격 예시">
+입력 토큰 1,000개 처리 + 출력 토큰 200개 생성
+
+Claude 3 Haiku 기준:
+입력: 1,000 × ($0.80 / 1,000,000) = $0.0008
+출력: 200 × ($2.40 / 1,000,000) = $0.00048
+총: 약 $0.0013
+</CopyBlock>
+
+### 무료 체험 정책
+
+- Anthropic은 현재 무료 체험을 제공하지 않습니다
+- 시작 즉시 결제가 필요합니다
+- 하지만 API 키만 생성해서 사용하지 않으면 요금이 청구되지 않습니다
+
+### 사용량 모니터링
+
+1. Anthropic 콘솔의 **결제[Billing]** 탭
+2. **사용량[Usage]** 확인
+3. 월별 비용 추적
+
+## 보안 팁
+
+### API 키 보호
+
+1. 절대로 공개 저장소에 커밋하지 마세요
+2. `.env` 파일을 `.gitignore`에 추가
+3. 정기적으로 사용하지 않은 키 삭제
+4. 팀 작업 시 별도 키 사용
+
+### 레이트 제한
+
+API 키마다 레이트 제한이 있습니다:
+- 기본: 초당 수백 요청
+- 높은 사용량 시: 우선 지원을 통해 증가 가능
+
+---
+
+## 문제 해결
+
+### API 키가 작동하지 않습니다
+
+1. API 키가 올바르게 복사되었는지 확인
+2. 환경 변수가 올바르게 설정되었는지 확인
+3. API 키가 비활성화되지 않았는지 확인
+
+### 결제 오류
+
+1. 카드 정보가 정확한지 확인
+2. 카드 만료 기한 확인
+3. 자동 결제가 활성화되어 있는지 확인
+
+### 사용량이 예상보다 많습니다
+
+1. 로그를 확인하여 불필요한 API 호출 확인
+2. 배치 작업으로 토큰 효율성 개선
+3. 캐싱을 활용하여 중복 요청 방지

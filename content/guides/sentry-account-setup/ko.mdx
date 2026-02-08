@@ -1,0 +1,227 @@
+# Sentry 계정 만들고 프로젝트 설정하기
+
+Sentry는 **애플리케이션의 에러와 성능 문제를 실시간으로 추적**하는 에러 모니터링 플랫폼입니다. 월 5,000개의 무료 이벤트로 시작할 수 있습니다. 이 가이드를 따라 15분 안에 계정을 설정합니다.
+
+<FreeTierInfo
+  service="Sentry"
+  limit="월 5,000 이벤트"
+  period="monthly"
+  status="generous"
+/>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "이메일 주소", required: true },
+  { text: "비밀번호", required: true },
+  { text: "웹 브라우저", required: true }
+]} />
+
+<Callout type="info">
+🔍 **Sentry란 무엇인가요?** Sentry는 에러 추적 플랫폼입니다. 애플리케이션에서 발생하는 예외[exception]를 자동으로 감지하고, 스택 트레이스, 사용자 정보, 환경 정보 등을 수집하여 개발자에게 알립니다.
+</Callout>
+
+---
+
+<Step number={1} title="Sentry에 가입">
+
+### Sentry 웹사이트 방문
+
+1. [Sentry.io](https://sentry.io)를 방문합니다
+2. **가입** 또는 **Sign Up** 버튼을 클릭합니다
+3. 가입 방법을 선택합니다:
+   - 이메일 주소
+   - GitHub 계정
+   - Google 계정
+
+### 이메일로 가입하는 경우
+
+1. 이메일 주소를 입력합니다
+2. 비밀번호를 입력합니다 (최소 8자 이상)
+3. **회원가입** 또는 **Sign Up** 버튼을 클릭합니다
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/sentry/step1-signup-ko.png"
+  alt="Sentry 가입 페이지"
+  caption="Sentry에 가입합니다"
+  priority={true}
+/>
+
+<Callout type="tip">
+💡 **팁**: GitHub나 Google로 가입하면 더 빠르고 쉽습니다. 비밀번호를 기억할 필요가 없습니다!
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="이메일 확인 및 조직 설정">
+
+### 확인 이메일 클릭
+
+1. 등록한 이메일 받은편지함을 확인합니다
+2. Sentry에서 보낸 **확인 이메일**을 엽니다
+3. **이메일 확인** 링크를 클릭합니다
+
+### 조직 정보 입력
+
+Sentry는 **조직[organization]** 단위로 프로젝트를 관리합니다:
+
+1. 조직 이름을 입력합니다 (예: "My Company", "Personal Projects")
+2. 조직 슬러그[URL]가 자동으로 생성됩니다
+3. **조직 만들기** 또는 **Create Organization** 버튼을 클릭합니다
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/sentry/step2-email-org-ko.png"
+  alt="이메일 확인 및 조직 설정"
+  caption="이메일을 확인하고 조직을 생성합니다"
+/>
+
+<Checkpoint>
+Sentry 대시보드로 리다이렉트되었나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={3} title="첫 번째 프로젝트 생성">
+
+### 프로젝트 생성 페이지
+
+조직 생성 후 자동으로 **프로젝트 생성** 페이지로 이동합니다.
+
+1. **프로젝트 생성** 또는 **Create Project** 버튼을 클릭합니다
+2. 플랫폼을 선택합니다:
+   - JavaScript / React / Vue
+   - Python / Django / Flask
+   - Node.js / Express
+   - Java / Spring
+   - Go
+   - Ruby
+   - .NET
+   - PHP
+   - 기타 플랫폼
+
+### 프로젝트 설정
+
+프로젝트 생성 창에서:
+
+1. **프로젝트 이름** 입력 (예: "My Web App", "API Server")
+2. **플랫폼** 선택 (사용 중인 프로그래밍 언어)
+3. **프로젝트 생성** 클릭
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/sentry/step3-create-project-ko.png"
+  alt="프로젝트 생성"
+  caption="플랫폼을 선택하고 프로젝트를 생성합니다"
+/>
+
+<Callout type="success">
+✅ 프로젝트가 생성되었습니다! 이제 프로젝트 설정 페이지가 표시됩니다.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="프로젝트 설정 및 DSN 얻기">
+
+### DSN (Data Source Name) 확인
+
+프로젝트 생성 후 **설정[Settings]** 페이지에서 DSN을 확인할 수 있습니다.
+
+DSN은 다음과 같은 형태입니다:
+```
+https://key@sentry.io/projectid
+```
+
+### DSN 위치 찾기
+
+1. 좌측 네비게이션에서 **설정[Settings]** 클릭
+2. **클라이언트 키[Client Keys]** 선택
+3. DSN이 표시됩니다
+
+### 설정 확인
+
+**프로젝트 설정[Project Settings]** 페이지에서:
+
+1. **일반[General]** - 프로젝트 이름, 팀 확인
+2. **에러 보고[Error Reporting]** - 에러 필터 설정
+3. **성능[Performance]** - 성능 모니터링 활성화
+4. **릴리스[Releases]** - 버전 관리
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/sentry/step4-dsn-config-ko.png"
+  alt="DSN 확인 및 프로젝트 설정"
+  caption="DSN을 확인하고 프로젝트 설정을 완료합니다"
+/>
+
+<DevTip>
+DSN은 공개해도 괜찮습니다. 하지만 실수로 버전 관리에 커밋하지 않도록 주의하세요. 환경 변수에 저장하는 것이 좋습니다.
+</DevTip>
+
+<Checkpoint>
+DSN을 얻었나요? 이제 애플리케이션에 Sentry를 통합할 준비가 되었습니다.
+</Checkpoint>
+
+</Step>
+
+---
+
+## 다음 단계
+
+<Callout type="success">
+✅ **완료!** Sentry 계정과 프로젝트가 준비되었습니다.
+</Callout>
+
+- [Sentry 에러 추적 통합](/guides/sentry-error-tracking) - 애플리케이션에 Sentry를 통합하기
+- [Sentry 공식 문서](https://docs.sentry.io/)
+- [Sentry Python SDK](https://docs.sentry.io/platforms/python/)
+- [Sentry JavaScript SDK](https://docs.sentry.io/platforms/javascript/)
+
+## 팁과 모범 사례
+
+### 팀 구성원 초대
+
+1. **설정[Settings]** > **팀[Team]**으로 이동
+2. **팀원 초대[Invite Team Members]** 클릭
+3. 팀원 이메일 주소 입력
+4. 역할[role] 선택:
+   - Owner - 모든 권한
+   - Manager - 프로젝트 관리 권한
+   - Member - 읽기 권한
+
+### 프로젝트 환경 분리
+
+여러 환경을 위해 별도의 프로젝트를 만드는 것이 좋습니다:
+- **Production** - 실제 운영 환경
+- **Staging** - 스테이징 환경
+- **Development** - 개발 환경
+
+### 알림 설정
+
+1. **알림[Alerts]** 메뉴 접근
+2. **알림 규칙[Alert Rules]** 생성
+3. 심각도별 또는 빈도별 알림 설정
+4. Slack, 이메일 등으로 알림 받기
+
+---
+
+## 문제 해결
+
+### 가입 이메일이 도착하지 않았습니다
+
+1. **스팸 폴더**를 확인합니다
+2. **[Sentry 복구 옵션](https://sentry.io/account/password/reset/)** 사용
+3. 다른 이메일 주소로 다시 가입 시도
+
+### 프로젝트가 보이지 않습니다
+
+1. 올바른 **조직**을 선택했는지 확인
+2. 좌측 네비게이션에서 **프로젝트[Projects]** 메뉴 확인
+3. 페이지 새로고침
+
+### 이미 Sentry 계정이 있습니다
+
+이미 계정이 있다면 [Sentry.io](https://sentry.io)에서 로그인하고 **새 프로젝트 만들기**를 선택하세요.

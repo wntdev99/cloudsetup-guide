@@ -1,0 +1,59 @@
+{
+  "slug": "elasticsearch-indexing-search",
+  "platform": "elasticsearch",
+  "service": "Elasticsearch Search Engine",
+  "category": "database",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 30,
+  "totalSteps": 5,
+  "freeTier": {
+    "service": "Elasticsearch",
+    "limit": "Full features with self-hosted or Elastic Cloud",
+    "period": "unlimited",
+    "amount": "Free",
+    "status": "generous",
+    "conditions": [
+      "Create and manage unlimited indexes",
+      "Full-text search on all data",
+      "Complex queries and aggregations",
+      "No limits on document count",
+      "Open source version available"
+    ]
+  },
+  "prerequisites": [
+    "elasticsearch-installation-setup"
+  ],
+  "nextGuides": [],
+  "seo": {
+    "ko": {
+      "title": "Elasticsearch 인덱싱 및 검색하기 | CloudSetup.guide",
+      "description": "Elasticsearch에 데이터를 인덱싱하고 전문검색을 수행하는 방법을 배웁니다. 실전 예제로 검색 쿼리를 작성합니다.",
+      "keywords": [
+        "Elasticsearch 인덱싱",
+        "전문검색",
+        "Elasticsearch 쿼리",
+        "REST API",
+        "JSON 문서",
+        "검색 엔진",
+        "데이터 인덱싱"
+      ]
+    },
+    "en": {
+      "title": "Index and Search Data in Elasticsearch | CloudSetup.guide",
+      "description": "Learn how to index data and perform full-text searches in Elasticsearch. Write search queries with practical examples.",
+      "keywords": [
+        "Elasticsearch indexing",
+        "full-text search",
+        "Elasticsearch queries",
+        "REST API",
+        "JSON documents",
+        "search engine",
+        "data indexing"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z",
+  "published": false
+}

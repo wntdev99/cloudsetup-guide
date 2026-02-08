@@ -1,0 +1,384 @@
+# GitLab CI/CD 파이프라인 설정하기
+
+이제 **GitLab에서 자동화된 빌드, 테스트, 배포 파이프라인**을 설정합니다. `.gitlab-ci.yml` 파일을 통해 코드 커밋 시 자동으로 테스트하고 배포할 수 있습니다.
+
+<FreeTierInfo
+  service="GitLab CI/CD"
+  limit="월 400분 무료 파이프라인 시간"
+  period="monthly"
+  status="generous"
+/>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "GitLab 프로젝트", required: true },
+  { text: "저장소 복제 완료", required: true },
+  { text: "Node.js 또는 Python 프로젝트", required: false }
+]} />
+
+<Callout type="info">
+🚀 **CI/CD란?** CI는 Continuous Integration (연속 통합)으로 코드 변경 시 자동으로 빌드 및 테스트합니다. CD는 Continuous Deployment (연속 배포)로 테스트 통과 후 자동으로 배포합니다.
+</Callout>
+
+---
+
+<Step number={1} title=".gitlab-ci.yml 파일 생성">
+
+### 파일 생성
+
+프로젝트 루트에 `.gitlab-ci.yml` 파일을 생성합니다:
+
+<CopyBlock language="bash" title="파일 생성">
+touch .gitlab-ci.yml
+</CopyBlock>
+
+### 기본 Python 파이프라인
+
+Python 프로젝트의 경우:
+
+<CopyBlock language="yaml" title=".gitlab-ci.yml (Python)">
+stages:
+  - test
+  - build
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+test:
+  stage: test
+  image: python:3.11
+  script:
+    - pip install -r requirements.txt
+    - pytest tests/
+  cache:
+    paths:
+      - .cache/pip
+      - venv/
+
+build:
+  stage: build
+  image: python:3.11
+  script:
+    - pip install -r requirements.txt
+    - python setup.py build
+  artifacts:
+    paths:
+      - build/
+</CopyBlock>
+
+### 기본 Node.js 파이프라인
+
+Node.js 프로젝트의 경우:
+
+<CopyBlock language="yaml" title=".gitlab-ci.yml (Node.js)">
+stages:
+  - install
+  - test
+  - build
+
+variables:
+  npm_config_cache: "$CI_PROJECT_DIR/.npm"
+
+install:
+  stage: install
+  image: node:18
+  script:
+    - npm install
+  cache:
+    paths:
+      - node_modules/
+      - .npm/
+
+test:
+  stage: test
+  image: node:18
+  script:
+    - npm install
+    - npm run test
+  cache:
+    paths:
+      - node_modules/
+
+build:
+  stage: build
+  image: node:18
+  script:
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - dist/
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/gitlab/step1-gitlab-ci-file-ko.png"
+  alt=".gitlab-ci.yml 파일"
+  caption="프로젝트 루트에 .gitlab-ci.yml 파일을 생성합니다"
+  priority={true}
+/>
+
+<Callout type="tip">
+💡 **캐싱**: `cache` 키를 사용하여 의존성을 캐시하면 파이프라인 실행 시간을 단축할 수 있습니다.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="파이프라인 커밋 및 실행">
+
+### 파일 추가 및 커밋
+
+<CopyBlock language="bash" title="변경사항 커밋">
+git add .gitlab-ci.yml
+git commit -m "ci: add GitLab CI/CD pipeline"
+git push origin main
+</CopyBlock>
+
+### 파이프라인 모니터링
+
+1. GitLab 프로젝트 페이지로 이동
+2. **CI/CD** > **파이프라인[Pipelines]** 선택
+3. 최신 파이프라인 클릭
+4. 각 스테이지의 진행 상황 확인
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/gitlab/step2-pipeline-execution-ko.png"
+  alt="파이프라인 실행"
+  caption="코드를 푸시하면 파이프라인이 자동으로 실행됩니다"
+/>
+
+<Checkpoint>
+파이프라인이 성공적으로 완료되었나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={3} title="환경 변수 및 시크릿 설정">
+
+### 환경 변수 정의
+
+`.gitlab-ci.yml`에서 변수를 정의합니다:
+
+<CopyBlock language="yaml" title="환경 변수">
+variables:
+  NODE_ENV: production
+  DATABASE_URL: "postgres://user:pass@localhost/db"
+  API_KEY: "secret_key_value"
+
+stages:
+  - deploy
+
+deploy:
+  stage: deploy
+  image: node:18
+  script:
+    - echo "Deploying with NODE_ENV=$NODE_ENV"
+    - npm run deploy
+</CopyBlock>
+
+### 보안 변수 설정 (시크릿)
+
+민감한 정보는 GitLab 시크릿 변수로 관리합니다:
+
+1. **프로젝트 설정[Settings]** > **CI/CD**
+2. **변수[Variables]** 섹션에서 **변수 추가**
+3. **키**: `DATABASE_PASSWORD`
+4. **값**: 실제 비밀번호
+5. **보호됨[Protected]** 체크 (메인 브랜치에만 사용)
+6. **저장**
+
+그 다음 파이프라인에서 사용:
+
+<CopyBlock language="yaml" title="시크릿 변수 사용">
+deploy:
+  stage: deploy
+  script:
+    - echo "DB Password: $DATABASE_PASSWORD"
+  only:
+    - main
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/gitlab/step3-variables-ko.png"
+  alt="환경 변수 설정"
+  caption="환경 변수와 시크릿을 설정하여 민감 정보를 보호합니다"
+/>
+
+<Callout type="warning">
+⚠️ **주의**: 비밀번호나 API 키는 절대로 코드에 직접 포함하지 마세요. 시크릿 변수로 관리하세요.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="배포 스테이지 추가">
+
+### 개발 환경으로 배포
+
+<CopyBlock language="yaml" title="배포 설정">
+stages:
+  - test
+  - build
+  - deploy_dev
+  - deploy_prod
+
+deploy_dev:
+  stage: deploy_dev
+  image: node:18
+  environment:
+    name: development
+    url: https://dev.example.com
+  script:
+    - npm install
+    - npm run build
+    - npm run deploy:dev
+  only:
+    - develop
+
+deploy_prod:
+  stage: deploy_prod
+  image: node:18
+  environment:
+    name: production
+    url: https://example.com
+  script:
+    - npm install
+    - npm run build
+    - npm run deploy:prod
+  only:
+    - main
+  when: manual
+</CopyBlock>
+
+옵션 설명:
+- `environment.name`: 배포 환경 이름
+- `environment.url`: 배포된 애플리케이션 URL
+- `only`: 특정 브랜치에서만 실행 (develop, main)
+- `when: manual`: 수동 확인 후 배포
+
+### Docker를 사용한 배포
+
+<CopyBlock language="yaml" title="Docker 배포">
+build_image:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    - docker build -t myapp:latest .
+    - docker tag myapp:latest registry.gitlab.com/user/myapp:latest
+    - docker push registry.gitlab.com/user/myapp:latest
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/gitlab/step4-deployment-ko.png"
+  alt="배포 스테이지"
+  caption="개발, 스테이징, 프로덕션 환경으로의 배포를 자동화합니다"
+/>
+
+<DevTip>
+여러 환경으로의 배포를 자동화하면 수동 배포 오류를 줄일 수 있습니다. 프로덕션 배포는 `when: manual`로 설정하여 검증 후 배포하는 것이 안전합니다.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={5} title="파이프라인 최적화 및 모니터링">
+
+### 병렬 실행
+
+여러 작업을 동시에 실행합니다:
+
+<CopyBlock language="yaml" title="병렬 실행">
+test_unit:
+  stage: test
+  script:
+    - npm run test:unit
+
+test_integration:
+  stage: test
+  script:
+    - npm run test:integration
+
+lint:
+  stage: test
+  script:
+    - npm run lint
+</CopyBlock>
+
+이 세 작업은 동시에 실행되어 전체 시간을 단축합니다.
+
+### 조건부 실행
+
+특정 조건에서만 작업 실행:
+
+<CopyBlock language="yaml" title="조건부 실행">
+deploy_prod:
+  stage: deploy
+  script:
+    - npm run deploy
+  only:
+    - tags
+  except:
+    - schedules
+</CopyBlock>
+
+- `only`: 특정 조건에서만 실행
+- `except`: 특정 조건에서 제외
+
+### 파이프라인 스케줄
+
+정기적으로 작업 실행:
+
+1. **CI/CD** > **스케줄[Schedules]**
+2. **새 스케줄 생성** 클릭
+3. 설명: "Night build"
+4. 변수 설정
+5. Cron 표현식: `0 2 * * *` (매일 2시)
+
+<Callout type="success">
+✅ **완료!** GitLab CI/CD 파이프라인이 설정되었습니다. 이제 코드 커밋 시 자동으로 테스트와 배포가 진행됩니다.
+</Callout>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/gitlab/step5-optimization-ko.png"
+  alt="파이프라인 최적화"
+  caption="병렬 실행, 조건부 실행, 스케줄을 활용하여 파이프라인을 최적화합니다"
+/>
+
+</Step>
+
+---
+
+## 문제 해결
+
+### 파이프라인 실패
+
+1. 파이프라인 클릭
+2. 실패한 작업 클릭
+3. **로그** 탭에서 오류 메시지 확인
+
+### 캐시가 작동하지 않습니다
+
+1. `.gitlab-ci.yml`의 `cache` 설정 확인
+2. `cache:key` 값이 고유한지 확인
+3. 캐시 용량 초과 여부 확인
+
+### 배포가 실패합니다
+
+1. 환경 변수가 올바르게 설정되었는지 확인
+2. 배포 스크립트 문법 확인
+3. 서버 접근 권한 확인 (SSH 키, API 토큰)
+
+### 파이프라인 시간이 너무 깁니다
+
+1. 병렬 실행으로 단축
+2. 캐싱 활용
+3. 불필요한 작업 제거
+4. 리소스 증설 고려
