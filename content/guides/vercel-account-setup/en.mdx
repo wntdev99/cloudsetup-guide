@@ -1,0 +1,191 @@
+# Vercel Account Setup Guide
+
+<FreeTierInfo
+  platform="vercel"
+  limit="Hobby Plan"
+  period="month"
+  amount="Unlimited deployments, 100GB bandwidth"
+  status="available"
+/>
+
+Vercel is the company behind Next.js and provides the best deployment platform for frontend frameworks. This guide walks you through creating a Vercel account with your GitHub account, exploring the dashboard, and understanding the free Hobby plan benefits.
+
+## Prerequisites
+
+Before you begin, you'll need:
+
+- GitHub account (create one for free at [github.com](https://github.com) if you don't have one)
+- Email address
+- Web browser
+
+<Callout type="info">
+While Vercel supports GitHub, GitLab, and Bitbucket sign-in, we recommend using GitHub for the best integration experience with Next.js.
+</Callout>
+
+---
+
+<Step number={1} title="Visit Vercel Website and Sign Up with GitHub">
+
+1. Open your web browser and navigate to [vercel.com](https://vercel.com).
+2. Click the **Sign Up** button in the top-right corner.
+3. Select **Continue with GitHub** from the login options.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step1-signup-en.png"
+  alt="Vercel sign-up page showing GitHub login option"
+  caption="Click Continue with GitHub button to sign up with your GitHub account"
+/>
+
+<Callout type="tip">
+Signing up with GitHub makes Git repository integration automatic later, streamlining your deployment workflow.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="GitHub OAuth Authentication and Permission Grant">
+
+1. When the GitHub login page appears, enter your GitHub username and password.
+2. Click the **Authorize Vercel** button to grant Vercel access to your GitHub account.
+3. Review the requested permissions:
+   - Read repository access
+   - Webhook creation (for automatic deployments)
+   - Commit status updates
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step2-github-auth-en.png"
+  alt="GitHub OAuth authorization screen"
+  caption="Review and approve the permissions Vercel requests from GitHub"
+/>
+
+<Callout type="warning">
+During authorization, you can choose "Grant access to all repositories" or "Only select repositories". We recommend starting with selected repositories only.
+</Callout>
+
+<Checkpoint>
+- [ ] Successfully logged in with your GitHub account?
+- [ ] Approved the permissions requested by Vercel?
+- [ ] Received email verification? (Check spam folder)
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={3} title="Choose Account Type (Personal vs Team)">
+
+After GitHub authentication, Vercel will ask you to choose an account type.
+
+### Personal Account
+- Perfect for personal and side projects
+- Free Hobby plan access
+- Single user access
+- Unlimited deployments
+
+### Team Account
+- Designed for collaborative projects
+- Invite multiple team members
+- Starts with Pro plan (paid)
+- Role-based access control
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step3-account-type-en.png"
+  alt="Vercel account type selection screen"
+  caption="Choose between Personal Account or Team Account"
+/>
+
+**We recommend starting with a Personal Account (Hobby Plan) for beginners.**
+
+1. Select **Continue with Personal Account**.
+2. (Optional) Set your account name. Default is your GitHub username.
+
+<DevTip title="When You Need a Team Account">
+You can create a team anytime from settings later. It's better to start with a personal account and upgrade to a team when collaboration is needed.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={4} title="Explore Dashboard and Verify Free Plan">
+
+Once account creation is complete, you'll be redirected to the Vercel dashboard.
+
+### Dashboard Main Components
+
+1. **Overview Tab**: List of all projects and recent deployment status
+2. **New Project Button**: Connect Git repository to deploy new project
+3. **Storage**: Access to Vercel KV, Postgres, and Blob storage
+4. **Settings**: Account settings, domains, environment variables, team management
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step4-dashboard-en.png"
+  alt="Vercel dashboard main screen"
+  caption="Main menu and project list on Vercel dashboard"
+/>
+
+### Verify Hobby Plan Free Benefits
+
+Click the account menu in the top-right corner and navigate to **Settings** > **Billing** to view your current plan.
+
+**Hobby Plan Free Benefits:**
+- ✅ Unlimited deployments (production + preview)
+- ✅ 100GB bandwidth per month
+- ✅ Automatic HTTPS (SSL certificates)
+- ✅ Free `.vercel.app` domain
+- ✅ Global CDN
+- ✅ Automatic preview deployments (per Pull Request)
+- ✅ Edge Functions 100GB-hours/month
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step4-billing-en.png"
+  alt="Vercel Hobby plan detailed information"
+  caption="Free Hobby plan detailed usage and limits"
+/>
+
+<Callout type="info">
+The Hobby plan is free for personal and non-commercial use only. Commercial projects require the Pro plan ($20/month).
+</Callout>
+
+<Checkpoint>
+- [ ] Successfully accessed Vercel dashboard?
+- [ ] Hobby plan is active?
+- [ ] Understand the main dashboard menus?
+</Checkpoint>
+
+</Step>
+
+---
+
+## Next Steps
+
+Congratulations! You've successfully created and set up your Vercel account. You're now ready for the next steps:
+
+1. **[Deploy Next.js App to Vercel](/guides/vercel-nextjs-deploy)** - Connect Git repository and make your first deployment
+2. **[Vercel Environment Variables Setup](/guides/vercel-env-setup)** - Securely manage API keys and secrets
+
+<Callout type="tip">
+Before proceeding to the next guide, prepare a Git repository ready for deployment for a smoother experience.
+</Callout>
+
+## Troubleshooting
+
+### GitHub Authorization Failed
+- Verify you're logged into GitHub.
+- Disable popup blockers if enabled.
+- Try incognito mode or a different browser.
+
+### Didn't Receive Email Verification
+- Check your spam folder.
+- Go to Profile > Settings > General in the dashboard and click "Resend Verification Email".
+
+### Chose Wrong Account Type
+- You can create a team anytime from Settings > General using "Create Team" button.
+- Team accounts cannot be deleted, so choose carefully.
+
+## Related Resources
+
+- [Vercel Official Documentation](https://vercel.com/docs)
+- [Vercel Pricing](https://vercel.com/pricing)
+- [Vercel GitHub Integration Guide](https://vercel.com/docs/git/vercel-for-github)

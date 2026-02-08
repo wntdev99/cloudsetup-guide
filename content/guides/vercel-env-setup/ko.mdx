@@ -1,0 +1,588 @@
+# Vercel 환경 변수 설정 가이드
+
+<FreeTierInfo
+  platform="vercel"
+  limit="무제한"
+  period="unlimited"
+  amount="무제한 환경 변수"
+  status="available"
+/>
+
+환경 변수는 API 키, 데이터베이스 연결 문자열, 비밀 토큰 등 민감한 정보를 안전하게 관리하는 핵심 방법입니다. Vercel은 환경별(Production, Preview, Development)로 다른 값을 설정할 수 있으며, 모든 값은 자동으로 암호화되어 저장됩니다. 이 가이드에서는 Vercel 대시보드와 CLI를 통한 환경 변수 설정 방법을 다룹니다.
+
+## 준비사항
+
+시작하기 전에 다음이 필요합니다:
+
+- Vercel 계정 및 배포된 프로젝트 ([가이드](/guides/vercel-nextjs-deploy) 참조)
+- Next.js 프로젝트에 대한 Git 저장소 접근 권한
+- (선택) Vercel CLI 설치 (`npm i -g vercel`)
+
+<Callout type="info">
+환경 변수는 빌드 시간과 런타임 모두에서 사용할 수 있습니다. Next.js는 `NEXT_PUBLIC_` 접두사를 통해 클라이언트/서버 구분을 제공합니다.
+</Callout>
+
+---
+
+<Step number={1} title="Vercel 대시보드에서 환경 변수 추가">
+
+가장 기본적인 방법은 Vercel 대시보드를 통해 환경 변수를 추가하는 것입니다.
+
+### 프로젝트 설정 접근
+
+1. [Vercel 대시보드](https://vercel.com/dashboard)에 로그인합니다.
+2. 환경 변수를 설정할 프로젝트를 선택합니다.
+3. 상단 메뉴에서 **Settings** 탭을 클릭합니다.
+4. 왼쪽 메뉴에서 **Environment Variables**를 선택합니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step1-env-settings-ko.png"
+  alt="Vercel 프로젝트 설정의 Environment Variables 메뉴"
+  caption="Settings > Environment Variables로 이동"
+/>
+
+### 환경 변수 추가
+
+1. 입력 필드에 환경 변수 정보를 입력합니다:
+   - **Key (Name)**: 변수 이름 (예: `DATABASE_URL`)
+   - **Value**: 변수 값 (예: `postgresql://user:pass@host:5432/db`)
+   - **Environments**: 적용할 환경 선택
+
+2. **Environment** 체크박스 선택:
+   - **Production**: 프로덕션 배포 (`main` 브랜치)
+   - **Preview**: PR 프리뷰 배포 (모든 PR)
+   - **Development**: 로컬 개발 (`vercel dev` 실행 시)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step1-add-env-ko.png"
+  alt="환경 변수 추가 입력 폼"
+  caption="Key, Value, Environment를 입력하여 환경 변수 추가"
+/>
+
+3. **Add** 버튼을 클릭합니다.
+
+<Callout type="warning">
+환경 변수를 추가한 후에는 변경사항을 반영하기 위해 프로젝트를 재배포해야 합니다. 기존 배포에는 새 환경 변수가 적용되지 않습니다.
+</Callout>
+
+### 여러 환경 변수 한 번에 추가
+
+많은 변수를 추가해야 한다면 `.env` 형식을 사용할 수 있습니다:
+
+1. **Environment Variables** 페이지 상단의 **Add** 드롭다운을 클릭합니다.
+2. **Paste .env** 옵션을 선택합니다.
+3. `.env` 형식으로 변수를 붙여넣습니다:
+
+<CopyBlock language="bash">
+{`DATABASE_URL=postgresql://user:pass@host:5432/db
+API_KEY=sk-1234567890abcdef
+NEXT_PUBLIC_API_ENDPOINT=https://api.example.com
+STRIPE_SECRET_KEY=sk_test_123456
+REDIS_URL=redis://localhost:6379`}
+</CopyBlock>
+
+4. 적용할 환경을 선택하고 **Add** 버튼을 클릭합니다.
+
+<DevTip title=".env 파일에서 직접 복사하기">
+로컬 `.env.local` 파일의 내용을 복사하여 붙여넣으면 빠르게 여러 변수를 추가할 수 있습니다. 단, 민감한 프로덕션 키는 개발용과 분리해서 관리하세요.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={2} title="환경별 설정 및 클라이언트 노출 변수 이해하기">
+
+Vercel은 세 가지 환경을 구분하며, 각 환경에 다른 값을 설정할 수 있습니다.
+
+### 환경 유형
+
+**1. Production (프로덕션)**
+- `main` 브랜치나 기본 브랜치에 푸시할 때 사용
+- 실제 서비스에 배포되는 환경
+- 실제 API 키, 프로덕션 데이터베이스 URL 등 사용
+
+**2. Preview (프리뷰)**
+- Pull Request나 다른 브랜치에 푸시할 때 사용
+- 프로덕션에 영향 없이 테스트 가능
+- 테스트 API 키, 개발 데이터베이스 등 사용
+
+**3. Development (개발)**
+- 로컬에서 `vercel dev` 실행 시 사용
+- `vercel env pull` 명령으로 로컬에 다운로드 가능
+- 로컬 개발용 설정값 사용
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step2-env-types-ko.png"
+  alt="세 가지 환경 유형 선택 화면"
+  caption="Production, Preview, Development 중 적용할 환경 선택"
+/>
+
+### 클라이언트 노출 변수 (NEXT_PUBLIC_)
+
+Next.js에서 환경 변수는 기본적으로 서버 측에서만 접근 가능합니다. 클라이언트(브라우저)에서 접근하려면 `NEXT_PUBLIC_` 접두사를 붙여야 합니다.
+
+**서버 전용 변수 (접두사 없음):**
+<CopyBlock language="bash">
+{`# 서버에서만 접근 가능
+DATABASE_URL=postgresql://...
+API_SECRET_KEY=sk_123456
+STRIPE_SECRET_KEY=sk_test_...`}
+</CopyBlock>
+
+**클라이언트 노출 변수 (NEXT_PUBLIC_ 접두사):**
+<CopyBlock language="bash">
+{`# 클라이언트(브라우저)에서도 접근 가능
+NEXT_PUBLIC_API_URL=https://api.example.com
+NEXT_PUBLIC_SITE_NAME=My App
+NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX`}
+</CopyBlock>
+
+사용 예시:
+
+<CopyBlock language="typescript">
+{`// 서버 컴포넌트 또는 API Route에서
+const dbUrl = process.env.DATABASE_URL; // ✅ 작동
+
+// 클라이언트 컴포넌트에서
+'use client';
+
+const apiUrl = process.env.NEXT_PUBLIC_API_URL; // ✅ 작동
+const dbUrl = process.env.DATABASE_URL; // ❌ undefined (보안상 차단)
+`}
+</CopyBlock>
+
+<Callout type="danger">
+비밀 키, API 시크릿, 데이터베이스 비밀번호 등 민감한 정보는 절대 `NEXT_PUBLIC_` 접두사를 붙이지 마세요! 클라이언트에 노출되면 누구나 볼 수 있습니다.
+</Callout>
+
+### 환경별로 다른 값 설정 예시
+
+같은 키에 환경별로 다른 값을 설정할 수 있습니다:
+
+| Key | Production | Preview | Development |
+|-----|------------|---------|-------------|
+| `DATABASE_URL` | `postgresql://prod.db` | `postgresql://test.db` | `postgresql://localhost:5432` |
+| `API_KEY` | `pk_live_xxx` | `pk_test_xxx` | `pk_test_xxx` |
+| `NEXT_PUBLIC_API_URL` | `https://api.myapp.com` | `https://api-staging.myapp.com` | `http://localhost:3000` |
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step2-env-values-ko.png"
+  alt="환경별로 다른 값을 가진 환경 변수 목록"
+  caption="같은 키가 환경별로 다른 값으로 설정됨"
+/>
+
+<Checkpoint>
+- [ ] Production, Preview, Development 환경의 차이를 이해했나요?
+- [ ] `NEXT_PUBLIC_` 접두사의 용도를 이해했나요?
+- [ ] 환경별로 다른 값을 설정할 수 있나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={3} title="로컬 개발 환경 설정 (.env.local)">
+
+Vercel 프로젝트를 로컬에서 개발할 때는 `.env.local` 파일을 사용하여 환경 변수를 설정합니다.
+
+### .env.local 파일 생성
+
+프로젝트 루트에 `.env.local` 파일을 생성합니다:
+
+<CopyBlock language="bash">
+{`# .env.local (로컬 개발용, Git에 커밋하지 말 것!)
+
+# 데이터베이스
+DATABASE_URL=postgresql://localhost:5432/mydb
+
+# API 키 (테스트용)
+API_KEY=test-api-key-123
+STRIPE_SECRET_KEY=sk_test_51234567890
+
+# 클라이언트 노출 변수
+NEXT_PUBLIC_API_URL=http://localhost:3000/api
+NEXT_PUBLIC_SITE_NAME=My App (Dev)
+
+# 외부 서비스
+REDIS_URL=redis://localhost:6379
+SMTP_HOST=localhost
+SMTP_PORT=1025`}
+</CopyBlock>
+
+### .gitignore에 추가
+
+`.env.local` 파일은 민감한 정보를 포함하므로 Git에 커밋하면 안 됩니다:
+
+<CopyBlock language="bash">
+{`# .gitignore
+
+# 환경 변수 파일
+.env*.local
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Vercel
+.vercel`}
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step3-env-local-ko.png"
+  alt=".env.local 파일 구조"
+  caption="로컬 개발용 환경 변수를 .env.local 파일에 정의"
+/>
+
+### 환경 변수 파일 우선순위
+
+Next.js는 여러 `.env` 파일을 지원하며, 다음 순서로 우선순위가 적용됩니다:
+
+1. `.env.local` (가장 높은 우선순위, 모든 환경)
+2. `.env.development` (개발 환경, `npm run dev`)
+3. `.env.production` (프로덕션 빌드, `npm run build`)
+4. `.env` (기본값, Git에 커밋 가능)
+
+<Callout type="tip">
+팀원들과 공유해야 하는 기본값은 `.env` 파일에 넣고, 개인별 설정이나 비밀 정보는 `.env.local`에 넣어 Git에서 제외하세요.
+</Callout>
+
+### 환경 변수 확인
+
+로컬에서 환경 변수가 올바르게 로드되는지 확인하려면:
+
+<CopyBlock language="typescript">
+{`// app/api/test-env/route.ts
+import { NextResponse } from 'next/server';
+
+export async function GET() {
+  return NextResponse.json({
+    // 서버 전용 변수 (표시되면 안 됨)
+    hasDbUrl: !!process.env.DATABASE_URL,
+    hasApiKey: !!process.env.API_KEY,
+
+    // 클라이언트 노출 변수 (값 표시 가능)
+    publicApiUrl: process.env.NEXT_PUBLIC_API_URL,
+    publicSiteName: process.env.NEXT_PUBLIC_SITE_NAME,
+  });
+}`}
+</CopyBlock>
+
+테스트:
+<CopyBlock language="bash">
+npm run dev
+curl http://localhost:3000/api/test-env
+</CopyBlock>
+
+</Step>
+
+---
+
+<Step number={4} title="Vercel CLI로 환경 변수 관리하기">
+
+Vercel CLI를 사용하면 터미널에서 환경 변수를 추가, 조회, 동기화할 수 있습니다.
+
+### Vercel CLI 설치 및 로그인
+
+<CopyBlock language="bash">
+# Vercel CLI 전역 설치
+npm i -g vercel
+
+# Vercel 로그인
+vercel login
+</CopyBlock>
+
+프로젝트 디렉터리에서:
+<CopyBlock language="bash">
+# 프로젝트와 Vercel 연결
+vercel link
+</CopyBlock>
+
+프롬프트에 따라 팀, 프로젝트를 선택하면 `.vercel` 디렉터리가 생성됩니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step4-vercel-link-ko.png"
+  alt="vercel link 명령어 실행 화면"
+  caption="프로젝트를 Vercel과 연결하여 CLI 사용 준비"
+/>
+
+### 환경 변수 추가 (CLI)
+
+<CopyBlock language="bash">
+# 환경 변수 추가 (대화형)
+vercel env add DATABASE_URL
+
+# 프롬프트:
+# ? What's the value of DATABASE_URL? postgresql://...
+# ? Add to which Environments? (Production, Preview, Development)
+</CopyBlock>
+
+한 줄로 추가:
+<CopyBlock language="bash">
+# Production 환경에만 추가
+vercel env add DATABASE_URL production
+
+# 모든 환경에 추가
+vercel env add API_KEY production preview development
+</CopyBlock>
+
+### 환경 변수 조회
+
+<CopyBlock language="bash">
+# 모든 환경 변수 목록 보기
+vercel env ls
+
+# 특정 환경의 변수만 보기
+vercel env ls production
+vercel env ls preview
+vercel env ls development
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step4-env-ls-ko.png"
+  alt="vercel env ls 명령어 출력"
+  caption="CLI에서 환경 변수 목록 조회"
+/>
+
+### 환경 변수 로컬로 동기화
+
+Vercel에 설정된 환경 변수를 로컬 `.env` 파일로 다운로드:
+
+<CopyBlock language="bash">
+# Development 환경 변수를 .env.local로 다운로드
+vercel env pull .env.local
+</CopyBlock>
+
+이 명령은 Vercel의 Development 환경 변수를 가져와서 `.env.local` 파일을 생성/업데이트합니다.
+
+<Callout type="tip">
+새 팀원이 프로젝트를 클론한 후 `vercel link && vercel env pull`을 실행하면 필요한 환경 변수를 자동으로 받을 수 있습니다.
+</Callout>
+
+### 환경 변수 삭제
+
+<CopyBlock language="bash">
+# 특정 환경의 변수 삭제
+vercel env rm DATABASE_URL production
+
+# 대화형으로 삭제 (환경 선택)
+vercel env rm DATABASE_URL
+</CopyBlock>
+
+<DevTip title="CI/CD 파이프라인에서 사용하기">
+Vercel CLI는 GitHub Actions 같은 CI/CD 파이프라인에서 환경 변수를 자동으로 설정하는 데도 유용합니다. `VERCEL_TOKEN`을 사용하여 인증할 수 있습니다.
+</DevTip>
+
+<Checkpoint>
+- [ ] Vercel CLI를 설치하고 로그인했나요?
+- [ ] `vercel link`로 프로젝트를 연결했나요?
+- [ ] `vercel env pull`로 환경 변수를 다운로드했나요?
+- [ ] CLI로 환경 변수를 추가/조회/삭제할 수 있나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={5} title="데이터베이스 및 외부 서비스 통합 환경 변수">
+
+실제 프로젝트에서는 여러 외부 서비스와 통합해야 합니다. 각 서비스별 환경 변수 설정 예시를 알아봅니다.
+
+### Vercel Postgres 통합
+
+Vercel Storage(Postgres, KV, Blob)를 사용하면 환경 변수가 자동으로 추가됩니다.
+
+1. 프로젝트 대시보드에서 **Storage** 탭으로 이동합니다.
+2. **Create Database**를 클릭하고 Postgres를 선택합니다.
+3. 데이터베이스 이름을 입력하고 생성합니다.
+4. **Connect** 버튼을 클릭하여 프로젝트에 연결합니다.
+
+자동으로 추가되는 환경 변수:
+<CopyBlock language="bash">
+{`POSTGRES_URL=postgres://...
+POSTGRES_PRISMA_URL=postgres://...
+POSTGRES_URL_NON_POOLING=postgres://...
+POSTGRES_USER=...
+POSTGRES_HOST=...
+POSTGRES_PASSWORD=...
+POSTGRES_DATABASE=...`}
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step5-postgres-ko.png"
+  alt="Vercel Postgres 연결 화면"
+  caption="Postgres 데이터베이스를 프로젝트에 연결하면 환경 변수 자동 추가"
+/>
+
+### 일반적인 서비스별 환경 변수
+
+**Supabase:**
+<CopyBlock language="bash">
+{`NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJ...
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJ...`}
+</CopyBlock>
+
+**OpenAI:**
+<CopyBlock language="bash">
+{`OPENAI_API_KEY=sk-...
+OPENAI_ORG_ID=org-...`}
+</CopyBlock>
+
+**Stripe:**
+<CopyBlock language="bash">
+{`STRIPE_SECRET_KEY=sk_test_... # 또는 sk_live_...
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...`}
+</CopyBlock>
+
+**SendGrid (이메일):**
+<CopyBlock language="bash">
+{`SENDGRID_API_KEY=SG.xxx...
+SENDGRID_FROM_EMAIL=noreply@example.com`}
+</CopyBlock>
+
+**AWS S3:**
+<CopyBlock language="bash">
+{`AWS_ACCESS_KEY_ID=AKIA...
+AWS_SECRET_ACCESS_KEY=xxx...
+AWS_REGION=us-east-1
+AWS_S3_BUCKET=my-bucket`}
+</CopyBlock>
+
+**Google Analytics:**
+<CopyBlock language="bash">
+{`NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX`}
+</CopyBlock>
+
+### 환경 변수 검증 및 타입 안정성
+
+환경 변수가 올바르게 설정되었는지 확인하는 검증 로직을 추가하세요:
+
+<CopyBlock language="typescript">
+{`// lib/env.ts
+const requiredEnvVars = [
+  'DATABASE_URL',
+  'API_KEY',
+  'NEXT_PUBLIC_API_URL',
+] as const;
+
+export function validateEnv() {
+  const missing = requiredEnvVars.filter(
+    (varName) => !process.env[varName]
+  );
+
+  if (missing.length > 0) {
+    throw new Error(
+      \`Missing required environment variables: \${missing.join(', ')}\`
+    );
+  }
+}
+
+// 타입 안전한 환경 변수 접근
+export const env = {
+  database: {
+    url: process.env.DATABASE_URL!,
+  },
+  api: {
+    key: process.env.API_KEY!,
+    url: process.env.NEXT_PUBLIC_API_URL!,
+  },
+} as const;`}
+</CopyBlock>
+
+Next.js 시작 시 검증:
+<CopyBlock language="typescript">
+{`// app/layout.tsx
+import { validateEnv } from '@/lib/env';
+
+// 서버 컴포넌트에서 실행
+validateEnv();
+
+export default function RootLayout({ children }) {
+  return <html>{children}</html>;
+}`}
+</CopyBlock>
+
+<Callout type="info">
+Zod 같은 스키마 검증 라이브러리를 사용하면 환경 변수의 형식까지 검증할 수 있습니다. `@t3-oss/env-nextjs` 패키지를 사용하면 타입 안전한 환경 변수 관리가 가능합니다.
+</Callout>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step5-integration-ko.png"
+  alt="여러 외부 서비스의 환경 변수 설정"
+  caption="Postgres, Stripe, OpenAI 등 다양한 서비스의 환경 변수 통합"
+/>
+
+<Checkpoint>
+- [ ] 데이터베이스 환경 변수를 설정했나요?
+- [ ] 외부 서비스 API 키를 추가했나요?
+- [ ] 환경 변수 검증 로직을 구현했나요?
+- [ ] 모든 필수 환경 변수가 설정되었나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+## 다음 단계
+
+축하합니다! Vercel에서 환경 변수를 안전하게 설정하고 관리하는 방법을 배웠습니다. 이제 다음 단계로 넘어갈 준비가 되었습니다:
+
+1. **[Vercel Serverless Functions](/guides/vercel-serverless-functions)** - API Routes에서 환경 변수 사용하기
+2. **Vercel KV/Postgres 연동** - 데이터베이스 환경 변수 활용하기
+
+<Callout type="tip">
+팀 프로젝트에서는 `.env.example` 파일을 Git에 커밋하여 필요한 환경 변수 목록을 문서화하세요. 실제 값은 포함하지 말고 키 이름만 나열합니다.
+</Callout>
+
+## 문제 해결
+
+### 환경 변수가 undefined로 나와요
+- 배포 후 변경한 환경 변수는 재배포가 필요합니다.
+- 클라이언트에서 접근하려면 `NEXT_PUBLIC_` 접두사가 필요합니다.
+- 로컬에서는 `.env.local` 파일이 있는지, 개발 서버를 재시작했는지 확인하세요.
+
+### .env.local 파일이 Git에 올라갔어요
+- 즉시 Git 히스토리에서 제거하고 관련 비밀 키를 모두 재발급하세요.
+- GitHub의 경우 Secrets scanning이 자동으로 경고를 보낼 수 있습니다.
+- `.gitignore`에 `.env*.local`이 포함되어 있는지 확인하세요.
+
+### Vercel에서 환경 변수를 변경했는데 적용이 안 돼요
+- 환경 변수 변경은 새 배포에만 적용됩니다.
+- Deployments 탭에서 **Redeploy**를 클릭하거나 새로 푸시하세요.
+- Edge Config나 KV를 사용하면 재배포 없이 설정을 변경할 수 있습니다.
+
+### vercel env pull이 작동하지 않아요
+- `vercel link`를 먼저 실행했는지 확인하세요.
+- Vercel CLI가 최신 버전인지 확인하세요: `npm i -g vercel@latest`
+- 프로젝트 권한이 있는지 확인하세요.
+
+## 보안 모범 사례
+
+1. **절대 비밀 키를 Git에 커밋하지 마세요**
+   - `.env.local`, `.env.production.local` 등을 `.gitignore`에 추가
+   - Git 히스토리에 실수로 커밋했다면 즉시 키를 재발급
+
+2. **클라이언트 노출을 최소화하세요**
+   - `NEXT_PUBLIC_` 접두사는 정말 필요한 경우에만 사용
+   - API 엔드포인트 URL 등 민감하지 않은 정보만 노출
+
+3. **환경별로 다른 키를 사용하세요**
+   - Production: 실제 라이브 키
+   - Preview/Development: 테스트 키
+
+4. **정기적으로 키를 순환하세요**
+   - 중요한 API 키는 3-6개월마다 재발급
+   - 팀원이 퇴사하면 관련 키를 모두 재발급
+
+5. **최소 권한 원칙을 따르세요**
+   - API 키에 필요한 최소한의 권한만 부여
+   - 읽기 전용이 가능하면 쓰기 권한을 주지 마세요
+
+## 관련 자료
+
+- [Vercel Environment Variables 문서](https://vercel.com/docs/projects/environment-variables)
+- [Next.js Environment Variables](https://nextjs.org/docs/app/building-your-application/configuring/environment-variables)
+- [Vercel CLI 문서](https://vercel.com/docs/cli/env)
+- [@t3-oss/env-nextjs](https://env.t3.gg/) - 타입 안전한 환경 변수

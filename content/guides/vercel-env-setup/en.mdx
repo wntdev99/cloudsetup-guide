@@ -1,0 +1,588 @@
+# Vercel Environment Variables Setup Guide
+
+<FreeTierInfo
+  platform="vercel"
+  limit="Unlimited"
+  period="unlimited"
+  amount="Unlimited environment variables"
+  status="available"
+/>
+
+Environment variables are the key method for securely managing sensitive information like API keys, database connection strings, and secret tokens. Vercel allows you to set different values per environment (Production, Preview, Development), and all values are automatically encrypted when stored. This guide covers environment variable setup through both the Vercel dashboard and CLI.
+
+## Prerequisites
+
+Before you begin, you'll need:
+
+- Vercel account and deployed project (see [guide](/guides/vercel-nextjs-deploy))
+- Git repository access for Next.js project
+- (Optional) Vercel CLI installed (`npm i -g vercel`)
+
+<Callout type="info">
+Environment variables are available at both build time and runtime. Next.js provides client/server separation through the `NEXT_PUBLIC_` prefix.
+</Callout>
+
+---
+
+<Step number={1} title="Add Environment Variables in Vercel Dashboard">
+
+The most basic method is adding environment variables through the Vercel dashboard.
+
+### Access Project Settings
+
+1. Log in to [Vercel dashboard](https://vercel.com/dashboard).
+2. Select the project where you want to configure environment variables.
+3. Click the **Settings** tab in the top menu.
+4. Select **Environment Variables** from the left menu.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step1-env-settings-en.png"
+  alt="Environment Variables menu in Vercel project settings"
+  caption="Navigate to Settings > Environment Variables"
+/>
+
+### Add Environment Variables
+
+1. Enter environment variable information in the input fields:
+   - **Key (Name)**: Variable name (e.g., `DATABASE_URL`)
+   - **Value**: Variable value (e.g., `postgresql://user:pass@host:5432/db`)
+   - **Environments**: Select environments to apply
+
+2. Select **Environment** checkboxes:
+   - **Production**: Production deployments (`main` branch)
+   - **Preview**: PR preview deployments (all PRs)
+   - **Development**: Local development (when running `vercel dev`)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step1-add-env-en.png"
+  alt="Environment variable addition form"
+  caption="Add environment variable by entering Key, Value, and Environment"
+/>
+
+3. Click **Add** button.
+
+<Callout type="warning">
+After adding environment variables, you must redeploy the project to reflect changes. New environment variables won't apply to existing deployments.
+</Callout>
+
+### Add Multiple Environment Variables at Once
+
+If you need to add many variables, you can use `.env` format:
+
+1. Click **Add** dropdown at the top of the **Environment Variables** page.
+2. Select **Paste .env** option.
+3. Paste variables in `.env` format:
+
+<CopyBlock language="bash">
+{`DATABASE_URL=postgresql://user:pass@host:5432/db
+API_KEY=sk-1234567890abcdef
+NEXT_PUBLIC_API_ENDPOINT=https://api.example.com
+STRIPE_SECRET_KEY=sk_test_123456
+REDIS_URL=redis://localhost:6379`}
+</CopyBlock>
+
+4. Select environments to apply and click **Add** button.
+
+<DevTip title="Copy Directly from .env File">
+Copy contents from your local `.env.local` file and paste to quickly add multiple variables. However, keep sensitive production keys separate from development keys.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={2} title="Understand Environment-Specific Settings and Client-Exposed Variables">
+
+Vercel distinguishes three environments and allows different values for each.
+
+### Environment Types
+
+**1. Production**
+- Used when pushing to `main` branch or default branch
+- Environment deployed to actual service
+- Use real API keys, production database URLs, etc.
+
+**2. Preview**
+- Used when pushing to Pull Requests or other branches
+- Test without affecting production
+- Use test API keys, development databases, etc.
+
+**3. Development**
+- Used when running `vercel dev` locally
+- Can download locally with `vercel env pull` command
+- Use local development configuration values
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step2-env-types-en.png"
+  alt="Selection screen for three environment types"
+  caption="Select from Production, Preview, and Development environments"
+/>
+
+### Client-Exposed Variables (NEXT_PUBLIC_)
+
+By default, environment variables in Next.js are only accessible server-side. To access from client (browser), add `NEXT_PUBLIC_` prefix.
+
+**Server-only variables (no prefix):**
+<CopyBlock language="bash">
+{`# Accessible only on server
+DATABASE_URL=postgresql://...
+API_SECRET_KEY=sk_123456
+STRIPE_SECRET_KEY=sk_test_...`}
+</CopyBlock>
+
+**Client-exposed variables (NEXT_PUBLIC_ prefix):**
+<CopyBlock language="bash">
+{`# Accessible in client (browser) as well
+NEXT_PUBLIC_API_URL=https://api.example.com
+NEXT_PUBLIC_SITE_NAME=My App
+NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX`}
+</CopyBlock>
+
+Usage example:
+
+<CopyBlock language="typescript">
+{`// In Server Component or API Route
+const dbUrl = process.env.DATABASE_URL; // ✅ Works
+
+// In Client Component
+'use client';
+
+const apiUrl = process.env.NEXT_PUBLIC_API_URL; // ✅ Works
+const dbUrl = process.env.DATABASE_URL; // ❌ undefined (blocked for security)
+`}
+</CopyBlock>
+
+<Callout type="danger">
+Never add the `NEXT_PUBLIC_` prefix to sensitive information like secret keys, API secrets, or database passwords! If exposed to client, anyone can see them.
+</Callout>
+
+### Example: Different Values per Environment
+
+You can set different values per environment for the same key:
+
+| Key | Production | Preview | Development |
+|-----|------------|---------|-------------|
+| `DATABASE_URL` | `postgresql://prod.db` | `postgresql://test.db` | `postgresql://localhost:5432` |
+| `API_KEY` | `pk_live_xxx` | `pk_test_xxx` | `pk_test_xxx` |
+| `NEXT_PUBLIC_API_URL` | `https://api.myapp.com` | `https://api-staging.myapp.com` | `http://localhost:3000` |
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step2-env-values-en.png"
+  alt="Environment variable list with different values per environment"
+  caption="Same key configured with different values per environment"
+/>
+
+<Checkpoint>
+- [ ] Understand differences between Production, Preview, and Development?
+- [ ] Understand purpose of `NEXT_PUBLIC_` prefix?
+- [ ] Can set different values per environment?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={3} title="Local Development Environment Setup (.env.local)">
+
+When developing Vercel projects locally, use `.env.local` file to set environment variables.
+
+### Create .env.local File
+
+Create `.env.local` file in project root:
+
+<CopyBlock language="bash">
+{`# .env.local (for local development, DO NOT commit to Git!)
+
+# Database
+DATABASE_URL=postgresql://localhost:5432/mydb
+
+# API Keys (for testing)
+API_KEY=test-api-key-123
+STRIPE_SECRET_KEY=sk_test_51234567890
+
+# Client-exposed variables
+NEXT_PUBLIC_API_URL=http://localhost:3000/api
+NEXT_PUBLIC_SITE_NAME=My App (Dev)
+
+# External services
+REDIS_URL=redis://localhost:6379
+SMTP_HOST=localhost
+SMTP_PORT=1025`}
+</CopyBlock>
+
+### Add to .gitignore
+
+`.env.local` files contain sensitive information and should not be committed to Git:
+
+<CopyBlock language="bash">
+{`# .gitignore
+
+# Environment variable files
+.env*.local
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Vercel
+.vercel`}
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step3-env-local-en.png"
+  alt=".env.local file structure"
+  caption="Define local development environment variables in .env.local file"
+/>
+
+### Environment Variable File Priority
+
+Next.js supports multiple `.env` files with priority applied in this order:
+
+1. `.env.local` (highest priority, all environments)
+2. `.env.development` (development environment, `npm run dev`)
+3. `.env.production` (production build, `npm run build`)
+4. `.env` (defaults, can commit to Git)
+
+<Callout type="tip">
+Put default values to share with team in `.env` file, and put personal settings or secrets in `.env.local` excluded from Git.
+</Callout>
+
+### Verify Environment Variables
+
+To verify environment variables load correctly locally:
+
+<CopyBlock language="typescript">
+{`// app/api/test-env/route.ts
+import { NextResponse } from 'next/server';
+
+export async function GET() {
+  return NextResponse.json({
+    // Server-only variables (shouldn't display)
+    hasDbUrl: !!process.env.DATABASE_URL,
+    hasApiKey: !!process.env.API_KEY,
+
+    // Client-exposed variables (can display values)
+    publicApiUrl: process.env.NEXT_PUBLIC_API_URL,
+    publicSiteName: process.env.NEXT_PUBLIC_SITE_NAME,
+  });
+}`}
+</CopyBlock>
+
+Test:
+<CopyBlock language="bash">
+npm run dev
+curl http://localhost:3000/api/test-env
+</CopyBlock>
+
+</Step>
+
+---
+
+<Step number={4} title="Manage Environment Variables with Vercel CLI">
+
+Using Vercel CLI, you can add, view, and sync environment variables from the terminal.
+
+### Install and Login to Vercel CLI
+
+<CopyBlock language="bash">
+# Install Vercel CLI globally
+npm i -g vercel
+
+# Login to Vercel
+vercel login
+</CopyBlock>
+
+From project directory:
+<CopyBlock language="bash">
+# Link project with Vercel
+vercel link
+</CopyBlock>
+
+Follow prompts to select team and project, creating `.vercel` directory.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step4-vercel-link-en.png"
+  alt="vercel link command execution screen"
+  caption="Link project with Vercel to prepare for CLI usage"
+/>
+
+### Add Environment Variables (CLI)
+
+<CopyBlock language="bash">
+# Add environment variable (interactive)
+vercel env add DATABASE_URL
+
+# Prompts:
+# ? What's the value of DATABASE_URL? postgresql://...
+# ? Add to which Environments? (Production, Preview, Development)
+</CopyBlock>
+
+Add in one line:
+<CopyBlock language="bash">
+# Add only to Production environment
+vercel env add DATABASE_URL production
+
+# Add to all environments
+vercel env add API_KEY production preview development
+</CopyBlock>
+
+### View Environment Variables
+
+<CopyBlock language="bash">
+# List all environment variables
+vercel env ls
+
+# View variables for specific environment only
+vercel env ls production
+vercel env ls preview
+vercel env ls development
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step4-env-ls-en.png"
+  alt="vercel env ls command output"
+  caption="View environment variable list from CLI"
+/>
+
+### Sync Environment Variables Locally
+
+Download environment variables set on Vercel to local `.env` file:
+
+<CopyBlock language="bash">
+# Download Development environment variables to .env.local
+vercel env pull .env.local
+</CopyBlock>
+
+This command fetches Vercel's Development environment variables and creates/updates `.env.local` file.
+
+<Callout type="tip">
+After new team members clone the project, running `vercel link && vercel env pull` automatically provides necessary environment variables.
+</Callout>
+
+### Delete Environment Variables
+
+<CopyBlock language="bash">
+# Delete variable from specific environment
+vercel env rm DATABASE_URL production
+
+# Delete interactively (select environment)
+vercel env rm DATABASE_URL
+</CopyBlock>
+
+<DevTip title="Use in CI/CD Pipelines">
+Vercel CLI is also useful for automatically setting environment variables in CI/CD pipelines like GitHub Actions. Can authenticate using `VERCEL_TOKEN`.
+</DevTip>
+
+<Checkpoint>
+- [ ] Installed and logged into Vercel CLI?
+- [ ] Linked project with `vercel link`?
+- [ ] Downloaded environment variables with `vercel env pull`?
+- [ ] Can add/view/delete environment variables via CLI?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={5} title="Database and External Service Integration Environment Variables">
+
+In real projects, you need to integrate with multiple external services. Let's look at environment variable setup examples for each service.
+
+### Vercel Postgres Integration
+
+When using Vercel Storage (Postgres, KV, Blob), environment variables are automatically added.
+
+1. Navigate to **Storage** tab in project dashboard.
+2. Click **Create Database** and select Postgres.
+3. Enter database name and create.
+4. Click **Connect** button to link to project.
+
+Automatically added environment variables:
+<CopyBlock language="bash">
+{`POSTGRES_URL=postgres://...
+POSTGRES_PRISMA_URL=postgres://...
+POSTGRES_URL_NON_POOLING=postgres://...
+POSTGRES_USER=...
+POSTGRES_HOST=...
+POSTGRES_PASSWORD=...
+POSTGRES_DATABASE=...`}
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step5-postgres-en.png"
+  alt="Vercel Postgres connection screen"
+  caption="Linking Postgres database to project automatically adds environment variables"
+/>
+
+### Common Service-Specific Environment Variables
+
+**Supabase:**
+<CopyBlock language="bash">
+{`NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJ...
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJ...`}
+</CopyBlock>
+
+**OpenAI:**
+<CopyBlock language="bash">
+{`OPENAI_API_KEY=sk-...
+OPENAI_ORG_ID=org-...`}
+</CopyBlock>
+
+**Stripe:**
+<CopyBlock language="bash">
+{`STRIPE_SECRET_KEY=sk_test_... # or sk_live_...
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...`}
+</CopyBlock>
+
+**SendGrid (Email):**
+<CopyBlock language="bash">
+{`SENDGRID_API_KEY=SG.xxx...
+SENDGRID_FROM_EMAIL=noreply@example.com`}
+</CopyBlock>
+
+**AWS S3:**
+<CopyBlock language="bash">
+{`AWS_ACCESS_KEY_ID=AKIA...
+AWS_SECRET_ACCESS_KEY=xxx...
+AWS_REGION=us-east-1
+AWS_S3_BUCKET=my-bucket`}
+</CopyBlock>
+
+**Google Analytics:**
+<CopyBlock language="bash">
+{`NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX`}
+</CopyBlock>
+
+### Environment Variable Validation and Type Safety
+
+Add validation logic to verify environment variables are set correctly:
+
+<CopyBlock language="typescript">
+{`// lib/env.ts
+const requiredEnvVars = [
+  'DATABASE_URL',
+  'API_KEY',
+  'NEXT_PUBLIC_API_URL',
+] as const;
+
+export function validateEnv() {
+  const missing = requiredEnvVars.filter(
+    (varName) => !process.env[varName]
+  );
+
+  if (missing.length > 0) {
+    throw new Error(
+      \`Missing required environment variables: \${missing.join(', ')}\`
+    );
+  }
+}
+
+// Type-safe environment variable access
+export const env = {
+  database: {
+    url: process.env.DATABASE_URL!,
+  },
+  api: {
+    key: process.env.API_KEY!,
+    url: process.env.NEXT_PUBLIC_API_URL!,
+  },
+} as const;`}
+</CopyBlock>
+
+Validate at Next.js startup:
+<CopyBlock language="typescript">
+{`// app/layout.tsx
+import { validateEnv } from '@/lib/env';
+
+// Execute in Server Component
+validateEnv();
+
+export default function RootLayout({ children }) {
+  return <html>{children}</html>;
+}`}
+</CopyBlock>
+
+<Callout type="info">
+Using schema validation libraries like Zod allows validating environment variable formats. The `@t3-oss/env-nextjs` package enables type-safe environment variable management.
+</Callout>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step5-integration-en.png"
+  alt="Environment variable setup for multiple external services"
+  caption="Integration of environment variables for various services like Postgres, Stripe, OpenAI"
+/>
+
+<Checkpoint>
+- [ ] Set database environment variables?
+- [ ] Added external service API keys?
+- [ ] Implemented environment variable validation logic?
+- [ ] All required environment variables configured?
+</Checkpoint>
+
+</Step>
+
+---
+
+## Next Steps
+
+Congratulations! You've learned how to securely configure and manage environment variables on Vercel. You're now ready for the next steps:
+
+1. **[Vercel Serverless Functions](/guides/vercel-serverless-functions)** - Using environment variables in API Routes
+2. **Vercel KV/Postgres Integration** - Utilizing database environment variables
+
+<Callout type="tip">
+For team projects, commit a `.env.example` file to Git to document required environment variables. Don't include actual values, just list key names.
+</Callout>
+
+## Troubleshooting
+
+### Environment Variables Show as Undefined
+- Environment variables changed after deployment require redeployment.
+- Client access requires `NEXT_PUBLIC_` prefix.
+- Locally, verify `.env.local` file exists and restart development server.
+
+### .env.local File Committed to Git
+- Immediately remove from Git history and reissue all related secret keys.
+- GitHub's Secrets scanning may automatically send warnings.
+- Verify `.env*.local` is included in `.gitignore`.
+
+### Changed Environment Variables on Vercel Not Applied
+- Environment variable changes only apply to new deployments.
+- Click **Redeploy** in Deployments tab or push new changes.
+- Using Edge Config or KV allows changing settings without redeployment.
+
+### vercel env pull Doesn't Work
+- Verify you've run `vercel link` first.
+- Verify Vercel CLI is latest version: `npm i -g vercel@latest`
+- Verify you have project permissions.
+
+## Security Best Practices
+
+1. **Never Commit Secret Keys to Git**
+   - Add `.env.local`, `.env.production.local`, etc. to `.gitignore`
+   - If accidentally committed to Git history, immediately reissue keys
+
+2. **Minimize Client Exposure**
+   - Use `NEXT_PUBLIC_` prefix only when really necessary
+   - Only expose non-sensitive info like API endpoint URLs
+
+3. **Use Different Keys per Environment**
+   - Production: Real live keys
+   - Preview/Development: Test keys
+
+4. **Rotate Keys Regularly**
+   - Reissue important API keys every 3-6 months
+   - Reissue all related keys when team members leave
+
+5. **Follow Principle of Least Privilege**
+   - Grant API keys only minimum necessary permissions
+   - Don't give write permissions if read-only is sufficient
+
+## Related Resources
+
+- [Vercel Environment Variables Documentation](https://vercel.com/docs/projects/environment-variables)
+- [Next.js Environment Variables](https://nextjs.org/docs/app/building-your-application/configuring/environment-variables)
+- [Vercel CLI Documentation](https://vercel.com/docs/cli/env)
+- [@t3-oss/env-nextjs](https://env.t3.gg/) - Type-safe environment variables

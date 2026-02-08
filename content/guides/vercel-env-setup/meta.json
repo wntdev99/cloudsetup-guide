@@ -1,0 +1,51 @@
+{
+  "slug": "vercel-env-setup",
+  "platform": "vercel",
+  "service": "Environment Variables",
+  "category": "compute",
+  "difficulty": "beginner",
+  "estimatedMinutes": 15,
+  "totalSteps": 5,
+  "freeTier": {
+    "limit": "Hobby Plan",
+    "period": "unlimited",
+    "amount": "Unlimited environment variables",
+    "status": "available",
+    "details": {
+      "ko": "무제한 환경 변수, 환경별 설정, Vercel CLI 통합, 자동 암호화 포함",
+      "en": "Unlimited environment variables, environment-specific config, Vercel CLI integration, automatic encryption included"
+    },
+    "conditions": {
+      "ko": "모든 플랜에서 사용 가능",
+      "en": "Available on all plans"
+    }
+  },
+  "prerequisites": [
+    "vercel-account-setup",
+    "vercel-nextjs-deploy"
+  ],
+  "nextGuides": [
+    "vercel-serverless-functions"
+  ],
+  "tags": {
+    "ko": ["Vercel", "환경 변수", "비밀 정보", "환경 설정", "Vercel CLI", ".env.local"],
+    "en": ["Vercel", "Environment Variables", "Secrets", "Configuration", "Vercel CLI", ".env.local"]
+  },
+  "seo": {
+    "ko": {
+      "title": "Vercel 환경 변수 설정 가이드 - API 키와 비밀 정보 관리",
+      "description": "Vercel에서 환경 변수를 안전하게 설정하고 관리하는 방법을 배웁니다. Production, Preview, Development 환경별 설정과 Vercel CLI 활용법을 알아보세요.",
+      "keywords": ["Vercel 환경 변수", "Vercel 비밀 정보", "환경 설정", "Vercel CLI", "Next.js 환경 변수"]
+    },
+    "en": {
+      "title": "Vercel Environment Variables Setup Guide - Managing API Keys and Secrets",
+      "description": "Learn how to securely configure and manage environment variables on Vercel. Discover environment-specific settings for Production, Preview, and Development, plus Vercel CLI usage.",
+      "keywords": ["Vercel environment variables", "Vercel secrets", "configuration", "Vercel CLI", "Next.js environment variables"]
+    }
+  },
+  "published": true,
+  "featured": true,
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z"
+}

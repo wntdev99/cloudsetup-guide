@@ -1,0 +1,49 @@
+{
+  "slug": "vercel-account-setup",
+  "platform": "vercel",
+  "service": "Vercel Platform",
+  "category": "compute",
+  "difficulty": "beginner",
+  "estimatedMinutes": 10,
+  "totalSteps": 4,
+  "freeTier": {
+    "limit": "Hobby Plan",
+    "period": "month",
+    "amount": "Unlimited deployments, 100GB bandwidth",
+    "status": "available",
+    "details": {
+      "ko": "무제한 배포, 월 100GB 대역폭, 자동 HTTPS, 무료 도메인 포함",
+      "en": "Unlimited deployments, 100GB bandwidth/month, automatic HTTPS, free domains included"
+    },
+    "conditions": {
+      "ko": "개인 및 비상업적 프로젝트에 한함",
+      "en": "For personal and non-commercial projects only"
+    }
+  },
+  "prerequisites": [],
+  "nextGuides": [
+    "vercel-nextjs-deploy",
+    "vercel-env-setup"
+  ],
+  "tags": {
+    "ko": ["Vercel", "계정 설정", "회원가입", "GitHub 연동", "무료 플랜"],
+    "en": ["Vercel", "Account Setup", "Sign Up", "GitHub Integration", "Free Plan"]
+  },
+  "seo": {
+    "ko": {
+      "title": "Vercel 계정 생성 및 설정 가이드 - 무료로 시작하기",
+      "description": "GitHub로 Vercel 계정을 생성하고 대시보드를 설정하는 방법을 단계별로 알아봅니다. Hobby 플랜의 무료 혜택과 팀/개인 계정 차이를 이해하세요.",
+      "keywords": ["Vercel 회원가입", "Vercel 계정 생성", "Vercel GitHub 연동", "Vercel 무료 플랜", "Vercel Hobby 플랜"]
+    },
+    "en": {
+      "title": "Vercel Account Setup Guide - Get Started for Free",
+      "description": "Learn how to create a Vercel account with GitHub and set up your dashboard step by step. Understand Hobby plan free tier benefits and team vs personal account differences.",
+      "keywords": ["Vercel sign up", "Vercel account creation", "Vercel GitHub integration", "Vercel free plan", "Vercel Hobby plan"]
+    }
+  },
+  "published": true,
+  "featured": true,
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z"
+}

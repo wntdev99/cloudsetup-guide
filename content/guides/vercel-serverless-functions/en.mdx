@@ -1,0 +1,624 @@
+# Vercel Serverless Functions Guide
+
+<FreeTierInfo
+  platform="vercel"
+  limit="Hobby Plan"
+  period="month"
+  amount="100GB-hours execution, 1M invocations"
+  status="available"
+/>
+
+Vercel Serverless Functions allow you to execute backend logic without managing server infrastructure. You can easily create APIs through Next.js API Routes, implement global low-latency processing with Edge Functions, and handle request preprocessing with Middleware. This guide covers implementing and deploying each feature.
+
+## Prerequisites
+
+Before you begin, you'll need:
+
+- Vercel account and deployed Next.js project (see [guide](/guides/vercel-nextjs-deploy))
+- Node.js 18.x or higher installed
+- TypeScript basics (recommended)
+- Understanding of REST API concepts
+
+<Callout type="info">
+This guide is written for Next.js 14+ App Router. If using Pages Router, create files in the `pages/api/` directory instead.
+</Callout>
+
+---
+
+<Step number={1} title="Create Next.js API Route and Implement Basic Function">
+
+API Routes are the simplest way to create serverless functions within a Next.js project.
+
+### Create Your First API Route
+
+1. Create `app/api/hello/route.ts` file from project root:
+
+<CopyBlock language="typescript">
+{`// app/api/hello/route.ts
+import { NextResponse } from 'next/server';
+
+export async function GET(request: Request) {
+  return NextResponse.json({
+    message: 'Hello from Vercel Serverless Function!',
+    timestamp: new Date().toISOString(),
+  });
+}
+
+export async function POST(request: Request) {
+  const body = await request.json();
+
+  return NextResponse.json({
+    received: body,
+    message: 'Data received successfully',
+  });
+}`}
+</CopyBlock>
+
+2. Run development server locally:
+
+<CopyBlock language="bash">
+npm run dev
+</CopyBlock>
+
+3. Test with browser or curl:
+
+<CopyBlock language="bash">
+# GET request
+curl http://localhost:3000/api/hello
+
+# POST request
+curl -X POST http://localhost:3000/api/hello \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Vercel"}'
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step1-api-route-en.png"
+  alt="API Route response result"
+  caption="Verify API Route call result in browser"
+/>
+
+<Callout type="tip">
+In App Router, each HTTP method (GET, POST, PUT, DELETE, etc.) must be exported as separate functions. Unlike Pages Router, don't branch by `req.method`.
+</Callout>
+
+### Create Dynamic Route API
+
+To create an API that accepts parameters, use dynamic segments in `[id]` format.
+
+Create `app/api/users/[id]/route.ts` file:
+
+<CopyBlock language="typescript">
+{`// app/api/users/[id]/route.ts
+import { NextResponse } from 'next/server';
+
+export async function GET(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  const userId = params.id;
+
+  // In practice, query from database
+  const user = {
+    id: userId,
+    name: 'John Doe',
+    email: 'john@example.com',
+  };
+
+  return NextResponse.json(user);
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  const userId = params.id;
+
+  // In practice, delete from database
+  return NextResponse.json({
+    success: true,
+    message: \`User \${userId} deleted\`,
+  });
+}`}
+</CopyBlock>
+
+Test:
+<CopyBlock language="bash">
+curl http://localhost:3000/api/users/123
+</CopyBlock>
+
+<Checkpoint>
+- [ ] API Route responding normally?
+- [ ] Tested both GET and POST requests?
+- [ ] Dynamic route parameters passed correctly?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={2} title="Deploy API and Test in Production">
+
+Once local testing is complete, deploy to Vercel.
+
+### Commit to Git and Deploy
+
+<CopyBlock language="bash">
+git add .
+git commit -m "Add serverless API routes"
+git push origin main
+</CopyBlock>
+
+Vercel automatically starts deployment. Once complete, check in dashboard.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step2-deploy-api-en.png"
+  alt="Deployment complete with API Routes"
+  caption="Verify deployed API in Functions tab on Vercel dashboard"
+/>
+
+### Test Production API
+
+Call API with deployed URL:
+
+<CopyBlock language="bash">
+# Change to your Vercel domain
+curl https://my-vercel-app.vercel.app/api/hello
+
+curl https://my-vercel-app.vercel.app/api/users/123
+</CopyBlock>
+
+### Monitor in Functions Tab
+
+1. Navigate to **Functions** tab in Vercel project dashboard.
+2. View list of deployed serverless functions.
+3. Click each function to view:
+   - Execution time
+   - Invocation count
+   - Memory usage
+   - Error logs
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step2-functions-monitor-en.png"
+  alt="Functions tab monitoring screen"
+  caption="Serverless function execution statistics and logs"
+/>
+
+<DevTip title="Understanding Cold Starts">
+Serverless Functions automatically shut down when there are no requests and restart on the next request (cold start). First request may be slightly slower, but subsequent requests are fast. Pro plan can keep functions in ready state.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="Implement Edge Functions (Ultra-Low Latency Global API)">
+
+Edge Functions run on Vercel's edge network, responding from the location closest to users. Much faster than regular serverless functions but with some constraints.
+
+### Create Edge Runtime API
+
+Create `app/api/edge/route.ts` file:
+
+<CopyBlock language="typescript">
+{`// app/api/edge/route.ts
+import { NextResponse } from 'next/server';
+
+// Declare Edge Runtime usage
+export const runtime = 'edge';
+
+export async function GET(request: Request) {
+  // Extract info from request headers
+  const { geo, ip } = request as any;
+
+  return NextResponse.json({
+    message: 'Response from Edge Network',
+    location: {
+      city: geo?.city || 'Unknown',
+      country: geo?.country || 'Unknown',
+      region: geo?.region || 'Unknown',
+    },
+    ip: ip || 'Unknown',
+    timestamp: new Date().toISOString(),
+  });
+}`}
+</CopyBlock>
+
+### Edge Function Use Case: A/B Testing
+
+Edge Functions can immediately process requests and redirect, making them ideal for A/B testing:
+
+<CopyBlock language="typescript">
+{`// app/api/ab-test/route.ts
+import { NextResponse } from 'next/server';
+
+export const runtime = 'edge';
+
+export async function GET(request: Request) {
+  // 50% probability A/B split
+  const variant = Math.random() < 0.5 ? 'A' : 'B';
+
+  const response = NextResponse.json({
+    variant,
+    message: \`You are in group \${variant}\`,
+  });
+
+  // Store variant in cookie
+  response.cookies.set('ab-test-variant', variant, {
+    maxAge: 60 * 60 * 24 * 30, // 30 days
+  });
+
+  return response;
+}`}
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step3-edge-function-en.png"
+  alt="Edge Function response including location info"
+  caption="Edge Function response including user's geographic location"
+/>
+
+### Edge Runtime Constraints
+
+Edge Functions have the following constraints:
+- ❌ Cannot use Node.js-only modules (fs, path, etc.)
+- ❌ Cannot use native binaries
+- ❌ Max execution time: 30 seconds (Hobby), 30 seconds (Pro)
+- ✅ Can use Web APIs (fetch, Response, Headers, etc.)
+- ✅ Ultra-low latency response (under 50ms)
+
+<Callout type="warning">
+Use regular serverless functions if you need database connections or file system access. Edge Functions are suitable for lightweight logic requiring fast responses.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="Implement Middleware (Request Preprocessing and Authentication)">
+
+Middleware executes before all requests reach routes, performing authentication, redirects, header modifications, etc.
+
+### Create Basic Middleware
+
+Create `middleware.ts` file in project root:
+
+<CopyBlock language="typescript">
+{`// middleware.ts
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+export function middleware(request: NextRequest) {
+  // Request logging
+  console.log('Request:', request.method, request.url);
+
+  // Add custom headers
+  const response = NextResponse.next();
+  response.headers.set('X-Custom-Header', 'MyValue');
+  response.headers.set('X-Request-Time', new Date().toISOString());
+
+  return response;
+}
+
+// Specify paths where middleware runs
+export const config = {
+  matcher: [
+    /*
+     * All paths except:
+     * - _next/static (static files)
+     * - _next/image (image optimization)
+     * - favicon.ico (favicon)
+     */
+    '/((?!_next/static|_next/image|favicon.ico).*)',
+  ],
+};`}
+</CopyBlock>
+
+### Implement Authentication Middleware
+
+Add simple token authentication to API routes:
+
+<CopyBlock language="typescript">
+{`// middleware.ts
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+export function middleware(request: NextRequest) {
+  // Apply authentication only to API routes
+  if (request.nextUrl.pathname.startsWith('/api/protected')) {
+    const authHeader = request.headers.get('authorization');
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    const token = authHeader.substring(7);
+
+    // In practice, perform JWT verification, etc.
+    if (token !== 'valid-token-123') {
+      return NextResponse.json(
+        { error: 'Invalid token' },
+        { status: 403 }
+      );
+    }
+  }
+
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: '/api/protected/:path*',
+};`}
+</CopyBlock>
+
+### Create Protected API Endpoint
+
+Create `app/api/protected/data/route.ts` file:
+
+<CopyBlock language="typescript">
+{`// app/api/protected/data/route.ts
+import { NextResponse } from 'next/server';
+
+export async function GET(request: Request) {
+  // Only requests that passed middleware reach here
+  return NextResponse.json({
+    data: 'This is protected data',
+    secret: 'Only authenticated users can see this',
+  });
+}`}
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step4-middleware-en.png"
+  alt="Middleware authentication failure response"
+  caption="401 error returned when calling protected API without token"
+/>
+
+Test:
+
+<CopyBlock language="bash">
+# Call without authentication - 401 error
+curl https://my-vercel-app.vercel.app/api/protected/data
+
+# Call with correct token - success
+curl https://my-vercel-app.vercel.app/api/protected/data \
+  -H "Authorization: Bearer valid-token-123"
+</CopyBlock>
+
+<DevTip title="Middleware Use Case Ideas">
+- **Redirects**: Redirect unauthenticated users to login page
+- **Internationalization**: Auto-detect language based on Accept-Language header and redirect
+- **A/B Testing**: Randomly route users to different versions
+- **Rate Limiting**: IP-based request limiting (use with KV storage)
+- **Bot Blocking**: Block malicious bots via User-Agent inspection
+</DevTip>
+
+<Checkpoint>
+- [ ] Edge Function working properly?
+- [ ] Location information returned correctly?
+- [ ] Middleware intercepting requests?
+- [ ] Authentication logic working correctly?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={5} title="External API Calls and Error Handling Implementation">
+
+Learn how to call external APIs from serverless functions and implement proper error handling.
+
+### Create External API Calling Function
+
+Create `app/api/weather/route.ts` file:
+
+<CopyBlock language="typescript">
+{`// app/api/weather/route.ts
+import { NextResponse } from 'next/server';
+
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const city = searchParams.get('city') || 'Seoul';
+
+  try {
+    // In practice, get API key from environment variables
+    const apiKey = process.env.WEATHER_API_KEY;
+
+    if (!apiKey) {
+      throw new Error('API key not configured');
+    }
+
+    const response = await fetch(
+      \`https://api.openweathermap.org/data/2.5/weather?q=\${city}&appid=\${apiKey}&units=metric\`,
+      {
+        // Cache settings
+        next: { revalidate: 3600 }, // Revalidate every hour
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(\`Weather API error: \${response.status}\`);
+    }
+
+    const data = await response.json();
+
+    return NextResponse.json({
+      city: data.name,
+      temperature: data.main.temp,
+      description: data.weather[0].description,
+      humidity: data.main.humidity,
+    });
+
+  } catch (error) {
+    console.error('Weather API error:', error);
+
+    return NextResponse.json(
+      {
+        error: 'Failed to fetch weather data',
+        message: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 }
+    );
+  }
+}`}
+</CopyBlock>
+
+### Add CORS Headers
+
+Configure CORS to allow API calls from external frontends:
+
+<CopyBlock language="typescript">
+{`// app/api/public/route.ts
+import { NextResponse } from 'next/server';
+
+export async function GET(request: Request) {
+  const data = { message: 'Public API' };
+
+  return NextResponse.json(data, {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
+}
+
+// Handle OPTIONS requests (preflight)
+export async function OPTIONS(request: Request) {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
+}`}
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step5-api-call-en.png"
+  alt="External API call and response"
+  caption="Call weather API and return processed data"
+/>
+
+### Timeout and Retry Logic
+
+<CopyBlock language="typescript">
+{`// lib/api-utils.ts
+export async function fetchWithRetry(
+  url: string,
+  options: RequestInit = {},
+  maxRetries = 3
+): Promise<Response> {
+  let lastError: Error | null = null;
+
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 5000); // 5s timeout
+
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeout);
+
+      if (response.ok) {
+        return response;
+      }
+
+      // Retry only 5xx errors
+      if (response.status >= 500) {
+        lastError = new Error(\`HTTP \${response.status}\`);
+        await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1))); // Exponential backoff
+        continue;
+      }
+
+      return response;
+
+    } catch (error) {
+      lastError = error as Error;
+      if (i < maxRetries - 1) {
+        await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+      }
+    }
+  }
+
+  throw lastError || new Error('Max retries exceeded');
+}`}
+</CopyBlock>
+
+Usage example:
+
+<CopyBlock language="typescript">
+{`import { fetchWithRetry } from '@/lib/api-utils';
+
+export async function GET() {
+  try {
+    const response = await fetchWithRetry('https://api.example.com/data');
+    const data = await response.json();
+    return NextResponse.json(data);
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Failed after retries' },
+      { status: 500 }
+    );
+  }
+}`}
+</CopyBlock>
+
+<Checkpoint>
+- [ ] External API call succeeding?
+- [ ] Error handling working correctly?
+- [ ] CORS headers added?
+- [ ] Timeout and retry working normally?
+</Checkpoint>
+
+</Step>
+
+---
+
+## Next Steps
+
+Congratulations! You've successfully implemented Vercel Serverless Functions, Edge Functions, and Middleware. You're now ready for the next steps:
+
+1. **[Vercel Environment Variables Setup](/guides/vercel-env-setup)** - Securely manage API keys and secrets
+2. **Vercel KV/Postgres Integration** - Connect serverless database with functions
+
+<Callout type="tip">
+Use the Real-time Logs feature in the Functions tab to view production environment logs in real-time. Very useful for debugging.
+</Callout>
+
+## Troubleshooting
+
+### Function Returns Timeout Error
+- Hobby plan allows max 10 seconds, Pro plan allows 60 seconds execution.
+- Separate long tasks into background jobs or queues.
+- Optimize database queries and add indexes.
+
+### Module Not Found Error in Edge Function
+- Edge Runtime doesn't support Node.js-only modules.
+- Only use libraries compatible with Web APIs.
+- Switch to regular serverless function with `runtime = 'nodejs'`.
+
+### Middleware Not Executing
+- Verify `middleware.ts` file is in project root (or src/).
+- Verify `config.matcher` configuration is correct.
+- After deployment, check build logs to verify middleware was recognized.
+
+### CORS Error Occurs
+- Verify OPTIONS method is implemented.
+- Verify `Access-Control-Allow-Origin` header is included in all responses.
+- Verify preflight request returns 204 status code.
+
+## Related Resources
+
+- [Vercel Functions Documentation](https://vercel.com/docs/functions)
+- [Edge Functions Guide](https://vercel.com/docs/functions/edge-functions)
+- [Middleware Documentation](https://nextjs.org/docs/app/building-your-application/routing/middleware)
+- [Next.js API Routes](https://nextjs.org/docs/app/building-your-application/routing/route-handlers)

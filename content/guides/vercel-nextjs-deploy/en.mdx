@@ -1,0 +1,353 @@
+# Deploy Next.js App to Vercel
+
+<FreeTierInfo
+  platform="vercel"
+  limit="Hobby Plan"
+  period="month"
+  amount="Unlimited deployments, 100GB bandwidth"
+  status="available"
+/>
+
+Vercel is the optimal deployment platform for Next.js. When you connect your Git repository, it automatically deploys whenever you push code, and creates preview deployments for every Pull Request. This guide covers the complete process of deploying a Next.js project to Vercel and setting up a custom domain.
+
+## Prerequisites
+
+Before you begin, you'll need:
+
+- Vercel account (see [guide](/guides/vercel-account-setup))
+- GitHub account with Vercel integration completed
+- Node.js 18.x or higher installed
+- Basic Git knowledge
+- (Optional) Next.js project to deploy (we'll create one if you don't have one)
+
+<Callout type="info">
+This guide uses a Next.js App Router project as an example, but Pages Router and other frameworks (React, Vue, Svelte) can be deployed the same way.
+</Callout>
+
+---
+
+<Step number={1} title="Create Next.js Project and Push to Git Repository">
+
+Skip this step if you have an existing project. To create a new project, follow these steps.
+
+### Create Next.js Project Locally
+
+Open your terminal and run:
+
+<CopyBlock language="bash">
+npx create-next-app@latest my-vercel-app
+</CopyBlock>
+
+Select installation options:
+- **TypeScript**: Yes (recommended)
+- **ESLint**: Yes
+- **Tailwind CSS**: Yes (optional)
+- **src/ directory**: No
+- **App Router**: Yes (recommended)
+- **Customize import alias**: No
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step1-create-nextjs-en.png"
+  alt="create-next-app execution screen"
+  caption="Selecting options when creating a Next.js project"
+/>
+
+### Create GitHub Repository and Push
+
+1. Create a new repository at [github.com](https://github.com) (public or private).
+2. Enter repository name and click **Create repository**.
+3. Push the created project to GitHub:
+
+<CopyBlock language="bash">
+cd my-vercel-app
+git remote add origin https://github.com/YOUR_USERNAME/my-vercel-app.git
+git branch -M main
+git push -u origin main
+</CopyBlock>
+
+<Callout type="tip">
+Vercel can deploy private repositories for free. Set projects you don't want to make public as private.
+</Callout>
+
+<Checkpoint>
+- [ ] Next.js project runs normally locally? (`npm run dev`)
+- [ ] Code pushed to GitHub repository?
+- [ ] Build script exists in package.json? (`"build": "next build"`)
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={2} title="Create New Project on Vercel and Connect Git Repository">
+
+1. Log in to [vercel.com/dashboard](https://vercel.com/dashboard).
+2. Click **Add New...** button and select **Project**.
+3. Find the repository you want to deploy in the **Import Git Repository** section.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step2-import-repo-en.png"
+  alt="Importing Git repository on Vercel"
+  caption="Select and import the GitHub repository to deploy"
+/>
+
+### If Repository Doesn't Appear in List
+
+1. Click **Adjust GitHub App Permissions**.
+2. Add desired repositories on GitHub permissions settings page.
+3. Click **Save** and return to Vercel.
+
+4. Click **Import** button next to the repository.
+
+<DevTip title="Connecting Organization Repositories">
+To deploy repositories from a GitHub organization, you must approve the Vercel GitHub App in that organization. Find and install Vercel in Organization Settings > GitHub Apps.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="Configure Project Settings and Build Configuration">
+
+After importing the repository, the project settings screen appears.
+
+### Basic Settings
+
+1. **Project Name**: Project name (used in URL, e.g., `my-vercel-app`)
+2. **Framework Preset**: Next.js is automatically detected
+3. **Root Directory**: `./` (use default unless monorepo)
+4. **Build and Output Settings**: Automatically configured
+   - Build Command: `next build`
+   - Output Directory: `.next`
+   - Install Command: `npm install`
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step3-config-en.png"
+  alt="Vercel project settings screen"
+  caption="Configure project name and build settings"
+/>
+
+### Add Environment Variables (Optional)
+
+If your project requires API keys or secrets:
+
+1. Expand the **Environment Variables** section.
+2. Add key-value pairs (e.g., `NEXT_PUBLIC_API_URL=https://api.example.com`)
+3. Select environment:
+   - **Production**: Production deployments
+   - **Preview**: PR preview deployments
+   - **Development**: Local development
+
+<Callout type="warning">
+Only environment variables with the `NEXT_PUBLIC_` prefix are accessible on the client side. Never add `NEXT_PUBLIC_` to secret API keys!
+</Callout>
+
+4. Review all settings and click the **Deploy** button.
+
+</Step>
+
+---
+
+<Step number={4} title="Deploy and Monitor Build Logs">
+
+When you click Deploy, Vercel automatically starts building and deploying.
+
+### Deployment Process
+
+1. **Building**: Install dependencies and build Next.js
+2. **Assigning Domains**: Assign `.vercel.app` domain
+3. **Uploading**: Upload built files to global CDN
+4. **Ready**: Deployment complete, accessible via URL
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step4-building-en.png"
+  alt="Vercel build progress screen"
+  caption="Monitor deployment progress with real-time build logs"
+/>
+
+### Review Build Logs
+
+You can view real-time logs on the build progress screen:
+- List of installed packages
+- Build warnings and errors
+- Build time and memory usage
+- List of generated pages
+
+First deployments typically take 1-3 minutes.
+
+<Callout type="info">
+If build fails, check the error message in the logs. Most common causes are TypeScript type errors or missing environment variables.
+</Callout>
+
+<Checkpoint>
+- [ ] Deployment completed successfully?
+- [ ] "Congratulations!" message displayed?
+- [ ] `.vercel.app` domain assigned?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={5} title="Verify Deployed Site and Test Automatic Deployments">
+
+When deployment completes, a congratulations screen appears.
+
+### Visit Deployed Site
+
+1. Click **Visit** button or open the provided URL (e.g., `my-vercel-app.vercel.app`) in your browser.
+2. Verify the Next.js default page displays correctly.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step5-deployed-en.png"
+  alt="Deployment complete screen and site URL"
+  caption="Deployment complete with accessible URL displayed"
+/>
+
+### Test Automatic Deployment
+
+One of Vercel's most powerful features is Git-integrated automatic deployment.
+
+1. Modify a project file locally (e.g., change text in `app/page.tsx`).
+2. Commit and push the changes:
+
+<CopyBlock language="bash">
+git add .
+git commit -m "Update homepage text"
+git push origin main
+</CopyBlock>
+
+3. Verify a new deployment starts automatically in the **Deployments** tab on Vercel dashboard.
+4. After deployment completes, refresh the site to see the changes reflected.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step5-auto-deploy-en.png"
+  alt="Deployments tab showing automatic deployment in progress"
+  caption="New deployment automatically started after Git push"
+/>
+
+### Preview Deployments
+
+When you create a Pull Request, Vercel automatically generates a preview URL:
+
+1. Create a new branch and push changes:
+
+<CopyBlock language="bash">
+git checkout -b feature/new-page
+# Make file changes
+git add .
+git commit -m "Add new page"
+git push origin feature/new-page
+</CopyBlock>
+
+2. Create a Pull Request on GitHub.
+3. Vercel bot automatically creates a preview deployment and comments on the PR.
+4. Review changes on the preview URL, then merge the PR to automatically deploy to production.
+
+<DevTip title="Leveraging Preview Deployments">
+Preview deployments are perfect for sharing changes with team members and getting reviews. Each PR gets a unique URL, allowing testing without affecting production.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={6} title="Set Up Custom Domain (Optional)">
+
+To use your own domain instead of `.vercel.app`:
+
+### Add Domain
+
+1. Navigate to the **Settings** tab in project dashboard.
+2. Select **Domains** from left menu.
+3. Enter your desired domain in the input field (e.g., `myapp.com`).
+4. Click **Add** button.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step6-add-domain-en.png"
+  alt="Adding custom domain on Vercel"
+  caption="Enter custom domain to use for project"
+/>
+
+### DNS Configuration
+
+Vercel verifies the domain and guides you through DNS setup.
+
+**Method 1: Use Vercel Nameservers (Recommended)**
+- Change nameservers to Vercel nameservers at domain registrar
+- Vercel automatically manages all DNS
+- Automatic SSL certificate renewal
+
+**Method 2: Add A/CNAME Records**
+- Keep existing DNS provider
+- A Record: `76.76.21.21`
+- CNAME Record: `cname.vercel-dns.com`
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step6-dns-config-en.png"
+  alt="Vercel DNS configuration instructions"
+  caption="DNS records to configure at domain registrar"
+/>
+
+### Domain Verification and SSL Certificate
+
+Once DNS settings propagate (usually 5 minutes to 48 hours):
+1. Vercel automatically verifies the domain.
+2. Let's Encrypt SSL certificate is automatically issued.
+3. HTTPS is automatically enabled.
+4. HTTP → HTTPS redirect is automatically configured.
+
+<Callout type="info">
+Vercel automatically issues and renews SSL certificates. No additional configuration needed, and HTTPS is applied by default to all domains.
+</Callout>
+
+<Checkpoint>
+- [ ] Custom domain added?
+- [ ] DNS configuration complete?
+- [ ] HTTPS working properly?
+- [ ] Can access site via domain?
+</Checkpoint>
+
+</Step>
+
+---
+
+## Next Steps
+
+Congratulations! You've successfully deployed your Next.js app to Vercel. You're now ready for the next steps:
+
+1. **[Using Vercel Serverless Functions](/guides/vercel-serverless-functions)** - Implement API routes and Edge Functions
+2. **[Vercel Environment Variables Setup](/guides/vercel-env-setup)** - Manage environment-specific settings and secrets
+
+<Callout type="tip">
+In Project Settings > Git, you can change the automatic deployment branch or set filters to deploy only when specific paths change.
+</Callout>
+
+## Troubleshooting
+
+### Build Fails
+- Check error message in build logs.
+- Verify `npm run build` succeeds locally.
+- Verify compatible Node.js version (changeable in Project Settings > General).
+- Verify `package-lock.json` or `yarn.lock` is committed to Git.
+
+### Deployment Succeeds but Page Shows 404 Error
+- If using Next.js App Router, verify `app/page.tsx` exists.
+- Check for "Compiled successfully" message in build logs.
+- Verify Output Directory setting is correct (Next.js uses `.next`).
+
+### Environment Variables Don't Work
+- Verify `NEXT_PUBLIC_` prefix is correctly added where needed.
+- Verify redeployment after adding environment variables.
+- Use `.env.local` file locally, configure in dashboard on Vercel.
+
+### Preview Deployments Not Created
+- Verify GitHub App permissions include webhook permissions.
+- Verify preview deployments are enabled in Project Settings > Git.
+
+## Related Resources
+
+- [Vercel Deployment Documentation](https://vercel.com/docs/deployments/overview)
+- [Next.js Deployment Guide](https://nextjs.org/docs/deployment)
+- [Vercel CLI Usage](https://vercel.com/docs/cli)
+- [Custom Domain Setup](https://vercel.com/docs/projects/domains)

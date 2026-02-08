@@ -1,0 +1,51 @@
+{
+  "slug": "vercel-nextjs-deploy",
+  "platform": "vercel",
+  "service": "Vercel Deployment",
+  "category": "compute",
+  "difficulty": "beginner",
+  "estimatedMinutes": 15,
+  "totalSteps": 6,
+  "freeTier": {
+    "limit": "Hobby Plan",
+    "period": "month",
+    "amount": "Unlimited deployments, 100GB bandwidth",
+    "status": "available",
+    "details": {
+      "ko": "무제한 프로덕션 배포, 무제한 프리뷰 배포, 자동 HTTPS, 글로벌 CDN 포함",
+      "en": "Unlimited production deployments, unlimited preview deployments, automatic HTTPS, global CDN included"
+    },
+    "conditions": {
+      "ko": "개인 및 비상업적 프로젝트에 한함",
+      "en": "For personal and non-commercial projects only"
+    }
+  },
+  "prerequisites": [
+    "vercel-account-setup"
+  ],
+  "nextGuides": [
+    "vercel-serverless-functions",
+    "vercel-env-setup"
+  ],
+  "tags": {
+    "ko": ["Vercel", "Next.js", "배포", "Git 연동", "자동 배포", "프리뷰 배포", "커스텀 도메인"],
+    "en": ["Vercel", "Next.js", "Deployment", "Git Integration", "Automatic Deployment", "Preview Deployment", "Custom Domain"]
+  },
+  "seo": {
+    "ko": {
+      "title": "Vercel에 Next.js 앱 배포하기 - Git 연동 및 자동 배포 설정",
+      "description": "Next.js 프로젝트를 Vercel에 배포하는 전체 과정을 다룹니다. Git 저장소 연결, 빌드 설정, 프리뷰 배포, 커스텀 도메인 설정까지 단계별로 알아보세요.",
+      "keywords": ["Vercel 배포", "Next.js 배포", "Vercel Git 연동", "자동 배포", "프리뷰 배포", "Vercel 도메인"]
+    },
+    "en": {
+      "title": "Deploy Next.js App to Vercel - Git Integration and Auto Deployment",
+      "description": "Complete guide to deploying Next.js projects to Vercel. Learn Git repository connection, build configuration, preview deployments, and custom domain setup step by step.",
+      "keywords": ["Vercel deployment", "Next.js deployment", "Vercel Git integration", "automatic deployment", "preview deployment", "Vercel domain"]
+    }
+  },
+  "published": true,
+  "featured": true,
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z"
+}

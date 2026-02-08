@@ -1,0 +1,51 @@
+{
+  "slug": "vercel-serverless-functions",
+  "platform": "vercel",
+  "service": "Serverless Functions",
+  "category": "compute",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 20,
+  "totalSteps": 5,
+  "freeTier": {
+    "limit": "Hobby Plan",
+    "period": "month",
+    "amount": "100GB-hours execution, 1M invocations",
+    "status": "available",
+    "details": {
+      "ko": "100GB-시간 실행 시간, 월 100만 호출, 10초 최대 실행 시간, Edge Functions 포함",
+      "en": "100GB-hours execution time, 1M invocations/month, 10s max execution time, Edge Functions included"
+    },
+    "conditions": {
+      "ko": "개인 및 비상업적 프로젝트에 한함",
+      "en": "For personal and non-commercial projects only"
+    }
+  },
+  "prerequisites": [
+    "vercel-account-setup",
+    "vercel-nextjs-deploy"
+  ],
+  "nextGuides": [
+    "vercel-env-setup"
+  ],
+  "tags": {
+    "ko": ["Vercel", "Serverless Functions", "API Routes", "Edge Functions", "Middleware", "Next.js API"],
+    "en": ["Vercel", "Serverless Functions", "API Routes", "Edge Functions", "Middleware", "Next.js API"]
+  },
+  "seo": {
+    "ko": {
+      "title": "Vercel Serverless Functions 사용 가이드 - API 라우트와 Edge Functions",
+      "description": "Next.js API Routes로 서버리스 함수를 만들고 Vercel에 배포하는 방법을 배웁니다. Edge Functions와 미들웨어 구현까지 단계별로 알아보세요.",
+      "keywords": ["Vercel Serverless", "Next.js API Routes", "Edge Functions", "Vercel 미들웨어", "서버리스 함수"]
+    },
+    "en": {
+      "title": "Vercel Serverless Functions Guide - API Routes and Edge Functions",
+      "description": "Learn how to create serverless functions with Next.js API Routes and deploy to Vercel. Step-by-step guide to implementing Edge Functions and middleware.",
+      "keywords": ["Vercel Serverless", "Next.js API Routes", "Edge Functions", "Vercel Middleware", "Serverless Functions"]
+    }
+  },
+  "published": true,
+  "featured": true,
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z"
+}

@@ -1,0 +1,353 @@
+# Vercel에 Next.js 앱 배포하기
+
+<FreeTierInfo
+  platform="vercel"
+  limit="Hobby Plan"
+  period="월"
+  amount="무제한 배포, 100GB 대역폭"
+  status="available"
+/>
+
+Vercel은 Next.js를 위한 최적의 배포 플랫폼입니다. Git 저장소를 연결하면 코드를 푸시할 때마다 자동으로 배포되며, Pull Request마다 프리뷰 배포가 생성됩니다. 이 가이드에서는 Next.js 프로젝트를 Vercel에 배포하고 커스텀 도메인을 설정하는 전체 과정을 다룹니다.
+
+## 준비사항
+
+시작하기 전에 다음이 필요합니다:
+
+- Vercel 계정 ([가이드](/guides/vercel-account-setup) 참조)
+- GitHub 계정 및 Vercel 연동 완료
+- Node.js 18.x 이상 설치
+- Git 기본 지식
+- (선택) 배포할 Next.js 프로젝트 (없으면 가이드에서 생성)
+
+<Callout type="info">
+이 가이드는 Next.js App Router 기반 프로젝트를 예시로 사용하지만, Pages Router와 다른 프레임워크(React, Vue, Svelte)도 동일한 방식으로 배포할 수 있습니다.
+</Callout>
+
+---
+
+<Step number={1} title="Next.js 프로젝트 생성 및 Git 저장소 푸시">
+
+기존 프로젝트가 있다면 이 단계를 건너뛰세요. 새 프로젝트를 만들려면 다음을 따릅니다.
+
+### 로컬에서 Next.js 프로젝트 생성
+
+터미널을 열고 다음 명령어를 실행합니다:
+
+<CopyBlock language="bash">
+npx create-next-app@latest my-vercel-app
+</CopyBlock>
+
+설치 옵션을 선택합니다:
+- **TypeScript**: Yes (권장)
+- **ESLint**: Yes
+- **Tailwind CSS**: Yes (선택)
+- **src/ directory**: No
+- **App Router**: Yes (권장)
+- **Customize import alias**: No
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step1-create-nextjs-ko.png"
+  alt="create-next-app 실행 화면"
+  caption="Next.js 프로젝트 생성 시 옵션 선택"
+/>
+
+### GitHub 저장소 생성 및 푸시
+
+1. [github.com](https://github.com)에서 새 저장소를 생성합니다 (public 또는 private).
+2. 저장소 이름을 입력하고 **Create repository**를 클릭합니다.
+3. 생성된 프로젝트를 GitHub에 푸시합니다:
+
+<CopyBlock language="bash">
+cd my-vercel-app
+git remote add origin https://github.com/YOUR_USERNAME/my-vercel-app.git
+git branch -M main
+git push -u origin main
+</CopyBlock>
+
+<Callout type="tip">
+Vercel은 private 저장소도 무료로 배포할 수 있습니다. 공개하고 싶지 않은 프로젝트는 private으로 설정하세요.
+</Callout>
+
+<Checkpoint>
+- [ ] Next.js 프로젝트가 로컬에서 정상 실행되나요? (`npm run dev`)
+- [ ] GitHub 저장소에 코드가 푸시되었나요?
+- [ ] package.json에 빌드 스크립트가 있나요? (`"build": "next build"`)
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={2} title="Vercel에서 새 프로젝트 생성 및 Git 저장소 연결">
+
+1. [vercel.com/dashboard](https://vercel.com/dashboard)에 로그인합니다.
+2. **Add New...** 버튼을 클릭하고 **Project**를 선택합니다.
+3. **Import Git Repository** 섹션에서 배포할 저장소를 찾습니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step2-import-repo-ko.png"
+  alt="Vercel에서 Git 저장소 가져오기"
+  caption="배포할 GitHub 저장소를 선택하여 Import"
+/>
+
+### 저장소가 목록에 보이지 않는 경우
+
+1. **Adjust GitHub App Permissions**를 클릭합니다.
+2. GitHub 권한 설정 페이지에서 원하는 저장소를 추가합니다.
+3. **Save**를 클릭하고 Vercel로 돌아옵니다.
+
+4. 저장소 옆의 **Import** 버튼을 클릭합니다.
+
+<DevTip title="조직 저장소 연결하기">
+GitHub 조직(Organization)의 저장소를 배포하려면, 해당 조직에서 Vercel GitHub App을 승인해야 합니다. 조직 설정 > GitHub Apps에서 Vercel을 찾아 설치하세요.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="프로젝트 설정 및 빌드 구성">
+
+저장소를 Import하면 프로젝트 설정 화면이 나타납니다.
+
+### 기본 설정
+
+1. **Project Name**: 프로젝트 이름 (URL에 사용됨, 예: `my-vercel-app`)
+2. **Framework Preset**: Next.js가 자동 감지됩니다
+3. **Root Directory**: `./` (모노레포가 아니면 기본값 사용)
+4. **Build and Output Settings**: 자동 설정됨
+   - Build Command: `next build`
+   - Output Directory: `.next`
+   - Install Command: `npm install`
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step3-config-ko.png"
+  alt="Vercel 프로젝트 설정 화면"
+  caption="프로젝트 이름과 빌드 설정 구성"
+/>
+
+### 환경 변수 추가 (선택)
+
+프로젝트에 API 키나 비밀 정보가 필요한 경우:
+
+1. **Environment Variables** 섹션을 확장합니다.
+2. 키-값 쌍을 추가합니다 (예: `NEXT_PUBLIC_API_URL=https://api.example.com`)
+3. 환경 선택:
+   - **Production**: 프로덕션 배포
+   - **Preview**: PR 프리뷰 배포
+   - **Development**: 로컬 개발
+
+<Callout type="warning">
+`NEXT_PUBLIC_` 접두사가 붙은 환경 변수만 클라이언트 측에서 접근할 수 있습니다. 비밀 API 키는 절대 `NEXT_PUBLIC_`을 붙이지 마세요!
+</Callout>
+
+4. 모든 설정을 확인하고 **Deploy** 버튼을 클릭합니다.
+
+</Step>
+
+---
+
+<Step number={4} title="첫 배포 진행 및 빌드 로그 확인">
+
+Deploy 버튼을 클릭하면 Vercel이 자동으로 빌드와 배포를 시작합니다.
+
+### 배포 프로세스
+
+1. **Building**: 의존성 설치 및 Next.js 빌드
+2. **Assigning Domains**: `.vercel.app` 도메인 할당
+3. **Uploading**: 빌드된 파일을 글로벌 CDN에 업로드
+4. **Ready**: 배포 완료, URL로 접근 가능
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step4-building-ko.png"
+  alt="Vercel 빌드 진행 화면"
+  caption="실시간 빌드 로그를 보며 배포 진행 상황 확인"
+/>
+
+### 빌드 로그 확인
+
+빌드 진행 화면에서 실시간 로그를 볼 수 있습니다:
+- 설치된 패키지 목록
+- 빌드 경고 및 오류
+- 빌드 시간 및 메모리 사용량
+- 생성된 페이지 목록
+
+일반적으로 첫 배포는 1-3분 정도 소요됩니다.
+
+<Callout type="info">
+빌드가 실패하면 로그에서 오류 메시지를 확인하세요. 대부분 TypeScript 타입 오류나 환경 변수 누락이 원인입니다.
+</Callout>
+
+<Checkpoint>
+- [ ] 배포가 성공적으로 완료되었나요?
+- [ ] "Congratulations!" 메시지가 표시되나요?
+- [ ] `.vercel.app` 도메인이 할당되었나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={5} title="배포된 사이트 확인 및 자동 배포 테스트">
+
+배포가 완료되면 축하 화면이 나타납니다.
+
+### 배포된 사이트 방문
+
+1. **Visit** 버튼을 클릭하거나 제공된 URL(예: `my-vercel-app.vercel.app`)을 브라우저에서 엽니다.
+2. Next.js 기본 페이지가 정상적으로 표시되는지 확인합니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step5-deployed-ko.png"
+  alt="배포 완료 화면 및 사이트 URL"
+  caption="배포가 완료되고 접속 가능한 URL이 표시됨"
+/>
+
+### 자동 배포 테스트
+
+Vercel의 가장 강력한 기능 중 하나는 Git 연동 자동 배포입니다.
+
+1. 로컬에서 프로젝트 파일을 수정합니다 (예: `app/page.tsx`의 텍스트 변경).
+2. 변경사항을 커밋하고 푸시합니다:
+
+<CopyBlock language="bash">
+git add .
+git commit -m "Update homepage text"
+git push origin main
+</CopyBlock>
+
+3. Vercel 대시보드의 **Deployments** 탭에서 새 배포가 자동으로 시작되는 것을 확인합니다.
+4. 배포 완료 후 사이트를 새로고침하면 변경사항이 반영됩니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step5-auto-deploy-ko.png"
+  alt="자동 배포가 진행되는 Deployments 탭"
+  caption="Git push 후 자동으로 시작된 새 배포"
+/>
+
+### 프리뷰 배포 (Preview Deployments)
+
+Pull Request를 생성하면 Vercel이 자동으로 프리뷰 URL을 생성합니다:
+
+1. 새 브랜치를 만들고 변경사항을 푸시합니다:
+
+<CopyBlock language="bash">
+git checkout -b feature/new-page
+# 파일 수정
+git add .
+git commit -m "Add new page"
+git push origin feature/new-page
+</CopyBlock>
+
+2. GitHub에서 Pull Request를 생성합니다.
+3. Vercel 봇이 자동으로 프리뷰 배포를 생성하고 PR에 댓글을 남깁니다.
+4. 프리뷰 URL로 변경사항을 확인한 후 PR을 병합하면 프로덕션에 자동 배포됩니다.
+
+<DevTip title="프리뷰 배포 활용하기">
+프리뷰 배포는 팀원들과 변경사항을 공유하고 검토받기에 완벽합니다. 각 PR마다 고유한 URL이 생성되어 프로덕션에 영향 없이 테스트할 수 있습니다.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={6} title="커스텀 도메인 설정 (선택)">
+
+`.vercel.app` 대신 자신의 도메인을 사용하려면:
+
+### 도메인 추가
+
+1. 프로젝트 대시보드에서 **Settings** 탭으로 이동합니다.
+2. 왼쪽 메뉴에서 **Domains**를 선택합니다.
+3. 도메인 입력란에 원하는 도메인을 입력합니다 (예: `myapp.com`).
+4. **Add** 버튼을 클릭합니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step6-add-domain-ko.png"
+  alt="Vercel에서 커스텀 도메인 추가"
+  caption="프로젝트에 사용할 커스텀 도메인 입력"
+/>
+
+### DNS 설정
+
+Vercel이 도메인을 확인하고 DNS 설정 방법을 안내합니다.
+
+**방법 1: Vercel Nameservers 사용 (권장)**
+- 도메인 등록업체에서 네임서버를 Vercel 네임서버로 변경
+- Vercel이 모든 DNS를 자동 관리
+- SSL 인증서 자동 갱신
+
+**방법 2: A/CNAME 레코드 추가**
+- 기존 DNS 제공업체 유지
+- A 레코드: `76.76.21.21`
+- CNAME 레코드: `cname.vercel-dns.com`
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step6-dns-config-ko.png"
+  alt="Vercel DNS 설정 안내"
+  caption="도메인 등록업체에서 설정해야 할 DNS 레코드"
+/>
+
+### 도메인 확인 및 SSL 인증서
+
+DNS 설정이 전파되면 (보통 5분~48시간):
+1. Vercel이 자동으로 도메인을 확인합니다.
+2. Let's Encrypt SSL 인증서가 자동 발급됩니다.
+3. HTTPS가 자동으로 활성화됩니다.
+4. HTTP → HTTPS 리다이렉트가 자동 설정됩니다.
+
+<Callout type="info">
+Vercel은 SSL 인증서를 자동으로 발급하고 갱신합니다. 별도의 설정이 필요 없으며, 모든 도메인에 HTTPS가 기본 적용됩니다.
+</Callout>
+
+<Checkpoint>
+- [ ] 커스텀 도메인이 추가되었나요?
+- [ ] DNS 설정을 완료했나요?
+- [ ] HTTPS가 정상 작동하나요?
+- [ ] 도메인으로 사이트에 접속할 수 있나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+## 다음 단계
+
+축하합니다! Next.js 앱을 Vercel에 성공적으로 배포했습니다. 이제 다음 단계로 넘어갈 준비가 되었습니다:
+
+1. **[Vercel Serverless Functions 사용하기](/guides/vercel-serverless-functions)** - API 라우트와 Edge Functions 구현
+2. **[Vercel 환경 변수 설정](/guides/vercel-env-setup)** - 환경별 설정 및 비밀 정보 관리
+
+<Callout type="tip">
+프로젝트 설정 > Git에서 자동 배포 브랜치를 변경하거나, 특정 경로의 변경사항만 배포하도록 필터를 설정할 수 있습니다.
+</Callout>
+
+## 문제 해결
+
+### 빌드가 실패해요
+- 빌드 로그에서 오류 메시지를 확인하세요.
+- 로컬에서 `npm run build`가 성공하는지 확인하세요.
+- Node.js 버전이 호환되는지 확인하세요 (프로젝트 설정 > General에서 변경 가능).
+- `package-lock.json` 또는 `yarn.lock`이 Git에 커밋되어 있는지 확인하세요.
+
+### 배포는 성공했는데 페이지가 404 오류를 보여요
+- Next.js App Router를 사용하는 경우 `app/page.tsx`가 있는지 확인하세요.
+- 빌드 로그에서 "Compiled successfully" 메시지를 확인하세요.
+- Output Directory 설정이 올바른지 확인하세요 (Next.js는 `.next`).
+
+### 환경 변수가 작동하지 않아요
+- `NEXT_PUBLIC_` 접두사가 필요한 곳에 올바르게 붙어있는지 확인하세요.
+- 환경 변수를 추가한 후 재배포했는지 확인하세요.
+- 로컬에서는 `.env.local` 파일을 사용하고, Vercel에서는 대시보드에서 설정하세요.
+
+### 프리뷰 배포가 생성되지 않아요
+- GitHub App 권한에 웹훅 권한이 포함되어 있는지 확인하세요.
+- 프로젝트 설정 > Git에서 프리뷰 배포가 활성화되어 있는지 확인하세요.
+
+## 관련 자료
+
+- [Vercel 배포 문서](https://vercel.com/docs/deployments/overview)
+- [Next.js 배포 가이드](https://nextjs.org/docs/deployment)
+- [Vercel CLI 사용법](https://vercel.com/docs/cli)
+- [커스텀 도메인 설정](https://vercel.com/docs/projects/domains)

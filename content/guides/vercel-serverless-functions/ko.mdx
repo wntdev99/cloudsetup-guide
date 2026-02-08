@@ -1,0 +1,624 @@
+# Vercel Serverless Functions 사용 가이드
+
+<FreeTierInfo
+  platform="vercel"
+  limit="Hobby Plan"
+  period="월"
+  amount="100GB-시간 실행, 100만 호출"
+  status="available"
+/>
+
+Vercel Serverless Functions를 사용하면 서버 인프라 관리 없이 백엔드 로직을 실행할 수 있습니다. Next.js API Routes를 통해 간단하게 API를 만들고, Edge Functions로 글로벌 저지연 처리를, Middleware로 요청 전처리를 구현할 수 있습니다. 이 가이드에서는 각 기능을 실제로 구현하고 배포하는 방법을 다룹니다.
+
+## 준비사항
+
+시작하기 전에 다음이 필요합니다:
+
+- Vercel 계정 및 Next.js 프로젝트 배포 완료 ([가이드](/guides/vercel-nextjs-deploy) 참조)
+- Node.js 18.x 이상 설치
+- TypeScript 기본 지식 (권장)
+- REST API 개념 이해
+
+<Callout type="info">
+이 가이드는 Next.js 14+ App Router를 기준으로 작성되었습니다. Pages Router를 사용하는 경우 `pages/api/` 디렉터리에 파일을 생성하면 됩니다.
+</Callout>
+
+---
+
+<Step number={1} title="Next.js API Route 생성 및 기본 함수 구현">
+
+API Routes는 Next.js 프로젝트 내에서 서버리스 함수를 만드는 가장 간단한 방법입니다.
+
+### 첫 번째 API Route 만들기
+
+1. 프로젝트 루트에서 `app/api/hello/route.ts` 파일을 생성합니다:
+
+<CopyBlock language="typescript">
+{`// app/api/hello/route.ts
+import { NextResponse } from 'next/server';
+
+export async function GET(request: Request) {
+  return NextResponse.json({
+    message: 'Hello from Vercel Serverless Function!',
+    timestamp: new Date().toISOString(),
+  });
+}
+
+export async function POST(request: Request) {
+  const body = await request.json();
+
+  return NextResponse.json({
+    received: body,
+    message: 'Data received successfully',
+  });
+}`}
+</CopyBlock>
+
+2. 로컬에서 개발 서버를 실행합니다:
+
+<CopyBlock language="bash">
+npm run dev
+</CopyBlock>
+
+3. 브라우저나 curl로 테스트합니다:
+
+<CopyBlock language="bash">
+# GET 요청
+curl http://localhost:3000/api/hello
+
+# POST 요청
+curl -X POST http://localhost:3000/api/hello \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Vercel"}'
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step1-api-route-ko.png"
+  alt="API Route 응답 결과"
+  caption="브라우저에서 API Route 호출 결과 확인"
+/>
+
+<Callout type="tip">
+App Router에서는 각 HTTP 메서드(GET, POST, PUT, DELETE 등)를 개별 함수로 export해야 합니다. Pages Router와 달리 `req.method`로 분기하지 않습니다.
+</Callout>
+
+### 동적 라우트 API 만들기
+
+파라미터를 받는 API를 만들려면 `[id]` 형식의 동적 세그먼트를 사용합니다.
+
+`app/api/users/[id]/route.ts` 파일을 생성합니다:
+
+<CopyBlock language="typescript">
+{`// app/api/users/[id]/route.ts
+import { NextResponse } from 'next/server';
+
+export async function GET(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  const userId = params.id;
+
+  // 실제로는 데이터베이스에서 조회
+  const user = {
+    id: userId,
+    name: 'John Doe',
+    email: 'john@example.com',
+  };
+
+  return NextResponse.json(user);
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  const userId = params.id;
+
+  // 실제로는 데이터베이스에서 삭제
+  return NextResponse.json({
+    success: true,
+    message: \`User \${userId} deleted\`,
+  });
+}`}
+</CopyBlock>
+
+테스트:
+<CopyBlock language="bash">
+curl http://localhost:3000/api/users/123
+</CopyBlock>
+
+<Checkpoint>
+- [ ] API Route가 정상적으로 응답하나요?
+- [ ] GET과 POST 요청을 모두 테스트했나요?
+- [ ] 동적 라우트 파라미터가 올바르게 전달되나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={2} title="API 배포 및 프로덕션 테스트">
+
+로컬에서 테스트가 완료되면 Vercel에 배포합니다.
+
+### Git에 커밋하고 배포
+
+<CopyBlock language="bash">
+git add .
+git commit -m "Add serverless API routes"
+git push origin main
+</CopyBlock>
+
+Vercel이 자동으로 배포를 시작합니다. 배포가 완료되면 대시보드에서 확인할 수 있습니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step2-deploy-api-ko.png"
+  alt="API Routes가 포함된 배포 완료"
+  caption="Vercel 대시보드에서 Functions 탭에 배포된 API 확인"
+/>
+
+### 프로덕션 API 테스트
+
+배포된 URL로 API를 호출합니다:
+
+<CopyBlock language="bash">
+# 본인의 Vercel 도메인으로 변경
+curl https://my-vercel-app.vercel.app/api/hello
+
+curl https://my-vercel-app.vercel.app/api/users/123
+</CopyBlock>
+
+### Functions 탭에서 모니터링
+
+1. Vercel 프로젝트 대시보드에서 **Functions** 탭으로 이동합니다.
+2. 배포된 서버리스 함수 목록을 확인합니다.
+3. 각 함수를 클릭하면 다음을 확인할 수 있습니다:
+   - 실행 시간
+   - 호출 횟수
+   - 메모리 사용량
+   - 오류 로그
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step2-functions-monitor-ko.png"
+  alt="Functions 탭의 모니터링 화면"
+  caption="서버리스 함수의 실행 통계 및 로그"
+/>
+
+<DevTip title="콜드 스타트 이해하기">
+Serverless Functions는 요청이 없을 때 자동으로 종료되고, 다음 요청 시 다시 시작됩니다(콜드 스타트). 첫 요청은 약간 느릴 수 있지만, 이후 요청은 빠릅니다. Pro 플랜에서는 함수를 항상 준비 상태로 유지할 수 있습니다.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="Edge Functions 구현 (초저지연 글로벌 API)">
+
+Edge Functions는 Vercel의 엣지 네트워크에서 실행되어 사용자와 가장 가까운 위치에서 응답합니다. 일반 서버리스 함수보다 훨씬 빠르지만 일부 제약이 있습니다.
+
+### Edge Runtime API 만들기
+
+`app/api/edge/route.ts` 파일을 생성합니다:
+
+<CopyBlock language="typescript">
+{`// app/api/edge/route.ts
+import { NextResponse } from 'next/server';
+
+// Edge Runtime 사용 선언
+export const runtime = 'edge';
+
+export async function GET(request: Request) {
+  // 요청 헤더에서 정보 추출
+  const { geo, ip } = request as any;
+
+  return NextResponse.json({
+    message: 'Response from Edge Network',
+    location: {
+      city: geo?.city || 'Unknown',
+      country: geo?.country || 'Unknown',
+      region: geo?.region || 'Unknown',
+    },
+    ip: ip || 'Unknown',
+    timestamp: new Date().toISOString(),
+  });
+}`}
+</CopyBlock>
+
+### Edge Function 활용 예시: A/B 테스팅
+
+Edge Functions는 요청을 즉시 처리하고 리다이렉트할 수 있어 A/B 테스팅에 적합합니다:
+
+<CopyBlock language="typescript">
+{`// app/api/ab-test/route.ts
+import { NextResponse } from 'next/server';
+
+export const runtime = 'edge';
+
+export async function GET(request: Request) {
+  // 50% 확률로 A/B 분기
+  const variant = Math.random() < 0.5 ? 'A' : 'B';
+
+  const response = NextResponse.json({
+    variant,
+    message: \`You are in group \${variant}\`,
+  });
+
+  // 쿠키에 variant 저장
+  response.cookies.set('ab-test-variant', variant, {
+    maxAge: 60 * 60 * 24 * 30, // 30일
+  });
+
+  return response;
+}`}
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step3-edge-function-ko.png"
+  alt="Edge Function 응답에 지역 정보 포함"
+  caption="사용자의 지리적 위치 정보를 포함한 Edge Function 응답"
+/>
+
+### Edge Runtime 제약사항
+
+Edge Functions는 다음 제약이 있습니다:
+- ❌ Node.js 전용 모듈 사용 불가 (fs, path 등)
+- ❌ 네이티브 바이너리 사용 불가
+- ❌ 최대 실행 시간: 30초 (Hobby), 30초 (Pro)
+- ✅ Web API 사용 가능 (fetch, Response, Headers 등)
+- ✅ 초저지연 응답 (50ms 이하)
+
+<Callout type="warning">
+데이터베이스 연결이나 파일 시스템 접근이 필요한 경우 일반 서버리스 함수를 사용하세요. Edge Functions는 가벼운 로직과 빠른 응답이 필요한 경우에 적합합니다.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="Middleware 구현 (요청 전처리 및 인증)">
+
+Middleware는 모든 요청이 라우트에 도달하기 전에 실행되어 인증, 리다이렉트, 헤더 수정 등을 수행합니다.
+
+### 기본 Middleware 만들기
+
+프로젝트 루트에 `middleware.ts` 파일을 생성합니다:
+
+<CopyBlock language="typescript">
+{`// middleware.ts
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+export function middleware(request: NextRequest) {
+  // 요청 로깅
+  console.log('Request:', request.method, request.url);
+
+  // 커스텀 헤더 추가
+  const response = NextResponse.next();
+  response.headers.set('X-Custom-Header', 'MyValue');
+  response.headers.set('X-Request-Time', new Date().toISOString());
+
+  return response;
+}
+
+// Middleware가 실행될 경로 지정
+export const config = {
+  matcher: [
+    /*
+     * 다음을 제외한 모든 경로:
+     * - _next/static (정적 파일)
+     * - _next/image (이미지 최적화)
+     * - favicon.ico (파비콘)
+     */
+    '/((?!_next/static|_next/image|favicon.ico).*)',
+  ],
+};`}
+</CopyBlock>
+
+### 인증 Middleware 구현
+
+API 경로에 간단한 토큰 인증을 추가합니다:
+
+<CopyBlock language="typescript">
+{`// middleware.ts
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+export function middleware(request: NextRequest) {
+  // API 경로에만 인증 적용
+  if (request.nextUrl.pathname.startsWith('/api/protected')) {
+    const authHeader = request.headers.get('authorization');
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    const token = authHeader.substring(7);
+
+    // 실제로는 JWT 검증 등 수행
+    if (token !== 'valid-token-123') {
+      return NextResponse.json(
+        { error: 'Invalid token' },
+        { status: 403 }
+      );
+    }
+  }
+
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: '/api/protected/:path*',
+};`}
+</CopyBlock>
+
+### 보호된 API 엔드포인트 만들기
+
+`app/api/protected/data/route.ts` 파일을 생성합니다:
+
+<CopyBlock language="typescript">
+{`// app/api/protected/data/route.ts
+import { NextResponse } from 'next/server';
+
+export async function GET(request: Request) {
+  // Middleware를 통과한 요청만 여기 도달
+  return NextResponse.json({
+    data: 'This is protected data',
+    secret: 'Only authenticated users can see this',
+  });
+}`}
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step4-middleware-ko.png"
+  alt="Middleware 인증 실패 응답"
+  caption="토큰 없이 보호된 API 호출 시 401 오류 반환"
+</Screenshot>
+
+테스트:
+
+<CopyBlock language="bash">
+# 인증 없이 호출 - 401 오류
+curl https://my-vercel-app.vercel.app/api/protected/data
+
+# 올바른 토큰으로 호출 - 성공
+curl https://my-vercel-app.vercel.app/api/protected/data \
+  -H "Authorization: Bearer valid-token-123"
+</CopyBlock>
+
+<DevTip title="Middleware 활용 아이디어">
+- **리다이렉트**: 로그인하지 않은 사용자를 로그인 페이지로 리다이렉트
+- **국제화**: Accept-Language 헤더 기반 언어 자동 감지 및 리다이렉트
+- **A/B 테스팅**: 사용자를 무작위로 다른 버전으로 라우팅
+- **속도 제한**: IP 기반 요청 제한 (KV 스토리지와 함께 사용)
+- **봇 차단**: User-Agent 검사로 악성 봇 차단
+</DevTip>
+
+<Checkpoint>
+- [ ] Edge Function이 정상 작동하나요?
+- [ ] 지역 정보가 올바르게 반환되나요?
+- [ ] Middleware가 요청을 가로채나요?
+- [ ] 인증 로직이 제대로 작동하나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={5} title="외부 API 호출 및 에러 처리 구현">
+
+서버리스 함수에서 외부 API를 호출하고 적절한 에러 처리를 구현하는 방법을 알아봅니다.
+
+### 외부 API 호출 함수 만들기
+
+`app/api/weather/route.ts` 파일을 생성합니다:
+
+<CopyBlock language="typescript">
+{`// app/api/weather/route.ts
+import { NextResponse } from 'next/server';
+
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const city = searchParams.get('city') || 'Seoul';
+
+  try {
+    // 실제로는 환경 변수에서 API 키 가져오기
+    const apiKey = process.env.WEATHER_API_KEY;
+
+    if (!apiKey) {
+      throw new Error('API key not configured');
+    }
+
+    const response = await fetch(
+      \`https://api.openweathermap.org/data/2.5/weather?q=\${city}&appid=\${apiKey}&units=metric\`,
+      {
+        // 캐시 설정
+        next: { revalidate: 3600 }, // 1시간마다 재검증
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(\`Weather API error: \${response.status}\`);
+    }
+
+    const data = await response.json();
+
+    return NextResponse.json({
+      city: data.name,
+      temperature: data.main.temp,
+      description: data.weather[0].description,
+      humidity: data.main.humidity,
+    });
+
+  } catch (error) {
+    console.error('Weather API error:', error);
+
+    return NextResponse.json(
+      {
+        error: 'Failed to fetch weather data',
+        message: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 }
+    );
+  }
+}`}
+</CopyBlock>
+
+### CORS 헤더 추가
+
+외부 프론트엔드에서 API를 호출할 수 있도록 CORS를 설정합니다:
+
+<CopyBlock language="typescript">
+{`// app/api/public/route.ts
+import { NextResponse } from 'next/server';
+
+export async function GET(request: Request) {
+  const data = { message: 'Public API' };
+
+  return NextResponse.json(data, {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
+}
+
+// OPTIONS 요청 처리 (preflight)
+export async function OPTIONS(request: Request) {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
+}`}
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/vercel/step5-api-call-ko.png"
+  alt="외부 API 호출 및 응답"
+  caption="날씨 API를 호출하고 가공된 데이터 반환"
+/>
+
+### 타임아웃 및 재시도 로직
+
+<CopyBlock language="typescript">
+{`// lib/api-utils.ts
+export async function fetchWithRetry(
+  url: string,
+  options: RequestInit = {},
+  maxRetries = 3
+): Promise<Response> {
+  let lastError: Error | null = null;
+
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 5000); // 5초 타임아웃
+
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeout);
+
+      if (response.ok) {
+        return response;
+      }
+
+      // 5xx 오류만 재시도
+      if (response.status >= 500) {
+        lastError = new Error(\`HTTP \${response.status}\`);
+        await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1))); // 지수 백오프
+        continue;
+      }
+
+      return response;
+
+    } catch (error) {
+      lastError = error as Error;
+      if (i < maxRetries - 1) {
+        await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+      }
+    }
+  }
+
+  throw lastError || new Error('Max retries exceeded');
+}`}
+</CopyBlock>
+
+사용 예시:
+
+<CopyBlock language="typescript">
+{`import { fetchWithRetry } from '@/lib/api-utils';
+
+export async function GET() {
+  try {
+    const response = await fetchWithRetry('https://api.example.com/data');
+    const data = await response.json();
+    return NextResponse.json(data);
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Failed after retries' },
+      { status: 500 }
+    );
+  }
+}`}
+</CopyBlock>
+
+<Checkpoint>
+- [ ] 외부 API 호출이 성공하나요?
+- [ ] 에러 처리가 올바르게 작동하나요?
+- [ ] CORS 헤더가 추가되었나요?
+- [ ] 타임아웃과 재시도가 정상 작동하나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+## 다음 단계
+
+축하합니다! Vercel Serverless Functions, Edge Functions, Middleware를 성공적으로 구현했습니다. 이제 다음 단계로 넘어갈 준비가 되었습니다:
+
+1. **[Vercel 환경 변수 설정](/guides/vercel-env-setup)** - API 키와 비밀 정보를 안전하게 관리
+2. **Vercel KV/Postgres 연동** - 서버리스 데이터베이스와 함수 연결
+
+<Callout type="tip">
+Functions 탭의 Real-time Logs 기능을 사용하면 프로덕션 환경의 실시간 로그를 볼 수 있습니다. 디버깅에 매우 유용합니다.
+</Callout>
+
+## 문제 해결
+
+### 함수가 타임아웃 오류를 반환해요
+- Hobby 플랜은 최대 10초, Pro 플랜은 60초까지 실행 가능합니다.
+- 긴 작업은 백그라운드 작업이나 큐로 분리하세요.
+- 데이터베이스 쿼리를 최적화하고 인덱스를 추가하세요.
+
+### Edge Function에서 모듈을 찾을 수 없다는 오류
+- Edge Runtime은 Node.js 전용 모듈을 지원하지 않습니다.
+- Web API와 호환되는 라이브러리만 사용하세요.
+- `runtime = 'nodejs'`로 변경하여 일반 서버리스 함수로 전환하세요.
+
+### Middleware가 실행되지 않아요
+- `middleware.ts` 파일이 프로젝트 루트(또는 src/)에 있는지 확인하세요.
+- `config.matcher` 설정이 올바른지 확인하세요.
+- 배포 후에는 빌드 로그에서 Middleware가 인식되었는지 확인하세요.
+
+### CORS 오류가 발생해요
+- OPTIONS 메서드를 구현했는지 확인하세요.
+- `Access-Control-Allow-Origin` 헤더가 모든 응답에 포함되어 있는지 확인하세요.
+- Preflight 요청이 204 상태 코드를 반환하는지 확인하세요.
+
+## 관련 자료
+
+- [Vercel Functions 문서](https://vercel.com/docs/functions)
+- [Edge Functions 가이드](https://vercel.com/docs/functions/edge-functions)
+- [Middleware 문서](https://nextjs.org/docs/app/building-your-application/routing/middleware)
+- [Next.js API Routes](https://nextjs.org/docs/app/building-your-application/routing/route-handlers)
