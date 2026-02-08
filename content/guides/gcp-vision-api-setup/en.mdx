@@ -1,0 +1,542 @@
+# Setup GCP Vision API - Start Image Analysis AI
+
+Google Cloud Vision API provides powerful AI services for **image analysis**, **OCR**, **face detection**, and more. Follow this guide to enable Vision API and run your first image analysis in just 15 minutes!
+
+<FreeTierInfo
+  service="Cloud Vision API"
+  limit="1,000 requests/month"
+  period="Monthly"
+  status="generous"
+/>
+
+## What Can Vision API Do?
+
+<Callout type="info">
+🤖 **Key Vision API Features**
+
+- **Label Detection**: Automatically identify objects, places, activities
+- **Text Recognition (OCR)**: Extract text from images
+- **Face Detection**: Locate faces and analyze emotions
+- **Logo Detection**: Recognize brand logos automatically
+- **Landmark Detection**: Identify famous places and buildings
+- **SafeSearch Detection**: Filter inappropriate content
+- **Web Entities**: Find similar images on the web
+
+**Use Cases**:
+- Automatic photo tagging
+- Business card scanner
+- Document digitization
+- Content moderation
+</Callout>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "GCP account and project created", required: true },
+  { text: "Billing account linked", required: true },
+  { text: "Test image file ready", required: false }
+]} />
+
+<Callout type="tip">
+💡 **Free Tier**: Use up to 1,000 Vision API requests per month for free. Perfect for learning and small projects!
+</Callout>
+
+---
+
+<Step number={1} title="Enable Vision API">
+
+1. Log in to [Google Cloud Console](https://console.cloud.google.com).
+2. Verify the correct project is selected.
+3. Type **"Vision API"** in the top search bar.
+4. Click **Cloud Vision API** from the results.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-vision-api-step1-en.png"
+  alt="Search for Vision API"
+  caption="Find Vision API using the search bar"
+/>
+
+5. Click the **ENABLE** button.
+6. API activation takes a few seconds.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-vision-api-step1b-en.png"
+  alt="Enable Vision API"
+  caption="Click ENABLE to activate the API"
+/>
+
+<Checkpoint
+  title="Verify API Enabled"
+  items={[
+    "Is the API enabled?",
+    "Did you navigate to the 'API enabled' page?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="Create Credentials">
+
+To use Vision API, you need an **API key** or **service account**. We'll create a quick and simple API key.
+
+### 2-1. Navigate to Credentials Page
+
+1. Click **Credentials** in the left menu.
+2. Click **+ CREATE CREDENTIALS** button at the top.
+3. Select **API key** from the dropdown.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-vision-api-step2-en.png"
+  alt="Create credentials"
+  caption="Select API key to create"
+/>
+
+### 2-2. Generate and Copy API Key
+
+1. A popup appears when the API key is generated.
+2. Click **COPY** to copy the API key.
+3. Save it somewhere safe (notepad, password manager, etc.).
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-vision-api-step2b-en.png"
+  alt="API key generated"
+  caption="Copy and securely store your API key"
+/>
+
+<Callout type="warning">
+⚠️ **API Key Security**
+
+API keys are like passwords that anyone can use:
+- Never upload to GitHub, blogs, or public repositories
+- Store in environment variables or config files and add to .gitignore
+- Use service accounts for production
+</Callout>
+
+### 2-3. Restrict API Key (Recommended)
+
+For security, restrict API key usage:
+
+1. Click **Restrict Key** in the popup.
+2. **Application restrictions**:
+   - Development: Select "None"
+   - Production: Select "HTTP referrers" or "IP addresses"
+3. **API restrictions**:
+   - Select "Restrict key"
+   - Check only "Cloud Vision API"
+4. Click **Save**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-vision-api-step2c-en.png"
+  alt="Restrict API key"
+  caption="Restrict to Vision API only for security"
+/>
+
+<DevTip>
+Restricting API keys prevents unauthorized use of other APIs (like Compute Engine) even if the key is exposed, minimizing potential damage.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="Test Vision API - Web Console">
+
+The easiest way is to test directly in the GCP console.
+
+1. Return to the Vision API page.
+2. Click **TRY THIS API** button.
+3. The right panel opens.
+
+### 3-1. Test with Sample Image
+
+1. Sample JSON is pre-filled in the **Request body** section.
+2. Scroll down and click **EXECUTE**.
+3. Click **Allow** when prompted for Google account permissions.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-vision-api-step3-en.png"
+  alt="Test Vision API"
+  caption="Execute sample request to test the API"
+/>
+
+### 3-2. Check Results
+
+Results include information like:
+
+<CopyBlock
+  code='{
+  "responses": [
+    {
+      "labelAnnotations": [
+        {
+          "mid": "/m/0bt9lr",
+          "description": "Dog",
+          "score": 0.97346616,
+          "topicality": 0.97346616
+        },
+        {
+          "mid": "/m/09686",
+          "description": "Vertebrate",
+          "score": 0.9568194,
+          "topicality": 0.9568194
+        }
+      ]
+    }
+  ]
+}'
+  language="json"
+/>
+
+<Callout type="success">
+✅ **Success!** Vision API analyzed the image and detected labels like "Dog" and "Vertebrate" with 97% confidence!
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="Test Vision API - cURL (Command Line)">
+
+In real development, you'll call the API from code or command line. Let's test with cURL.
+
+### 4-1. Prepare Test Image URL
+
+Use a public image URL from the internet. Example:
+```
+https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/June_odd-eyed-cat.jpg/300px-June_odd-eyed-cat.jpg
+```
+
+### 4-2. Execute cURL Command
+
+Open terminal or command prompt and run:
+
+<CopyBlock
+  code='curl -X POST \
+  -H "Content-Type: application/json" \
+  "https://vision.googleapis.com/v1/images:annotate?key=YOUR_API_KEY" \
+  -d "{
+    \"requests\": [
+      {
+        \"image\": {
+          \"source\": {
+            \"imageUri\": \"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/June_odd-eyed-cat.jpg/300px-June_odd-eyed-cat.jpg\"
+          }
+        },
+        \"features\": [
+          {
+            \"type\": \"LABEL_DETECTION\",
+            \"maxResults\": 5
+          }
+        ]
+      }
+    ]
+  }"'
+  language="bash"
+/>
+
+**Note**: Replace `YOUR_API_KEY` with your actual API key from Step 2!
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-vision-api-step4-en.png"
+  alt="Call API with cURL"
+  caption="Call Vision API directly from terminal"
+/>
+
+### 4-3. Check Response
+
+You'll receive a JSON response like:
+
+<CopyBlock
+  code='{
+  "responses": [
+    {
+      "labelAnnotations": [
+        {
+          "mid": "/m/01yrx",
+          "description": "Cat",
+          "score": 0.99012345,
+          "topicality": 0.99012345
+        },
+        {
+          "mid": "/m/0307l",
+          "description": "Whiskers",
+          "score": 0.96123456,
+          "topicality": 0.96123456
+        }
+      ]
+    }
+  ]
+}'
+  language="json"
+/>
+
+<Checkpoint
+  title="Verify API Test Success"
+  items={[
+    "Did the cURL command execute without errors?",
+    "Does the JSON response include labelAnnotations?",
+    "Were relevant labels detected for the image?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={5} title="Test Various Features">
+
+Try other Vision API features!
+
+### 5-1. OCR (Text Recognition)
+
+Extract text from images:
+
+<CopyBlock
+  code='{
+  "requests": [
+    {
+      "image": {
+        "source": {
+          "imageUri": "YOUR_IMAGE_URL_WITH_TEXT"
+        }
+      },
+      "features": [
+        {
+          "type": "TEXT_DETECTION"
+        }
+      ]
+    }
+  ]
+}'
+  language="json"
+/>
+
+### 5-2. Face Detection
+
+Analyze face locations and emotions:
+
+<CopyBlock
+  code='{
+  "requests": [
+    {
+      "image": {
+        "source": {
+          "imageUri": "YOUR_IMAGE_URL_WITH_FACES"
+        }
+      },
+      "features": [
+        {
+          "type": "FACE_DETECTION",
+          "maxResults": 10
+        }
+      ]
+    }
+  ]
+}'
+  language="json"
+/>
+
+### 5-3. Landmark Detection
+
+Recognize famous places and buildings:
+
+<CopyBlock
+  code='{
+  "requests": [
+    {
+      "image": {
+        "source": {
+          "imageUri": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Tour_Eiffel_Wikimedia_Commons.jpg/300px-Tour_Eiffel_Wikimedia_Commons.jpg"
+        }
+      },
+      "features": [
+        {
+          "type": "LANDMARK_DETECTION",
+          "maxResults": 5
+        }
+      ]
+    }
+  ]
+}'
+  language="json"
+/>
+
+Result: "Eiffel Tower" detected!
+
+</Step>
+
+---
+
+<Step number={6} title="Use in Real Code">
+
+Now call Vision API from your programming language.
+
+### 6-1. Python Example
+
+<CopyBlock
+  code='import requests
+import json
+
+API_KEY = "YOUR_API_KEY"
+url = f"https://vision.googleapis.com/v1/images:annotate?key={API_KEY}"
+
+request_body = {
+    "requests": [
+        {
+            "image": {
+                "source": {
+                    "imageUri": "https://example.com/image.jpg"
+                }
+            },
+            "features": [
+                {
+                    "type": "LABEL_DETECTION",
+                    "maxResults": 5
+                }
+            ]
+        }
+    ]
+}
+
+response = requests.post(url, json=request_body)
+result = response.json()
+
+print("Detected labels:")
+for label in result["responses"][0]["labelAnnotations"]:
+    print(f"- {label[\"description\"]}: {label[\"score\"]:.2%}")'
+  language="python"
+/>
+
+### 6-2. Node.js Example
+
+<CopyBlock
+  code='const axios = require("axios");
+
+const API_KEY = "YOUR_API_KEY";
+const url = `https://vision.googleapis.com/v1/images:annotate?key=${API_KEY}`;
+
+const requestBody = {
+  requests: [
+    {
+      image: {
+        source: {
+          imageUri: "https://example.com/image.jpg"
+        }
+      },
+      features: [
+        {
+          type: "LABEL_DETECTION",
+          maxResults: 5
+        }
+      ]
+    }
+  ]
+};
+
+axios.post(url, requestBody)
+  .then(response => {
+    const labels = response.data.responses[0].labelAnnotations;
+    console.log("Detected labels:");
+    labels.forEach(label => {
+      console.log(`- ${label.description}: ${(label.score * 100).toFixed(2)}%`);
+    });
+  })
+  .catch(error => console.error("Error:", error));'
+  language="javascript"
+/>
+
+<Callout type="success">
+🎉 **Complete!** You've enabled Vision API and successfully analyzed images!
+</Callout>
+
+</Step>
+
+---
+
+## Cost Management
+
+<Callout type="info">
+💰 **Vision API Pricing**
+
+- **Free tier**: 1,000 requests/month
+- **Overage pricing**:
+  - Label detection: $0.0015 per request (1,001~5,000,000)
+  - OCR: $0.0015 per request
+  - Face detection: $0.0015 per request
+  - Landmark/Logo detection: $0.0015 per request
+
+**Example**: 5,000 requests/month
+- Free: 1,000 requests
+- Paid: 4,000 × $0.0015 = **$6**
+</Callout>
+
+---
+
+## Next Steps
+
+Now that you've mastered Vision API, try other AI APIs:
+
+1. **[Translation API Setup](../gcp-translation-api-setup)** - Translate 100+ languages
+2. **[Speech-to-Text API Setup](../gcp-speech-to-text-setup)** - Convert speech to text
+3. **[Text-to-Speech API Setup](../gcp-text-to-speech-setup)** - Convert text to speech
+
+---
+
+## Frequently Asked Questions
+
+<Callout type="info">
+**Q. My API key was exposed. What should I do?**
+
+A. Take immediate action:
+1. Go to GCP Console > Credentials
+2. Click delete button next to the exposed API key
+3. Create a new API key
+4. If uploaded to GitHub, remove from commit history immediately
+</Callout>
+
+<Callout type="info">
+**Q. Will I be charged automatically if I exceed the free tier?**
+
+A. Yes. Free trial accounts charge within credit limits, and paid accounts auto-charge. Set up budget alerts!
+</Callout>
+
+<Callout type="info">
+**Q. Can I analyze local image files?**
+
+A. Yes! Encode the image to Base64 and send:
+```json
+{
+  "image": {
+    "content": "BASE64_ENCODED_IMAGE"
+  }
+}
+```
+</Callout>
+
+---
+
+## Troubleshooting
+
+### "API key not valid" error
+
+- Verify API key was copied correctly
+- Check Vision API is allowed in key restrictions
+- Verify key is not disabled
+
+### "Permission denied" error
+
+- Confirm Vision API is enabled
+- Verify working in correct project
+- Check billing account is linked
+
+### No response or slow
+
+- Check network connection
+- Verify image URL is publicly accessible
+- Check image size (max 20MB)
+
+---
+
+**Vision API Setup Complete!** 🎊 Now freely use AI image analysis!

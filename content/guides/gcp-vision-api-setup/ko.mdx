@@ -1,0 +1,542 @@
+# GCP Vision API 설정 - 이미지 분석 AI 시작하기
+
+Google Cloud Vision API는 **이미지 분석**, **OCR**, **얼굴 인식** 등을 제공하는 강력한 AI 서비스입니다. 이 가이드를 따라 15분 안에 Vision API를 활성화하고 첫 번째 이미지 분석을 실행해보세요!
+
+<FreeTierInfo
+  service="Cloud Vision API"
+  limit="월 1,000건"
+  period="매월"
+  status="generous"
+/>
+
+## Vision API로 무엇을 할 수 있나요?
+
+<Callout type="info">
+🤖 **Vision API의 주요 기능**
+
+- **레이블 감지**: 이미지에서 객체, 장소, 활동 등 자동 인식
+- **텍스트 인식 (OCR)**: 이미지 속 텍스트를 텍스트로 추출
+- **얼굴 인식**: 얼굴 위치와 감정 분석
+- **로고 감지**: 브랜드 로고 자동 인식
+- **랜드마크 감지**: 유명한 장소나 건물 인식
+- **부적절한 콘텐츠 감지**: 성인물, 폭력물 등 필터링
+- **웹 엔티티**: 유사한 이미지를 웹에서 검색
+
+**활용 예시**:
+- 사진 앱의 자동 태그
+- 명함 스캐너
+- 문서 디지털화
+- 콘텐츠 모더레이션
+</Callout>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "GCP 계정 및 프로젝트 생성", required: true },
+  { text: "결제 계정 연결", required: true },
+  { text: "테스트할 이미지 파일 준비", required: false }
+]} />
+
+<Callout type="tip">
+💡 **무료 한도**: 매월 1,000건의 Vision API 요청을 무료로 사용할 수 있습니다. 학습과 소규모 프로젝트에 충분합니다!
+</Callout>
+
+---
+
+<Step number={1} title="Vision API 활성화">
+
+1. [Google Cloud Console](https://console.cloud.google.com)에 로그인합니다.
+2. 올바른 프로젝트가 선택되었는지 확인합니다.
+3. 상단 검색창에 **"Vision API"**를 입력합니다.
+4. 검색 결과에서 **Cloud Vision API**를 클릭합니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-vision-api-step1-ko.png"
+  alt="Vision API 검색"
+  caption="검색창에서 Vision API를 찾으세요"
+/>
+
+5. **사용(ENABLE)** 버튼을 클릭합니다.
+6. API 활성화에 몇 초 정도 소요됩니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-vision-api-step1b-ko.png"
+  alt="Vision API 활성화"
+  caption="사용 버튼을 클릭하여 API를 활성화하세요"
+/>
+
+<Checkpoint
+  title="API 활성화 확인"
+  items={[
+    "API가 활성화되었나요?",
+    "'API 및 서비스 사용 설정됨' 페이지로 이동되었나요?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="인증 정보 만들기">
+
+Vision API를 사용하려면 **API 키** 또는 **서비스 계정**이 필요합니다. 여기서는 빠르고 간단한 API 키를 만들겠습니다.
+
+### 2-1. 인증 정보 페이지로 이동
+
+1. 왼쪽 메뉴에서 **사용자 인증 정보(Credentials)**를 클릭합니다.
+2. 상단의 **+ 인증 정보 만들기(CREATE CREDENTIALS)** 버튼을 클릭합니다.
+3. 드롭다운에서 **API 키(API key)**를 선택합니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-vision-api-step2-ko.png"
+  alt="인증 정보 만들기"
+  caption="API 키를 선택하여 생성하세요"
+/>
+
+### 2-2. API 키 생성 및 복사
+
+1. API 키가 생성되면 팝업이 나타납니다.
+2. **키 복사** 버튼을 클릭하여 API 키를 복사합니다.
+3. 안전한 곳에 저장하세요 (메모장, 비밀번호 관리자 등).
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-vision-api-step2b-ko.png"
+  alt="API 키 생성 완료"
+  caption="생성된 API 키를 복사하여 안전하게 보관하세요"
+/>
+
+<Callout type="warning">
+⚠️ **API 키 보안**
+
+API 키는 누구나 사용할 수 있는 비밀번호와 같습니다:
+- GitHub, 블로그 등 공개 저장소에 절대 업로드하지 마세요
+- 환경 변수나 설정 파일에 저장하고 .gitignore에 추가하세요
+- 프로덕션에서는 서비스 계정 사용을 권장합니다
+</Callout>
+
+### 2-3. API 키 제한 설정 (권장)
+
+보안을 위해 API 키 사용을 제한하는 것이 좋습니다:
+
+1. 팝업에서 **키 제한(Restrict Key)** 버튼을 클릭합니다.
+2. **애플리케이션 제한사항**:
+   - 개발 중: "없음" 선택
+   - 프로덕션: "HTTP 리퍼러" 또는 "IP 주소" 선택
+3. **API 제한사항**:
+   - "키 제한" 선택
+   - "Cloud Vision API"만 체크
+4. **저장** 버튼 클릭
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-vision-api-step2c-ko.png"
+  alt="API 키 제한 설정"
+  caption="보안을 위해 Vision API만 사용하도록 제한하세요"
+/>
+
+<DevTip>
+API 키 제한을 설정하면, 키가 노출되더라도 다른 API(예: Compute Engine)에는 사용할 수 없어 피해를 최소화할 수 있습니다.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="Vision API 테스트 - 웹 콘솔">
+
+가장 쉬운 방법은 GCP 콘솔에서 직접 테스트하는 것입니다.
+
+1. Vision API 페이지로 돌아갑니다.
+2. **API 사용해 보기(TRY THIS API)** 버튼을 클릭합니다.
+3. 오른쪽 패널이 열립니다.
+
+### 3-1. 샘플 이미지로 테스트
+
+1. **Request body** 섹션에서 샘플 JSON이 미리 입력되어 있습니다.
+2. 아래로 스크롤하여 **EXECUTE** 버튼을 클릭합니다.
+3. Google 계정 권한 승인 요청이 나타나면 **허용**을 클릭합니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-vision-api-step3-ko.png"
+  alt="Vision API 테스트"
+  caption="샘플 요청을 실행하여 API를 테스트하세요"
+/>
+
+### 3-2. 결과 확인
+
+결과에는 다음과 같은 정보가 포함됩니다:
+
+<CopyBlock
+  code='{
+  "responses": [
+    {
+      "labelAnnotations": [
+        {
+          "mid": "/m/0bt9lr",
+          "description": "Dog",
+          "score": 0.97346616,
+          "topicality": 0.97346616
+        },
+        {
+          "mid": "/m/09686",
+          "description": "Vertebrate",
+          "score": 0.9568194,
+          "topicality": 0.9568194
+        }
+      ]
+    }
+  ]
+}'
+  language="json"
+/>
+
+<Callout type="success">
+✅ **성공!** Vision API가 이미지를 분석하여 "Dog"(개), "Vertebrate"(척추동물) 등의 레이블을 97% 확신도로 감지했습니다!
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="Vision API 테스트 - cURL (커맨드라인)">
+
+실제 개발에서는 API를 코드나 커맨드라인에서 호출합니다. cURL로 테스트해보겠습니다.
+
+### 4-1. 테스트 이미지 URL 준비
+
+인터넷에 있는 공개 이미지 URL을 사용합니다. 예:
+```
+https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/June_odd-eyed-cat.jpg/300px-June_odd-eyed-cat.jpg
+```
+
+### 4-2. cURL 명령 실행
+
+터미널이나 명령 프롬프트를 열고 다음 명령을 실행합니다:
+
+<CopyBlock
+  code='curl -X POST \
+  -H "Content-Type: application/json" \
+  "https://vision.googleapis.com/v1/images:annotate?key=YOUR_API_KEY" \
+  -d "{
+    \"requests\": [
+      {
+        \"image\": {
+          \"source\": {
+            \"imageUri\": \"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/June_odd-eyed-cat.jpg/300px-June_odd-eyed-cat.jpg\"
+          }
+        },
+        \"features\": [
+          {
+            \"type\": \"LABEL_DETECTION\",
+            \"maxResults\": 5
+          }
+        ]
+      }
+    ]
+  }"'
+  language="bash"
+/>
+
+**주의**: `YOUR_API_KEY`를 Step 2에서 복사한 실제 API 키로 교체하세요!
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-vision-api-step4-ko.png"
+  alt="cURL로 API 호출"
+  caption="터미널에서 Vision API를 직접 호출하세요"
+/>
+
+### 4-3. 응답 확인
+
+JSON 형식으로 다음과 같은 응답을 받습니다:
+
+<CopyBlock
+  code='{
+  "responses": [
+    {
+      "labelAnnotations": [
+        {
+          "mid": "/m/01yrx",
+          "description": "Cat",
+          "score": 0.99012345,
+          "topicality": 0.99012345
+        },
+        {
+          "mid": "/m/0307l",
+          "description": "Whiskers",
+          "score": 0.96123456,
+          "topicality": 0.96123456
+        }
+      ]
+    }
+  ]
+}'
+  language="json"
+/>
+
+<Checkpoint
+  title="API 테스트 성공 확인"
+  items={[
+    "cURL 명령이 에러 없이 실행되었나요?",
+    "JSON 응답에 labelAnnotations가 포함되어 있나요?",
+    "이미지와 관련된 레이블이 감지되었나요?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={5} title="다양한 기능 테스트">
+
+Vision API의 다른 기능들도 테스트해보세요!
+
+### 5-1. OCR (텍스트 인식)
+
+텍스트가 포함된 이미지에서 글자를 추출합니다:
+
+<CopyBlock
+  code='{
+  "requests": [
+    {
+      "image": {
+        "source": {
+          "imageUri": "YOUR_IMAGE_URL_WITH_TEXT"
+        }
+      },
+      "features": [
+        {
+          "type": "TEXT_DETECTION"
+        }
+      ]
+    }
+  ]
+}'
+  language="json"
+/>
+
+### 5-2. 얼굴 인식
+
+얼굴의 위치와 감정을 분석합니다:
+
+<CopyBlock
+  code='{
+  "requests": [
+    {
+      "image": {
+        "source": {
+          "imageUri": "YOUR_IMAGE_URL_WITH_FACES"
+        }
+      },
+      "features": [
+        {
+          "type": "FACE_DETECTION",
+          "maxResults": 10
+        }
+      ]
+    }
+  ]
+}'
+  language="json"
+/>
+
+### 5-3. 랜드마크 인식
+
+유명한 장소나 건물을 인식합니다:
+
+<CopyBlock
+  code='{
+  "requests": [
+    {
+      "image": {
+        "source": {
+          "imageUri": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Tour_Eiffel_Wikimedia_Commons.jpg/300px-Tour_Eiffel_Wikimedia_Commons.jpg"
+        }
+      },
+      "features": [
+        {
+          "type": "LANDMARK_DETECTION",
+          "maxResults": 5
+        }
+      ]
+    }
+  ]
+}'
+  language="json"
+/>
+
+결과: "Eiffel Tower" (에펠탑) 감지!
+
+</Step>
+
+---
+
+<Step number={6} title="실제 코드에서 사용하기">
+
+이제 프로그래밍 언어로 Vision API를 호출해보세요.
+
+### 6-1. Python 예제
+
+<CopyBlock
+  code='import requests
+import json
+
+API_KEY = "YOUR_API_KEY"
+url = f"https://vision.googleapis.com/v1/images:annotate?key={API_KEY}"
+
+request_body = {
+    "requests": [
+        {
+            "image": {
+                "source": {
+                    "imageUri": "https://example.com/image.jpg"
+                }
+            },
+            "features": [
+                {
+                    "type": "LABEL_DETECTION",
+                    "maxResults": 5
+                }
+            ]
+        }
+    ]
+}
+
+response = requests.post(url, json=request_body)
+result = response.json()
+
+print("감지된 레이블:")
+for label in result["responses"][0]["labelAnnotations"]:
+    print(f"- {label[\"description\"]}: {label[\"score\"]:.2%}")'
+  language="python"
+/>
+
+### 6-2. Node.js 예제
+
+<CopyBlock
+  code='const axios = require("axios");
+
+const API_KEY = "YOUR_API_KEY";
+const url = `https://vision.googleapis.com/v1/images:annotate?key=${API_KEY}`;
+
+const requestBody = {
+  requests: [
+    {
+      image: {
+        source: {
+          imageUri: "https://example.com/image.jpg"
+        }
+      },
+      features: [
+        {
+          type: "LABEL_DETECTION",
+          maxResults: 5
+        }
+      ]
+    }
+  ]
+};
+
+axios.post(url, requestBody)
+  .then(response => {
+    const labels = response.data.responses[0].labelAnnotations;
+    console.log("감지된 레이블:");
+    labels.forEach(label => {
+      console.log(`- ${label.description}: ${(label.score * 100).toFixed(2)}%`);
+    });
+  })
+  .catch(error => console.error("에러:", error));'
+  language="javascript"
+/>
+
+<Callout type="success">
+🎉 **완료!** Vision API를 활성화하고 이미지 분석까지 성공했습니다!
+</Callout>
+
+</Step>
+
+---
+
+## 비용 관리
+
+<Callout type="info">
+💰 **Vision API 가격**
+
+- **무료 한도**: 월 1,000건
+- **초과 요금**:
+  - 레이블 감지: 건당 $0.0015 (1,001~5,000,000건)
+  - OCR: 건당 $0.0015
+  - 얼굴 감지: 건당 $0.0015
+  - 랜드마크/로고 감지: 건당 $0.0015
+
+**예시**: 월 5,000건 사용 시
+- 무료: 1,000건
+- 유료: 4,000건 × $0.0015 = **$6**
+</Callout>
+
+---
+
+## 다음 단계
+
+Vision API를 마스터했으니, 다른 AI API도 사용해보세요:
+
+1. **[Translation API 세팅](../gcp-translation-api-setup)** - 100개 이상 언어 자동 번역
+2. **[Speech-to-Text API 세팅](../gcp-speech-to-text-setup)** - 음성을 텍스트로 변환
+3. **[Text-to-Speech API 세팅](../gcp-text-to-speech-setup)** - 텍스트를 음성으로 변환
+
+---
+
+## 자주 묻는 질문
+
+<Callout type="info">
+**Q. API 키가 노출되었어요. 어떻게 하나요?**
+
+A. 즉시 조치가 필요합니다:
+1. GCP 콘솔 > 인증 정보로 이동
+2. 노출된 API 키 옆의 삭제 버튼 클릭
+3. 새 API 키 생성
+4. GitHub 등에 업로드했다면 즉시 커밋 히스토리에서도 제거
+</Callout>
+
+<Callout type="info">
+**Q. 무료 한도를 초과하면 자동으로 과금되나요?**
+
+A. 네. 무료 체험 계정에서는 크레딧 범위 내에서 과금되며, 유료 계정으로 전환하면 자동 과금됩니다. 예산 알림을 설정하세요!
+</Callout>
+
+<Callout type="info">
+**Q. 로컬 이미지 파일도 분석할 수 있나요?**
+
+A. 네! 이미지를 Base64로 인코딩하여 전송하면 됩니다:
+```json
+{
+  "image": {
+    "content": "BASE64_ENCODED_IMAGE"
+  }
+}
+```
+</Callout>
+
+---
+
+## 문제 해결
+
+### "API key not valid" 에러
+
+- API 키를 정확히 복사했는지 확인
+- API 키 제한 설정에서 Vision API가 허용되었는지 확인
+- 키가 비활성화되지 않았는지 확인
+
+### "Permission denied" 에러
+
+- Vision API가 활성화되었는지 확인
+- 올바른 프로젝트에서 작업 중인지 확인
+- 결제 계정이 연결되었는지 확인
+
+### 응답이 없거나 느려요
+
+- 네트워크 연결 확인
+- 이미지 URL이 공개적으로 접근 가능한지 확인
+- 이미지 크기 확인 (최대 20MB)
+
+---
+
+**Vision API 설정 완료!** 🎊 이제 AI 이미지 분석을 자유롭게 사용해보세요!

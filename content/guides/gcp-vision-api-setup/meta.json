@@ -1,0 +1,63 @@
+{
+  "slug": "gcp-vision-api-setup",
+  "platform": "gcp",
+  "service": "Cloud Vision API",
+  "category": "ai-ml",
+  "difficulty": "beginner",
+  "estimatedMinutes": 15,
+  "totalSteps": 6,
+  "freeTier": {
+    "service": "Cloud Vision API",
+    "limit": "월 1,000건",
+    "period": "month",
+    "amount": "무료",
+    "status": "generous",
+    "conditions": [
+      "월 1,000건 무료 (모든 기능)",
+      "초과 시 건당 $0.0015~$0.006",
+      "무료 크레딧으로도 사용 가능"
+    ]
+  },
+  "prerequisites": [
+    "gcp-account-setup",
+    "gcp-project-create"
+  ],
+  "nextGuides": [
+    "gcp-translation-api-setup",
+    "gcp-speech-to-text-setup"
+  ],
+  "seo": {
+    "ko": {
+      "title": "GCP Vision API 설정 - 이미지 분석 AI 사용법 | CloudSetup.guide",
+      "description": "Google Cloud Vision API를 활성화하고 첫 번째 이미지 분석을 실행하는 방법을 6단계로 배워보세요. API 키 생성부터 실제 테스트까지 완벽 가이드.",
+      "keywords": [
+        "GCP Vision API",
+        "Google Cloud Vision",
+        "이미지 분석 API",
+        "OCR API",
+        "AI 이미지 인식",
+        "Vision API 설정",
+        "GCP API 키",
+        "클라우드 비전"
+      ]
+    },
+    "en": {
+      "title": "Setup GCP Vision API - Image Analysis AI Guide | CloudSetup.guide",
+      "description": "Learn how to enable Google Cloud Vision API and run your first image analysis in 6 easy steps. Complete guide from API key creation to testing.",
+      "keywords": [
+        "GCP Vision API",
+        "Google Cloud Vision",
+        "image analysis API",
+        "OCR API",
+        "AI image recognition",
+        "Vision API setup",
+        "GCP API key",
+        "cloud vision"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T03:00:00.000Z",
+  "updatedAt": "2026-02-08T03:00:00.000Z",
+  "lastVerified": "2026-02-08T03:00:00.000Z",
+  "published": true
+}
