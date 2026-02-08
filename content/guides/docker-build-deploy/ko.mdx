@@ -1,0 +1,476 @@
+# Docker 이미지 빌드 및 컨테이너 배포
+
+이제 Docker 설치가 완료되었으니, 직접 애플리케이션 이미지를 만들어 보겠습니다. 이 가이드에서는 Node.js 애플리케이션을 예로 들어 Dockerfile을 작성하고 배포하는 전 과정을 배웁니다.
+
+<FreeTierInfo
+  service="Docker Community Edition"
+  limit="무제한 빌드 및 배포"
+  period="영구 무료"
+  status="generous"
+/>
+
+## Dockerfile이란?
+
+<Callout type="info">
+📋 **Dockerfile은 이미지의 설계도입니다**
+
+Dockerfile에는 다음이 포함됩니다:
+- **베이스 이미지**: 기반이 될 OS/런타임 [예: node:18]
+- **작업 디렉토리**: 컨테이너 내부 작업 경로
+- **파일 복사**: 호스트의 파일을 컨테이너로 복사
+- **의존성 설치**: npm install 같은 설정 명령어
+- **실행 명령어**: 컨테이너가 시작할 때 실행할 명령어
+
+예시:
+```
+FROM node:18
+WORKDIR /app
+COPY . .
+RUN npm install
+CMD ["npm", "start"]
+```
+</Callout>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "Docker Desktop 설치 완료", required: true },
+  { text: "Node.js 샘플 애플리케이션 준비", required: true },
+  { text: "기본 터미널/CLI 사용법", required: false }
+]} />
+
+---
+
+<Step number={1} title="샘플 Node.js 애플리케이션 준비">
+
+먼저 프로젝트 디렉토리를 만들고 필요한 파일을 생성합니다:
+
+<CopyBlock
+  code="mkdir my-docker-app
+cd my-docker-app"
+  language="bash"
+/>
+
+**package.json** 파일을 생성합니다:
+
+<CopyBlock
+  code="cat > package.json << 'EOF'
+{
+  \"name\": \"my-docker-app\",
+  \"version\": \"1.0.0\",
+  \"description\": \"Simple Docker Node.js app\",
+  \"main\": \"app.js\",
+  \"scripts\": {
+    \"start\": \"node app.js\"
+  },
+  \"dependencies\": {
+    \"express\": \"^4.18.2\"
+  }
+}
+EOF"
+  language="bash"
+/>
+
+**app.js** 파일을 생성합니다:
+
+<CopyBlock
+  code="cat > app.js << 'EOF'
+const express = require('express');
+const app = express();
+const PORT = 3000;
+
+app.get('/', (req, res) => {
+  res.send('Hello from Docker!');
+});
+
+app.listen(PORT, () => {
+  console.log('Server running on port ' + PORT);
+});
+EOF"
+  language="bash"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/docker/docker-build-deploy-step1-ko.png"
+  alt="프로젝트 구조"
+  caption="디렉토리 구조: package.json과 app.js"
+  priority={true}
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="Dockerfile 작성">
+
+프로젝트 루트에 **Dockerfile** [대문자, 확장자 없음]을 생성합니다:
+
+<CopyBlock
+  code="cat > Dockerfile << 'EOF'
+# 1. 베이스 이미지 선택
+FROM node:18-alpine
+
+# 2. 컨테이너 내 작업 디렉토리 설정
+WORKDIR /app
+
+# 3. package.json과 package-lock.json 복사
+COPY package*.json ./
+
+# 4. 의존성 설치
+RUN npm install --production
+
+# 5. 애플리케이션 코드 복사
+COPY . .
+
+# 6. 컨테이너가 사용할 포트 선언
+EXPOSE 3000
+
+# 7. 컨테이너 시작 시 실행할 명령어
+CMD [\"npm\", \"start\"]
+EOF"
+  language="bash"
+/>
+
+<Callout type="tip">
+💡 **Dockerfile 작성 팁**
+
+- **FROM**: 항상 첫 번째 줄에서 베이스 이미지 지정
+- **WORKDIR**: 반드시 설정하여 경로 충돌 방지
+- **COPY**: 먼저 package.json만 복사하여 캐시 활용
+- **RUN**: npm install은 모든 파일 복사 전에 실행
+- **EXPOSE**: 문서화 목적 [실제 포트 매핑은 별도]
+- **CMD**: 이미지를 실행할 때의 기본 명령어
+
+베이스 이미지 선택:
+- `node:18`: 최신 안정 버전
+- `node:18-alpine`: 가볍고 빠름 [권장]
+- `node:18-slim`: 중간 크기
+</Callout>
+
+<DevTip>
+**.dockerignore 파일 [선택사항]**
+
+Dockerfile이 있는 디렉토리에 .dockerignore를 만들어 제외할 파일을 지정하면 빌드 속도가 빨라집니다:
+
+```
+node_modules
+npm-debug.log
+.git
+.gitignore
+README.md
+.env
+```
+</DevTip>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/docker/docker-build-deploy-step2-ko.png"
+  alt="Dockerfile 작성"
+  caption="Dockerfile의 구조와 각 줄의 역할"
+/>
+
+</Step>
+
+---
+
+<Step number={3} title="Docker 이미지 빌드">
+
+Dockerfile이 있는 디렉토리에서 다음을 실행합니다:
+
+<CopyBlock
+  code="docker build -t my-app:1.0 ."
+  language="bash"
+/>
+
+명령어의 의미:
+- `docker build`: 이미지를 빌드하는 명령어
+- `-t my-app:1.0`: 이미지에 태그 지정 [repository:tag 형식]
+- `.`: 현재 디렉토리에서 Dockerfile 찾기
+
+빌드 진행 상황:
+
+<CopyBlock
+  code="Sending build context to Docker daemon
+Step 1/7 : FROM node:18-alpine
+18-alpine: Pulling from library/node
+Step 2/7 : WORKDIR /app
+Step 3/7 : COPY package*.json ./
+Step 4/7 : RUN npm install --production
+Step 5/7 : COPY . .
+Step 6/7 : EXPOSE 3000
+Step 7/7 : CMD [\"npm\", \"start\"]
+Successfully built abc123def456
+Successfully tagged my-app:1.0"
+  language="bash"
+/>
+
+<Checkpoint
+  title="빌드 확인"
+  items={[
+    "빌드가 \"Successfully built\" 메시지로 끝났나요?",
+    "이미지가 \"Successfully tagged\" 되었나요?"
+  ]}
+/>
+
+<Callout type="info">
+**빌드 과정 설명**
+
+1. Docker 클라이언트가 빌드 컨텍스트 전송
+2. 각 Dockerfile 줄마다 중간 이미지 생성
+3. 각 단계의 결과가 캐시됨 [다음 빌드 시 빠름]
+4. 최종 이미지가 생성되고 태그 지정
+</Callout>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/docker/docker-build-deploy-step3-ko.png"
+  alt="Docker 빌드 진행"
+  caption="빌드 과정에서 각 Step이 차례대로 실행됩니다"
+/>
+
+</Step>
+
+---
+
+<Step number={4} title="빌드된 이미지 확인">
+
+빌드가 완료되면 이미지 목록을 확인해봅시다:
+
+<CopyBlock
+  code="docker images"
+  language="bash"
+/>
+
+출력:
+
+<CopyBlock
+  code="REPOSITORY   TAG       IMAGE ID       CREATED          SIZE
+my-app       1.0       abc123def456   2 minutes ago    150MB
+node         18-alpine xyz789uvw012   2 weeks ago      130MB
+hello-world  latest    abc1234d5e67   5 months ago     13kB"
+  language="bash"
+/>
+
+이미지 세부 정보 확인:
+
+<CopyBlock
+  code="docker inspect my-app:1.0"
+  language="bash"
+/>
+
+<DevTip>
+**태그 이해하기**
+
+- `my-app:1.0`: repository는 "my-app", tag는 "1.0"
+- 같은 이미지에 여러 태그 가능: `my-app:latest`, `my-app:1.0`
+- 태그 없으면 자동으로 `:latest` 추가
+
+예:
+```
+docker build -t my-app:1.0 .  # 특정 버전
+docker build -t my-app:latest .  # 최신 버전
+docker tag my-app:1.0 my-app:latest  # 기존 이미지에 태그 추가
+```
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={5} title="컨테이너 실행 및 테스트">
+
+빌드한 이미지로 컨테이너를 실행합니다:
+
+<CopyBlock
+  code="docker run -d -p 3000:3000 --name my-container my-app:1.0"
+  language="bash"
+/>
+
+명령어의 의미:
+- `docker run`: 컨테이너 실행
+- `-d`: 백그라운드에서 실행 [Detached mode]
+- `-p 3000:3000`: 포트 매핑 [호스트:컨테이너]
+- `--name my-container`: 컨테이너 이름 지정
+- `my-app:1.0`: 사용할 이미지
+
+실행 중인 컨테이너 확인:
+
+<CopyBlock
+  code="docker ps"
+  language="bash"
+/>
+
+출력:
+
+<CopyBlock
+  code="CONTAINER ID   IMAGE        COMMAND          CREATED         STATUS         PORTS                    NAMES
+abc123def456   my-app:1.0   \"npm start\"   10 seconds ago  Up 8 seconds   0.0.0.0:3000->3000/tcp   my-container"
+  language="bash"
+/>
+
+### 애플리케이션 테스트
+
+브라우저에서 `http://localhost:3000`을 방문하거나 터미널에서:
+
+<CopyBlock
+  code="curl http://localhost:3000"
+  language="bash"
+/>
+
+응답:
+
+<CopyBlock
+  code="Hello from Docker!"
+  language="bash"
+/>
+
+<Callout type="success">
+✅ **축하합니다!** Docker 컨테이너가 성공적으로 실행되었습니다!
+</Callout>
+
+### 컨테이너 로그 확인
+
+<CopyBlock
+  code="docker logs my-container"
+  language="bash"
+/>
+
+출력:
+
+<CopyBlock
+  code="Server running on port 3000"
+  language="bash"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/docker/docker-build-deploy-step5-ko.png"
+  alt="컨테이너 실행 및 테스트"
+  caption="브라우저에서 localhost:3000 접속 결과"
+/>
+
+<Checkpoint
+  title="컨테이너 배포 확인"
+  items={[
+    "docker ps에서 컨테이너가 UP 상태인가요?",
+    "curl 또는 브라우저에서 정상 응답이 나오나요?",
+    "docker logs에서 서버 시작 메시지가 보이나요?"
+  ]}
+/>
+
+</Step>
+
+---
+
+## 컨테이너 관리 명령어
+
+### 실행 중인 컨테이너 중지
+
+<CopyBlock
+  code="docker stop my-container"
+  language="bash"
+/>
+
+### 중지된 컨테이너 다시 시작
+
+<CopyBlock
+  code="docker start my-container"
+  language="bash"
+/>
+
+### 컨테이너 제거
+
+<CopyBlock
+  code="docker rm my-container"
+  language="bash"
+/>
+
+### 이미지 제거
+
+<CopyBlock
+  code="docker rmi my-app:1.0"
+  language="bash"
+/>
+
+---
+
+## Docker Hub에 이미지 배포 [선택사항]
+
+### 1. Docker Hub 계정 로그인
+
+<CopyBlock
+  code="docker login"
+  language="bash"
+/>
+
+### 2. 이미지 태그 변경
+
+<CopyBlock
+  code="docker tag my-app:1.0 [username]/my-app:1.0"
+  language="bash"
+/>
+
+### 3. Docker Hub에 푸시
+
+<CopyBlock
+  code="docker push [username]/my-app:1.0"
+  language="bash"
+/>
+
+### 4. Docker Hub에서 다운로드하여 실행
+
+<CopyBlock
+  code="docker run -d -p 3000:3000 [username]/my-app:1.0"
+  language="bash"
+/>
+
+---
+
+## 다음 단계
+
+Docker 빌드 및 배포가 완료되었으니, 이제 클라우드 플랫폼에 배포해보세요:
+
+1. **[Heroku 앱 배포](../heroku-app-deployment)** - Docker 이미지를 Heroku에 배포하세요
+2. **[PlanetScale 데이터베이스](../planetscale-account-setup)** - 데이터베이스를 추가해보세요
+
+---
+
+## 자주 묻는 질문
+
+<Callout type="info">
+**Q. Dockerfile 없이 컨테이너를 만들 수 있나요?**
+
+A. 기존 이미지를 실행한 후 변경하고 commit으로 저장할 수 있지만, Dockerfile 사용이 베스트 프랙티스입니다.
+</Callout>
+
+<Callout type="info">
+**Q. 컨테이너가 왜 `docker run` 후 바로 종료되나요?**
+
+A. 실행할 프로세스가 없으면 컨테이너가 종료됩니다. Dockerfile의 CMD가 계속 실행되는 프로세스여야 합니다.
+</Callout>
+
+<Callout type="info">
+**Q. 포트 3000이 이미 사용 중이면?**
+
+A. `-p 8000:3000` 처럼 다른 호스트 포트 사용: `docker run -d -p 8000:3000 my-app:1.0`
+</Callout>
+
+---
+
+## 문제 해결
+
+### "COPY failed: file not found"
+
+- Dockerfile이 프로젝트 루트에 있는지 확인
+- 파일 경로가 정확한지 확인
+
+### "npm ERR! code ERESOLVE"
+
+- npm 버전 문제일 수 있습니다
+- Dockerfile에서 `npm ci --production` 사용 시도
+
+### "Cannot connect to container"
+
+- 포트 매핑이 올바른지 확인: `docker port container-name`
+- 방화벽 설정 확인
+
+---
+
+**축하합니다!** 🎉 Docker 이미지 빌드와 배포를 완료했습니다!

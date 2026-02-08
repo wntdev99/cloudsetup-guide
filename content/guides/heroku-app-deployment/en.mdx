@@ -1,0 +1,450 @@
+# Deploy Heroku App - Node.js/Python Application Deployment
+
+Let's deploy a Node.js or Python application to Heroku. Heroku makes deployment as simple as a git push.
+
+<FreeTierInfo
+  service="Heroku Dyno Hours"
+  limit="1,000 free dyno-hours per month"
+  period="Per month"
+  status="limited"
+/>
+
+## What is Procfile?
+
+<Callout type="info">
+📄 **Procfile tells Heroku how to run your app**
+
+Procfile's role:
+- **Process definition**: Specify how to run the application
+- **Port setup**: Use the port Heroku assigns
+- **Scale configuration**: Define process types and counts
+
+Example:
+```
+web: npm start
+worker: node worker.js
+```
+
+First line is web process, second is background worker.
+</Callout>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Heroku account and CLI installed", required: true },
+  { text: "Git installed and repository initialized", required: true },
+  { text: "Node.js or Python application", required: true }
+]} />
+
+---
+
+<Step number={1} title="Create Procfile">
+
+Create a **Procfile** file [no extension] at project root:
+
+### Node.js Application
+
+<CopyBlock
+  code="echo 'web: npm start' > Procfile"
+  language="bash"
+/>
+
+Or custom command:
+
+<CopyBlock
+  code="echo 'web: node server.js' > Procfile"
+  language="bash"
+/>
+
+### Python Application
+
+For Flask:
+
+<CopyBlock
+  code="echo 'web: gunicorn app:app' > Procfile"
+  language="bash"
+/>
+
+For Django:
+
+<CopyBlock
+  code="echo 'web: gunicorn myproject.wsgi' > Procfile"
+  language="bash"
+/>
+
+<Callout type="tip">
+💡 **Procfile Writing Tips**
+
+Node.js:
+- `npm start` must match scripts.start in package.json
+- Common: `node app.js` or `npm start`
+
+Python:
+- Flask: gunicorn required
+- Django: also need gunicorn
+- Specify version: `python-3.11.0` in runtime.txt
+</Callout>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/heroku/heroku-app-deployment-step1-en.png"
+  alt="Create Procfile"
+  caption="Procfile created at project root"
+  priority={true}
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="Set Environment Variables [Optional]">
+
+Manage sensitive information with environment variables:
+
+<CopyBlock
+  code="heroku config:set DATABASE_URL=your_database_url"
+  language="bash"
+/>
+
+Or add all from .env:
+
+<CopyBlock
+  code="heroku config:set $(cat .env | sed 's/^/-e /')"
+  language="bash"
+/>
+
+Check environment variables:
+
+<CopyBlock
+  code="heroku config"
+  language="bash"
+/>
+
+<Callout type="warning">
+⚠️ **Security Precautions**
+
+- Set API keys, database URLs as environment variables
+- Add .env to .gitignore
+- Never put secrets in Procfile
+</Callout>
+
+### Use Environment Variables in Node.js
+
+<CopyBlock
+  code="const dbUrl = process.env.DATABASE_URL;
+const apiKey = process.env.API_KEY;"
+  language="javascript"
+/>
+
+### Use Environment Variables in Python
+
+<CopyBlock
+  code="import os
+
+db_url = os.getenv('DATABASE_URL')
+api_key = os.getenv('API_KEY')"
+  language="python"
+/>
+
+<DevTip>
+**Port Configuration**
+
+Heroku assigns ports dynamically:
+
+Node.js:
+```
+const PORT = process.env.PORT || 3000;
+app.listen(PORT);
+```
+
+Python Flask:
+```
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+```
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="Prepare Git Repository">
+
+If project isn't a Git repo:
+
+<CopyBlock
+  code="git init
+git add .
+git commit -m 'Initial commit for Heroku deployment'"
+  language="bash"
+/>
+
+Create Heroku app:
+
+<CopyBlock
+  code="heroku create my-awesome-app"
+  language="bash"
+/>
+
+Or use auto-generated name:
+
+<CopyBlock
+  code="heroku create"
+  language="bash"
+/>
+
+<Callout type="info">
+**Heroku App Naming Rules**
+
+- Only lowercase, numbers, hyphens
+- 3-30 characters
+- Globally unique
+
+Examples:
+- `my-awesome-app` ✅
+- `blog-app-2024` ✅
+- `MyAwesomeApp` ❌ (no uppercase)
+</Callout>
+
+Verify created apps:
+
+<CopyBlock
+  code="heroku apps"
+  language="bash"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/heroku/heroku-app-deployment-step3-en.png"
+  alt="Prepare Git repository"
+  caption="Git remote automatically set after heroku create"
+/>
+
+</Step>
+
+---
+
+<Step number={4} title="Deploy to Heroku">
+
+Deploy with a simple git push:
+
+<CopyBlock
+  code="git push heroku main"
+  language="bash"
+/>
+
+Or for master branch:
+
+<CopyBlock
+  code="git push heroku master"
+  language="bash"
+/>
+
+Deployment progress:
+
+<CopyBlock
+  code="Enumerating objects: 45, done.
+Counting objects: 100% [45/45]
+Compressing objects: 100% [45/45]
+Writing objects: 100% [45/45]
+
+-----> Building on the Heroku platform
+-----> Using buildpack: heroku/nodejs
+-----> Nodejs app detected
+-----> Installing node modules
+npm install
+-----> Launching...
+released v1
+https://my-awesome-app.herokuapp.com/ deployed to Heroku
+
+Verifying deploy... done."
+  language="bash"
+/>
+
+<Checkpoint
+  title="Verify Deployment"
+  items={[
+    "Did deployment end with 'released v1' message?",
+    "Was an app URL generated?",
+    "Were there no error messages?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **Congratulations!** Your application deployed successfully!
+</Callout>
+
+</Step>
+
+---
+
+<Step number={5} title="Test and Monitor Deployed App">
+
+### Visit Your App
+
+<CopyBlock
+  code="heroku open"
+  language="bash"
+/>
+
+Browser opens automatically. Or manually visit:
+
+<CopyBlock
+  code="https://my-awesome-app.herokuapp.com"
+  language="bash"
+/>
+
+### Check Logs
+
+<CopyBlock
+  code="heroku logs --tail"
+  language="bash"
+/>
+
+Real-time logs:
+
+<CopyBlock
+  code="heroku logs --tail --dyno=web.1"
+  language="bash"
+/>
+
+Check last 50 lines:
+
+<CopyBlock
+  code="heroku logs -n 50"
+  language="bash"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/heroku/heroku-app-deployment-step5-en.png"
+  alt="Test app"
+  caption="Deployed app running correctly in browser"
+/>
+
+### Check App Information
+
+<CopyBlock
+  code="heroku info"
+  language="bash"
+/>
+
+Sample output:
+
+<CopyBlock
+  code="=== my-awesome-app
+Dynos:
+Dyno Types: web
+Git URL: https://git.heroku.com/my-awesome-app.git
+Web URL: https://my-awesome-app.herokuapp.com/
+Region: us
+Released At: 2024-02-08T10:30:00Z"
+  language="bash"
+/>
+
+<Checkpoint
+  title="Verify After Deployment"
+  items={[
+    "Does heroku open show your app working?",
+    "Are there no errors in heroku logs?",
+    "Does app.json have all required info?"
+  ]}
+/>
+
+</Step>
+
+---
+
+## How to Redeploy
+
+After code changes, redeploy:
+
+<CopyBlock
+  code="git add .
+git commit -m 'Fix: update app logic'
+git push heroku main"
+  language="bash"
+/>
+
+---
+
+## Deploy from Heroku Dashboard
+
+Or enable auto-deploy from GitHub:
+
+1. Go to [Heroku Dashboard](https://dashboard.heroku.com)
+2. Select your app
+3. Go to **Deploy** tab
+4. Click **Connect to GitHub**
+5. Select your repository
+6. Enable **Automatic Deploys**
+
+Now pushing to main branch auto-deploys.
+
+---
+
+## Scaling [Advanced]
+
+Adjust number of dynos:
+
+<CopyBlock
+  code="heroku ps:scale web=2"
+  language="bash"
+/>
+
+Or adjust in Resources tab on dashboard.
+
+---
+
+## Next Steps
+
+App deployment complete, now add a database:
+
+1. **[PlanetScale Account Setup](../planetscale-account-setup)** - Setup MySQL database
+2. **[Connect PlanetScale](../planetscale-database-connection)** - Connect database to app
+
+---
+
+## Frequently Asked Questions
+
+<Callout type="info">
+**Q. App terminated immediately after deploy**
+
+A. Process in Procfile may have stopped. Check error with heroku logs.
+</Callout>
+
+<Callout type="info">
+**Q. Node modules not recognized**
+
+A. Verify package.json is at project root. Heroku auto-detects it.
+</Callout>
+
+<Callout type="info">
+**Q. Need to use port other than 3000?**
+
+A. In Procfile: `web: PORT=5000 npm start` or use process.env.PORT in code
+</Callout>
+
+---
+
+## Troubleshooting
+
+### "No default language detected"
+
+- Need package.json [Node.js] or requirements.txt [Python] at root
+- Verify it's committed to Git
+
+### "Procfile not found"
+
+- Verify Procfile at project root [capital P, no extension]
+- Verify it's added to Git
+
+### "Dyno crashed"
+
+<CopyBlock
+  code="heroku logs --tail"
+  language="bash"
+/>
+
+Check error message in logs
+
+---
+
+**Congratulations!** 🎉 Heroku deployment complete!

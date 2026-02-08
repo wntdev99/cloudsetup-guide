@@ -1,0 +1,313 @@
+# Heroku 계정 생성 및 CLI 설치
+
+Heroku는 애플리케이션을 쉽게 배포할 수 있는 클라우드 플랫폼입니다. 이 가이드에서는 Heroku 계정을 만들고 CLI를 설치하는 방법을 배웁니다.
+
+<FreeTierInfo
+  service="Heroku Dyno Hours"
+  limit="월 1,000 무료 dyno 시간"
+  period="매월"
+  status="limited"
+/>
+
+## Heroku란?
+
+<Callout type="info">
+🚀 **Heroku는 개발자 친화적인 배포 플랫폼입니다**
+
+Heroku의 주요 특징:
+- **Git 배포**: Git push만으로 자동 배포
+- **무료 선택지**: 무료 tier로 시작 가능
+- **애드온**: 데이터베이스, 캐시 등 추가 서비스
+- **자동 스케일링**: 트래픽 증가 시 자동 확장
+- **여러 언어 지원**: Node.js, Python, Ruby, Java, PHP 등
+
+예시:
+- `my-blog`: 블로그 애플리케이션
+- `api-server`: REST API 서버
+- `data-processing`: 데이터 처리 작업
+</Callout>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "유효한 이메일 주소", required: true },
+  { text: "인터넷 연결", required: true },
+  { text: "Git 설치 [선택사항]", required: false }
+]} />
+
+---
+
+<Step number={1} title="Heroku 계정 만들기">
+
+1. [Heroku 공식 웹사이트](https://www.heroku.com)에 접속합니다.
+2. 상단의 **Sign up** 버튼을 클릭합니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/heroku/heroku-account-setup-step1-ko.png"
+  alt="Heroku 홈페이지"
+  caption="Heroku 공식 사이트의 Sign up 버튼"
+  priority={true}
+/>
+
+### 회원가입 양식 작성
+
+다음 정보를 입력합니다:
+
+1. **First Name**: 이름
+2. **Last Name**: 성
+3. **Email**: 유효한 이메일 주소
+4. **Company Name**: 회사명 [선택사항]
+5. **Phone Number**: 전화번호 [선택사항]
+
+<Callout type="tip">
+💡 **Heroku 무료 계정의 장점**
+
+- 신용카드 불필요 [기본 기능]
+- 매월 1,000시간 무료 dyno 시간
+- 최대 5개 앱 배포 가능
+- 공개 저장소라면 자동 배포 가능
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="이메일 인증">
+
+1. 가입한 이메일을 확인합니다.
+2. Heroku에서 보낸 인증 이메일을 찾습니다.
+3. 이메일에서 **Verify email address** 링크를 클릭합니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/heroku/heroku-account-setup-step2-ko.png"
+  alt="이메일 인증"
+  caption="Heroku 인증 이메일의 확인 링크"
+/>
+
+### 비밀번호 설정
+
+1. 인증 후 강력한 비밀번호를 설정합니다.
+2. 다음 요구사항을 만족해야 합니다:
+   - 최소 8자 이상
+   - 대문자 포함
+   - 숫자 포함
+   - 특수문자 포함
+
+<Callout type="warning">
+⚠️ **보안 주의사항**
+
+- 비밀번호는 안전한 곳에 보관하세요
+- 다른 사이트와 동일한 비밀번호 사용 금지
+- Heroku API 키도 절대 공유하면 안 됩니다
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="Heroku CLI 설치">
+
+### macOS 설치
+
+Homebrew가 설치되어 있다면:
+
+<CopyBlock
+  code="brew tap heroku/brew && brew install heroku"
+  language="bash"
+/>
+
+또는 [다운로드](https://devcenter.heroku.com/articles/heroku-cli)에서 설치 파일을 받습니다.
+
+### Windows 설치
+
+1. [Heroku CLI Windows 설치 파일](https://devcenter.heroku.com/articles/heroku-cli)을 다운로드합니다.
+2. 설치 파일을 실행하고 설치 마법사를 따릅니다.
+3. 설치 후 명령 프롬프트를 다시 시작합니다.
+
+### Linux 설치
+
+<CopyBlock
+  code="curl https://cli-assets.heroku.com/install.sh | sh"
+  language="bash"
+/>
+
+또는 Snap 사용:
+
+<CopyBlock
+  code="sudo snap install heroku --classic"
+  language="bash"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/heroku/heroku-account-setup-step3-ko.png"
+  alt="Heroku CLI 설치"
+  caption="터미널에서 heroku 명령어 실행"
+/>
+
+</Step>
+
+---
+
+<Step number={4} title="Heroku CLI 로그인 및 확인">
+
+터미널을 열고 다음을 실행합니다:
+
+<CopyBlock
+  code="heroku --version"
+  language="bash"
+/>
+
+출력:
+
+<CopyBlock
+  code="heroku/8.7.0 [platform] [node-version]"
+  language="bash"
+/>
+
+### Heroku에 로그인
+
+<CopyBlock
+  code="heroku login"
+  language="bash"
+/>
+
+브라우저가 자동으로 열리고 로그인 페이지가 표시됩니다. 또는:
+
+<CopyBlock
+  code="heroku login -i"
+  language="bash"
+/>
+
+이 경우 터미널에서 직접 이메일과 비밀번호를 입력합니다.
+
+<Callout type="info">
+**로그인 후 확인**
+
+다음 명령어를 실행하여 로그인 상태를 확인합니다:
+
+```
+heroku auth:whoami
+```
+
+출력되어야 할 정보:
+- 로그인한 이메일 주소
+- API 키 [masking됨]
+</Callout>
+
+### 계정 정보 확인
+
+<CopyBlock
+  code="heroku whoami"
+  language="bash"
+/>
+
+로그인한 계정의 이메일이 표시됩니다:
+
+<CopyBlock
+  code="your-email@example.com"
+  language="bash"
+/>
+
+<Checkpoint
+  title="Heroku 설정 확인"
+  items={[
+    "heroku --version 명령어가 작동하나요?",
+    "Heroku 계정으로 성공적으로 로그인했나요?",
+    "heroku whoami로 계정 정보가 표시되나요?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **축하합니다!** Heroku 계정 설정이 완료되었습니다. 이제 앱을 배포할 준비가 되었습니다!
+</Callout>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/heroku/heroku-account-setup-step4-ko.png"
+  alt="Heroku 로그인 확인"
+  caption="heroku whoami 명령어로 계정 확인"
+/>
+
+</Step>
+
+---
+
+## Heroku 대시보드 살펴보기
+
+로그인 후 [Heroku 대시보드](https://dashboard.heroku.com)에서:
+
+1. **Apps**: 배포한 애플리케이션 목록
+2. **Personal**: 계정 설정
+3. **Account Settings**: 이메일, 비밀번호 변경
+4. **Applications**: API 키 관리
+
+---
+
+## Heroku 앱 생성 [대시보드]
+
+또는 CLI로도 가능합니다:
+
+<CopyBlock
+  code="heroku create my-app-name"
+  language="bash"
+/>
+
+이 명령어는:
+- Heroku에 새 앱 생성
+- Git remote 자동 설정
+- 앱 URL 할당
+
+---
+
+## 다음 단계
+
+Heroku 계정과 CLI 설정이 완료되었으니, 이제 앱을 배포해보세요:
+
+1. **[Heroku 앱 배포](../heroku-app-deployment)** - Node.js/Python 앱을 배포하세요
+2. **[Docker 빌드 및 배포](../docker-build-deploy)** - Docker 컨테이너를 사용해보세요
+
+---
+
+## 자주 묻는 질문
+
+<Callout type="info">
+**Q. 무료 tier의 dyno는 얼마나 오래 실행되나요?**
+
+A. 30분 동안 요청이 없으면 슬립 모드로 진입합니다. 다시 요청이 오면 깨어납니다 [약 30초 소요].
+</Callout>
+
+<Callout type="info">
+**Q. Heroku 무료 tier가 없어지나요?**
+
+A. Heroku는 2025년 이후 무료 dyno를 단계적으로 폐지할 예정입니다. 현재는 아직 사용 가능합니다.
+</Callout>
+
+<Callout type="info">
+**Q. CLI 없이 앱을 배포할 수 있나요?**
+
+A. 네, Heroku 대시보드에서 GitHub 연동으로 자동 배포 가능합니다.
+</Callout>
+
+---
+
+## 문제 해결
+
+### "heroku: command not found"
+
+- Heroku CLI가 설치되지 않았거나 PATH에 없습니다
+- 설치를 다시 시도하거나 터미널을 다시 시작합니다
+
+### "Not authenticated" 에러
+
+- `heroku logout`으로 로그아웃 후 다시 로그인
+- 또는 `~/.netrc` 파일 확인 [인증 정보 저장]
+
+### CLI 업데이트
+
+<CopyBlock
+  code="heroku update"
+  language="bash"
+/>
+
+---
+
+**축하합니다!** 🚀 Heroku 계정 설정이 완료되었습니다!

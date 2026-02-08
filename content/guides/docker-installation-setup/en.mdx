@@ -1,0 +1,311 @@
+# Install and Setup Docker - Start Container Development
+
+Docker is a tool that packages applications and their dependencies into standardized units called containers. Follow this guide to install Docker Desktop and run your first container!
+
+<FreeTierInfo
+  service="Docker Community Edition"
+  limit="Unlimited containers and images"
+  period="Forever free"
+  status="generous"
+/>
+
+## What is Docker?
+
+<Callout type="info">
+🐳 **Docker is a containerization platform**
+
+Key features of Docker:
+- **Environment consistency**: Run the same environment as development
+- **Fast deployment**: Much faster startup than virtual machines
+- **Resource efficiency**: Each container is lightweight and independent
+- **Version control**: Precise version management through images
+- **Scalability**: Easily manage multiple containers
+
+Examples:
+- `nodejs-app`: For Node.js applications
+- `postgres-db`: For PostgreSQL database
+- `nginx-server`: For Nginx web server
+</Callout>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Admin rights [Windows/Mac]", required: true },
+  { text: "Sufficient disk space [2GB minimum]", required: true },
+  { text: "Internet connection", required: true }
+]} />
+
+---
+
+<Step number={1} title="Download Docker Desktop">
+
+### macOS Installation
+
+1. Visit [Docker official website](https://www.docker.com/products/docker-desktop).
+2. Click the **Download for Mac** button at the top.
+3. Select based on your Mac's CPU:
+   - **Apple Silicon [M1/M2/M3]**: For newer Macs
+   - **Intel Chip**: For older Macs
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/docker/docker-installation-step1-en.png"
+  alt="Docker Desktop download page"
+  caption="Download Mac version from Docker official site"
+  priority={true}
+/>
+
+### Windows Installation
+
+1. Click the **Download for Windows** button.
+2. WSL 2 [Windows Subsystem for Linux] will be installed automatically.
+3. Download the Docker Desktop installer file.
+
+<Callout type="warning">
+⚠️ **Windows Requirements**
+
+- Windows 10 Pro, Enterprise, Education or higher
+- Or Windows 11
+- Hyper-V support is required
+</Callout>
+
+### Linux Installation
+
+1. Linux uses a different installation method.
+2. Open a terminal and run these commands:
+
+<CopyBlock
+  code="curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh"
+  language="bash"
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="Install and Run Docker Desktop">
+
+### macOS and Windows
+
+1. Run the downloaded installer file.
+2. Follow the installation process [takes about 2-3 minutes].
+3. Once installation completes, find Docker in Applications and launch it.
+4. Docker is running when the icon appears in your menu bar.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/docker/docker-installation-step2-en.png"
+  alt="Docker installation progress"
+  caption="Installation progress screen - requires admin password"
+/>
+
+<Callout type="tip">
+💡 **Tip**: When you first run Docker, it will ask for your system password. Docker needs admin rights to use the Hypervisor [virtualization technology].
+</Callout>
+
+### Linux
+
+After installation, docker commands are immediately available. To add your user to the docker group:
+
+<CopyBlock
+  code="sudo usermod -aG docker $USER
+newgrp docker"
+  language="bash"
+/>
+
+</Step>
+
+---
+
+<Step number={3} title="Verify Installation">
+
+Open a terminal or command prompt and type:
+
+<CopyBlock
+  code="docker --version"
+  language="bash"
+/>
+
+You should see output like:
+
+<CopyBlock
+  code="Docker version 24.0.0, build abcdef123"
+  language="bash"
+/>
+
+For more detailed information:
+
+<CopyBlock
+  code="docker info"
+  language="bash"
+/>
+
+This command shows Docker daemon status, container count, image count, and more.
+
+<Checkpoint
+  title="Verify Installation"
+  items={[
+    "Did the docker --version command run successfully?",
+    "Is the version number displayed?",
+    "Did you verify the status with docker info?"
+  ]}
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/docker/docker-installation-step3-en.png"
+  alt="Docker version verification"
+  caption="Docker command execution result in terminal"
+/>
+
+</Step>
+
+---
+
+<Step number={4} title="Run Your First Container">
+
+Let's run a Hello World container to verify installation:
+
+<CopyBlock
+  code="docker run hello-world"
+  language="bash"
+/>
+
+If successful, you'll see output like:
+
+<CopyBlock
+  code="Hello from Docker!
+This message shows that your installation appears to be working correctly.
+
+To generate this message, Docker took the following steps:
+1. The Docker client contacted the Docker daemon
+2. The Docker daemon pulled the hello-world image
+3. The Docker daemon created a new container
+4. The Docker daemon streamed that output to the Docker client"
+  language="bash"
+/>
+
+<Callout type="success">
+✅ **Congratulations!** Docker is installed correctly and your first container ran successfully!
+</Callout>
+
+<DevTip>
+**Docker Images and Containers Concept**
+
+- **Image**: Template or blueprint for an application
+- **Container**: Running instance of an image
+
+Example:
+- When you run the `hello-world` image, it creates a hello-world container
+- You can create multiple containers from the same image
+</DevTip>
+
+</Step>
+
+---
+
+## After Installation - Verification Steps
+
+### Check System Requirements Met
+
+<CopyBlock
+  code="docker ps
+docker ps -a
+docker images"
+  language="bash"
+/>
+
+What each command does:
+- `docker ps`: List of running containers
+- `docker ps -a`: List of all containers [including stopped ones]
+- `docker images`: List of installed images
+
+### Docker Hub Login [Optional]
+
+To share images later, create a Docker Hub account and login:
+
+<CopyBlock
+  code="docker login"
+  language="bash"
+/>
+
+---
+
+## Next Steps
+
+Docker installation is complete, now let's get started:
+
+1. **[Docker Build and Deploy](../docker-build-deploy)** - Create containers yourself
+2. **[Deploy Heroku App](../heroku-app-deployment)** - Deploy containers to the cloud
+
+---
+
+## Platform-Specific Additional Setup
+
+### macOS - Rosetta 2 [Apple Silicon]
+
+To run Intel-based images on Apple Silicon Mac:
+
+<CopyBlock
+  code="docker run --platform linux/amd64 [image-name]"
+  language="bash"
+/>
+
+### Windows - Verify WSL 2
+
+Check if you're using WSL 2 on Windows:
+
+<CopyBlock
+  code="wsl --version"
+  language="bash"
+/>
+
+Or in Docker Desktop settings:
+- Click **Settings** [gear icon]
+- Go to **Resources**
+- Check **WSL Integration**
+
+---
+
+## Frequently Asked Questions
+
+<Callout type="info">
+**Q. Is Docker really free?**
+
+A. Yes, Docker Community Edition is completely free. You can use it without limits.
+</Callout>
+
+<Callout type="info">
+**Q. What's the difference between Docker and virtual machines?**
+
+A. Docker uses OS-level virtualization, making it much faster and lighter than virtual machines.
+</Callout>
+
+<Callout type="info">
+**Q. Can I run all images on M1/M2 Macs?**
+
+A. Most work, but some Intel-only images need emulation with the --platform flag.
+</Callout>
+
+---
+
+## Troubleshooting
+
+### "Cannot connect to Docker daemon"
+
+- Verify Docker Desktop is running
+- Check the menu bar for the Docker icon on Mac/Windows
+- Try restarting Docker
+
+### "Permission denied while trying to connect to Docker daemon" [Linux]
+
+- Add user to docker group: `sudo usermod -aG docker $USER`
+- Restart your terminal or run `newgrp docker`
+
+### Windows: "WSL 2 installation is incomplete"
+
+- Run Windows PowerShell as administrator
+- Run `wsl --install`
+- Restart your system
+
+---
+
+**Congratulations!** 🐳 Docker installation is complete. You're now ready to containerize real applications!

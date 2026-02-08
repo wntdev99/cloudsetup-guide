@@ -1,0 +1,507 @@
+# OpenAI API 통합 - Node.js/Python 애플리케이션에서 AI 사용하기
+
+이제 실제 애플리케이션에서 OpenAI API를 사용해봅시다. ChatGPT, GPT-4, 이미지 생성 등 다양한 기능을 활용할 수 있습니다.
+
+<FreeTierInfo
+  service="OpenAI API"
+  limit="$5 크레딧 이후 종량제"
+  period="요청 기반"
+  status="limited"
+/>
+
+## OpenAI API 통합 개요
+
+<Callout type="info">
+🚀 **OpenAI API를 애플리케이션에 통합하는 방법**
+
+통합 방식:
+- **REST API**: HTTP 요청으로 직접 호출
+- **SDK**: 공식 라이브러리 사용 [권장]
+- **스트리밍**: 응답을 실시간 스트리밍
+- **배치 처리**: 대량의 요청을 일괄 처리
+
+주요 기능:
+- Chat Completions: 대화형 AI
+- Embeddings: 텍스트 유사도 검색
+- Images: 이미지 생성
+- Transcriptions: 음성을 텍스트로
+</Callout>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "OpenAI API 키", required: true },
+  { text: "Node.js 또는 Python 설치", required: true },
+  { text: "npm 또는 pip", required: true },
+  { text: "환경 변수 설정", required: true }
+]} />
+
+---
+
+<Step number={1} title="라이브러리 설치 및 기초 설정">
+
+### Node.js
+
+라이브러리 설치:
+
+<CopyBlock
+  code="npm install openai dotenv"
+  language="bash"
+/>
+
+환경 변수 설정:
+
+<CopyBlock
+  code="cat > .env << 'EOF'
+OPENAI_API_KEY=sk-proj-xxxxx
+EOF"
+  language="bash"
+/>
+
+기초 설정:
+
+<CopyBlock
+  code="const OpenAI = require('openai').default;
+require('dotenv').config();
+
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
+
+module.exports = client;"
+  language="javascript"
+/>
+
+### Python
+
+라이브러리 설치:
+
+<CopyBlock
+  code="pip install openai python-dotenv"
+  language="bash"
+/>
+
+환경 변수 설정:
+
+<CopyBlock
+  code="cat > .env << 'EOF'
+OPENAI_API_KEY=sk-proj-xxxxx
+EOF"
+  language="bash"
+/>
+
+기초 설정:
+
+<CopyBlock
+  code="import os
+from dotenv import load_dotenv
+from openai import OpenAI
+
+load_dotenv()
+
+client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))"
+  language="python"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/openai/openai-api-integration-step1-ko.png"
+  alt="라이브러리 설치"
+  caption="OpenAI SDK 라이브러리 설치"
+  priority={true}
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="Chat Completion 사용하기">
+
+가장 기본적인 기능은 Chat Completion입니다.
+
+### Node.js 예제
+
+<CopyBlock
+  code="const client = require('./openai-client');
+
+async function chat(userMessage) {
+  try {
+    const response = await client.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        {
+          role: 'system',
+          content: 'You are a helpful assistant.'
+        },
+        {
+          role: 'user',
+          content: userMessage
+        }
+      ],
+      max_tokens: 500,
+      temperature: 0.7
+    });
+
+    return response.choices[0].message.content;
+  } catch (error) {
+    console.error('Error:', error);
+    throw error;
+  }
+}
+
+chat('What is the capital of France?').then(response => {
+  console.log('Assistant:', response);
+});"
+  language="javascript"
+/>
+
+### Python 예제
+
+<CopyBlock
+  code="import client from openai
+
+def chat(user_message):
+    try:
+        response = client.chat.completions.create(
+            model='gpt-3.5-turbo',
+            messages=[
+                {
+                    'role': 'system',
+                    'content': 'You are a helpful assistant.'
+                },
+                {
+                    'role': 'user',
+                    'content': user_message
+                }
+            ],
+            max_tokens=500,
+            temperature=0.7
+        )
+        return response.choices[0].message.content
+    except Exception as error:
+        print('Error:', error)
+        raise
+
+response = chat('What is the capital of France?')
+print('Assistant:', response)"
+  language="python"
+/>
+
+<Callout type="tip">
+💡 **Chat Completion 파라미터**
+
+- `model`: 사용할 모델 [gpt-3.5-turbo, gpt-4]
+- `messages`: 대화 이력 배열
+- `max_tokens`: 응답의 최대 토큰 수
+- `temperature`: 응답의 창의성 [0-2, 기본값 1]
+  - 0에 가까울수록 일관성 높음
+  - 2에 가까울수록 창의성 높음
+</Callout>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/openai/openai-api-integration-step2-ko.png"
+  alt="Chat Completion"
+  caption="OpenAI Chat API 응답 예제"
+/>
+
+</Step>
+
+---
+
+<Step number={3} title="대화 이력 관리">
+
+사용자와의 대화 이력을 유지하는 것이 중요합니다.
+
+### Node.js 예제
+
+<CopyBlock
+  code="class Chatbot {
+  constructor() {
+    this.conversationHistory = [];
+  }
+
+  addMessage(role, content) {
+    this.conversationHistory.push({
+      role: role,
+      content: content
+    });
+  }
+
+  async chat(userMessage) {
+    this.addMessage('user', userMessage);
+
+    const response = await client.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        { role: 'system', content: 'You are helpful.' },
+        ...this.conversationHistory
+      ],
+      max_tokens: 500
+    });
+
+    const assistantMessage = response.choices[0].message.content;
+    this.addMessage('assistant', assistantMessage);
+
+    return assistantMessage;
+  }
+}
+
+const bot = new Chatbot();
+bot.chat('My name is John').then(r => console.log(r));
+bot.chat('What is my name?').then(r => console.log(r));"
+  language="javascript"
+/>
+
+### Python 예제
+
+<CopyBlock
+  code="class Chatbot:
+    def __init__(self):
+        self.conversation_history = []
+
+    def add_message(self, role, content):
+        self.conversation_history.append({
+            'role': role,
+            'content': content
+        })
+
+    def chat(self, user_message):
+        self.add_message('user', user_message)
+
+        response = client.chat.completions.create(
+            model='gpt-3.5-turbo',
+            messages=[
+                {'role': 'system', 'content': 'You are helpful.'},
+                *self.conversation_history
+            ],
+            max_tokens=500
+        )
+
+        assistant_message = response.choices[0].message.content
+        self.add_message('assistant', assistant_message)
+        return assistant_message
+
+bot = Chatbot()
+print(bot.chat('My name is John'))
+print(bot.chat('What is my name?'))"
+  language="python"
+/>
+
+<DevTip>
+**대화 이력 관리 팁**
+
+- 메모리 절약을 위해 오래된 메시지 제거
+- 데이터베이스에 이력 저장
+- 사용자별로 별도 이력 관리
+- 토큰 수 체크하여 비용 제어
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={4} title="이미지 생성">
+
+DALL-E를 사용하여 이미지를 생성할 수 있습니다.
+
+### Node.js 예제
+
+<CopyBlock
+  code="async function generateImage(prompt) {
+  try {
+    const response = await client.images.generate({
+      model: 'dall-e-3',
+      prompt: prompt,
+      n: 1,
+      size: '1024x1024',
+      quality: 'standard'
+    });
+
+    return response.data[0].url;
+  } catch (error) {
+    console.error('Error:', error);
+    throw error;
+  }
+}
+
+generateImage('A cat wearing a hat').then(url => {
+  console.log('Image URL:', url);
+});"
+  language="javascript"
+/>
+
+### Python 예제
+
+<CopyBlock
+  code="def generate_image(prompt):
+    try:
+        response = client.images.generate(
+            model='dall-e-3',
+            prompt=prompt,
+            n=1,
+            size='1024x1024',
+            quality='standard'
+        )
+        return response.data[0].url
+    except Exception as error:
+        print('Error:', error)
+        raise
+
+url = generate_image('A cat wearing a hat')
+print('Image URL:', url)"
+  language="python"
+/>
+
+<Callout type="warning">
+⚠️ **이미지 생성 비용**
+
+- DALL-E 3은 비교적 비쌈
+- 1024x1024: $0.020
+- 1024x1792: $0.030
+- 한도 설정으로 예상치 못한 비용 방지
+</Callout>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/openai/openai-api-integration-step4-ko.png"
+  alt="이미지 생성"
+  caption="DALL-E를 이용한 이미지 생성"
+/>
+
+</Step>
+
+---
+
+<Step number={5} title="에러 처리 및 최적화">
+
+실제 운영 환경에서는 에러 처리가 필수입니다.
+
+### Node.js 예제
+
+<CopyBlock
+  code="const client = require('./openai-client');
+
+async function safeChat(message) {
+  try {
+    const response = await client.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        { role: 'user', content: message }
+      ],
+      max_tokens: 500,
+      timeout: 30000
+    });
+
+    if (!response.choices || response.choices.length === 0) {
+      throw new Error('Empty response');
+    }
+
+    return response.choices[0].message.content;
+  } catch (error) {
+    if (error.status === 401) {
+      console.error('Invalid API key');
+    } else if (error.status === 429) {
+      console.error('Rate limit exceeded');
+    } else if (error.status === 500) {
+      console.error('OpenAI server error');
+    } else {
+      console.error('Unknown error:', error.message);
+    }
+    throw error;
+  }
+}
+
+safeChat('Hello').then(console.log).catch(console.error);"
+  language="javascript"
+/>
+
+### Python 예제
+
+<CopyBlock
+  code="from openai import RateLimitError, APIError
+
+def safe_chat(message):
+    try:
+        response = client.chat.completions.create(
+            model='gpt-3.5-turbo',
+            messages=[
+                {'role': 'user', 'content': message}
+            ],
+            max_tokens=500,
+            timeout=30
+        )
+
+        if not response.choices:
+            raise ValueError('Empty response')
+
+        return response.choices[0].message.content
+    except RateLimitError:
+        print('Rate limit exceeded, retrying...')
+    except APIError as e:
+        if e.status_code == 401:
+            print('Invalid API key')
+        elif e.status_code == 500:
+            print('OpenAI server error')
+        else:
+            print('API error:', e.message)
+        raise
+
+try:
+    result = safe_chat('Hello')
+    print(result)
+except Exception as e:
+    print('Error:', e)"
+  language="python"
+/>
+
+<Checkpoint
+  title="API 통합 확인"
+  items={[
+    "Chat Completion이 작동하나요?",
+    "대화 이력이 유지되나요?",
+    "에러 처리가 구현되었나요?",
+    "API 비용을 모니터링하고 있나요?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **축하합니다!** OpenAI API 통합이 완료되었습니다!
+</Callout>
+
+</Step>
+
+---
+
+## 비용 최적화 팁
+
+1. **모델 선택**: gpt-3.5-turbo는 gpt-4보다 훨씬 저렴
+2. **토큰 제한**: max_tokens 설정으로 비용 제어
+3. **배치 처리**: 여러 요청을 한 번에 처리
+4. **캐싱**: 자주 사용하는 응답을 캐시
+
+---
+
+## 다음 단계
+
+OpenAI API 통합이 완료되었으니, 더 고급 기능을 사용해보세요:
+
+1. **[Slack 통합](../slack-integration-setup)** - Slack 봇에 AI 기능 추가
+2. **[Docker 배포](../docker-build-deploy)** - AI 애플리케이션을 컨테이너화
+
+---
+
+## 자주 묻는 질문
+
+<Callout type="info">
+**Q. 응답이 너무 길어요**
+
+A. max_tokens을 줄이거나 temperature를 낮추세요.
+</Callout>
+
+<Callout type="info">
+**Q. API 호출이 느려요**
+
+A. 타임아웃 증가, 배치 처리, 또는 gpt-3.5-turbo 사용을 고려하세요.
+</Callout>
+
+---
+
+**축하합니다!** 🚀 OpenAI 통합이 완료되었습니다!

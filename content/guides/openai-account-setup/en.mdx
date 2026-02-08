@@ -1,0 +1,341 @@
+# Create OpenAI Account and Get API Keys
+
+OpenAI API provides various AI features including ChatGPT, GPT-4, and image generation. Learn how to create an account and get API keys.
+
+<FreeTierInfo
+  service="OpenAI API Credits"
+  limit="$5 trial credit for new accounts"
+  period="One-time"
+  status="limited"
+/>
+
+## What is OpenAI API?
+
+<Callout type="info">
+🤖 **OpenAI API is interface to access generative AI models**
+
+Key features:
+- **Chat Completion**: Conversational AI like ChatGPT
+- **Text Generation**: Text generation and completion
+- **Image Generation**: DALL-E image generation
+- **Embedding**: Text vectorization
+- **Speech**: Speech synthesis and recognition
+
+Popular models:
+- `gpt-4`: Latest high-performance model
+- `gpt-3.5-turbo`: Best value model
+- `dall-e-3`: Image generation
+- `whisper`: Speech recognition
+</Callout>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Valid email address", required: true },
+  { text: "Credit/debit card", required: false },
+  { text: "Phone number [Optional]", required: false }
+]} />
+
+---
+
+<Step number={1} title="Create OpenAI Account">
+
+1. Visit [OpenAI official website](https://openai.com).
+2. Click **Sign up** button in the top menu.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/openai/openai-account-setup-step1-en.png"
+  alt="OpenAI homepage"
+  caption="Sign up button on OpenAI website"
+  priority={true}
+/>
+
+### Account Registration Options
+
+Choose one:
+
+1. **Email**: Sign up with email
+2. **Google**: Sign up with Google account
+3. **Microsoft**: Sign up with Microsoft account
+
+All methods provide the same result.
+
+<Callout type="tip">
+💡 **Signup Tips**
+
+- Business email recommended
+- Fastest with Google or Microsoft accounts
+- Email can be changed later
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Email Verification and Profile Setup">
+
+### Email Verification
+
+1. Check email from OpenAI
+2. Click **Verify email address** link
+3. Enter profile info after verification
+
+### Profile Information
+
+Enter the following:
+
+1. **First Name**: Your first name
+2. **Last Name**: Your last name
+3. **Organization Name**: Organization name [Optional]
+4. **Phone Number**: Phone number [Optional]
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/openai/openai-account-setup-step2-en.png"
+  alt="Enter profile"
+  caption="OpenAI profile setup"
+/>
+
+### Select Usage Purpose
+
+- **Personal**: Personal projects
+- **Company**: Company/business
+- **Education**: Educational purposes
+
+<Callout type="info">
+**Get $5 Credit**
+
+- Automatically provided to new accounts
+- Must be used within 3 months
+- After that, pay-as-you-go billing
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="Setup Billing Information [Optional]">
+
+Setup billing to continue after free credits expire.
+
+### Add Payment Method
+
+1. Go to account settings
+2. Click **Billing** or **Payment** tab
+3. Click **Add payment method**
+4. Enter credit/debit card info
+
+### Set Usage Limits [Recommended]
+
+Control costs by setting limits:
+
+1. Go to **Billing** tab
+2. **Usage limits** section
+3. **Soft limit**: Alert amount [e.g., $10]
+4. **Hard limit**: Stop API amount [e.g., $20]
+
+<Callout type="warning">
+⚠️ **Cost Precautions**
+
+- Pay-per-use pricing model
+- Different cost per model
+- Set limits to prevent unexpected charges
+- Monitor usage regularly
+
+Price examples:
+- gpt-3.5-turbo: Very affordable
+- gpt-4: More expensive but better performance
+- DALL-E: Charged per image
+</Callout>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/openai/openai-account-setup-step3-en.png"
+  alt="Setup billing"
+  caption="OpenAI payment method and usage limits"
+/>
+
+</Step>
+
+---
+
+<Step number={4} title="Generate and Secure API Keys">
+
+### Generate API Key
+
+1. Login to [OpenAI API Dashboard](https://platform.openai.com)
+2. Click **API keys** or **Billing and usage** in left menu
+3. Click **Create new secret key** or **+Create new secret key** button
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/openai/openai-account-setup-step4-en.png"
+  alt="Generate API key"
+  caption="Create API key in OpenAI dashboard"
+/>
+
+### Copy and Save API Key
+
+1. Generated API key displays
+2. Click **Copy** button to copy
+3. Save in secure place [e.g., password manager]
+
+<Callout type="warning">
+⚠️ **API Key Security Precautions**
+
+- Never share API key publicly
+- Don't hardcode in application
+- Save in .env file
+- Never commit to GitHub
+- Regenerate immediately if exposed
+
+Wrong example:
+```
+const apiKey = 'sk-xxxxx'; // NEVER!
+```
+
+Right example:
+```
+const apiKey = process.env.OPENAI_API_KEY;
+```
+</Callout>
+
+### Manage with Environment Variables
+
+**.env file:**
+
+<CopyBlock
+  code="OPENAI_API_KEY=sk-proj-xxxxx"
+  language="bash"
+/>
+
+**.gitignore:**
+
+<CopyBlock
+  code="echo '.env' >> .gitignore"
+  language="bash"
+/>
+
+### View API Key List
+
+In API dashboard:
+- View all API keys
+- Check last usage date
+- Disable or delete keys if needed
+
+<Checkpoint
+  title="Verify API Setup"
+  items={[
+    "Is your OpenAI account created?",
+    "Did you generate API key?",
+    "Did you save API key securely?",
+    "Did you set usage limits?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **Congratulations!** OpenAI API setup complete. You're ready to use the API!
+</Callout>
+
+</Step>
+
+---
+
+## Explore OpenAI API Dashboard
+
+### API keys
+- Manage and generate API keys
+- Disable/delete keys
+- Check last usage time
+
+### Usage
+- Real-time API usage tracking
+- Cost tracking
+- Request statistics
+
+### Billing
+- Payment method management
+- Billing history
+- Usage limit settings
+
+### Organization
+- Add team members
+- Manage roles and permissions
+- Organization settings
+
+---
+
+## Next Steps
+
+OpenAI API setup complete, now use the API:
+
+1. **[Integrate OpenAI API](../openai-api-integration)** - Use API in Node.js/Python
+2. **[Setup Slack Integration](../slack-integration-setup)** - Add AI to Slack bot
+
+---
+
+## Pricing by Model [2024]
+
+<CopyBlock
+  code="GPT-4 Turbo:
+  - Input: $0.01 per 1K tokens
+  - Output: $0.03 per 1K tokens
+
+GPT-3.5 Turbo:
+  - Input: $0.0005 per 1K tokens
+  - Output: $0.0015 per 1K tokens
+
+DALL-E 3:
+  - 1024x1024: $0.020 per image
+  - 1024x1792: $0.030 per image
+
+Token concept:
+- About 4 characters = 1 token
+- Non-ASCII text uses more tokens"
+  language="bash"
+/>
+
+---
+
+## Frequently Asked Questions
+
+<Callout type="info">
+**Q. How far does $5 credit go?**
+
+A. With gpt-3.5-turbo, approximately 10,000 API calls.
+</Callout>
+
+<Callout type="info">
+**Q. What if API key is exposed?**
+
+A. Immediately disable key in dashboard and generate new one.
+</Callout>
+
+<Callout type="info">
+**Q. Which model should I use?**
+
+A. Cost saving: gpt-3.5-turbo / Performance: gpt-4
+</Callout>
+
+---
+
+## Troubleshooting
+
+### "Authentication failed"
+
+- Verify API key is correct
+- Verify API key was copied
+- Check for "sk-" prefix
+
+### "Rate limit exceeded"
+
+- Limit API call frequency
+- Check usage limits
+- Wait before retrying
+
+### Key not working
+
+- Regenerate API key
+- Create new .env file
+- Reload environment variables
+
+---
+
+**Congratulations!** 🤖 OpenAI API setup complete!

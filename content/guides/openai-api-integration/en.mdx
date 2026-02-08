@@ -1,0 +1,507 @@
+# Integrate OpenAI API - Use ChatGPT/GPT-4 in Applications
+
+Let's use OpenAI API in real applications. You can leverage ChatGPT, GPT-4, image generation, and more.
+
+<FreeTierInfo
+  service="OpenAI API"
+  limit="Pay-as-you-go after $5 trial"
+  period="Per request"
+  status="limited"
+/>
+
+## OpenAI API Integration Overview
+
+<Callout type="info">
+🚀 **Ways to integrate OpenAI API into applications**
+
+Integration methods:
+- **REST API**: Direct HTTP calls
+- **SDK**: Official library [recommended]
+- **Streaming**: Real-time response streaming
+- **Batch**: Process large request volumes
+
+Key features:
+- Chat Completions: Conversational AI
+- Embeddings: Text similarity search
+- Images: Image generation
+- Transcriptions: Speech to text
+</Callout>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "OpenAI API key", required: true },
+  { text: "Node.js or Python installed", required: true },
+  { text: "npm or pip", required: true },
+  { text: "Environment variables set", required: true }
+]} />
+
+---
+
+<Step number={1} title="Install Library and Setup">
+
+### Node.js
+
+Install library:
+
+<CopyBlock
+  code="npm install openai dotenv"
+  language="bash"
+/>
+
+Set environment variables:
+
+<CopyBlock
+  code="cat > .env << 'EOF'
+OPENAI_API_KEY=sk-proj-xxxxx
+EOF"
+  language="bash"
+/>
+
+Basic setup:
+
+<CopyBlock
+  code="const OpenAI = require('openai').default;
+require('dotenv').config();
+
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
+
+module.exports = client;"
+  language="javascript"
+/>
+
+### Python
+
+Install library:
+
+<CopyBlock
+  code="pip install openai python-dotenv"
+  language="bash"
+/>
+
+Set environment variables:
+
+<CopyBlock
+  code="cat > .env << 'EOF'
+OPENAI_API_KEY=sk-proj-xxxxx
+EOF"
+  language="bash"
+/>
+
+Basic setup:
+
+<CopyBlock
+  code="import os
+from dotenv import load_dotenv
+from openai import OpenAI
+
+load_dotenv()
+
+client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))"
+  language="python"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/openai/openai-api-integration-step1-en.png"
+  alt="Install library"
+  caption="Install OpenAI SDK library"
+  priority={true}
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="Use Chat Completion">
+
+Chat Completion is the most basic feature.
+
+### Node.js Example
+
+<CopyBlock
+  code="const client = require('./openai-client');
+
+async function chat(userMessage) {
+  try {
+    const response = await client.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        {
+          role: 'system',
+          content: 'You are a helpful assistant.'
+        },
+        {
+          role: 'user',
+          content: userMessage
+        }
+      ],
+      max_tokens: 500,
+      temperature: 0.7
+    });
+
+    return response.choices[0].message.content;
+  } catch (error) {
+    console.error('Error:', error);
+    throw error;
+  }
+}
+
+chat('What is the capital of France?').then(response => {
+  console.log('Assistant:', response);
+});"
+  language="javascript"
+/>
+
+### Python Example
+
+<CopyBlock
+  code="import client from openai
+
+def chat(user_message):
+    try:
+        response = client.chat.completions.create(
+            model='gpt-3.5-turbo',
+            messages=[
+                {
+                    'role': 'system',
+                    'content': 'You are a helpful assistant.'
+                },
+                {
+                    'role': 'user',
+                    'content': user_message
+                }
+            ],
+            max_tokens=500,
+            temperature=0.7
+        )
+        return response.choices[0].message.content
+    except Exception as error:
+        print('Error:', error)
+        raise
+
+response = chat('What is the capital of France?')
+print('Assistant:', response)"
+  language="python"
+/>
+
+<Callout type="tip">
+💡 **Chat Completion Parameters**
+
+- `model`: Model to use [gpt-3.5-turbo, gpt-4]
+- `messages`: Array of conversation history
+- `max_tokens`: Maximum response tokens
+- `temperature`: Response creativity [0-2, default 1]
+  - Close to 0: More consistency
+  - Close to 2: More creativity
+</Callout>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/openai/openai-api-integration-step2-en.png"
+  alt="Chat Completion"
+  caption="OpenAI Chat API response example"
+/>
+
+</Step>
+
+---
+
+<Step number={3} title="Manage Conversation History">
+
+Maintaining conversation history with users is important.
+
+### Node.js Example
+
+<CopyBlock
+  code="class Chatbot {
+  constructor() {
+    this.conversationHistory = [];
+  }
+
+  addMessage(role, content) {
+    this.conversationHistory.push({
+      role: role,
+      content: content
+    });
+  }
+
+  async chat(userMessage) {
+    this.addMessage('user', userMessage);
+
+    const response = await client.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        { role: 'system', content: 'You are helpful.' },
+        ...this.conversationHistory
+      ],
+      max_tokens: 500
+    });
+
+    const assistantMessage = response.choices[0].message.content;
+    this.addMessage('assistant', assistantMessage);
+
+    return assistantMessage;
+  }
+}
+
+const bot = new Chatbot();
+bot.chat('My name is John').then(r => console.log(r));
+bot.chat('What is my name?').then(r => console.log(r));"
+  language="javascript"
+/>
+
+### Python Example
+
+<CopyBlock
+  code="class Chatbot:
+    def __init__(self):
+        self.conversation_history = []
+
+    def add_message(self, role, content):
+        self.conversation_history.append({
+            'role': role,
+            'content': content
+        })
+
+    def chat(self, user_message):
+        self.add_message('user', user_message)
+
+        response = client.chat.completions.create(
+            model='gpt-3.5-turbo',
+            messages=[
+                {'role': 'system', 'content': 'You are helpful.'},
+                *self.conversation_history
+            ],
+            max_tokens=500
+        )
+
+        assistant_message = response.choices[0].message.content
+        self.add_message('assistant', assistant_message)
+        return assistant_message
+
+bot = Chatbot()
+print(bot.chat('My name is John'))
+print(bot.chat('What is my name?'))"
+  language="python"
+/>
+
+<DevTip>
+**Conversation History Tips**
+
+- Remove old messages to save memory
+- Store history in database
+- Manage history per user
+- Check token count for cost control
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={4} title="Generate Images">
+
+Generate images using DALL-E.
+
+### Node.js Example
+
+<CopyBlock
+  code="async function generateImage(prompt) {
+  try {
+    const response = await client.images.generate({
+      model: 'dall-e-3',
+      prompt: prompt,
+      n: 1,
+      size: '1024x1024',
+      quality: 'standard'
+    });
+
+    return response.data[0].url;
+  } catch (error) {
+    console.error('Error:', error);
+    throw error;
+  }
+}
+
+generateImage('A cat wearing a hat').then(url => {
+  console.log('Image URL:', url);
+});"
+  language="javascript"
+/>
+
+### Python Example
+
+<CopyBlock
+  code="def generate_image(prompt):
+    try:
+        response = client.images.generate(
+            model='dall-e-3',
+            prompt=prompt,
+            n=1,
+            size='1024x1024',
+            quality='standard'
+        )
+        return response.data[0].url
+    except Exception as error:
+        print('Error:', error)
+        raise
+
+url = generate_image('A cat wearing a hat')
+print('Image URL:', url)"
+  language="python"
+/>
+
+<Callout type="warning">
+⚠️ **Image Generation Cost**
+
+- DALL-E 3 is relatively expensive
+- 1024x1024: $0.020
+- 1024x1792: $0.030
+- Set limits to prevent unexpected costs
+</Callout>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/openai/openai-api-integration-step4-en.png"
+  alt="Generate images"
+  caption="Image generation using DALL-E"
+/>
+
+</Step>
+
+---
+
+<Step number={5} title="Error Handling and Optimization">
+
+Error handling is essential in production.
+
+### Node.js Example
+
+<CopyBlock
+  code="const client = require('./openai-client');
+
+async function safeChat(message) {
+  try {
+    const response = await client.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        { role: 'user', content: message }
+      ],
+      max_tokens: 500,
+      timeout: 30000
+    });
+
+    if (!response.choices || response.choices.length === 0) {
+      throw new Error('Empty response');
+    }
+
+    return response.choices[0].message.content;
+  } catch (error) {
+    if (error.status === 401) {
+      console.error('Invalid API key');
+    } else if (error.status === 429) {
+      console.error('Rate limit exceeded');
+    } else if (error.status === 500) {
+      console.error('OpenAI server error');
+    } else {
+      console.error('Unknown error:', error.message);
+    }
+    throw error;
+  }
+}
+
+safeChat('Hello').then(console.log).catch(console.error);"
+  language="javascript"
+/>
+
+### Python Example
+
+<CopyBlock
+  code="from openai import RateLimitError, APIError
+
+def safe_chat(message):
+    try:
+        response = client.chat.completions.create(
+            model='gpt-3.5-turbo',
+            messages=[
+                {'role': 'user', 'content': message}
+            ],
+            max_tokens=500,
+            timeout=30
+        )
+
+        if not response.choices:
+            raise ValueError('Empty response')
+
+        return response.choices[0].message.content
+    except RateLimitError:
+        print('Rate limit exceeded, retrying...')
+    except APIError as e:
+        if e.status_code == 401:
+            print('Invalid API key')
+        elif e.status_code == 500:
+            print('OpenAI server error')
+        else:
+            print('API error:', e.message)
+        raise
+
+try:
+    result = safe_chat('Hello')
+    print(result)
+except Exception as e:
+    print('Error:', e)"
+  language="python"
+/>
+
+<Checkpoint
+  title="Verify API Integration"
+  items={[
+    "Does Chat Completion work?",
+    "Is conversation history maintained?",
+    "Is error handling implemented?",
+    "Are you monitoring API costs?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **Congratulations!** OpenAI API integration complete!
+</Callout>
+
+</Step>
+
+---
+
+## Cost Optimization Tips
+
+1. **Choose model**: gpt-3.5-turbo much cheaper than gpt-4
+2. **Limit tokens**: Set max_tokens to control costs
+3. **Batch processing**: Process multiple requests at once
+4. **Caching**: Cache frequently used responses
+
+---
+
+## Next Steps
+
+OpenAI integration complete, now explore advanced features:
+
+1. **[Setup Slack Integration](../slack-integration-setup)** - Add AI to Slack bot
+2. **[Deploy Docker](../docker-build-deploy)** - Containerize AI application
+
+---
+
+## Frequently Asked Questions
+
+<Callout type="info">
+**Q. Response is too long**
+
+A. Reduce max_tokens or lower temperature.
+</Callout>
+
+<Callout type="info">
+**Q. API calls are slow**
+
+A. Increase timeout, use batch processing, or use gpt-3.5-turbo.
+</Callout>
+
+---
+
+**Congratulations!** 🚀 OpenAI integration is complete!

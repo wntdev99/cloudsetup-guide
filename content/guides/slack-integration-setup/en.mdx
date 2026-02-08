@@ -1,0 +1,492 @@
+# Develop Slack Bot and Handle Events
+
+Let's implement a real working Slack bot. Receive messages, respond, and handle commands.
+
+<FreeTierInfo
+  service="Slack API"
+  limit="Unlimited message handling and events"
+  period="Forever free"
+  status="generous"
+/>
+
+## Slack Bot Development Overview
+
+<Callout type="info">
+🤖 **Slack bots process messages and events**
+
+Bot's role:
+- **Receive messages**: Handle channel, DM messages
+- **Handle commands**: Process /command slash commands
+- **React to events**: Detect reactions, user changes
+- **Send responses**: Messages, files, blocks
+- **User interaction**: Handle buttons, menus
+
+Examples:
+- AI chatbot: Answer with OpenAI
+- Alert bot: Notify of external events
+- Task management: Manage to-do lists
+</Callout>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Slack app created", required: true },
+  { text: "Bot Token and Signing Secret", required: true },
+  { text: "Node.js or Python", required: true },
+  { text: "Public server [HTTPS URL]", required: true }
+]} />
+
+---
+
+<Step number={1} title="Implement Basic Bot Server">
+
+### Node.js with Express
+
+Install packages:
+
+<CopyBlock
+  code="npm install express @slack/bolt dotenv body-parser"
+  language="bash"
+/>
+
+Basic implementation:
+
+<CopyBlock
+  code="require('dotenv').config();
+const { App } = require('@slack/bolt');
+
+const app = new App({
+  token: process.env.SLACK_BOT_TOKEN,
+  signingSecret: process.env.SLACK_SIGNING_SECRET
+});
+
+app.message(async ({ message, say }) => {
+  try {
+    await say('Hello from bot!');
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+app.start(3000);
+console.log('Slack app started on port 3000');"
+  language="javascript"
+/>
+
+### Python with Flask
+
+Install packages:
+
+<CopyBlock
+  code="pip install slack-bolt flask python-dotenv"
+  language="bash"
+/>
+
+Basic implementation:
+
+<CopyBlock
+  code="import os
+from slack_bolt import App
+from flask import Flask
+
+app = App(
+    token=os.environ.get('SLACK_BOT_TOKEN'),
+    signing_secret=os.environ.get('SLACK_SIGNING_SECRET')
+)
+
+@app.message()
+def handle_message(message, say):
+    try:
+        say('Hello from bot!')
+    except Exception as e:
+        print(f'Error: {e}')
+
+if __name__ == '__main__':
+    app.start(port=3000)
+    print('Slack app started on port 3000')"
+  language="python"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/slack/slack-integration-setup-step1-en.png"
+  alt="Basic bot"
+  caption="Implement basic Slack bot server"
+  priority={true}
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="Handle Message Events">
+
+Handle various message types.
+
+### Node.js Example
+
+<CopyBlock
+  code="app.message('hello', async ({ message, say }) => {
+  await say('Hi there!');
+});
+
+app.message(/.*/, async ({ message, say }) => {
+  const text = message.text;
+  console.log('Received:', text);
+
+  if (text.includes('help')) {
+    await say('I can help with: ...');
+  }
+});
+
+app.event('app_mention', async ({ event, say }) => {
+  await say('You mentioned me!');
+});"
+  language="javascript"
+/>
+
+### Python Example
+
+<CopyBlock
+  code="@app.message('hello')
+def message_hello(message, say):
+    say('Hi there!')
+
+@app.message()
+def handle_any_message(message, say):
+    text = message.get('text', '')
+    print('Received:', text)
+
+    if 'help' in text:
+        say('I can help with: ...')
+
+@app.event('app_mention')
+def handle_mention(event, say):
+    say('You mentioned me!')"
+  language="python"
+/>
+
+<Callout type="tip">
+💡 **Message Handling Tips**
+
+- `message()`: Handle all messages
+- `message('keyword')`: Messages with keyword
+- `message(/regex/)`: Regex matching
+- `event('app_mention')`: Bot mentions
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="Handle Slash Commands">
+
+Handle /command style commands.
+
+### Node.js Example
+
+<CopyBlock
+  code="app.command('/help', async ({ command, ack, say }) => {
+  await ack();
+
+  await say({
+    blocks: [
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: '*Help*\\n' +
+                '/help - Show this message\\n' +
+                '/ask - Ask question'
+        }
+      }
+    ]
+  });
+});
+
+app.command('/ask', async ({ command, ack, say }) => {
+  await ack();
+
+  const question = command.text;
+  const answer = await getAnswerFromAI(question);
+
+  await say('Q: ' + question + '\\nA: ' + answer);
+});"
+  language="javascript"
+/>
+
+### Python Example
+
+<CopyBlock
+  code="@app.command('/help')
+def handle_help_command(ack, say):
+    ack()
+
+    say({
+        'blocks': [
+            {
+                'type': 'section',
+                'text': {
+                    'type': 'mrkdwn',
+                    'text': '*Help*\\n' +
+                            '/help - Show this\\n' +
+                            '/ask - Ask question'
+                }
+            }
+        ]
+    })
+
+@app.command('/ask')
+def handle_ask_command(ack, say, command):
+    ack()
+
+    question = command['text']
+    answer = get_answer_from_ai(question)
+
+    say(f'Q: {question}\\nA: {answer}')"
+  language="python"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/slack/slack-integration-setup-step2-en.png"
+  alt="Slash commands"
+  caption="Handle Slack slash commands"
+/>
+
+</Step>
+
+---
+
+<Step number={4} title="Integrate OpenAI">
+
+Add AI features to Slack bot.
+
+### Node.js Example
+
+<CopyBlock
+  code="const OpenAI = require('openai');
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+app.message(async ({ message, say }) => {
+  try {
+    const response = await openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        { role: 'user', content: message.text }
+      ],
+      max_tokens: 500
+    });
+
+    const answer = response.choices[0].message.content;
+    await say(answer);
+  } catch (error) {
+    console.error(error);
+    await say('Error processing request');
+  }
+});"
+  language="javascript"
+/>
+
+### Python Example
+
+<CopyBlock
+  code="import os
+from openai import OpenAI
+
+client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+
+@app.message()
+def handle_message_with_ai(message, say):
+    try:
+        response = client.chat.completions.create(
+            model='gpt-3.5-turbo',
+            messages=[
+                {'role': 'user', 'content': message['text']}
+            ],
+            max_tokens=500
+        )
+
+        answer = response.choices[0].message.content
+        say(answer)
+    except Exception as e:
+        print(f'Error: {e}')
+        say('Error processing request')"
+  language="python"
+/>
+
+<Callout type="warning">
+⚠️ **Cost Warning**
+
+- OpenAI API is paid
+- API call per Slack message
+- Set usage limits
+- Choose right model [gpt-3.5-turbo recommended]
+</Callout>
+
+<DevTip>
+**AI Integration Optimization**
+
+- Limit message length
+- Set timeout
+- Enhanced error handling
+- Manage conversation history
+- Implement rate limiting
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={5} title="Deploy and Test">
+
+Deploy bot to public server and test.
+
+### Local Testing [with ngrok]
+
+Install ngrok:
+
+<CopyBlock
+  code="brew install ngrok"
+  language="bash"
+/>
+
+Run ngrok:
+
+<CopyBlock
+  code="ngrok http 3000"
+  language="bash"
+/>
+
+Update Slack App:
+- Request URL: `https://xxxxx.ngrok.io/slack/events`
+
+### Production Deployment
+
+Deploy to Heroku:
+
+<CopyBlock
+  code="heroku create my-slack-bot
+git push heroku main
+heroku config:set SLACK_BOT_TOKEN=xoxb-...
+heroku config:set SLACK_SIGNING_SECRET=..."
+  language="bash"
+/>
+
+Update Request URL:
+- `https://my-slack-bot.herokuapp.com/slack/events`
+
+### Test in Slack
+
+1. Mention bot in workspace
+2. Send message
+3. Verify bot responds
+
+<Checkpoint
+  title="Verify Bot Works"
+  items={[
+    "Does bot receive messages?",
+    "Do slash commands work?",
+    "Is AI response correct?",
+    "Are there no errors?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **Congratulations!** Slack bot is working!
+</Callout>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/slack/slack-integration-setup-step5-en.png"
+  alt="Bot deployment"
+  caption="Working bot in Slack"
+/>
+
+</Step>
+
+---
+
+## Send Rich Messages with Block Kit
+
+Send messages with buttons, images instead of plain text:
+
+### Node.js
+
+<CopyBlock
+  code="await say({
+  blocks: [
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: '*Title*\\nSome description'
+      }
+    },
+    {
+      type: 'actions',
+      elements: [
+        {
+          type: 'button',
+          text: { type: 'plain_text', text: 'Click me' },
+          action_id: 'button_click'
+        }
+      ]
+    }
+  ]
+});"
+  language="javascript"
+/>
+
+### Python
+
+<CopyBlock
+  code="say({
+    'blocks': [
+        {
+            'type': 'section',
+            'text': {
+                'type': 'mrkdwn',
+                'text': '*Title*\\nSome description'
+            }
+        },
+        {
+            'type': 'actions',
+            'elements': [
+                {
+                    'type': 'button',
+                    'text': {'type': 'plain_text', 'text': 'Click me'},
+                    'action_id': 'button_click'
+                }
+            ]
+        }
+    ]
+})"
+  language="python"
+/>
+
+---
+
+## Next Steps
+
+Slack bot complete, now deploy and extend:
+
+1. **[Deploy Docker](../docker-build-deploy)** - Containerize bot
+2. **[Deploy Heroku](../heroku-app-deployment)** - Deploy to cloud
+
+---
+
+## Frequently Asked Questions
+
+<Callout type="info">
+**Q. Bot not receiving messages**
+
+A. Verify Request URL is set correctly. Check Slack logs for errors.
+</Callout>
+
+<Callout type="info">
+**Q. How to validate security?**
+
+A. Bolt library automatically validates with Signing Secret.
+</Callout>
+
+---
+
+**Congratulations!** 🎉 Slack bot development complete!

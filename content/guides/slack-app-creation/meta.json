@@ -1,0 +1,61 @@
+{
+  "slug": "slack-app-creation",
+  "platform": "slack",
+  "service": "Slack App",
+  "category": "integration",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 15,
+  "totalSteps": 4,
+  "freeTier": {
+    "service": "Slack Apps and Integrations",
+    "limit": "Unlimited free apps and basic features",
+    "period": "forever",
+    "status": "generous",
+    "conditions": [
+      "무료 Slack 워크스페이스에서 앱 사용 가능",
+      "기본 API 호출 무제한",
+      "OAuth, 이벤트 처리 지원",
+      "프리미엄 기능은 유료",
+      "문서 보관 제한"
+    ]
+  },
+  "prerequisites": [
+    "slack-workspace"
+  ],
+  "nextGuides": [
+    "slack-integration-setup",
+    "openai-api-integration"
+  ],
+  "seo": {
+    "ko": {
+      "title": "Slack 앱 생성 및 자격증명 발급 - Slack 봇 개발 시작 | CloudSetup.guide",
+      "description": "Slack 앱을 만들고 OAuth 토큰, 이벤트 구독을 설정하는 방법을 배워보세요. Slack 봇 개발의 첫 번째 단계입니다.",
+      "keywords": [
+        "Slack 앱 생성",
+        "Slack 봇 개발",
+        "OAuth 토큰",
+        "Slack API",
+        "앱 자격증명",
+        "이벤트 구독",
+        "Slack 통합"
+      ]
+    },
+    "en": {
+      "title": "Create Slack App and Get Credentials - Start Slack Bot Development | CloudSetup.guide",
+      "description": "Learn how to create Slack app and setup OAuth tokens and event subscriptions. First step to Slack bot development.",
+      "keywords": [
+        "create Slack app",
+        "Slack bot development",
+        "OAuth token",
+        "Slack API",
+        "app credentials",
+        "event subscription",
+        "Slack integration"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T02:00:00.000Z",
+  "updatedAt": "2026-02-08T02:00:00.000Z",
+  "lastVerified": "2026-02-08T02:00:00.000Z",
+  "published": true
+}

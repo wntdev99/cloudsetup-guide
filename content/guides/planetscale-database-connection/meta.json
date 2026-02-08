@@ -1,0 +1,62 @@
+{
+  "slug": "planetscale-database-connection",
+  "platform": "planetscale",
+  "service": "Database Connection",
+  "category": "database",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 20,
+  "totalSteps": 5,
+  "freeTier": {
+    "service": "PlanetScale MySQL Database",
+    "limit": "10GB storage with unlimited connections",
+    "period": "forever",
+    "status": "generous",
+    "conditions": [
+      "무제한 읽기/쓰기 쿼리",
+      "모든 MySQL 클라이언트 지원",
+      "SSL 연결 필수",
+      "연결 풀링 지원",
+      "자동 암호화"
+    ]
+  },
+  "prerequisites": [
+    "planetscale-account-setup",
+    "heroku-app-deployment"
+  ],
+  "nextGuides": [
+    "openai-account-setup",
+    "docker-build-deploy"
+  ],
+  "seo": {
+    "ko": {
+      "title": "PlanetScale 데이터베이스 연결 - Node.js/Python 애플리케이션 연동 | CloudSetup.guide",
+      "description": "Node.js 또는 Python 애플리케이션에서 PlanetScale MySQL 데이터베이스를 연결하는 방법을 배워보세요. 완벽한 CRUD 예제와 함께 제공됩니다.",
+      "keywords": [
+        "PlanetScale 연결",
+        "MySQL 연동",
+        "Node.js 데이터베이스",
+        "Python 데이터베이스",
+        "연결 문자열",
+        "쿼리 실행",
+        "데이터베이스 마이그레이션"
+      ]
+    },
+    "en": {
+      "title": "Connect PlanetScale Database - Integrate Node.js/Python Applications | CloudSetup.guide",
+      "description": "Learn how to connect PlanetScale MySQL database from Node.js or Python applications. Complete with CRUD examples.",
+      "keywords": [
+        "connect PlanetScale",
+        "MySQL integration",
+        "Node.js database",
+        "Python database",
+        "connection string",
+        "execute queries",
+        "database migration"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T02:00:00.000Z",
+  "updatedAt": "2026-02-08T02:00:00.000Z",
+  "lastVerified": "2026-02-08T02:00:00.000Z",
+  "published": true
+}

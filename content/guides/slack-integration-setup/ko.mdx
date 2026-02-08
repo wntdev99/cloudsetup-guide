@@ -1,0 +1,492 @@
+# Slack 봇 개발 및 이벤트 처리
+
+이제 실제로 작동하는 Slack 봇을 구현해봅시다. 메시지를 받고 응답하고, 명령어를 처리할 수 있습니다.
+
+<FreeTierInfo
+  service="Slack API"
+  limit="무제한 메시지 처리 및 이벤트"
+  period="영구 무료"
+  status="generous"
+/>
+
+## Slack 봇 개발 개요
+
+<Callout type="info">
+🤖 **Slack 봇은 메시지와 이벤트를 처리합니다**
+
+봇의 역할:
+- **메시지 수신**: 채널, DM 메시지 처리
+- **명령어 처리**: /command 형태의 슬래시 명령어
+- **이벤트 반응**: 리액션, 사용자 변화 감지
+- **응답 전송**: 메시지, 파일, 블록 등 전송
+- **사용자 상호작용**: 버튼, 메뉴 처리
+
+예시:
+- AI 챗봇: OpenAI 연동으로 대답
+- 알림 봇: 외부 시스템 이벤트 통지
+- 작업 관리: 할일 목록 관리
+</Callout>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "Slack 앱 생성 완료", required: true },
+  { text: "Bot Token 및 Signing Secret", required: true },
+  { text: "Node.js 또는 Python", required: true },
+  { text: "공개 서버 [HTTPS URL]", required: true }
+]} />
+
+---
+
+<Step number={1} title="기본 봇 서버 구현">
+
+### Node.js with Express
+
+패키지 설치:
+
+<CopyBlock
+  code="npm install express @slack/bolt dotenv body-parser"
+  language="bash"
+/>
+
+기본 앱 구현:
+
+<CopyBlock
+  code="require('dotenv').config();
+const { App } = require('@slack/bolt');
+
+const app = new App({
+  token: process.env.SLACK_BOT_TOKEN,
+  signingSecret: process.env.SLACK_SIGNING_SECRET
+});
+
+app.message(async ({ message, say }) => {
+  try {
+    await say('Hello from bot!');
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+app.start(3000);
+console.log('Slack app started on port 3000');"
+  language="javascript"
+/>
+
+### Python with Flask
+
+패키지 설치:
+
+<CopyBlock
+  code="pip install slack-bolt flask python-dotenv"
+  language="bash"
+/>
+
+기본 앱 구현:
+
+<CopyBlock
+  code="import os
+from slack_bolt import App
+from flask import Flask
+
+app = App(
+    token=os.environ.get('SLACK_BOT_TOKEN'),
+    signing_secret=os.environ.get('SLACK_SIGNING_SECRET')
+)
+
+@app.message()
+def handle_message(message, say):
+    try:
+        say('Hello from bot!')
+    except Exception as e:
+        print(f'Error: {e}')
+
+if __name__ == '__main__':
+    app.start(port=3000)
+    print('Slack app started on port 3000')"
+  language="python"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/slack/slack-integration-setup-step1-ko.png"
+  alt="기본 봇 구현"
+  caption="Slack 봇 기본 서버 구현"
+  priority={true}
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="메시지 이벤트 처리">
+
+다양한 메시지 타입을 처리할 수 있습니다.
+
+### Node.js 예제
+
+<CopyBlock
+  code="app.message('hello', async ({ message, say }) => {
+  await say('Hi there!');
+});
+
+app.message(/.*/, async ({ message, say }) => {
+  const text = message.text;
+  console.log('Received:', text);
+
+  if (text.includes('help')) {
+    await say('I can help with: ...');
+  }
+});
+
+app.event('app_mention', async ({ event, say }) => {
+  await say('You mentioned me!');
+});"
+  language="javascript"
+/>
+
+### Python 예제
+
+<CopyBlock
+  code="@app.message('hello')
+def message_hello(message, say):
+    say('Hi there!')
+
+@app.message()
+def handle_any_message(message, say):
+    text = message.get('text', '')
+    print('Received:', text)
+
+    if 'help' in text:
+        say('I can help with: ...')
+
+@app.event('app_mention')
+def handle_mention(event, say):
+    say('You mentioned me!')"
+  language="python"
+/>
+
+<Callout type="tip">
+💡 **메시지 처리 팁**
+
+- `message()`: 모든 메시지 처리
+- `message('keyword')`: 특정 키워드 포함 메시지
+- `message(/regex/)`: 정규식 매칭
+- `event('app_mention')`: 앱 멘션 처리
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="슬래시 명령어 처리">
+
+/command 형태의 명령어를 처리합니다.
+
+### Node.js 예제
+
+<CopyBlock
+  code="app.command('/help', async ({ command, ack, say }) => {
+  await ack();
+
+  await say({
+    blocks: [
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: '*도움말*\\n' +
+                '/help - 이 메시지 표시\\n' +
+                '/ask - 질문하기'
+        }
+      }
+    ]
+  });
+});
+
+app.command('/ask', async ({ command, ack, say }) => {
+  await ack();
+
+  const question = command.text;
+  const answer = await getAnswerFromAI(question);
+
+  await say('Q: ' + question + '\\nA: ' + answer);
+});"
+  language="javascript"
+/>
+
+### Python 예제
+
+<CopyBlock
+  code="@app.command('/help')
+def handle_help_command(ack, say):
+    ack()
+
+    say({
+        'blocks': [
+            {
+                'type': 'section',
+                'text': {
+                    'type': 'mrkdwn',
+                    'text': '*Help Menu*\\n' +
+                            '/help - Show this message\\n' +
+                            '/ask - Ask a question'
+                }
+            }
+        ]
+    })
+
+@app.command('/ask')
+def handle_ask_command(ack, say, command):
+    ack()
+
+    question = command['text']
+    answer = get_answer_from_ai(question)
+
+    say(f'Q: {question}\\nA: {answer}')"
+  language="python"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/slack/slack-integration-setup-step2-ko.png"
+  alt="슬래시 명령어"
+  caption="Slack 슬래시 명령어 처리"
+/>
+
+</Step>
+
+---
+
+<Step number={4} title="OpenAI 연동">
+
+AI 기능을 Slack 봇에 추가합니다.
+
+### Node.js 예제
+
+<CopyBlock
+  code="const OpenAI = require('openai');
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+app.message(async ({ message, say }) => {
+  try {
+    const response = await openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        { role: 'user', content: message.text }
+      ],
+      max_tokens: 500
+    });
+
+    const answer = response.choices[0].message.content;
+    await say(answer);
+  } catch (error) {
+    console.error(error);
+    await say('Error processing request');
+  }
+});"
+  language="javascript"
+/>
+
+### Python 예제
+
+<CopyBlock
+  code="import os
+from openai import OpenAI
+
+client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+
+@app.message()
+def handle_message_with_ai(message, say):
+    try:
+        response = client.chat.completions.create(
+            model='gpt-3.5-turbo',
+            messages=[
+                {'role': 'user', 'content': message['text']}
+            ],
+            max_tokens=500
+        )
+
+        answer = response.choices[0].message.content
+        say(answer)
+    except Exception as e:
+        print(f'Error: {e}')
+        say('Error processing request')"
+  language="python"
+/>
+
+<Callout type="warning">
+⚠️ **비용 주의**
+
+- OpenAI API는 유료
+- Slack 메시지마다 API 호출
+- 사용량 제한 설정하기
+- 적절한 모델 선택 [gpt-3.5-turbo 권장]
+</Callout>
+
+<DevTip>
+**AI 연동 최적화**
+
+- 메시지 길이 제한
+- 타임아웃 설정
+- 에러 처리 강화
+- 대화 이력 관리
+- Rate limiting 구현
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={5} title="배포 및 테스트">
+
+봇을 공개 서버에 배포하고 테스트합니다.
+
+### 로컬 테스트 [ngrok 사용]
+
+ngrok 설치:
+
+<CopyBlock
+  code="brew install ngrok"
+  language="bash"
+/>
+
+ngrok 실행:
+
+<CopyBlock
+  code="ngrok http 3000"
+  language="bash"
+/>
+
+Slack App 설정 업데이트:
+- Request URL: `https://xxxxx.ngrok.io/slack/events`
+
+### Production 배포
+
+Heroku 배포:
+
+<CopyBlock
+  code="heroku create my-slack-bot
+git push heroku main
+heroku config:set SLACK_BOT_TOKEN=xoxb-...
+heroku config:set SLACK_SIGNING_SECRET=..."
+  language="bash"
+/>
+
+Request URL 업데이트:
+- `https://my-slack-bot.herokuapp.com/slack/events`
+
+### Slack에서 테스트
+
+1. Slack 워크스페이스에서 봇 멘션
+2. 메시지 전송
+3. 봇이 응답하는지 확인
+
+<Checkpoint
+  title="봇 동작 확인"
+  items={[
+    "봇이 메시지를 수신하나요?",
+    "슬래시 명령어가 작동하나요?",
+    "AI 응답이 정상인가요?",
+    "에러가 없나요?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **축하합니다!** Slack 봇이 작동합니다!
+</Callout>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/slack/slack-integration-setup-step5-ko.png"
+  alt="봇 배포"
+  caption="Slack에서 작동하는 봇"
+/>
+
+</Step>
+
+---
+
+## Block Kit로 풍부한 메시지 전송
+
+단순 텍스트 대신 버튼, 이미지 등을 포함한 메시지:
+
+### Node.js
+
+<CopyBlock
+  code="await say({
+  blocks: [
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: '*Title*\\nSome description'
+      }
+    },
+    {
+      type: 'actions',
+      elements: [
+        {
+          type: 'button',
+          text: { type: 'plain_text', text: 'Click me' },
+          action_id: 'button_click'
+        }
+      ]
+    }
+  ]
+});"
+  language="javascript"
+/>
+
+### Python
+
+<CopyBlock
+  code="say({
+    'blocks': [
+        {
+            'type': 'section',
+            'text': {
+                'type': 'mrkdwn',
+                'text': '*Title*\\nSome description'
+            }
+        },
+        {
+            'type': 'actions',
+            'elements': [
+                {
+                    'type': 'button',
+                    'text': {'type': 'plain_text', 'text': 'Click me'},
+                    'action_id': 'button_click'
+                }
+            ]
+        }
+    ]
+})"
+  language="python"
+/>
+
+---
+
+## 다음 단계
+
+Slack 봇이 완성되었으니, 이제 배포하고 확장해보세요:
+
+1. **[Docker 배포](../docker-build-deploy)** - 봇을 컨테이너화
+2. **[Heroku 배포](../heroku-app-deployment)** - 클라우드에 배포
+
+---
+
+## 자주 묻는 질문
+
+<Callout type="info">
+**Q. 봇이 메시지를 받지 못해요**
+
+A. Request URL이 제대로 설정되었는지 확인하세요. Slack 로그에서 에러 확인 가능합니다.
+</Callout>
+
+<Callout type="info">
+**Q. 보안 검증은 어떻게 하나요?**
+
+A. Bolt 라이브러리가 자동으로 Signing Secret으로 검증합니다.
+</Callout>
+
+---
+
+**축하합니다!** 🎉 Slack 봇 개발이 완료되었습니다!

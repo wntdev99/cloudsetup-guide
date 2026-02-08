@@ -1,0 +1,62 @@
+{
+  "slug": "slack-integration-setup",
+  "platform": "slack",
+  "service": "Slack Bot Integration",
+  "category": "integration",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 25,
+  "totalSteps": 5,
+  "freeTier": {
+    "service": "Slack API",
+    "limit": "Unlimited message handling and events",
+    "period": "forever",
+    "status": "generous",
+    "conditions": [
+      "메시지 처리 무제한",
+      "이벤트 구독 무제한",
+      "슬래시 명령어 무제한",
+      "레이트 제한 있음",
+      "로깅 30일 보관"
+    ]
+  },
+  "prerequisites": [
+    "slack-app-creation",
+    "openai-api-integration"
+  ],
+  "nextGuides": [
+    "docker-build-deploy",
+    "heroku-app-deployment"
+  ],
+  "seo": {
+    "ko": {
+      "title": "Slack 봇 개발 및 이벤트 처리 - Node.js/Python 봇 구현 | CloudSetup.guide",
+      "description": "Node.js 또는 Python에서 Slack 봇을 구현하고 메시지 이벤트를 처리하는 방법을 배워보세요. AI 챗봇부터 자동화까지 가능합니다.",
+      "keywords": [
+        "Slack 봇 개발",
+        "이벤트 처리",
+        "Node.js 봇",
+        "Python 봇",
+        "메시지 처리",
+        "슬래시 명령어",
+        "Slack 자동화"
+      ]
+    },
+    "en": {
+      "title": "Develop Slack Bot and Handle Events - Implement Bot in Node.js/Python | CloudSetup.guide",
+      "description": "Learn how to implement Slack bot and handle message events in Node.js or Python. Everything from AI chatbot to automation.",
+      "keywords": [
+        "develop Slack bot",
+        "event handling",
+        "Node.js bot",
+        "Python bot",
+        "message handling",
+        "slash commands",
+        "Slack automation"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T02:00:00.000Z",
+  "updatedAt": "2026-02-08T02:00:00.000Z",
+  "lastVerified": "2026-02-08T02:00:00.000Z",
+  "published": true
+}

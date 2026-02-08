@@ -1,0 +1,476 @@
+# Build Docker Images and Deploy Containers
+
+Now that Docker is installed, let's create application images yourself. This guide walks through writing a Dockerfile and deploying it, using a Node.js application as an example.
+
+<FreeTierInfo
+  service="Docker Community Edition"
+  limit="Unlimited builds and deployments"
+  period="Forever free"
+  status="generous"
+/>
+
+## What is a Dockerfile?
+
+<Callout type="info">
+📋 **Dockerfile is the blueprint for images**
+
+Dockerfile includes:
+- **Base image**: The OS/runtime foundation [e.g., node:18]
+- **Working directory**: The working path inside the container
+- **File copy**: Copy files from host to container
+- **Dependency installation**: Setup commands like npm install
+- **Run command**: What to execute when the container starts
+
+Example:
+```
+FROM node:18
+WORKDIR /app
+COPY . .
+RUN npm install
+CMD ["npm", "start"]
+```
+</Callout>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Docker Desktop installed", required: true },
+  { text: "Sample Node.js application ready", required: true },
+  { text: "Basic terminal/CLI knowledge", required: false }
+]} />
+
+---
+
+<Step number={1} title="Prepare Sample Node.js Application">
+
+First, create a project directory with necessary files:
+
+<CopyBlock
+  code="mkdir my-docker-app
+cd my-docker-app"
+  language="bash"
+/>
+
+Create **package.json** file:
+
+<CopyBlock
+  code="cat > package.json << 'EOF'
+{
+  \"name\": \"my-docker-app\",
+  \"version\": \"1.0.0\",
+  \"description\": \"Simple Docker Node.js app\",
+  \"main\": \"app.js\",
+  \"scripts\": {
+    \"start\": \"node app.js\"
+  },
+  \"dependencies\": {
+    \"express\": \"^4.18.2\"
+  }
+}
+EOF"
+  language="bash"
+/>
+
+Create **app.js** file:
+
+<CopyBlock
+  code="cat > app.js << 'EOF'
+const express = require('express');
+const app = express();
+const PORT = 3000;
+
+app.get('/', (req, res) => {
+  res.send('Hello from Docker!');
+});
+
+app.listen(PORT, () => {
+  console.log('Server running on port ' + PORT);
+});
+EOF"
+  language="bash"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/docker/docker-build-deploy-step1-en.png"
+  alt="Project structure"
+  caption="Directory structure: package.json and app.js"
+  priority={true}
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="Write Dockerfile">
+
+Create **Dockerfile** [uppercase, no extension] in the project root:
+
+<CopyBlock
+  code="cat > Dockerfile << 'EOF'
+# 1. Choose base image
+FROM node:18-alpine
+
+# 2. Set working directory inside container
+WORKDIR /app
+
+# 3. Copy package.json and package-lock.json
+COPY package*.json ./
+
+# 4. Install dependencies
+RUN npm install --production
+
+# 5. Copy application code
+COPY . .
+
+# 6. Declare port the container will use
+EXPOSE 3000
+
+# 7. Command to run when container starts
+CMD [\"npm\", \"start\"]
+EOF"
+  language="bash"
+/>
+
+<Callout type="tip">
+💡 **Dockerfile Writing Tips**
+
+- **FROM**: Always specify base image on first line
+- **WORKDIR**: Must be set to avoid path conflicts
+- **COPY**: Copy package.json first to leverage caching
+- **RUN**: npm install should run before copying all files
+- **EXPOSE**: For documentation purposes [actual port mapping separate]
+- **CMD**: Default command when running the image
+
+Base image choices:
+- `node:18`: Latest stable version
+- `node:18-alpine`: Light and fast [recommended]
+- `node:18-slim`: Medium size
+</Callout>
+
+<DevTip>
+**.dockerignore File [Optional]**
+
+Create .dockerignore in the same directory as Dockerfile to exclude files and speed up builds:
+
+```
+node_modules
+npm-debug.log
+.git
+.gitignore
+README.md
+.env
+```
+</DevTip>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/docker/docker-build-deploy-step2-en.png"
+  alt="Write Dockerfile"
+  caption="Dockerfile structure and each line's purpose"
+/>
+
+</Step>
+
+---
+
+<Step number={3} title="Build Docker Image">
+
+Run this in the directory with your Dockerfile:
+
+<CopyBlock
+  code="docker build -t my-app:1.0 ."
+  language="bash"
+/>
+
+Command meaning:
+- `docker build`: Build an image
+- `-t my-app:1.0`: Tag the image [repository:tag format]
+- `.`: Find Dockerfile in current directory
+
+Build progress:
+
+<CopyBlock
+  code="Sending build context to Docker daemon
+Step 1/7 : FROM node:18-alpine
+18-alpine: Pulling from library/node
+Step 2/7 : WORKDIR /app
+Step 3/7 : COPY package*.json ./
+Step 4/7 : RUN npm install --production
+Step 5/7 : COPY . .
+Step 6/7 : EXPOSE 3000
+Step 7/7 : CMD [\"npm\", \"start\"]
+Successfully built abc123def456
+Successfully tagged my-app:1.0"
+  language="bash"
+/>
+
+<Checkpoint
+  title="Verify Build"
+  items={[
+    "Did the build end with \"Successfully built\" message?",
+    "Was the image \"Successfully tagged\"?"
+  ]}
+/>
+
+<Callout type="info">
+**Build Process Explanation**
+
+1. Docker client sends build context
+2. Create intermediate image for each Dockerfile line
+3. Results are cached [next build is faster]
+4. Final image is created and tagged
+</Callout>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/docker/docker-build-deploy-step3-en.png"
+  alt="Docker build progress"
+  caption="Each Step executes in sequence during build"
+/>
+
+</Step>
+
+---
+
+<Step number={4} title="Verify Built Image">
+
+After build completes, check the image list:
+
+<CopyBlock
+  code="docker images"
+  language="bash"
+/>
+
+Output:
+
+<CopyBlock
+  code="REPOSITORY   TAG       IMAGE ID       CREATED          SIZE
+my-app       1.0       abc123def456   2 minutes ago    150MB
+node         18-alpine xyz789uvw012   2 weeks ago      130MB
+hello-world  latest    abc1234d5e67   5 months ago     13kB"
+  language="bash"
+/>
+
+Check detailed image information:
+
+<CopyBlock
+  code="docker inspect my-app:1.0"
+  language="bash"
+/>
+
+<DevTip>
+**Understanding Tags**
+
+- `my-app:1.0`: repository is "my-app", tag is "1.0"
+- Multiple tags for same image possible: `my-app:latest`, `my-app:1.0`
+- Without tag, automatically becomes `:latest`
+
+Examples:
+```
+docker build -t my-app:1.0 .  # Specific version
+docker build -t my-app:latest .  # Latest version
+docker tag my-app:1.0 my-app:latest  # Add tag to existing image
+```
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={5} title="Run Container and Test">
+
+Run the built image as a container:
+
+<CopyBlock
+  code="docker run -d -p 3000:3000 --name my-container my-app:1.0"
+  language="bash"
+/>
+
+Command meaning:
+- `docker run`: Run a container
+- `-d`: Run in background [Detached mode]
+- `-p 3000:3000`: Port mapping [host:container]
+- `--name my-container`: Name the container
+- `my-app:1.0`: Image to use
+
+Verify running container:
+
+<CopyBlock
+  code="docker ps"
+  language="bash"
+/>
+
+Output:
+
+<CopyBlock
+  code="CONTAINER ID   IMAGE        COMMAND          CREATED         STATUS         PORTS                    NAMES
+abc123def456   my-app:1.0   \"npm start\"   10 seconds ago  Up 8 seconds   0.0.0.0:3000->3000/tcp   my-container"
+  language="bash"
+/>
+
+### Test the Application
+
+Visit `http://localhost:3000` in browser or run:
+
+<CopyBlock
+  code="curl http://localhost:3000"
+  language="bash"
+/>
+
+Response:
+
+<CopyBlock
+  code="Hello from Docker!"
+  language="bash"
+/>
+
+<Callout type="success">
+✅ **Congratulations!** Your Docker container is running successfully!
+</Callout>
+
+### Check Container Logs
+
+<CopyBlock
+  code="docker logs my-container"
+  language="bash"
+/>
+
+Output:
+
+<CopyBlock
+  code="Server running on port 3000"
+  language="bash"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/docker/docker-build-deploy-step5-en.png"
+  alt="Run container and test"
+  caption="Browser result accessing localhost:3000"
+/>
+
+<Checkpoint
+  title="Verify Container Deployment"
+  items={[
+    "Is the container in UP status in docker ps?",
+    "Do you get a normal response from curl or browser?",
+    "Does docker logs show the server startup message?"
+  ]}
+/>
+
+</Step>
+
+---
+
+## Container Management Commands
+
+### Stop Running Container
+
+<CopyBlock
+  code="docker stop my-container"
+  language="bash"
+/>
+
+### Restart Stopped Container
+
+<CopyBlock
+  code="docker start my-container"
+  language="bash"
+/>
+
+### Remove Container
+
+<CopyBlock
+  code="docker rm my-container"
+  language="bash"
+/>
+
+### Remove Image
+
+<CopyBlock
+  code="docker rmi my-app:1.0"
+  language="bash"
+/>
+
+---
+
+## Deploy Image to Docker Hub [Optional]
+
+### 1. Login to Docker Hub Account
+
+<CopyBlock
+  code="docker login"
+  language="bash"
+/>
+
+### 2. Retag Image
+
+<CopyBlock
+  code="docker tag my-app:1.0 [username]/my-app:1.0"
+  language="bash"
+/>
+
+### 3. Push to Docker Hub
+
+<CopyBlock
+  code="docker push [username]/my-app:1.0"
+  language="bash"
+/>
+
+### 4. Download and Run from Docker Hub
+
+<CopyBlock
+  code="docker run -d -p 3000:3000 [username]/my-app:1.0"
+  language="bash"
+/>
+
+---
+
+## Next Steps
+
+Docker build and deploy is complete, now deploy to cloud platforms:
+
+1. **[Deploy Heroku App](../heroku-app-deployment)** - Deploy Docker image to Heroku
+2. **[PlanetScale Database](../planetscale-account-setup)** - Add a database
+
+---
+
+## Frequently Asked Questions
+
+<Callout type="info">
+**Q. Can I create containers without Dockerfile?**
+
+A. You can run an existing image, modify it, and save via commit, but Dockerfile is the best practice.
+</Callout>
+
+<Callout type="info">
+**Q. Why does container exit right after docker run?**
+
+A. Container exits when the process ends. CMD in Dockerfile must be a long-running process.
+</Callout>
+
+<Callout type="info">
+**Q. What if port 3000 is already in use?**
+
+A. Use a different host port: `docker run -d -p 8000:3000 my-app:1.0`
+</Callout>
+
+---
+
+## Troubleshooting
+
+### "COPY failed: file not found"
+
+- Verify Dockerfile is in project root
+- Check file paths are correct
+
+### "npm ERR! code ERESOLVE"
+
+- May be npm version issue
+- Try `npm ci --production` in Dockerfile
+
+### "Cannot connect to container"
+
+- Verify port mapping is correct: `docker port container-name`
+- Check firewall settings
+
+---
+
+**Congratulations!** 🎉 You've completed Docker image build and deployment!

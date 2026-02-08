@@ -1,0 +1,59 @@
+{
+  "slug": "openai-account-setup",
+  "platform": "openai",
+  "service": "OpenAI API",
+  "category": "ai-ml",
+  "difficulty": "beginner",
+  "estimatedMinutes": 10,
+  "totalSteps": 4,
+  "freeTier": {
+    "service": "OpenAI API Credits",
+    "limit": "$5 trial credit for new accounts",
+    "period": "one-time",
+    "status": "limited",
+    "conditions": [
+      "신규 계정 $5 크레딧",
+      "3개월 내 사용해야 함",
+      "이후 종량제 [pay-as-you-go]",
+      "API 요청 기반 청구",
+      "모니터링 및 한도 설정 가능"
+    ]
+  },
+  "prerequisites": [],
+  "nextGuides": [
+    "openai-api-integration",
+    "planetscale-database-connection"
+  ],
+  "seo": {
+    "ko": {
+      "title": "OpenAI API 계정 생성 및 API 키 발급 - GPT 모델 사용 시작 | CloudSetup.guide",
+      "description": "OpenAI 계정을 만들고 API 키를 발급받는 방법을 배워보세요. ChatGPT, GPT-4, 이미지 생성 모델 등을 사용할 수 있습니다.",
+      "keywords": [
+        "OpenAI 계정",
+        "API 키 발급",
+        "ChatGPT API",
+        "GPT-4 사용",
+        "OpenAI 시작",
+        "AI API",
+        "LLM API"
+      ]
+    },
+    "en": {
+      "title": "Create OpenAI Account and Get API Keys - Start Using GPT Models | CloudSetup.guide",
+      "description": "Learn how to create OpenAI account and get API keys. Use ChatGPT, GPT-4, image generation models, and more.",
+      "keywords": [
+        "OpenAI account",
+        "get API key",
+        "ChatGPT API",
+        "use GPT-4",
+        "OpenAI getting started",
+        "AI API",
+        "LLM API"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T02:00:00.000Z",
+  "updatedAt": "2026-02-08T02:00:00.000Z",
+  "lastVerified": "2026-02-08T02:00:00.000Z",
+  "published": true
+}

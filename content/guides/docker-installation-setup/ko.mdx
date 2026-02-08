@@ -1,0 +1,311 @@
+# Docker 설치 및 설정 - 컨테이너 개발 시작하기
+
+Docker는 애플리케이션과 그 의존성을 컨테이너라는 표준화된 단위로 패킹하는 도구입니다. 이 가이드를 따라 Docker Desktop을 설치하고 첫 번째 컨테이너를 실행해보세요!
+
+<FreeTierInfo
+  service="Docker Community Edition"
+  limit="무제한 컨테이너 및 이미지"
+  period="영구 무료"
+  status="generous"
+/>
+
+## Docker란 무엇인가요?
+
+<Callout type="info">
+🐳 **Docker는 컨테이너화 플랫폼입니다**
+
+Docker의 주요 기능:
+- **환경 일관성**: 개발 중인 것과 동일한 환경에서 실행
+- **빠른 배포**: 가상 머신보다 훨씬 빠른 시작 시간
+- **리소스 효율**: 각 컨테이너는 경량이면서 독립적
+- **버전 관리**: 이미지를 통해 정확한 버전 관리 가능
+- **확장성**: 여러 컨테이너를 쉽게 관리
+
+예를 들어:
+- `nodejs-app`: Node.js 애플리케이션용
+- `postgres-db`: PostgreSQL 데이터베이스용
+- `nginx-server`: Nginx 웹 서버용
+</Callout>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "관리자 권한 (Windows/Mac)", required: true },
+  { text: "충분한 디스크 공간 [2GB 이상]", required: true },
+  { text: "인터넷 연결", required: true }
+]} />
+
+---
+
+<Step number={1} title="Docker Desktop 다운로드">
+
+### macOS 설치
+
+1. [Docker 공식 웹사이트](https://www.docker.com/products/docker-desktop)에 접속합니다.
+2. 상단의 **Download for Mac** 버튼을 클릭합니다.
+3. Mac의 CPU에 따라 선택합니다:
+   - **Apple Silicon [M1/M2/M3]**: 최신 Mac
+   - **Intel Chip**: 구형 Mac
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/docker/docker-installation-step1-ko.png"
+  alt="Docker Desktop 다운로드 페이지"
+  caption="Docker 공식 사이트에서 Mac 버전 다운로드"
+  priority={true}
+/>
+
+### Windows 설치
+
+1. **Download for Windows** 버튼을 클릭합니다.
+2. WSL 2 [Windows Subsystem for Linux]가 자동으로 설치됩니다.
+3. Docker Desktop 설치 파일을 다운로드합니다.
+
+<Callout type="warning">
+⚠️ **Windows 요구사항**
+
+- Windows 10 Pro, Enterprise, Education 이상
+- 또는 Windows 11
+- Hyper-V 지원이 필요합니다
+</Callout>
+
+### Linux 설치
+
+1. Linux는 별도 설치 방식을 사용합니다.
+2. 터미널을 열고 다음 명령어를 실행합니다:
+
+<CopyBlock
+  code="curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh"
+  language="bash"
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="Docker Desktop 설치 및 실행">
+
+### macOS 및 Windows
+
+1. 다운로드한 설치 파일을 실행합니다.
+2. 설치 프로세스를 따릅니다 [약 2-3분 소요].
+3. 설치가 완료되면 Applications 폴더에서 Docker를 찾아 실행합니다.
+4. Docker 아이콘이 메뉴바에 나타나면 실행 중입니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/docker/docker-installation-step2-ko.png"
+  alt="Docker 설치 진행 화면"
+  caption="설치 진행 중 화면 - 관리자 권한을 요청합니다"
+/>
+
+<Callout type="tip">
+💡 **팁**: Docker를 처음 실행하면 시스템 암호를 입력하라고 요청합니다. Docker는 Hypervisor [가상화 기술]를 사용하기 위해 관리자 권한이 필요합니다.
+</Callout>
+
+### Linux
+
+설치 후 docker 명령어가 바로 사용 가능합니다. 사용자를 docker 그룹에 추가하려면:
+
+<CopyBlock
+  code="sudo usermod -aG docker $USER
+newgrp docker"
+  language="bash"
+/>
+
+</Step>
+
+---
+
+<Step number={3} title="설치 확인 및 검증">
+
+터미널이나 명령 프롬프트를 열고 다음을 입력합니다:
+
+<CopyBlock
+  code="docker --version"
+  language="bash"
+/>
+
+다음과 같은 결과가 출력되어야 합니다:
+
+<CopyBlock
+  code="Docker version 24.0.0, build abcdef123"
+  language="bash"
+/>
+
+더 자세한 정보를 원한다면:
+
+<CopyBlock
+  code="docker info"
+  language="bash"
+/>
+
+이 명령어는 Docker 데몬 상태, 컨테이너 수, 이미지 수 등을 보여줍니다.
+
+<Checkpoint
+  title="설치 확인"
+  items={[
+    "docker --version 명령어가 정상적으로 실행되나요?",
+    "버전 번호가 표시되나요?",
+    "docker info 명령어로 상태를 확인했나요?"
+  ]}
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/docker/docker-installation-step3-ko.png"
+  alt="Docker 버전 확인"
+  caption="터미널에서 docker 명령어 실행 결과"
+/>
+
+</Step>
+
+---
+
+<Step number={4} title="첫 번째 컨테이너 실행">
+
+설치 확인을 위해 Hello World 컨테이너를 실행해봅시다:
+
+<CopyBlock
+  code="docker run hello-world"
+  language="bash"
+/>
+
+다음과 같은 출력이 나타나면 정상입니다:
+
+<CopyBlock
+  code="Hello from Docker!
+This message shows that your installation appears to be working correctly.
+
+To generate this message, Docker took the following steps:
+1. The Docker client contacted the Docker daemon
+2. The Docker daemon pulled the hello-world image
+3. The Docker daemon created a new container
+4. The Docker daemon streamed that output to the Docker client"
+  language="bash"
+/>
+
+<Callout type="success">
+✅ **축하합니다!** Docker가 정상적으로 설치되었습니다. 첫 번째 컨테이너가 성공적으로 실행되었습니다!
+</Callout>
+
+<DevTip>
+**Docker 이미지와 컨테이너 개념**
+
+- **이미지**: 애플리케이션의 템플릿 [청사진]
+- **컨테이너**: 이미지를 실행한 인스턴스
+
+예시:
+- `hello-world` 이미지를 실행하면 hello-world 컨테이너가 생성됩니다
+- 같은 이미지로 여러 컨테이너를 만들 수 있습니다
+</DevTip>
+
+</Step>
+
+---
+
+## Docker 설치 이후 확인 사항
+
+### 시스템 요구사항 충족 확인
+
+<CopyBlock
+  code="docker ps
+docker ps -a
+docker images"
+  language="bash"
+/>
+
+각 명령어의 의미:
+- `docker ps`: 실행 중인 컨테이너 목록
+- `docker ps -a`: 모든 컨테이너 목록 [중지된 것 포함]
+- `docker images`: 설치된 이미지 목록
+
+### Docker Hub 로그인 [선택사항]
+
+나중에 이미지를 공유하려면 Docker Hub 계정을 만들고 로그인합니다:
+
+<CopyBlock
+  code="docker login"
+  language="bash"
+/>
+
+---
+
+## 다음 단계
+
+Docker 설치가 완료되었으니, 이제 본격적으로 시작해보세요:
+
+1. **[Docker 빌드 및 배포](../docker-build-deploy)** - 직접 컨테이너를 만들어보세요
+2. **[Heroku 앱 배포](../heroku-app-deployment)** - 컨테이너를 클라우드에 배포하세요
+
+---
+
+## 시스템별 추가 설정
+
+### macOS - Rosetta 2 [Apple Silicon]
+
+Apple Silicon Mac에서 Intel 기반 이미지를 실행하려면:
+
+<CopyBlock
+  code="docker run --platform linux/amd64 [image-name]"
+  language="bash"
+/>
+
+### Windows - WSL 2 확인
+
+Windows에서 WSL 2를 사용 중인지 확인:
+
+<CopyBlock
+  code="wsl --version"
+  language="bash"
+/>
+
+또는 Docker Desktop 설정에서:
+- **Settings** [톱니바퀴 아이콘]
+- **Resources** [리소스]
+- **WSL Integration** 확인
+
+---
+
+## 자주 묻는 질문
+
+<Callout type="info">
+**Q. Docker는 정말 무료인가요?**
+
+A. 네, Docker Community Edition은 완전히 무료입니다. 무제한으로 사용할 수 있습니다.
+</Callout>
+
+<Callout type="info">
+**Q. Docker와 가상 머신의 차이는?**
+
+A. Docker는 OS 수준의 가상화를 사용하여 가상 머신보다 훨씬 빠르고 가볍습니다.
+</Callout>
+
+<Callout type="info">
+**Q. M1/M2 Mac에서도 모든 이미지를 실행할 수 있나요?**
+
+A. 대부분 가능하지만, 일부 Intel 전용 이미지는 --platform 플래그로 에뮬레이션해야 합니다.
+</Callout>
+
+---
+
+## 문제 해결
+
+### "Cannot connect to Docker daemon"
+
+- Docker Desktop이 실행 중인지 확인
+- Mac/Windows에서 메뉴바에서 Docker 아이콘 확인
+- Docker를 다시 시작해보세요
+
+### "Permission denied while trying to connect to Docker daemon" [Linux]
+
+- 사용자를 docker 그룹에 추가: `sudo usermod -aG docker $USER`
+- 터미널을 새로 시작하거나 `newgrp docker` 실행
+
+### Windows에서 "WSL 2 installation is incomplete"
+
+- Windows PowerShell을 관리자 권한으로 실행
+- `wsl --install` 실행
+- 시스템 재부팅
+
+---
+
+**축하합니다!** 🐳 Docker 설치가 완료되었습니다. 이제 실제 애플리케이션을 컨테이너화할 준비가 되었습니다!

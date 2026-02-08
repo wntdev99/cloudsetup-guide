@@ -1,0 +1,307 @@
+# PlanetScale 계정 생성 및 데이터베이스 설정
+
+PlanetScale은 MySQL 기반의 클라우드 데이터베이스 서비스입니다. Vitess 기술을 사용하여 매우 확장 가능한 데이터베이스를 제공합니다. 이 가이드에서는 PlanetScale 계정을 만들고 첫 데이터베이스를 생성해봅시다.
+
+<FreeTierInfo
+  service="PlanetScale MySQL Database"
+  limit="10GB 저장소 [브랜치 배포 포함]"
+  period="영구 무료"
+  status="generous"
+/>
+
+## PlanetScale이란?
+
+<Callout type="info">
+🚀 **PlanetScale은 MySQL 호환 데이터베이스 서비스입니다**
+
+PlanetScale의 특징:
+- **MySQL 호환**: 기존 MySQL 도구 및 라이브러리 사용 가능
+- **Vitess 기반**: 자동 샤딩으로 무제한 확장
+- **브랜칭**: 데이터베이스 버전 관리처럼 브랜치 생성 가능
+- **자동 백업**: 30일 보관
+- **온라인 마이그레이션**: 무중단 스키마 변경
+
+예시:
+- `myapp_db`: 프로덕션 데이터베이스
+- `development`: 개발 환경 브랜치
+- `staging`: 스테이징 환경 브랜치
+</Callout>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "유효한 이메일 주소", required: true },
+  { text: "인터넷 연결", required: true },
+  { text: "GitHub 계정 [선택사항]", required: false }
+]} />
+
+---
+
+<Step number={1} title="PlanetScale 계정 만들기">
+
+1. [PlanetScale 공식 웹사이트](https://planetscale.com)에 접속합니다.
+2. **Sign up** 또는 **Get started** 버튼을 클릭합니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/planetscale/planetscale-account-setup-step1-ko.png"
+  alt="PlanetScale 홈페이지"
+  caption="PlanetScale 회원가입 페이지"
+  priority={true}
+/>
+
+### 회원가입 옵션
+
+다음 중 하나를 선택합니다:
+
+1. **Email**: 이메일로 가입
+2. **GitHub**: GitHub 계정으로 가입 [권장]
+3. **Google**: Google 계정으로 가입
+
+GitHub로 가입하면 자동으로 저장소 연동이 가능합니다.
+
+<Callout type="tip">
+💡 **GitHub로 가입하는 이유**
+
+- 저장소 자동 연동
+- 배포 자동화 설정 용이
+- 액세스 토큰 관리 간편
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="이메일 인증 및 프로필 설정">
+
+### 이메일 인증
+
+1. 가입한 이메일로 인증 링크가 전송됩니다.
+2. 이메일에서 **Verify email** 링크를 클릭합니다.
+3. 인증 완료 후 대시보드로 이동합니다.
+
+### 프로필 정보 입력
+
+다음 정보를 입력합니다:
+
+1. **Organization name**: 조직명 [선택사항]
+2. **Default region**: 데이터베이스 위치 선택
+   - **us-east**: 미국 동부
+   - **us-west**: 미국 서부
+   - **eu-west**: 유럽 서부
+   - **ap-southeast**: 아시아 태평양
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/planetscale/planetscale-account-setup-step2-ko.png"
+  alt="프로필 설정"
+  caption="PlanetScale 조직 설정"
+/>
+
+<Callout type="info">
+**리전 선택 팁**
+
+- 사용자가 많은 지역을 선택하면 응답 속도 향상
+- 한국 사용자: ap-southeast 권장
+- 나중에 변경 가능
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="첫 데이터베이스 생성">
+
+1. 대시보드에서 **Create a new database** 또는 **New database** 버튼을 클릭합니다.
+2. 데이터베이스 정보를 입력합니다:
+   - **Database name**: 데이터베이스 이름 [예: myapp_db]
+   - **Region**: 기본값 사용 또는 변경
+   - **MySQL version**: 8.0 또는 5.7 [8.0 권장]
+
+<CopyBlock
+  code="데이터베이스 이름 규칙:
+- 소문자로 시작
+- 숫자와 언더스코어 사용 가능
+- 예: my_app_db, app_production, userdb_2024"
+  language="bash"
+/>
+
+### 브랜치 선택
+
+- **main**: 프로덕션 브랜치 [기본값]
+- **develop**: 개발용 브랜치 [선택사항]
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/planetscale/planetscale-account-setup-step3-ko.png"
+  alt="데이터베이스 생성"
+  caption="PlanetScale 데이터베이스 생성 폼"
+/>
+
+3. **Create database** 버튼을 클릭합니다.
+
+<Callout type="tip">
+💡 **PlanetScale의 브랜칭 개념**
+
+- **main 브랜치**: 프로덕션 데이터
+- **develop 브랜치**: 개발 환경
+- Git처럼 스키마 변경을 여러 브랜치에서 테스트 후 병합
+
+예:
+```
+main 브랜치      develop 브랜치
+[프로덕션]  <--  [개발환경 테스트]
+                  feature 브랜치
+                  [새 기능 개발]
+```
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="데이터베이스 연결 정보 확인">
+
+데이터베이스가 생성되면 연결 정보가 표시됩니다.
+
+### 연결 정보 복사
+
+1. 대시보드에서 생성한 데이터베이스 선택
+2. **Connect** 버튼 클릭
+3. 다음 정보가 표시됩니다:
+   - **Host**: 데이터베이스 호스트명
+   - **Username**: 데이터베이스 사용자명
+   - **Password**: 비밀번호 [새로 생성됨]
+   - **Database**: 데이터베이스명
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/planetscale/planetscale-account-setup-step4-ko.png"
+  alt="연결 정보"
+  caption="PlanetScale 데이터베이스 연결 정보"
+/>
+
+### 연결 문자열 형식
+
+<CopyBlock
+  code="mysql://username:password@host/database_name"
+  language="bash"
+/>
+
+예시:
+
+<CopyBlock
+  code="mysql://root:pscale_pw_xxxxx@aws.connect.psdb.cloud/myapp_db?sslaccept=strict"
+  language="bash"
+/>
+
+<Callout type="warning">
+⚠️ **보안 주의사항**
+
+- 연결 정보를 절대 공개 저장소에 올리지 마세요
+- 비밀번호는 환경 변수로 관리하세요
+- Git에 커밋할 때 .env 파일은 .gitignore에 추가
+</Callout>
+
+### 연결 테스트
+
+프로덕션 환경의 경우 비밀번호 재생성:
+
+1. **Settings** 탭에서 **Password**
+2. **Regenerate password** 클릭
+3. 새 비밀번호 생성
+
+<DevTip>
+**PlanetScale Password Policy**
+
+- 각 브랜치별로 독립적인 비밀번호
+- 정기적으로 재생성 권장 [3개월마다]
+- 구 비밀번호로도 일정 시간 접근 가능
+</DevTip>
+
+<Checkpoint
+  title="데이터베이스 생성 확인"
+  items={[
+    "데이터베이스가 'Ready' 상태인가요?",
+    "연결 정보를 확인했나요?",
+    "호스트명, 사용자명, 비밀번호를 메모했나요?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **축하합니다!** PlanetScale 데이터베이스가 생성되었습니다. 이제 애플리케이션과 연결할 준비가 완료되었습니다!
+</Callout>
+
+</Step>
+
+---
+
+## PlanetScale 대시보드 둘러보기
+
+### Databases 탭
+
+모든 데이터베이스 목록 및 상태 확인
+
+### Backups 탭
+
+- 자동 백업 확인
+- 백업 복구
+- 백업 스케줄 설정
+
+### Settings 탭
+
+- 데이터베이스 이름 변경
+- 리전 변경
+- MySQL 버전 확인
+- 비밀번호 재생성
+
+---
+
+## 다음 단계
+
+PlanetScale 데이터베이스 생성이 완료되었으니, 이제 애플리케이션과 연결해보세요:
+
+1. **[PlanetScale 데이터베이스 연결](../planetscale-database-connection)** - Node.js/Python 앱 연결
+2. **[Heroku 앱 배포](../heroku-app-deployment)** - 배포된 앱에 데이터베이스 연결
+
+---
+
+## 자주 묻는 질문
+
+<Callout type="info">
+**Q. 데이터베이스 이름을 변경할 수 있나요?**
+
+A. Settings에서 변경 가능합니다. 하지만 애플리케이션 연결 정보도 업데이트해야 합니다.
+</Callout>
+
+<Callout type="info">
+**Q. 무료 tier의 10GB는 충분한가요?**
+
+A. 중소 규모 애플리케이션에는 충분합니다. 초과 시 요금 청구됩니다.
+</Callout>
+
+<Callout type="info">
+**Q. 여러 데이터베이스를 만들 수 있나요?**
+
+A. 네, 무료 tier에서도 여러 데이터베이스 생성 가능합니다 [스토리지 제한 내에서].
+</Callout>
+
+---
+
+## 문제 해결
+
+### "Invalid database name"
+
+- 소문자만 사용하세요
+- 특수문자는 언더스코어만 가능
+- 이미 사용 중인 이름은 불가
+
+### "Unable to create database"
+
+- 무료 계정 스토리지 한계 확인
+- 불필요한 데이터베이스 삭제 후 재시도
+
+### 연결 정보를 모를 때
+
+- 대시보드에서 데이터베이스 클릭
+- **Connections** 탭에서 다시 확인 가능
+
+---
+
+**축하합니다!** 🚀 PlanetScale 데이터베이스 설정이 완료되었습니다!

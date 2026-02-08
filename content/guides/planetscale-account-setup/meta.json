@@ -1,0 +1,60 @@
+{
+  "slug": "planetscale-account-setup",
+  "platform": "planetscale",
+  "service": "PlanetScale MySQL",
+  "category": "database",
+  "difficulty": "beginner",
+  "estimatedMinutes": 10,
+  "totalSteps": 4,
+  "freeTier": {
+    "service": "PlanetScale MySQL Database",
+    "limit": "10GB storage with branch deployments",
+    "period": "forever",
+    "status": "generous",
+    "conditions": [
+      "1개의 프로덕션 브랜치",
+      "10개의 개발 브랜치",
+      "무제한 읽기/쓰기 수",
+      "30일 자동 백업",
+      "10GB 스토리지",
+      "신용카드 선택사항"
+    ]
+  },
+  "prerequisites": [],
+  "nextGuides": [
+    "planetscale-database-connection",
+    "heroku-app-deployment"
+  ],
+  "seo": {
+    "ko": {
+      "title": "PlanetScale 계정 생성 및 데이터베이스 설정 - MySQL 호스팅 | CloudSetup.guide",
+      "description": "PlanetScale 계정을 만들고 첫 MySQL 데이터베이스를 생성하는 방법을 배워보세요. Vitess 기반 확장 가능한 데이터베이스 솔루션입니다.",
+      "keywords": [
+        "PlanetScale 계정",
+        "MySQL 호스팅",
+        "데이터베이스 생성",
+        "Vitess",
+        "클라우드 데이터베이스",
+        "PlanetScale 시작",
+        "무료 데이터베이스"
+      ]
+    },
+    "en": {
+      "title": "Create PlanetScale Account and Setup Database - MySQL Hosting | CloudSetup.guide",
+      "description": "Learn how to create a PlanetScale account and create your first MySQL database. Scalable database solution powered by Vitess.",
+      "keywords": [
+        "PlanetScale account",
+        "MySQL hosting",
+        "create database",
+        "Vitess",
+        "cloud database",
+        "PlanetScale getting started",
+        "free database"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T02:00:00.000Z",
+  "updatedAt": "2026-02-08T02:00:00.000Z",
+  "lastVerified": "2026-02-08T02:00:00.000Z",
+  "published": true
+}

@@ -1,0 +1,60 @@
+{
+  "slug": "docker-build-deploy",
+  "platform": "docker",
+  "service": "Docker Containers",
+  "category": "container",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 20,
+  "totalSteps": 5,
+  "freeTier": {
+    "service": "Docker Community Edition",
+    "limit": "Unlimited builds and deployments",
+    "period": "forever",
+    "status": "generous",
+    "conditions": [
+      "로컬 빌드 및 배포 무제한",
+      "Docker Hub에 공개 저장소 무제한",
+      "개인 저장소 1개 무료",
+      "대역폭 제한 있음"
+    ]
+  },
+  "prerequisites": [
+    "docker-installation-setup"
+  ],
+  "nextGuides": [
+    "heroku-app-deployment",
+    "planetscale-account-setup"
+  ],
+  "seo": {
+    "ko": {
+      "title": "Docker 이미지 빌드 및 컨테이너 배포 - Dockerfile 작성 가이드 | CloudSetup.guide",
+      "description": "Dockerfile을 작성하고 Docker 이미지를 빌드한 후 컨테이너로 배포하는 방법을 배워보세요. Node.js 예제로 실무 기초를 완벽히 이해합니다.",
+      "keywords": [
+        "Docker 빌드",
+        "Dockerfile 작성",
+        "컨테이너 배포",
+        "Docker 이미지",
+        "Docker 명령어",
+        "Node.js Docker",
+        "컨테이너 실행"
+      ]
+    },
+    "en": {
+      "title": "Build Docker Images and Deploy Containers - Dockerfile Guide | CloudSetup.guide",
+      "description": "Learn how to write Dockerfile, build Docker images, and deploy containers. Master the basics with Node.js examples for real-world applications.",
+      "keywords": [
+        "Docker build",
+        "write Dockerfile",
+        "deploy containers",
+        "Docker images",
+        "Docker commands",
+        "Node.js Docker",
+        "run containers"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T02:00:00.000Z",
+  "updatedAt": "2026-02-08T02:00:00.000Z",
+  "lastVerified": "2026-02-08T02:00:00.000Z",
+  "published": false
+}

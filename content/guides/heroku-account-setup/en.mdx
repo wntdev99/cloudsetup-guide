@@ -1,0 +1,313 @@
+# Create Heroku Account and Install CLI
+
+Heroku is a cloud platform that makes deploying applications easy. This guide teaches you how to create a Heroku account and install the CLI.
+
+<FreeTierInfo
+  service="Heroku Dyno Hours"
+  limit="1,000 free dyno-hours per month"
+  period="Per month"
+  status="limited"
+/>
+
+## What is Heroku?
+
+<Callout type="info">
+🚀 **Heroku is a developer-friendly deployment platform**
+
+Key features:
+- **Git deployment**: Auto-deploy with just git push
+- **Free option**: Start with free tier
+- **Add-ons**: Additional services like database, cache
+- **Auto-scaling**: Automatically scale with traffic
+- **Multi-language support**: Node.js, Python, Ruby, Java, PHP, etc.
+
+Examples:
+- `my-blog`: Blog application
+- `api-server`: REST API server
+- `data-processing`: Data processing tasks
+</Callout>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Valid email address", required: true },
+  { text: "Internet connection", required: true },
+  { text: "Git installed [Optional]", required: false }
+]} />
+
+---
+
+<Step number={1} title="Create Heroku Account">
+
+1. Visit [Heroku official website](https://www.heroku.com).
+2. Click the **Sign up** button at the top.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/heroku/heroku-account-setup-step1-en.png"
+  alt="Heroku homepage"
+  caption="Sign up button on Heroku official site"
+  priority={true}
+/>
+
+### Fill Registration Form
+
+Enter the following information:
+
+1. **First Name**: Your first name
+2. **Last Name**: Your last name
+3. **Email**: Valid email address
+4. **Company Name**: Company name [Optional]
+5. **Phone Number**: Phone number [Optional]
+
+<Callout type="tip">
+💡 **Benefits of Heroku Free Account**
+
+- No credit card required [basic features]
+- 1,000 free dyno-hours per month
+- Deploy up to 5 apps
+- Auto-deploy if public repository
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Email Verification">
+
+1. Check the email you registered.
+2. Find the verification email from Heroku.
+3. Click **Verify email address** link in the email.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/heroku/heroku-account-setup-step2-en.png"
+  alt="Email verification"
+  caption="Verify link in Heroku verification email"
+/>
+
+### Set Password
+
+1. After verification, set a strong password.
+2. Must meet these requirements:
+   - Minimum 8 characters
+   - Include uppercase letter
+   - Include number
+   - Include special character
+
+<Callout type="warning">
+⚠️ **Security Precautions**
+
+- Keep password in safe place
+- Don't use same password as other sites
+- Never share Heroku API keys
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="Install Heroku CLI">
+
+### macOS Installation
+
+If Homebrew is installed:
+
+<CopyBlock
+  code="brew tap heroku/brew && brew install heroku"
+  language="bash"
+/>
+
+Or download from [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli).
+
+### Windows Installation
+
+1. Download [Heroku CLI Windows installer](https://devcenter.heroku.com/articles/heroku-cli).
+2. Run installer and follow wizard.
+3. Restart command prompt after installation.
+
+### Linux Installation
+
+<CopyBlock
+  code="curl https://cli-assets.heroku.com/install.sh | sh"
+  language="bash"
+/>
+
+Or using Snap:
+
+<CopyBlock
+  code="sudo snap install heroku --classic"
+  language="bash"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/heroku/heroku-account-setup-step3-en.png"
+  alt="Install Heroku CLI"
+  caption="Run heroku command in terminal"
+/>
+
+</Step>
+
+---
+
+<Step number={4} title="Login to Heroku CLI and Verify">
+
+Open terminal and run:
+
+<CopyBlock
+  code="heroku --version"
+  language="bash"
+/>
+
+Output:
+
+<CopyBlock
+  code="heroku/8.7.0 [platform] [node-version]"
+  language="bash"
+/>
+
+### Login to Heroku
+
+<CopyBlock
+  code="heroku login"
+  language="bash"
+/>
+
+Browser opens automatically with login page. Or use:
+
+<CopyBlock
+  code="heroku login -i"
+  language="bash"
+/>
+
+This way enter email and password directly in terminal.
+
+<Callout type="info">
+**Verify Login Status**
+
+Run this command to check login:
+
+```
+heroku auth:whoami
+```
+
+Should display:
+- Email of logged-in account
+- API key [masked]
+</Callout>
+
+### Check Account Information
+
+<CopyBlock
+  code="heroku whoami"
+  language="bash"
+/>
+
+Should display logged-in account email:
+
+<CopyBlock
+  code="your-email@example.com"
+  language="bash"
+/>
+
+<Checkpoint
+  title="Verify Heroku Setup"
+  items={[
+    "Does heroku --version command work?",
+    "Did you successfully login to your Heroku account?",
+    "Does heroku whoami show your account info?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **Congratulations!** Heroku account setup is complete. You're ready to deploy apps!
+</Callout>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/heroku/heroku-account-setup-step4-en.png"
+  alt="Verify Heroku login"
+  caption="Verify account with heroku whoami"
+/>
+
+</Step>
+
+---
+
+## Explore Heroku Dashboard
+
+After login, visit [Heroku Dashboard](https://dashboard.heroku.com) to see:
+
+1. **Apps**: List of deployed applications
+2. **Personal**: Account settings
+3. **Account Settings**: Change email, password
+4. **Applications**: Manage API keys
+
+---
+
+## Create Heroku App [Dashboard]
+
+Or create with CLI:
+
+<CopyBlock
+  code="heroku create my-app-name"
+  language="bash"
+/>
+
+This command:
+- Creates new app on Heroku
+- Automatically sets Git remote
+- Assigns app URL
+
+---
+
+## Next Steps
+
+Heroku account and CLI setup is complete, now deploy your app:
+
+1. **[Deploy Heroku App](../heroku-app-deployment)** - Deploy Node.js/Python app
+2. **[Docker Build and Deploy](../docker-build-deploy)** - Try Docker containers
+
+---
+
+## Frequently Asked Questions
+
+<Callout type="info">
+**Q. How long does a free dyno run?**
+
+A. It enters sleep mode after 30 minutes with no requests. Wakes up when request comes [takes ~30 seconds].
+</Callout>
+
+<Callout type="info">
+**Q. Is Heroku free tier going away?**
+
+A. Heroku will phase out free dynos after 2025. Currently still available.
+</Callout>
+
+<Callout type="info">
+**Q. Can I deploy without CLI?**
+
+A. Yes, you can auto-deploy by connecting GitHub from Heroku dashboard.
+</Callout>
+
+---
+
+## Troubleshooting
+
+### "heroku: command not found"
+
+- Heroku CLI not installed or not in PATH
+- Retry installation or restart terminal
+
+### "Not authenticated" error
+
+- Logout with `heroku logout` and login again
+- Or check `~/.netrc` file [stores auth info]
+
+### Update CLI
+
+<CopyBlock
+  code="heroku update"
+  language="bash"
+/>
+
+---
+
+**Congratulations!** 🚀 Heroku account setup is complete!

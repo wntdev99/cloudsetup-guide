@@ -1,0 +1,289 @@
+# Create Slack App and Setup Credentials
+
+Slack is a team communication platform that can be extended with custom apps and bots. Learn how to create a Slack app and get required credentials.
+
+<FreeTierInfo
+  service="Slack Apps and Integrations"
+  limit="Unlimited free apps and basic features"
+  period="Forever free"
+  status="generous"
+/>
+
+## What is a Slack App?
+
+<Callout type="info">
+🤖 **Slack Apps extend your Slack workspace**
+
+Key features:
+- **Bots**: Automatically send messages
+- **Slash commands**: Custom /command commands
+- **Event handling**: Detect messages, user actions
+- **Interactive**: Buttons, modals, select menus
+- **Workflows**: Automated processes
+
+Examples:
+- AI chatbot: Auto-respond to messages
+- Alert bot: Notify of external events
+- Task management: Manage to-do lists
+</Callout>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Slack workspace admin rights", required: true },
+  { text: "Slack account", required: true },
+  { text: "Internet connection", required: true }
+]} />
+
+---
+
+<Step number={1} title="Create App in Slack API Portal">
+
+1. Visit [Slack API Portal](https://api.slack.com/apps).
+2. Click **Create New App** button.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/slack/slack-app-creation-step1-en.png"
+  alt="Slack API Portal"
+  caption="Create app in Slack API Portal"
+  priority={true}
+/>
+
+### Choose App Creation Method
+
+Two options:
+
+1. **From scratch**: Create from beginning [recommended]
+2. **From an app manifest**: Create from preset config
+
+Choose **From scratch**.
+
+### Enter App Information
+
+1. **App Name**: App name [e.g., My Chat Bot]
+2. **Pick a workspace**: Select workspace for app
+3. Click **Create App**
+
+<Callout type="tip">
+💡 **App Naming Tips**
+
+- Clear and descriptive: "Customer Support Bot" ✅
+- Not too long: "My Amazing Chat Bot for Customer Support" ❌
+- Can be changed later
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Set App Permissions">
+
+Configure what permissions your app will have in the workspace.
+
+### Set Bot Token Scopes
+
+Click **OAuth & Permissions** in left menu:
+
+1. **Bot Token Scopes** section
+2. Click **Add an OAuth Scope** button
+3. Add required permissions:
+
+Popular permissions:
+- `chat:write`: Send messages
+- `chat:read`: Read messages
+- `users:read`: Get user info
+- `app_mentions:read`: Detect bot mentions
+- `messages.im`: Direct messages
+
+<CopyBlock
+  code="Common bot permissions:
+chat:write - Send messages
+chat:read - Read messages
+users:read - Get user info
+app_mentions:read - Detect mentions
+commands - Slash commands"
+  language="bash"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/slack/slack-app-creation-step2-en.png"
+  alt="Set permissions"
+  caption="Configure Bot Token Scopes"
+/>
+
+### User Token Scopes [Optional]
+
+Set if your app needs to act on behalf of users.
+
+<Callout type="warning">
+⚠️ **Permission Precautions**
+
+- Request only necessary permissions [principle of least privilege]
+- Too many permissions is a security risk
+- Can be modified later
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="Copy Bot Token and API Key">
+
+### Generate Bot Token
+
+1. In OAuth & Permissions page
+2. Click **Install to Workspace** button
+3. Review permissions and click **Allow**
+
+### Copy Token
+
+1. Find **Bot User OAuth Token**
+2. Copy token value [starts with xoxb-]
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/slack/slack-app-creation-step3-en.png"
+  alt="Copy token"
+  caption="Copy Bot User OAuth Token"
+/>
+
+### Securely Store Token
+
+Save in .env file:
+
+<CopyBlock
+  code="SLACK_BOT_TOKEN=xoxb-your-token
+SLACK_SIGNING_SECRET=your-signing-secret"
+  language="bash"
+/>
+
+Add to .gitignore:
+
+<CopyBlock
+  code="echo '.env' >> .gitignore"
+  language="bash"
+/>
+
+<Callout type="warning">
+⚠️ **Token Security Precautions**
+
+- Never share token publicly
+- Never hardcode in code
+- Never commit to GitHub
+- Regenerate immediately if exposed
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="Setup Event Subscriptions">
+
+Configure your app to listen for specific events.
+
+### Access Events Menu
+
+Click **Event Subscriptions** in left menu
+
+### Set Request URL
+
+1. Enter **Request URL** field
+2. Specify URL where Slack sends events
+3. Example: `https://your-domain.com/slack/events`
+
+<Callout type="info">
+**Why Request URL is needed**
+
+- Slack POSTs events to this URL
+- Your app receives and processes them
+- Must be public URL [localhost not allowed]
+</Callout>
+
+### Add Event Subscriptions
+
+1. **Subscribe to bot events** section
+2. Click **Add Bot User Event**
+3. Select events:
+
+Popular events:
+- `message.channels`: Channel messages
+- `app_mention`: Bot mentions
+- `reaction_added`: Reaction added
+- `user_change`: User info changed
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/slack/slack-app-creation-step4-en.png"
+  alt="Event subscriptions"
+  caption="Configure Event Subscriptions"
+/>
+
+### Register Slash Commands [Optional]
+
+In **Slash Commands** menu:
+
+1. Click **Create New Command**
+2. Enter command: `/mycommand`
+3. Request URL: `https://your-domain.com/slack/commands`
+4. Enter description
+5. Click **Save**
+
+<Checkpoint
+  title="Verify App Setup"
+  items={[
+    "Is Slack app created?",
+    "Did you set permissions?",
+    "Did you copy Bot Token?",
+    "Did you setup event subscriptions?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **Congratulations!** Slack app creation complete!
+</Callout>
+
+</Step>
+
+---
+
+## Copy Signing Secret
+
+Signing Secret is needed to verify requests are from Slack.
+
+1. **Basic Information** menu
+2. **App Credentials** section
+3. Copy **Signing Secret**
+
+Add to .env file:
+
+<CopyBlock
+  code="SLACK_SIGNING_SECRET=your-signing-secret"
+  language="bash"
+/>
+
+---
+
+## Next Steps
+
+App creation complete, now implement bot logic:
+
+1. **[Setup Slack Integration](../slack-integration-setup)** - Implement bot in Node.js/Python
+2. **[Integrate OpenAI](../openai-api-integration)** - Add AI features
+
+---
+
+## Frequently Asked Questions
+
+<Callout type="info">
+**Q. Can't set Request URL**
+
+A. Must be public HTTPS URL. Localhost not allowed. Can test with ngrok tunneling.
+</Callout>
+
+<Callout type="info">
+**Q. Does token expire?**
+
+A. Bot Token doesn't expire, but becomes invalid if app is removed.
+</Callout>
+
+---
+
+**Congratulations!** 🎉 Slack app creation complete!

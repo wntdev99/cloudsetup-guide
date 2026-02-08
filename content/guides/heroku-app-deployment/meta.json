@@ -1,0 +1,64 @@
+{
+  "slug": "heroku-app-deployment",
+  "platform": "heroku",
+  "service": "Heroku Deployment",
+  "category": "deployment",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 20,
+  "totalSteps": 5,
+  "freeTier": {
+    "service": "Heroku Dyno Hours",
+    "limit": "1,000 free dyno-hours per month",
+    "period": "month",
+    "status": "limited",
+    "conditions": [
+      "배포된 앱 실행 가능",
+      "자동 재배포 [Git push]",
+      "환경 변수 설정 가능",
+      "로깅 및 모니터링 기본 제공",
+      "수면 모드 있음"
+    ]
+  },
+  "prerequisites": [
+    "heroku-account-setup",
+    "docker-build-deploy"
+  ],
+  "nextGuides": [
+    "planetscale-account-setup",
+    "planetscale-database-connection"
+  ],
+  "seo": {
+    "ko": {
+      "title": "Heroku 앱 배포 가이드 - Node.js/Python 애플리케이션 배포 | CloudSetup.guide",
+      "description": "Heroku에 Node.js 또는 Python 애플리케이션을 배포하는 방법을 배워보세요. Git 푸시로 자동 배포되는 과정을 단계별로 안내합니다.",
+      "keywords": [
+        "Heroku 배포",
+        "Node.js 배포",
+        "Python 배포",
+        "클라우드 배포",
+        "Git 배포",
+        "Procfile",
+        "환경 변수",
+        "Heroku 앱"
+      ]
+    },
+    "en": {
+      "title": "Deploy Heroku App - Deploy Node.js/Python Applications | CloudSetup.guide",
+      "description": "Learn how to deploy Node.js or Python applications to Heroku. Step-by-step guide to auto-deployment with git push.",
+      "keywords": [
+        "Heroku deployment",
+        "deploy Node.js",
+        "deploy Python",
+        "cloud deployment",
+        "Git deployment",
+        "Procfile",
+        "environment variables",
+        "Heroku app"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T02:00:00.000Z",
+  "updatedAt": "2026-02-08T02:00:00.000Z",
+  "lastVerified": "2026-02-08T02:00:00.000Z",
+  "published": true
+}

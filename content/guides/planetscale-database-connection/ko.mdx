@@ -1,0 +1,588 @@
+# PlanetScale 데이터베이스 연결 - Node.js/Python 애플리케이션 연동
+
+이제 PlanetScale 데이터베이스를 실제 애플리케이션과 연결해봅시다. Node.js와 Python 모두 지원하며, 간단한 CRUD 작업부터 복잡한 쿼리까지 가능합니다.
+
+<FreeTierInfo
+  service="PlanetScale MySQL Database"
+  limit="10GB 저장소 [무제한 연결]"
+  period="영구 무료"
+  status="generous"
+/>
+
+## 데이터베이스 연결 개요
+
+<Callout type="info">
+🔌 **PlanetScale은 MySQL 호환 연결을 제공합니다**
+
+연결 방식:
+- **직접 연결**: mysql2/promise [Node.js], mysql-connector-python [Python]
+- **ORM 사용**: Prisma [Node.js], SQLAlchemy [Python]
+- **연결 풀링**: PlanetScale CLI 또는 별도 풀링 서비스
+- **SSL 필수**: 모든 연결은 암호화 필수
+
+연결 라이브러리:
+- Node.js: mysql2, sequelize, typeorm, prisma
+- Python: pymysql, mysql-connector, sqlalchemy, django-orm
+</Callout>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "PlanetScale 데이터베이스 생성 완료", required: true },
+  { text: "연결 정보 [host, username, password]", required: true },
+  { text: "Node.js 또는 Python 설치", required: true },
+  { text: "npm 또는 pip 패키지 매니저", required: true }
+]} />
+
+---
+
+<Step number={1} title="Node.js에서 mysql2 연결">
+
+### 패키지 설치
+
+<CopyBlock
+  code="npm install mysql2"
+  language="bash"
+/>
+
+### 연결 파일 생성
+
+**db.js** 파일 생성:
+
+<CopyBlock
+  code="const mysql = require('mysql2/promise');
+
+const pool = mysql.createPool({
+  host: 'aws.connect.psdb.cloud',
+  user: 'root',
+  password: 'pscale_pw_xxxxx',
+  database: 'myapp_db',
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+  ssl: 'amazon',
+  enableKeepAlive: true,
+  keepAliveInitialDelayMs: 0
+});
+
+module.exports = pool;"
+  language="javascript"
+/>
+
+<Callout type="warning">
+⚠️ **환경 변수로 관리하기**
+
+절대 코드에 비밀번호를 적지 마세요:
+
+```
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  ssl: 'amazon'
+});
+```
+
+.env 파일:
+```
+DB_HOST=aws.connect.psdb.cloud
+DB_USER=root
+DB_PASSWORD=pscale_pw_xxxxx
+DB_NAME=myapp_db
+```
+</Callout>
+
+### 간단한 쿼리 실행
+
+<CopyBlock
+  code="const pool = require('./db');
+
+async function getUsers() {
+  try {
+    const connection = await pool.getConnection();
+    const results = await connection.query('SELECT * FROM users');
+    connection.release();
+    return results[0];
+  } catch (error) {
+    console.error('Database error:', error);
+    throw error;
+  }
+}
+
+getUsers().then(users => {
+  console.log('Users:', users);
+}).catch(err => {
+  console.error('Error:', err);
+});"
+  language="javascript"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/planetscale/planetscale-database-connection-step1-ko.png"
+  alt="Node.js 연결"
+  caption="Node.js에서 PlanetScale 연결"
+  priority={true}
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="Python에서 mysql-connector 연결">
+
+### 패키지 설치
+
+<CopyBlock
+  code="pip install mysql-connector-python"
+  language="bash"
+/>
+
+### 연결 파일 생성
+
+**db.py** 파일 생성:
+
+<CopyBlock
+  code="import mysql.connector
+from mysql.connector import Error
+
+def get_db_connection():
+    try:
+        connection = mysql.connector.connect(
+            host='aws.connect.psdb.cloud',
+            user='root',
+            password='pscale_pw_xxxxx',
+            database='myapp_db',
+            ssl_disabled=False,
+            use_pure=True
+        )
+        return connection
+    except Error as e:
+        print('Error while connecting to MySQL', e)
+        raise
+
+def execute_query(query, params=None):
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    try:
+        if params:
+            cursor.execute(query, params)
+        else:
+            cursor.execute(query)
+        connection.commit()
+        print('Query executed successfully')
+    except Error as e:
+        print('Error executing query', e)
+    finally:
+        cursor.close()
+        connection.close()"
+  language="python"
+/>
+
+### 간단한 쿼리 실행
+
+<CopyBlock
+  code="import db
+
+def get_all_users():
+    connection = db.get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    try:
+        cursor.execute('SELECT * FROM users')
+        result = cursor.fetchall()
+        return result
+    finally:
+        cursor.close()
+        connection.close()
+
+users = get_all_users()
+for user in users:
+    print(user)"
+  language="python"
+/>
+
+</Step>
+
+---
+
+<Step number={3} title="데이터베이스 스키마 생성">
+
+먼저 테이블을 만들어야 합니다. PlanetScale CLI 또는 MySQL 클라이언트로 접속:
+
+### PlanetScale CLI로 접속
+
+<CopyBlock
+  code="pscale shell myapp_db main"
+  language="bash"
+/>
+
+또는 MySQL CLI:
+
+<CopyBlock
+  code="mysql -h aws.connect.psdb.cloud -u root -p"
+  language="bash"
+/>
+
+### 테이블 생성
+
+<CopyBlock
+  code="CREATE TABLE users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(100) UNIQUE NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE posts (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  title VARCHAR(200) NOT NULL,
+  content TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);"
+  language="sql"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/planetscale/planetscale-database-connection-step3-ko.png"
+  alt="테이블 생성"
+  caption="PlanetScale에서 테이블 생성"
+/>
+
+<Callout type="tip">
+💡 **테이블 생성 팁**
+
+- AUTO_INCREMENT: 자동 증가하는 ID
+- NOT NULL: 필수 필드
+- UNIQUE: 중복 불가
+- FOREIGN KEY: 관계형 데이터
+- DEFAULT CURRENT_TIMESTAMP: 자동 생성 시간
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="CRUD 작업 예제">
+
+### Create [데이터 삽입]
+
+**Node.js:**
+
+<CopyBlock
+  code="async function insertUser(name, email) {
+  const connection = await pool.getConnection();
+  try {
+    const [result] = await connection.query(
+      'INSERT INTO users (name, email) VALUES (?, ?)',
+      [name, email]
+    );
+    console.log('User inserted with ID:', result.insertId);
+    return result;
+  } finally {
+    connection.release();
+  }
+}
+
+insertUser('John Doe', 'john@example.com');"
+  language="javascript"
+/>
+
+**Python:**
+
+<CopyBlock
+  code="def insert_user(name, email):
+    connection = db.get_db_connection()
+    cursor = connection.cursor()
+    try:
+        query = 'INSERT INTO users (name, email) VALUES (%s, %s)'
+        cursor.execute(query, (name, email))
+        connection.commit()
+        print('User inserted successfully')
+    finally:
+        cursor.close()
+        connection.close()
+
+insert_user('John Doe', 'john@example.com')"
+  language="python"
+/>
+
+### Read [데이터 조회]
+
+**Node.js:**
+
+<CopyBlock
+  code="async function getUserById(id) {
+  const connection = await pool.getConnection();
+  try {
+    const [rows] = await connection.query(
+      'SELECT * FROM users WHERE id = ?',
+      [id]
+    );
+    return rows[0];
+  } finally {
+    connection.release();
+  }
+}
+
+const user = await getUserById(1);
+console.log('User:', user);"
+  language="javascript"
+/>
+
+**Python:**
+
+<CopyBlock
+  code="def get_user_by_id(user_id):
+    connection = db.get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    try:
+        cursor.execute('SELECT * FROM users WHERE id = %s', (user_id,))
+        return cursor.fetchone()
+    finally:
+        cursor.close()
+        connection.close()
+
+user = get_user_by_id(1)
+print('User:', user)"
+  language="python"
+/>
+
+### Update [데이터 수정]
+
+**Node.js:**
+
+<CopyBlock
+  code="async function updateUser(id, name, email) {
+  const connection = await pool.getConnection();
+  try {
+    const [result] = await connection.query(
+      'UPDATE users SET name = ?, email = ? WHERE id = ?',
+      [name, email, id]
+    );
+    console.log('Rows affected:', result.affectedRows);
+  } finally {
+    connection.release();
+  }
+}
+
+updateUser(1, 'Jane Doe', 'jane@example.com');"
+  language="javascript"
+/>
+
+**Python:**
+
+<CopyBlock
+  code="def update_user(user_id, name, email):
+    connection = db.get_db_connection()
+    cursor = connection.cursor()
+    try:
+        query = 'UPDATE users SET name = %s, email = %s WHERE id = %s'
+        cursor.execute(query, (name, email, user_id))
+        connection.commit()
+        print('User updated')
+    finally:
+        cursor.close()
+        connection.close()
+
+update_user(1, 'Jane Doe', 'jane@example.com')"
+  language="python"
+/>
+
+### Delete [데이터 삭제]
+
+**Node.js:**
+
+<CopyBlock
+  code="async function deleteUser(id) {
+  const connection = await pool.getConnection();
+  try {
+    const [result] = await connection.query(
+      'DELETE FROM users WHERE id = ?',
+      [id]
+    );
+    console.log('Rows deleted:', result.affectedRows);
+  } finally {
+    connection.release();
+  }
+}
+
+deleteUser(1);"
+  language="javascript"
+/>
+
+**Python:**
+
+<CopyBlock
+  code="def delete_user(user_id):
+    connection = db.get_db_connection()
+    cursor = connection.cursor()
+    try:
+        cursor.execute('DELETE FROM users WHERE id = %s', (user_id,))
+        connection.commit()
+        print('User deleted')
+    finally:
+        cursor.close()
+        connection.close()
+
+delete_user(1)"
+  language="python"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/planetscale/planetscale-database-connection-step4-ko.png"
+  alt="CRUD 작업"
+  caption="데이터 삽입, 조회, 수정, 삭제 예제"
+/>
+
+</Step>
+
+---
+
+<Step number={5} title="환경 변수와 보안 설정">
+
+### .env 파일 생성
+
+<CopyBlock
+  code="DB_HOST=aws.connect.psdb.cloud
+DB_USER=root
+DB_PASSWORD=pscale_pw_xxxxx
+DB_NAME=myapp_db
+NODE_ENV=production"
+  language="bash"
+/>
+
+### .gitignore에 추가
+
+<CopyBlock
+  code="echo '.env' >> .gitignore"
+  language="bash"
+/>
+
+### 환경 변수 로드
+
+**Node.js:**
+
+<CopyBlock
+  code="require('dotenv').config();
+
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  ssl: 'amazon'
+});"
+  language="javascript"
+/>
+
+**Python:**
+
+<CopyBlock
+  code="import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+def get_db_connection():
+    return mysql.connector.connect(
+        host=os.getenv('DB_HOST'),
+        user=os.getenv('DB_USER'),
+        password=os.getenv('DB_PASSWORD'),
+        database=os.getenv('DB_NAME')
+    )"
+  language="python"
+/>
+
+### Heroku에서 환경 변수 설정
+
+<CopyBlock
+  code="heroku config:set DB_HOST=aws.connect.psdb.cloud
+heroku config:set DB_USER=root
+heroku config:set DB_PASSWORD=pscale_pw_xxxxx
+heroku config:set DB_NAME=myapp_db"
+  language="bash"
+/>
+
+또는 한 번에:
+
+<CopyBlock
+  code="heroku config:set DB_HOST=aws.connect.psdb.cloud DB_USER=root DB_PASSWORD=pscale_pw_xxxxx DB_NAME=myapp_db"
+  language="bash"
+/>
+
+<Checkpoint
+  title="연결 확인"
+  items={[
+    "로컬에서 데이터베이스에 성공적으로 연결되었나요?",
+    "CRUD 작업을 모두 테스트했나요?",
+    "환경 변수가 .gitignore에 추가되었나요?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **축하합니다!** PlanetScale 데이터베이스 연결이 완료되었습니다!
+</Callout>
+
+</Step>
+
+---
+
+## 트러블슈팅
+
+### 연결 오류: "SSL Certificate Error"
+
+<CopyBlock
+  code="Node.js: ssl: 'amazon' 옵션 추가
+Python: ssl_disabled=False 설정"
+  language="bash"
+/>
+
+### 타임아웃 오류
+
+연결 풀 설정 확인:
+
+<CopyBlock
+  code="connectionLimit: 10
+waitForConnections: true
+queueLimit: 0"
+  language="javascript"
+/>
+
+### 비밀번호 오류
+
+PlanetScale 대시보드에서 비밀번호 재생성:
+
+1. Database Settings로 이동
+2. Passwords 섹션
+3. Regenerate 클릭
+
+---
+
+## 다음 단계
+
+데이터베이스 연결이 완료되었으니, 이제 고급 기능을 사용해보세요:
+
+1. **[OpenAI API 통합](../openai-api-integration)** - AI 기능 추가
+2. **[Slack 통합](../slack-integration-setup)** - 메시지 알림 기능
+
+---
+
+## 자주 묻는 질문
+
+<Callout type="info">
+**Q. 쿼리 성능이 느려요**
+
+A. 인덱스를 만들거나, 쿼리를 최적화하거나, 연결 풀을 조정하세요.
+</Callout>
+
+<Callout type="info">
+**Q. ORM을 사용하는 것이 좋나요?**
+
+A. Prisma [Node.js], SQLAlchemy [Python]을 권장합니다. 더 안전하고 간편합니다.
+</Callout>
+
+---
+
+**축하합니다!** 🚀 데이터베이스 연결이 완료되었습니다!

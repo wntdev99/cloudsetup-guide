@@ -1,0 +1,451 @@
+# Heroku 앱 배포 - Node.js/Python 애플리케이션 배포
+
+이제 Node.js 또는 Python 애플리케이션을 Heroku에 배포해봅시다. Heroku는 Git push만으로 자동 배포되는 편리한 플랫폼입니다.
+
+<FreeTierInfo
+  service="Heroku Dyno Hours"
+  limit="월 1,000 무료 dyno 시간"
+  period="매월"
+  status="limited"
+/>
+
+## Procfile이란?
+
+<Callout type="info">
+📄 **Procfile은 Heroku에 실행 방법을 알려주는 파일입니다**
+
+Procfile의 역할:
+- **프로세스 정의**: 애플리케이션을 어떻게 실행할지 지정
+- **포트 설정**: Heroku가 할당한 포트를 사용하도록 설정
+- **스케일 설정**: 프로세스 유형과 개수 정의
+
+예시:
+```
+web: npm start
+worker: node worker.js
+```
+
+첫 번째 줄은 웹 프로세스, 두 번째는 백그라운드 워커입니다.
+</Callout>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "Heroku 계정 및 CLI 설치", required: true },
+  { text: "Git 설치 및 저장소 초기화", required: true },
+  { text: "Node.js 또는 Python 애플리케이션", required: true }
+]} />
+
+---
+
+<Step number={1} title="Procfile 생성">
+
+프로젝트 루트에 **Procfile** 파일을 생성합니다 [확장자 없음]:
+
+### Node.js 애플리케이션
+
+<CopyBlock
+  code="echo 'web: npm start' > Procfile"
+  language="bash"
+/>
+
+또는 커스텀 명령어:
+
+<CopyBlock
+  code="echo 'web: node server.js' > Procfile"
+  language="bash"
+/>
+
+### Python 애플리케이션
+
+Flask를 사용하는 경우:
+
+<CopyBlock
+  code="echo 'web: gunicorn app:app' > Procfile"
+  language="bash"
+/>
+
+Django를 사용하는 경우:
+
+<CopyBlock
+  code="echo 'web: gunicorn myproject.wsgi' > Procfile"
+  language="bash"
+/>
+
+<Callout type="tip">
+💡 **Procfile 작성 팁**
+
+Node.js:
+- `npm start`를 package.json의 scripts.start와 맞춰야 함
+- `node app.js` 또는 `npm start`가 일반적
+
+Python:
+- Flask: gunicorn 필요
+- Django: 마찬가지로 gunicorn 필요
+- Python 버전 지정: runtime.txt에 `python-3.11.0`
+</Callout>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/heroku/heroku-app-deployment-step1-ko.png"
+  alt="Procfile 생성"
+  caption="프로젝트 루트에 생성된 Procfile"
+  priority={true}
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="환경 변수 설정 [선택사항]">
+
+민감한 정보는 환경 변수로 관리합니다:
+
+<CopyBlock
+  code="heroku config:set DATABASE_URL=your_database_url"
+  language="bash"
+/>
+
+또는 .env 파일의 모든 변수 추가:
+
+<CopyBlock
+  code="heroku config:set $(cat .env | sed 's/^/-e /')"
+  language="bash"
+/>
+
+환경 변수 확인:
+
+<CopyBlock
+  code="heroku config"
+  language="bash"
+/>
+
+<Callout type="warning">
+⚠️ **보안 주의사항**
+
+- API 키, 데이터베이스 URL을 환경 변수로 설정
+- .env 파일을 .gitignore에 추가
+- 절대 비밀정보를 Procfile에 기입하면 안 됨
+</Callout>
+
+### Node.js에서 환경 변수 사용
+
+<CopyBlock
+  code="const dbUrl = process.env.DATABASE_URL;
+const apiKey = process.env.API_KEY;"
+  language="javascript"
+/>
+
+### Python에서 환경 변수 사용
+
+<CopyBlock
+  code="import os
+
+db_url = os.getenv('DATABASE_URL')
+api_key = os.getenv('API_KEY')"
+  language="python"
+/>
+
+<DevTip>
+**포트 설정**
+
+Heroku는 동적으로 포트를 할당합니다:
+
+Node.js:
+```
+const PORT = process.env.PORT || 3000;
+app.listen(PORT);
+```
+
+Python Flask:
+```
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+```
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="Git 저장소 준비">
+
+프로젝트가 Git 저장소가 아니라면:
+
+<CopyBlock
+  code="git init
+git add .
+git commit -m 'Initial commit for Heroku deployment'"
+  language="bash"
+/>
+
+Heroku 앱 생성:
+
+<CopyBlock
+  code="heroku create my-awesome-app"
+  language="bash"
+  alt="Heroku create"
+/>
+
+또는 자동 생성된 이름 사용:
+
+<CopyBlock
+  code="heroku create"
+  language="bash"
+/>
+
+<Callout type="info">
+**Heroku 앱 이름 규칙**
+
+- 소문자, 숫자, 하이픈만 사용
+- 3-30자
+- 전 세계적으로 고유해야 함
+
+예:
+- `my-awesome-app` ✅
+- `blog-app-2024` ✅
+- `MyAwesomeApp` ❌ (대문자 금지)
+</Callout>
+
+생성된 앱 확인:
+
+<CopyBlock
+  code="heroku apps"
+  language="bash"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/heroku/heroku-app-deployment-step3-ko.png"
+  alt="Git 저장소 준비"
+  caption="heroku create 후 Git remote 자동 설정"
+/>
+
+</Step>
+
+---
+
+<Step number={4} title="Heroku에 배포">
+
+간단히 git push만으로 배포됩니다:
+
+<CopyBlock
+  code="git push heroku main"
+  language="bash"
+/>
+
+또는 master 브랜치:
+
+<CopyBlock
+  code="git push heroku master"
+  language="bash"
+/>
+
+배포 진행 상황:
+
+<CopyBlock
+  code="Enumerating objects: 45, done.
+Counting objects: 100% [45/45]
+Compressing objects: 100% [45/45]
+Writing objects: 100% [45/45]
+
+-----> Building on the Heroku platform
+-----> Using buildpack: heroku/nodejs
+-----> Nodejs app detected
+-----> Installing node modules
+npm install
+-----> Launching...
+released v1
+https://my-awesome-app.herokuapp.com/ deployed to Heroku
+
+Verifying deploy... done."
+  language="bash"
+/>
+
+<Checkpoint
+  title="배포 확인"
+  items={[
+    "배포가 'released v1' 메시지로 완료되었나요?",
+    "앱 URL이 생성되었나요?",
+    "오류 메시지가 없었나요?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **축하합니다!** 애플리케이션이 성공적으로 배포되었습니다!
+</Callout>
+
+</Step>
+
+---
+
+<Step number={5} title="배포된 앱 테스트 및 모니터링">
+
+### 앱 방문
+
+<CopyBlock
+  code="heroku open"
+  language="bash"
+/>
+
+브라우저에서 자동으로 앱이 열립니다. 또는 수동으로:
+
+<CopyBlock
+  code="https://my-awesome-app.herokuapp.com"
+  language="bash"
+/>
+
+### 로그 확인
+
+<CopyBlock
+  code="heroku logs --tail"
+  language="bash"
+/>
+
+실시간 로그:
+
+<CopyBlock
+  code="heroku logs --tail --dyno=web.1"
+  language="bash"
+/>
+
+최근 로그 50줄 확인:
+
+<CopyBlock
+  code="heroku logs -n 50"
+  language="bash"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/heroku/heroku-app-deployment-step5-ko.png"
+  alt="앱 테스트"
+  caption="배포된 앱이 브라우저에서 정상 작동"
+/>
+
+### 앱 정보 확인
+
+<CopyBlock
+  code="heroku info"
+  language="bash"
+/>
+
+출력 예시:
+
+<CopyBlock
+  code="=== my-awesome-app
+Dynos:
+Dyno Types: web
+Git URL: https://git.heroku.com/my-awesome-app.git
+Web URL: https://my-awesome-app.herokuapp.com/
+Region: us
+Released At: 2024-02-08T10:30:00Z"
+  language="bash"
+/>
+
+<Checkpoint
+  title="배포 후 확인"
+  items={[
+    "heroku open으로 앱이 정상 작동하나요?",
+    "heroku logs에서 오류가 없나요?",
+    "app.json에 모든 필수 정보가 있나요?"
+  ]}
+/>
+
+</Step>
+
+---
+
+## 재배포 방법
+
+코드를 수정한 후 다시 배포:
+
+<CopyBlock
+  code="git add .
+git commit -m 'Fix: update app logic'
+git push heroku main"
+  language="bash"
+/>
+
+---
+
+## Heroku 대시보드에서 배포
+
+또는 GitHub 연동으로 자동 배포:
+
+1. [Heroku 대시보드](https://dashboard.heroku.com) 접속
+2. 앱 선택
+3. **Deploy** 탭
+4. **Connect to GitHub**
+5. 저장소 선택
+6. **Enable Automatic Deploys** 활성화
+
+이제 main 브랜치에 push하면 자동으로 배포됩니다.
+
+---
+
+## 스케일링 [고급]
+
+dyno 개수 조정:
+
+<CopyBlock
+  code="heroku ps:scale web=2"
+  language="bash"
+/>
+
+또는 대시보드의 Resources 탭에서 조정합니다.
+
+---
+
+## 다음 단계
+
+앱 배포가 완료되었으니, 이제 데이터베이스를 추가해보세요:
+
+1. **[PlanetScale 계정 설정](../planetscale-account-setup)** - MySQL 데이터베이스 설정
+2. **[PlanetScale 연결](../planetscale-database-connection)** - 앱에 데이터베이스 연결
+
+---
+
+## 자주 묻는 질문
+
+<Callout type="info">
+**Q. 앱이 배포 후 바로 종료되었어요**
+
+A. Procfile의 프로세스가 중단되었을 수 있습니다. heroku logs로 오류를 확인하세요.
+</Callout>
+
+<Callout type="info">
+**Q. Node modules가 인식되지 않아요**
+
+A. package.json이 프로젝트 루트에 있는지 확인하세요. Heroku는 이를 자동으로 감지합니다.
+</Callout>
+
+<Callout type="info">
+**Q. 포트 3000이 아니라 다른 포트를 사용해야 하면?**
+
+A. Procfile에서: `web: PORT=5000 npm start` 또는 코드에서 process.env.PORT 사용
+</Callout>
+
+---
+
+## 문제 해결
+
+### "No default language detected"
+
+- 프로젝트 루트에 package.json [Node.js] 또는 requirements.txt [Python]이 필요
+- Git에 커밋했는지 확인
+
+### "Procfile not found"
+
+- Procfile이 프로젝트 루트에 있는지 확인 [대문자 P, 확장자 없음]
+- Git에 추가했는지 확인
+
+### "Dyno crashed"
+
+<CopyBlock
+  code="heroku logs --tail"
+  language="bash"
+/>
+
+로그에서 오류 메시지 확인
+
+---
+
+**축하합니다!** 🎉 Heroku 배포가 완료되었습니다!

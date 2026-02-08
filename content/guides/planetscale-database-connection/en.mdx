@@ -1,0 +1,588 @@
+# Connect PlanetScale Database - Node.js/Python Application Integration
+
+Let's connect PlanetScale database to a real application. Both Node.js and Python are supported, enabling everything from simple CRUD to complex queries.
+
+<FreeTierInfo
+  service="PlanetScale MySQL Database"
+  limit="10GB storage with unlimited connections"
+  period="Forever free"
+  status="generous"
+/>
+
+## Database Connection Overview
+
+<Callout type="info">
+🔌 **PlanetScale provides MySQL-compatible connections**
+
+Connection methods:
+- **Direct**: mysql2/promise [Node.js], mysql-connector-python [Python]
+- **ORM**: Prisma [Node.js], SQLAlchemy [Python]
+- **Connection pooling**: PlanetScale CLI or separate pooling service
+- **SSL required**: All connections must be encrypted
+
+Connection libraries:
+- Node.js: mysql2, sequelize, typeorm, prisma
+- Python: pymysql, mysql-connector, sqlalchemy, django-orm
+</Callout>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "PlanetScale database created", required: true },
+  { text: "Connection info [host, username, password]", required: true },
+  { text: "Node.js or Python installed", required: true },
+  { text: "npm or pip package manager", required: true }
+]} />
+
+---
+
+<Step number={1} title="Connect with mysql2 in Node.js">
+
+### Install Package
+
+<CopyBlock
+  code="npm install mysql2"
+  language="bash"
+/>
+
+### Create Connection File
+
+Create **db.js**:
+
+<CopyBlock
+  code="const mysql = require('mysql2/promise');
+
+const pool = mysql.createPool({
+  host: 'aws.connect.psdb.cloud',
+  user: 'root',
+  password: 'pscale_pw_xxxxx',
+  database: 'myapp_db',
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+  ssl: 'amazon',
+  enableKeepAlive: true,
+  keepAliveInitialDelayMs: 0
+});
+
+module.exports = pool;"
+  language="javascript"
+/>
+
+<Callout type="warning">
+⚠️ **Manage with environment variables**
+
+Never put password in code:
+
+```
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  ssl: 'amazon'
+});
+```
+
+.env file:
+```
+DB_HOST=aws.connect.psdb.cloud
+DB_USER=root
+DB_PASSWORD=pscale_pw_xxxxx
+DB_NAME=myapp_db
+```
+</Callout>
+
+### Execute Simple Query
+
+<CopyBlock
+  code="const pool = require('./db');
+
+async function getUsers() {
+  try {
+    const connection = await pool.getConnection();
+    const results = await connection.query('SELECT * FROM users');
+    connection.release();
+    return results[0];
+  } catch (error) {
+    console.error('Database error:', error);
+    throw error;
+  }
+}
+
+getUsers().then(users => {
+  console.log('Users:', users);
+}).catch(err => {
+  console.error('Error:', err);
+});"
+  language="javascript"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/planetscale/planetscale-database-connection-step1-en.png"
+  alt="Node.js connection"
+  caption="Connect to PlanetScale from Node.js"
+  priority={true}
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="Connect with mysql-connector in Python">
+
+### Install Package
+
+<CopyBlock
+  code="pip install mysql-connector-python"
+  language="bash"
+/>
+
+### Create Connection File
+
+Create **db.py**:
+
+<CopyBlock
+  code="import mysql.connector
+from mysql.connector import Error
+
+def get_db_connection():
+    try:
+        connection = mysql.connector.connect(
+            host='aws.connect.psdb.cloud',
+            user='root',
+            password='pscale_pw_xxxxx',
+            database='myapp_db',
+            ssl_disabled=False,
+            use_pure=True
+        )
+        return connection
+    except Error as e:
+        print('Error while connecting to MySQL', e)
+        raise
+
+def execute_query(query, params=None):
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    try:
+        if params:
+            cursor.execute(query, params)
+        else:
+            cursor.execute(query)
+        connection.commit()
+        print('Query executed successfully')
+    except Error as e:
+        print('Error executing query', e)
+    finally:
+        cursor.close()
+        connection.close()"
+  language="python"
+/>
+
+### Execute Simple Query
+
+<CopyBlock
+  code="import db
+
+def get_all_users():
+    connection = db.get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    try:
+        cursor.execute('SELECT * FROM users')
+        result = cursor.fetchall()
+        return result
+    finally:
+        cursor.close()
+        connection.close()
+
+users = get_all_users()
+for user in users:
+    print(user)"
+  language="python"
+/>
+
+</Step>
+
+---
+
+<Step number={3} title="Create Database Schema">
+
+First create tables. Connect with PlanetScale CLI or MySQL client:
+
+### Connect with PlanetScale CLI
+
+<CopyBlock
+  code="pscale shell myapp_db main"
+  language="bash"
+/>
+
+Or with MySQL CLI:
+
+<CopyBlock
+  code="mysql -h aws.connect.psdb.cloud -u root -p"
+  language="bash"
+/>
+
+### Create Tables
+
+<CopyBlock
+  code="CREATE TABLE users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(100) UNIQUE NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE posts (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  title VARCHAR(200) NOT NULL,
+  content TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);"
+  language="sql"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/planetscale/planetscale-database-connection-step3-en.png"
+  alt="Create tables"
+  caption="Create tables in PlanetScale"
+/>
+
+<Callout type="tip">
+💡 **Table Creation Tips**
+
+- AUTO_INCREMENT: Auto-incrementing ID
+- NOT NULL: Required field
+- UNIQUE: No duplicates allowed
+- FOREIGN KEY: Relational data
+- DEFAULT CURRENT_TIMESTAMP: Auto-created timestamp
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="CRUD Operations Examples">
+
+### Create [Insert Data]
+
+**Node.js:**
+
+<CopyBlock
+  code="async function insertUser(name, email) {
+  const connection = await pool.getConnection();
+  try {
+    const [result] = await connection.query(
+      'INSERT INTO users (name, email) VALUES (?, ?)',
+      [name, email]
+    );
+    console.log('User inserted with ID:', result.insertId);
+    return result;
+  } finally {
+    connection.release();
+  }
+}
+
+insertUser('John Doe', 'john@example.com');"
+  language="javascript"
+/>
+
+**Python:**
+
+<CopyBlock
+  code="def insert_user(name, email):
+    connection = db.get_db_connection()
+    cursor = connection.cursor()
+    try:
+        query = 'INSERT INTO users (name, email) VALUES (%s, %s)'
+        cursor.execute(query, (name, email))
+        connection.commit()
+        print('User inserted successfully')
+    finally:
+        cursor.close()
+        connection.close()
+
+insert_user('John Doe', 'john@example.com')"
+  language="python"
+/>
+
+### Read [Query Data]
+
+**Node.js:**
+
+<CopyBlock
+  code="async function getUserById(id) {
+  const connection = await pool.getConnection();
+  try {
+    const [rows] = await connection.query(
+      'SELECT * FROM users WHERE id = ?',
+      [id]
+    );
+    return rows[0];
+  } finally {
+    connection.release();
+  }
+}
+
+const user = await getUserById(1);
+console.log('User:', user);"
+  language="javascript"
+/>
+
+**Python:**
+
+<CopyBlock
+  code="def get_user_by_id(user_id):
+    connection = db.get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    try:
+        cursor.execute('SELECT * FROM users WHERE id = %s', (user_id,))
+        return cursor.fetchone()
+    finally:
+        cursor.close()
+        connection.close()
+
+user = get_user_by_id(1)
+print('User:', user)"
+  language="python"
+/>
+
+### Update [Modify Data]
+
+**Node.js:**
+
+<CopyBlock
+  code="async function updateUser(id, name, email) {
+  const connection = await pool.getConnection();
+  try {
+    const [result] = await connection.query(
+      'UPDATE users SET name = ?, email = ? WHERE id = ?',
+      [name, email, id]
+    );
+    console.log('Rows affected:', result.affectedRows);
+  } finally {
+    connection.release();
+  }
+}
+
+updateUser(1, 'Jane Doe', 'jane@example.com');"
+  language="javascript"
+/>
+
+**Python:**
+
+<CopyBlock
+  code="def update_user(user_id, name, email):
+    connection = db.get_db_connection()
+    cursor = connection.cursor()
+    try:
+        query = 'UPDATE users SET name = %s, email = %s WHERE id = %s'
+        cursor.execute(query, (name, email, user_id))
+        connection.commit()
+        print('User updated')
+    finally:
+        cursor.close()
+        connection.close()
+
+update_user(1, 'Jane Doe', 'jane@example.com')"
+  language="python"
+/>
+
+### Delete [Delete Data]
+
+**Node.js:**
+
+<CopyBlock
+  code="async function deleteUser(id) {
+  const connection = await pool.getConnection();
+  try {
+    const [result] = await connection.query(
+      'DELETE FROM users WHERE id = ?',
+      [id]
+    );
+    console.log('Rows deleted:', result.affectedRows);
+  } finally {
+    connection.release();
+  }
+}
+
+deleteUser(1);"
+  language="javascript"
+/>
+
+**Python:**
+
+<CopyBlock
+  code="def delete_user(user_id):
+    connection = db.get_db_connection()
+    cursor = connection.cursor()
+    try:
+        cursor.execute('DELETE FROM users WHERE id = %s', (user_id,))
+        connection.commit()
+        print('User deleted')
+    finally:
+        cursor.close()
+        connection.close()
+
+delete_user(1)"
+  language="python"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/planetscale/planetscale-database-connection-step4-en.png"
+  alt="CRUD operations"
+  caption="Examples of insert, query, update, delete operations"
+/>
+
+</Step>
+
+---
+
+<Step number={5} title="Environment Variables and Security Setup">
+
+### Create .env File
+
+<CopyBlock
+  code="DB_HOST=aws.connect.psdb.cloud
+DB_USER=root
+DB_PASSWORD=pscale_pw_xxxxx
+DB_NAME=myapp_db
+NODE_ENV=production"
+  language="bash"
+/>
+
+### Add to .gitignore
+
+<CopyBlock
+  code="echo '.env' >> .gitignore"
+  language="bash"
+/>
+
+### Load Environment Variables
+
+**Node.js:**
+
+<CopyBlock
+  code="require('dotenv').config();
+
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  ssl: 'amazon'
+});"
+  language="javascript"
+/>
+
+**Python:**
+
+<CopyBlock
+  code="import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+def get_db_connection():
+    return mysql.connector.connect(
+        host=os.getenv('DB_HOST'),
+        user=os.getenv('DB_USER'),
+        password=os.getenv('DB_PASSWORD'),
+        database=os.getenv('DB_NAME')
+    )"
+  language="python"
+/>
+
+### Set Environment Variables in Heroku
+
+<CopyBlock
+  code="heroku config:set DB_HOST=aws.connect.psdb.cloud
+heroku config:set DB_USER=root
+heroku config:set DB_PASSWORD=pscale_pw_xxxxx
+heroku config:set DB_NAME=myapp_db"
+  language="bash"
+/>
+
+Or all at once:
+
+<CopyBlock
+  code="heroku config:set DB_HOST=aws.connect.psdb.cloud DB_USER=root DB_PASSWORD=pscale_pw_xxxxx DB_NAME=myapp_db"
+  language="bash"
+/>
+
+<Checkpoint
+  title="Verify Connection"
+  items={[
+    "Did you successfully connect to database locally?",
+    "Did you test all CRUD operations?",
+    "Is environment variable in .gitignore?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **Congratulations!** PlanetScale database connection complete!
+</Callout>
+
+</Step>
+
+---
+
+## Troubleshooting
+
+### Connection Error: "SSL Certificate Error"
+
+<CopyBlock
+  code="Node.js: Add ssl: 'amazon' option
+Python: Set ssl_disabled=False"
+  language="bash"
+/>
+
+### Timeout Error
+
+Check connection pool settings:
+
+<CopyBlock
+  code="connectionLimit: 10
+waitForConnections: true
+queueLimit: 0"
+  language="javascript"
+/>
+
+### Password Error
+
+Regenerate password in PlanetScale dashboard:
+
+1. Go to Database Settings
+2. Passwords section
+3. Click Regenerate
+
+---
+
+## Next Steps
+
+Database connection complete, now use advanced features:
+
+1. **[Integrate OpenAI API](../openai-api-integration)** - Add AI features
+2. **[Setup Slack Integration](../slack-integration-setup)** - Add messaging notifications
+
+---
+
+## Frequently Asked Questions
+
+<Callout type="info">
+**Q. Query performance is slow**
+
+A. Create indexes, optimize queries, or adjust connection pool.
+</Callout>
+
+<Callout type="info">
+**Q. Should I use ORM?**
+
+A. Prisma [Node.js], SQLAlchemy [Python] recommended. Safer and more convenient.
+</Callout>
+
+---
+
+**Congratulations!** 🚀 Database connection is complete!

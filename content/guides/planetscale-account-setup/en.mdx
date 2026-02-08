@@ -1,0 +1,307 @@
+# Create PlanetScale Account and Setup Database
+
+PlanetScale is a cloud database service based on MySQL. Using Vitess technology, it provides a highly scalable database. Let's create a PlanetScale account and your first database!
+
+<FreeTierInfo
+  service="PlanetScale MySQL Database"
+  limit="10GB storage with branch deployments"
+  period="Forever free"
+  status="generous"
+/>
+
+## What is PlanetScale?
+
+<Callout type="info">
+🚀 **PlanetScale is a MySQL-compatible database service**
+
+Key features:
+- **MySQL compatible**: Use existing MySQL tools and libraries
+- **Vitess powered**: Auto-sharding for unlimited scaling
+- **Branching**: Create database versions like Git branches
+- **Auto backup**: 30-day retention
+- **Online migrations**: Zero-downtime schema changes
+
+Examples:
+- `myapp_db`: Production database
+- `development`: Development environment branch
+- `staging`: Staging environment branch
+</Callout>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Valid email address", required: true },
+  { text: "Internet connection", required: true },
+  { text: "GitHub account [Optional]", required: false }
+]} />
+
+---
+
+<Step number={1} title="Create PlanetScale Account">
+
+1. Visit [PlanetScale official website](https://planetscale.com).
+2. Click **Sign up** or **Get started** button.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/planetscale/planetscale-account-setup-step1-en.png"
+  alt="PlanetScale homepage"
+  caption="PlanetScale signup page"
+  priority={true}
+/>
+
+### Signup Options
+
+Choose one:
+
+1. **Email**: Sign up with email
+2. **GitHub**: Sign up with GitHub account [Recommended]
+3. **Google**: Sign up with Google account
+
+Signing up with GitHub enables auto-repository linking.
+
+<Callout type="tip">
+💡 **Why Signup with GitHub?**
+
+- Auto-repository linking
+- Easy deployment automation
+- Convenient access token management
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Email Verification and Profile Setup">
+
+### Email Verification
+
+1. Verification link sent to registered email
+2. Click **Verify email** link in the email
+3. Dashboard appears after verification
+
+### Fill Profile Information
+
+Enter the following:
+
+1. **Organization name**: Organization name [Optional]
+2. **Default region**: Choose database location
+   - **us-east**: US East
+   - **us-west**: US West
+   - **eu-west**: EU West
+   - **ap-southeast**: Asia Pacific
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/planetscale/planetscale-account-setup-step2-en.png"
+  alt="Profile setup"
+  caption="PlanetScale organization setup"
+/>
+
+<Callout type="info">
+**Region Selection Tips**
+
+- Choose region with most users for better speed
+- Korea users: ap-southeast recommended
+- Can be changed later
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="Create Your First Database">
+
+1. In dashboard, click **Create a new database** or **New database** button
+2. Enter database information:
+   - **Database name**: Database name [e.g., myapp_db]
+   - **Region**: Use default or change
+   - **MySQL version**: 8.0 or 5.7 [8.0 recommended]
+
+<CopyBlock
+  code="Database naming rules:
+- Start with lowercase
+- Numbers and underscores allowed
+- Examples: my_app_db, app_production, userdb_2024"
+  language="bash"
+/>
+
+### Choose Branch
+
+- **main**: Production branch [default]
+- **develop**: Development branch [optional]
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/planetscale/planetscale-account-setup-step3-en.png"
+  alt="Create database"
+  caption="PlanetScale database creation form"
+/>
+
+3. Click **Create database** button.
+
+<Callout type="tip">
+💡 **PlanetScale Branching Concept**
+
+- **main branch**: Production data
+- **develop branch**: Development environment
+- Like Git, test schema changes in multiple branches then merge
+
+Example:
+```
+main branch       develop branch
+[Production] <-- [Dev testing]
+                  feature branch
+                  [New feature dev]
+```
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="Verify Database Connection Information">
+
+After database creation, connection info appears.
+
+### Copy Connection Info
+
+1. Select created database in dashboard
+2. Click **Connect** button
+3. Following info displays:
+   - **Host**: Database hostname
+   - **Username**: Database username
+   - **Password**: Password [newly generated]
+   - **Database**: Database name
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/planetscale/planetscale-account-setup-step4-en.png"
+  alt="Connection info"
+  caption="PlanetScale database connection information"
+/>
+
+### Connection String Format
+
+<CopyBlock
+  code="mysql://username:password@host/database_name"
+  language="bash"
+/>
+
+Example:
+
+<CopyBlock
+  code="mysql://root:pscale_pw_xxxxx@aws.connect.psdb.cloud/myapp_db?sslaccept=strict"
+  language="bash"
+/>
+
+<Callout type="warning">
+⚠️ **Security Precautions**
+
+- Never push connection info to public repository
+- Manage password with environment variables
+- Add .env file to .gitignore
+</Callout>
+
+### Test Connection
+
+For production, regenerate password:
+
+1. Go to **Settings** tab → **Password**
+2. Click **Regenerate password**
+3. New password generated
+
+<DevTip>
+**PlanetScale Password Policy**
+
+- Each branch has independent password
+- Regular regeneration recommended [every 3 months]
+- Old password accessible for some time after regeneration
+</DevTip>
+
+<Checkpoint
+  title="Verify Database Creation"
+  items={[
+    "Is database in 'Ready' status?",
+    "Did you verify connection info?",
+    "Did you note hostname, username, and password?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **Congratulations!** PlanetScale database created. You're ready to connect to your application!
+</Callout>
+
+</Step>
+
+---
+
+## Explore PlanetScale Dashboard
+
+### Databases Tab
+
+View all databases and their status
+
+### Backups Tab
+
+- View auto backups
+- Restore from backup
+- Configure backup schedule
+
+### Settings Tab
+
+- Rename database
+- Change region
+- Check MySQL version
+- Regenerate password
+
+---
+
+## Next Steps
+
+Database setup complete, now connect to your application:
+
+1. **[Connect PlanetScale Database](../planetscale-database-connection)** - Connect Node.js/Python app
+2. **[Deploy Heroku App](../heroku-app-deployment)** - Connect database to deployed app
+
+---
+
+## Frequently Asked Questions
+
+<Callout type="info">
+**Q. Can I change database name?**
+
+A. Yes, change in Settings. Remember to update application connection info too.
+</Callout>
+
+<Callout type="info">
+**Q. Is 10GB enough for free tier?**
+
+A. Sufficient for small to medium apps. You'll be charged if exceeded.
+</Callout>
+
+<Callout type="info">
+**Q. Can I create multiple databases?**
+
+A. Yes, free tier allows multiple databases [within storage limit].
+</Callout>
+
+---
+
+## Troubleshooting
+
+### "Invalid database name"
+
+- Use only lowercase
+- Only underscores allowed for special chars
+- Already used names not allowed
+
+### "Unable to create database"
+
+- Check free account storage limit
+- Delete unnecessary databases and retry
+
+### Don't remember connection info?
+
+- Click database in dashboard
+- View again in **Connections** tab
+
+---
+
+**Congratulations!** 🚀 PlanetScale database setup is complete!

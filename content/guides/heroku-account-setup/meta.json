@@ -1,0 +1,59 @@
+{
+  "slug": "heroku-account-setup",
+  "platform": "heroku",
+  "service": "Heroku Account",
+  "category": "deployment",
+  "difficulty": "beginner",
+  "estimatedMinutes": 10,
+  "totalSteps": 4,
+  "freeTier": {
+    "service": "Heroku Dyno Hours",
+    "limit": "1,000 free dyno-hours per month",
+    "period": "month",
+    "status": "limited",
+    "conditions": [
+      "무료 dyno는 30분 유휴 후 슬립 모드 진입",
+      "신용카드 필수 [선택사항 기능용]",
+      "애드온은 별도 비용",
+      "자동 재시작 가능",
+      "2025년 이후 무료 dyno 단계적 폐지 예정"
+    ]
+  },
+  "prerequisites": [],
+  "nextGuides": [
+    "heroku-app-deployment",
+    "docker-build-deploy"
+  ],
+  "seo": {
+    "ko": {
+      "title": "Heroku 계정 생성 및 CLI 설치 - 무료 앱 배포 준비 | CloudSetup.guide",
+      "description": "Heroku 계정을 만들고 CLI를 설치하는 단계별 가이드입니다. 애플리케이션 배포를 위한 기본 설정을 완료하세요.",
+      "keywords": [
+        "Heroku 계정",
+        "Heroku CLI 설치",
+        "Heroku 시작하기",
+        "앱 배포",
+        "클라우드 배포",
+        "PaaS 플랫폼",
+        "무료 배포"
+      ]
+    },
+    "en": {
+      "title": "Create Heroku Account and Install CLI - Prepare App Deployment | CloudSetup.guide",
+      "description": "Step-by-step guide to create Heroku account and install Heroku CLI. Complete basic setup for application deployment.",
+      "keywords": [
+        "Heroku account",
+        "install Heroku CLI",
+        "getting started Heroku",
+        "deploy apps",
+        "cloud deployment",
+        "PaaS platform",
+        "free deployment"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T02:00:00.000Z",
+  "updatedAt": "2026-02-08T02:00:00.000Z",
+  "lastVerified": "2026-02-08T02:00:00.000Z",
+  "published": true
+}
