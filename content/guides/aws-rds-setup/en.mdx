@@ -1,0 +1,398 @@
+---
+title: "AWS RDS Setup"
+description: "Step-by-step guide to creating and connecting managed MySQL/PostgreSQL databases with AWS RDS."
+---
+
+# AWS RDS Setup
+
+AWS RDS (Relational Database Service) provides managed relational databases in the cloud. This guide walks you through creating and connecting MySQL or PostgreSQL databases.
+
+<FreeTierInfo
+  limit="750 hours/month db.t2.micro, 20GB storage"
+  period="12 months"
+  conditions={[
+    "Available for new AWS accounts for 12 months",
+    "Only db.t2.micro instances eligible",
+    "20GB General Purpose (SSD) storage included"
+  ]}
+/>
+
+## Prerequisites
+
+- AWS Account ([aws-account-setup](/guides/aws-account-setup) guide)
+- IAM User with Access Keys ([aws-iam-user-create](/guides/aws-iam-user-create) guide)
+- Database Client (MySQL Workbench, pgAdmin, DBeaver, etc.)
+
+---
+
+<Step number={1} title="Access RDS Dashboard and Start Database Creation">
+
+Navigate to the RDS service in AWS Console and start creating a database.
+
+1. Log in to [AWS Console](https://console.aws.amazon.com/)
+2. Type "RDS" in the top search bar and select it
+3. Click **Create database** button
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-rds-setup/step1-create-database-en.png"
+  alt="Create database button"
+  caption="Click Create database to start creating a new DB instance"
+/>
+
+### Choose Database Creation Method
+
+4. In **Choose a database creation method**, select **Standard create**
+5. In **Engine options**, select one of:
+   - **MySQL** (recommended - most widely used)
+   - **PostgreSQL** (for advanced features)
+   - **MariaDB** (MySQL compatible)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-rds-setup/step1-engine-selection-en.png"
+  alt="Database engine selection"
+  caption="Select MySQL or PostgreSQL engine"
+/>
+
+6. **Engine version**: Select the latest version (e.g., MySQL 8.0.35)
+
+<Callout type="info">
+Both MySQL and PostgreSQL support the Free tier. MySQL is more widely used, while PostgreSQL is suitable when advanced SQL features are needed.
+</Callout>
+
+</Step>
+
+<Step number={2} title="Configure Template and Instance Settings">
+
+Select the Free tier template and configure the database instance.
+
+### Template Selection
+
+1. In **Templates** section, select **Free tier**
+   - This limits options to Free tier eligible choices
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-rds-setup/step2-free-tier-template-en.png"
+  alt="Free tier template selection"
+  caption="Select Free tier template to limit options to free-eligible configurations"
+/>
+
+### Settings Configuration
+
+2. In **Settings** section:
+   - **DB instance identifier**: `my-database` (enter unique name)
+   - **Master username**: `admin` (default or preferred name)
+   - **Master password**: Enter strong password (minimum 8 characters)
+   - **Confirm password**: Re-enter the same password
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-rds-setup/step2-credentials-en.png"
+  alt="DB credentials setup"
+  caption="Set database master username and password"
+/>
+
+<Callout type="warning">
+Store the master password securely. This password is required for database access and is difficult to recover if lost.
+</Callout>
+
+### Instance Configuration
+
+3. In **Instance configuration** section:
+   - **DB instance class**: **db.t2.micro** or **db.t3.micro** (Free tier)
+   - Burstable classes (includes t classes) selected
+
+4. In **Storage** section:
+   - **Storage type**: **General Purpose SSD (gp2)** or **gp3**
+   - **Allocated storage**: **20 GiB** (Free tier maximum)
+   - **Enable storage autoscaling**: Uncheck (for cost management)
+
+<Checkpoint
+  items={[
+    "Did you select the Free tier template?",
+    "Is the DB instance class db.t2.micro or db.t3.micro?",
+    "Is storage set to 20GB or less?"
+  ]}
+/>
+
+</Step>
+
+<Step number={3} title="Configure Connectivity and Security Groups">
+
+Set up database connectivity settings and security groups.
+
+### Connectivity Settings
+
+1. In **Connectivity** section:
+   - **Compute resource**: Select **Don't connect to an EC2 compute resource** (standalone)
+   - **Network type**: **IPv4**
+   - **Virtual Private Cloud (VPC)**: Select default VPC
+   - **Public access**: Select **Yes** (for external access)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-rds-setup/step3-connectivity-en.png"
+  alt="Connectivity settings"
+  caption="Enable public access to allow external database connections"
+/>
+
+<Callout type="info">
+**Public Access Options:**
+- **Yes**: Accessible from the internet (access controlled by security groups)
+- **No**: Only accessible within VPC (more secure)
+
+For development/testing, select "Yes". For production, VPC-only access is recommended.
+</Callout>
+
+### VPC Security Groups
+
+2. In **VPC security group** section:
+   - **Choose existing** or **Create new**
+   - If creating new, name it: `rds-mysql-sg`
+
+3. **Availability Zone**: **No preference** (automatic selection)
+
+### Database Authentication
+
+4. In **Database authentication** section:
+   - Select **Password authentication** (default)
+
+</Step>
+
+<Step number={4} title="Additional Configuration and Database Creation">
+
+Configure backup, monitoring, and other settings, then create the database.
+
+### Additional Configuration
+
+1. Expand **Additional configuration** section
+
+2. **Database options**:
+   - **Initial database name**: `mydb` (optional but recommended)
+   - **DB parameter group**: Use default
+   - **Option group**: Use default
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-rds-setup/step4-additional-config-en.png"
+  alt="Additional configuration"
+  caption="Configure initial database name and backup settings"
+/>
+
+3. **Backup**:
+   - **Enable automated backups**: Check (recommended)
+   - **Backup retention period**: **7 days** (within Free tier)
+   - **Backup window**: Select preferred time
+
+4. **Encryption**:
+   - Use default settings for Free tier
+
+5. **Monitoring**:
+   - **Enable Enhanced Monitoring**: Uncheck (incurs additional cost)
+
+6. **Log exports**: Select if needed (exports to CloudWatch Logs)
+
+### Maintenance
+
+7. In **Maintenance** section:
+   - **Enable auto minor version upgrade**: Check (automatic security patches)
+
+### Deletion Protection
+
+8. **Deletion protection**: Check for production, uncheck for testing
+
+### Create Database
+
+9. Check **Estimated monthly costs** on the right to ensure it's within Free tier
+10. Click **Create database** button
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-rds-setup/step4-create-en.png"
+  alt="Create database"
+  caption="Review all settings and create the database"
+/>
+
+11. Database creation starts and takes 5-10 minutes to reach **Available** status
+
+<Callout type="info">
+During creation, the status changes from "Creating" to "Backing-up" to "Available".
+</Callout>
+
+</Step>
+
+<Step number={5} title="Connect to Database and Test">
+
+Connect to the created database and verify it's working properly.
+
+### Check Endpoint
+
+1. Select your database from the RDS dashboard
+2. In **Connectivity & security** tab, note:
+   - **Endpoint**: `my-database.xxxxxxxxxx.ap-northeast-2.rds.amazonaws.com`
+   - **Port**: `3306` (MySQL) or `5432` (PostgreSQL)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-rds-setup/step5-endpoint-en.png"
+  alt="DB endpoint check"
+  caption="Find the endpoint and port information needed for database connection"
+/>
+
+### Modify Security Group Inbound Rules
+
+3. Click the security group name under **VPC security groups**
+4. In **Inbound rules** tab, click **Edit inbound rules**
+5. Add the following rule:
+
+**For MySQL:**
+- Type: **MYSQL/Aurora**
+- Port: **3306**
+- Source: **My IP** (or specific IP range)
+
+**For PostgreSQL:**
+- Type: **PostgreSQL**
+- Port: **5432**
+- Source: **My IP** (or specific IP range)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-rds-setup/step5-security-group-en.png"
+  alt="Security group inbound rules"
+  caption="Add inbound rule for database port access"
+/>
+
+6. Click **Save rules** button
+
+<Callout type="warning">
+For security, restrict the source to "My IP" or specific IP ranges. Allowing all IPs (0.0.0.0/0) increases security risks.
+</Callout>
+
+### Test MySQL Connection
+
+7. Connect using MySQL client:
+
+<CopyBlock language="bash">
+mysql -h my-database.xxxxxxxxxx.ap-northeast-2.rds.amazonaws.com \
+  -P 3306 \
+  -u admin \
+  -p
+</CopyBlock>
+
+Or using connection string:
+
+<CopyBlock language="text">
+mysql://admin:password@my-database.xxxxxxxxxx.ap-northeast-2.rds.amazonaws.com:3306/mydb
+</CopyBlock>
+
+### Test PostgreSQL Connection
+
+8. Connect using PostgreSQL client:
+
+<CopyBlock language="bash">
+psql -h my-database.xxxxxxxxxx.ap-northeast-2.rds.amazonaws.com \
+  -p 5432 \
+  -U admin \
+  -d mydb
+</CopyBlock>
+
+Or using connection string:
+
+<CopyBlock language="text">
+postgresql://admin:password@my-database.xxxxxxxxxx.ap-northeast-2.rds.amazonaws.com:5432/mydb
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-rds-setup/step5-connection-success-en.png"
+  alt="Database connection success"
+  caption="Successfully connected using MySQL or PostgreSQL client"
+/>
+
+### Application Connection Examples
+
+**Node.js (MySQL):**
+
+<CopyBlock language="javascript">
+const mysql = require('mysql2');
+
+const connection = mysql.createConnection({
+  host: 'my-database.xxxxxxxxxx.ap-northeast-2.rds.amazonaws.com',
+  port: 3306,
+  user: 'admin',
+  password: 'your-password',
+  database: 'mydb'
+});
+
+connection.connect();
+</CopyBlock>
+
+**Python (PostgreSQL):**
+
+<CopyBlock language="python">
+import psycopg2
+
+conn = psycopg2.connect(
+    host="my-database.xxxxxxxxxx.ap-northeast-2.rds.amazonaws.com",
+    port=5432,
+    user="admin",
+    password="your-password",
+    database="mydb"
+)
+</CopyBlock>
+
+<Checkpoint
+  items={[
+    "Is the database status 'Available'?",
+    "Have you added inbound rules to the security group?",
+    "Can you connect successfully with a database client?"
+  ]}
+/>
+
+</Step>
+
+## Next Steps
+
+You've successfully set up an RDS database! Here's what you can do next:
+
+- [AWS EC2 Instance Launch](/guides/aws-ec2-instance-launch) - Create an application server
+- [AWS CloudWatch Monitoring Setup](/guides/aws-cloudwatch-setup) - Set up database monitoring
+
+## Database Management Tips
+
+### Backup and Restore
+
+- **Automated Backups**: Performed daily automatically (during backup retention period)
+- **Snapshots**: Manual snapshots for point-in-time backups
+- **Restore**: Restore from automated backups or snapshots to a new DB instance
+
+### Performance Monitoring
+
+1. Check **Monitoring** tab in RDS dashboard
+2. Review metrics like CPU utilization, connections, IOPS
+3. View detailed metrics in CloudWatch
+
+### Cost Optimization
+
+- **Stop Instance**: Temporarily when not in use (maximum 7 days)
+- **Adjust Storage**: Allocate only what you need
+- **Backup Retention**: Retention beyond 7 days incurs additional costs
+
+## Troubleshooting
+
+### Cannot Connect to Database
+
+1. **Check Security Group**: Verify the appropriate port is open
+2. **Public Access**: Ensure it's set to "Yes"
+3. **Endpoint**: Verify you're using the correct endpoint
+4. **Credentials**: Ensure username and password are correct
+
+### Worried About Free Tier Overages
+
+1. **Instance Class**: Confirm using db.t2.micro or db.t3.micro
+2. **Storage**: Keep at or below 20GB
+3. **Backup**: Maintain backup storage under 20GB
+4. **Billing Alarms**: Set up cost alarms in CloudWatch
+
+### Performance is Slow
+
+1. **Instance Size**: Free tier provides limited performance
+2. **Connection Count**: High concurrent connections degrade performance
+3. **Query Optimization**: Check slow query logs and add indexes
+4. **Storage IOPS**: Upgrade to gp3 for improved performance
+
+<Callout type="tip">
+For development, use a local database instead of RDS to save Free tier hours. Use RDS only for production testing.
+</Callout>

@@ -1,0 +1,481 @@
+---
+title: "AWS CloudWatch Setup"
+description: "Step-by-step guide to monitoring AWS resources like EC2 and RDS with CloudWatch and setting up alarms."
+---
+
+# AWS CloudWatch Setup
+
+AWS CloudWatch monitors AWS resources and applications in real-time. This guide walks you through EC2 instance monitoring, alarm setup, dashboard creation, and log collection.
+
+<FreeTierInfo
+  limit="10 custom metrics, 10 alarms, 5GB logs/month"
+  period="12 months + Always Free"
+  conditions={[
+    "Basic monitoring metrics: Free",
+    "10 custom metrics/alarms: Always Free",
+    "5GB log ingestion: Always Free"
+  ]}
+/>
+
+## Prerequisites
+
+- AWS Account ([aws-account-setup](/guides/aws-account-setup) guide)
+- Resources to Monitor (e.g., EC2 instance - [aws-ec2-instance-launch](/guides/aws-ec2-instance-launch) guide)
+- Optional: SNS Topic (for receiving notifications)
+
+---
+
+<Step number={1} title="Access CloudWatch Dashboard and Review Overview">
+
+Navigate to the CloudWatch service in AWS Console and check monitoring status.
+
+1. Log in to [AWS Console](https://console.aws.amazon.com/)
+2. Type "CloudWatch" in the top search bar and select it
+3. The CloudWatch dashboard is displayed
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudwatch-setup/step1-dashboard-en.png"
+  alt="CloudWatch dashboard"
+  caption="Review overall AWS resource status in the CloudWatch dashboard"
+/>
+
+### Understanding Key Menus
+
+Check these key features in the left menu:
+
+- **Dashboards**: Custom monitoring dashboards
+- **Alarms**: Metric-based alarm configuration
+- **Logs**: Collect and analyze logs with CloudWatch Logs
+- **Metrics**: Explore metrics from all AWS services
+- **Events**: Event-driven automation with EventBridge
+
+### Check Default Metrics
+
+4. Click **Metrics → All metrics** in the left menu
+5. Check active services in the namespace list:
+   - **EC2**: Instance CPU, network, disk metrics
+   - **RDS**: Database connections, CPU, storage metrics
+   - **S3**: Bucket size, request count metrics
+   - **CloudFront**: Request count, error rate, bytes transferred
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudwatch-setup/step1-metrics-en.png"
+  alt="CloudWatch metrics"
+  caption="Review metrics collected by AWS service"
+/>
+
+<Callout type="info">
+Basic monitoring is automatically enabled and free for most AWS services. For EC2, metrics are collected at 5-minute intervals. Detailed monitoring at 1-minute intervals incurs additional costs.
+</Callout>
+
+</Step>
+
+<Step number={2} title="Monitor EC2 Instance and Create Alarms">
+
+Monitor EC2 instance CPU utilization and set up alarms for threshold violations.
+
+### Check EC2 Metrics
+
+1. Click **Metrics → All metrics** in the left menu
+2. Click **EC2** and select **Per-Instance Metrics**
+3. Find your instance and select the **CPUUtilization** metric
+4. View the CPU utilization trend in the graph
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudwatch-setup/step2-ec2-metrics-en.png"
+  alt="EC2 CPU metrics"
+  caption="Review EC2 instance CPU utilization graph"
+/>
+
+### Create CPU Utilization Alarm
+
+5. Click the **bell icon (Create alarm)** button above the graph
+   - Or click **Alarms → All alarms → Create alarm** in the left menu
+
+6. **Select metric** (skip if already selected):
+   - **EC2 → Per-Instance Metrics**
+   - Select **CPUUtilization**
+   - Click **Select metric** button
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudwatch-setup/step2-select-metric-en.png"
+  alt="Select metric"
+  caption="Select EC2 CPU metric for alarm creation"
+/>
+
+### Configure Alarm Conditions
+
+7. On **Specify metric and conditions** page:
+   - **Statistic**: Select **Average** (default)
+   - **Period**: Select **5 minutes**
+   - **Threshold type**: Select **Static**
+   - **Alarm condition**: Select **Greater**
+   - **Threshold value**: Enter `80` (alarm when CPU exceeds 80%)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudwatch-setup/step2-alarm-conditions-en.png"
+  alt="Configure alarm conditions"
+  caption="Set alarm to trigger when CPU utilization exceeds 80%"
+/>
+
+8. **Additional configuration** (optional):
+   - **Treat missing data as**: Select **missing**
+   - **Datapoints to alarm**: `1/1` (1 out of 1, immediate alarm)
+
+9. Click **Next** button
+
+<DevTip title="Alarm Threshold Setting Tips">
+**Common Thresholds:**
+- **CPU**: 80% (high), 90% (very high)
+- **Memory**: 85% (high)
+- **Disk**: 80% (high)
+- **Network**: Depends on application
+
+**Evaluation Periods:**
+- Immediate response: `1/1` (1 out of 1 minute)
+- Ignore temporary spikes: `3/5` (3 out of 5 minutes)
+- Stable trends: `5/5` (5 consecutive minutes)
+</DevTip>
+
+</Step>
+
+<Step number={3} title="Configure SNS Notifications and Email Reception">
+
+Set up SNS topic to receive email notifications when alarms trigger.
+
+### Create SNS Topic
+
+1. On **Configure actions** page:
+   - **Alarm state trigger**: Select **In alarm**
+   - **Select an SNS topic**: Select **Create new topic**
+
+2. Create new topic:
+   - **Topic name**: Enter `cloudwatch-alarms`
+   - **Email endpoint to receive notifications**: Enter email address (e.g., `admin@example.com`)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudwatch-setup/step3-sns-topic-en.png"
+  alt="Create SNS topic"
+  caption="Create SNS topic for alarm notifications and register email"
+/>
+
+3. Click **Create topic** button
+4. Click **Next** button
+
+<Callout type="warning">
+After entering your email address, AWS sends a subscription confirmation email. You must open the email and click the **Confirm subscription** link to receive notifications.
+</Callout>
+
+### Set Alarm Name and Description
+
+5. On **Add name and description** page:
+   - **Alarm name**: Enter `high-cpu-utilization`
+   - **Alarm description**: Enter `EC2 instance CPU usage is above 80%` (optional)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudwatch-setup/step3-alarm-name-en.png"
+  alt="Set alarm name"
+  caption="Enter an identifiable name and description for the alarm"
+/>
+
+6. Click **Next** button
+
+### Review and Create Alarm
+
+7. Review all settings on the **Preview and create** page
+8. Click **Create alarm** button
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudwatch-setup/step3-alarm-created-en.png"
+  alt="Alarm created"
+  caption="Alarm successfully created"
+/>
+
+### Confirm Email Subscription
+
+9. AWS SNS sends a subscription confirmation email to your registered address
+10. Open the email and click the **Confirm subscription** link
+11. When you see "Subscription confirmed!" message, it's complete
+
+<Checkpoint
+  items={[
+    "Did you create an EC2 CPU utilization alarm?",
+    "Did you create an SNS topic and register an email?",
+    "Did you confirm the email subscription?"
+  ]}
+/>
+
+</Step>
+
+<Step number={4} title="Create Custom Dashboard and Add Widgets">
+
+Create a custom dashboard to view multiple metrics at a glance.
+
+### Create Dashboard
+
+1. Click **Dashboards** in the left menu
+2. Click **Create dashboard** button
+3. **Dashboard name**: Enter `my-infrastructure`
+4. Click **Create dashboard** button
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudwatch-setup/step4-create-dashboard-en.png"
+  alt="Create dashboard"
+  caption="Create a custom monitoring dashboard"
+/>
+
+### Add EC2 CPU Widget
+
+5. The **Add widget** dialog appears
+6. Select **Line** and click **Next**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudwatch-setup/step4-widget-type-en.png"
+  alt="Select widget type"
+  caption="Select line graph widget to display metric changes over time"
+/>
+
+7. On **Metrics** tab:
+   - Select **EC2 → Per-Instance Metrics**
+   - Check **CPUUtilization** for your instance
+   - Add **NetworkIn**, **NetworkOut** if needed
+
+8. Review metric settings on **Graphed metrics** tab
+9. Click **Create widget** button
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudwatch-setup/step4-cpu-widget-en.png"
+  alt="Add CPU widget"
+  caption="Add a widget displaying EC2 instance CPU utilization"
+/>
+
+### Add Additional Widgets
+
+10. Click **Add widget** button again to add more widgets
+
+**Memory Utilization Widget (Number):**
+- Widget type: **Number**
+- Metric: EC2 → Per-Instance → **MemoryUtilization** (requires CloudWatch Agent)
+
+**Disk I/O Widget:**
+- Widget type: **Stacked area**
+- Metrics: EC2 → Per-Instance → **DiskReadBytes**, **DiskWriteBytes**
+
+**RDS Connection Count Widget (if using RDS):**
+- Widget type: **Line**
+- Metric: RDS → Database → **DatabaseConnections**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudwatch-setup/step4-dashboard-complete-en.png"
+  alt="Completed dashboard"
+  caption="Custom dashboard with multiple metrics is complete"
+/>
+
+### Save Dashboard
+
+11. Click **Save dashboard** button when finished adding widgets
+12. You can drag widgets to resize and reposition them
+
+<Callout type="info">
+The Free tier allows up to 3 dashboards with up to 50 metrics each at no charge. Exceeding this incurs $3/month per dashboard.
+</Callout>
+
+</Step>
+
+<Step number={5} title="Configure CloudWatch Logs and Collect Logs">
+
+Collect and analyze application logs with CloudWatch Logs.
+
+### Create Log Group
+
+1. Click **Logs → Log groups** in the left menu
+2. Click **Create log group** button
+3. **Log group name**: Enter `/aws/ec2/my-app`
+4. **Retention setting**: Select **1 week** (for cost savings)
+5. Click **Create log group** button
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudwatch-setup/step5-log-group-en.png"
+  alt="Create log group"
+  caption="Create a log group to collect application logs"
+/>
+
+<Callout type="info">
+Setting a shorter log retention period reduces storage costs. The Free tier provides 5GB of log ingestion and storage.
+</Callout>
+
+### Install CloudWatch Agent (EC2)
+
+Install CloudWatch Agent on your EC2 instance to send logs.
+
+6. Connect to your EC2 instance via SSH
+7. Download and install CloudWatch Agent:
+
+**Amazon Linux 2 / Amazon Linux 2023:**
+
+<CopyBlock language="bash">
+sudo yum install -y amazon-cloudwatch-agent
+</CopyBlock>
+
+**Ubuntu:**
+
+<CopyBlock language="bash">
+wget https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
+sudo dpkg -i amazon-cloudwatch-agent.deb
+</CopyBlock>
+
+### Configure CloudWatch Agent
+
+8. Create Agent configuration file:
+
+<CopyBlock language="bash">
+sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-config-wizard
+</CopyBlock>
+
+9. Answer the wizard's questions:
+   - **OS**: Linux
+   - **EC2 or On-Premise**: EC2
+   - **StatsD daemon**: No
+   - **CollectD**: No
+   - **Monitor host metrics**: Yes (CPU, memory, disk, etc.)
+   - **Log files to monitor**: Yes
+     - Log file path: `/var/log/my-app/app.log`
+     - Log group name: `/aws/ec2/my-app`
+
+### Start Agent
+
+10. Start CloudWatch Agent:
+
+<CopyBlock language="bash">
+sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
+  -a fetch-config \
+  -m ec2 \
+  -s \
+  -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
+</CopyBlock>
+
+11. Check Agent status:
+
+<CopyBlock language="bash">
+sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
+  -a query \
+  -m ec2 \
+  -s
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudwatch-setup/step5-agent-status-en.png"
+  alt="CloudWatch Agent status"
+  caption="Verify CloudWatch Agent is running properly"
+/>
+
+### Check Log Streams
+
+12. Return to **Logs → Log groups** in CloudWatch console
+13. Click your created log group (`/aws/ec2/my-app`)
+14. Verify log streams are created and logs are being collected
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudwatch-setup/step5-log-streams-en.png"
+  alt="Check log streams"
+  caption="Logs sent from EC2 instance are being collected in CloudWatch Logs"
+/>
+
+### Log Insights Query
+
+15. Click **Logs Insights** tab
+16. Select log group and run query:
+
+<CopyBlock language="text">
+fields @timestamp, @message
+| filter @message like /ERROR/
+| sort @timestamp desc
+| limit 20
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudwatch-setup/step5-log-insights-en.png"
+  alt="Log Insights query"
+  caption="Search and analyze error logs with Log Insights"
+/>
+
+<Checkpoint
+  items={[
+    "Did you create a log group?",
+    "Did you install and start CloudWatch Agent on EC2?",
+    "Are logs being collected in CloudWatch Logs?"
+  ]}
+/>
+
+</Step>
+
+## Next Steps
+
+You've successfully set up CloudWatch! Here's what you can do next:
+
+- [AWS RDS Setup](/guides/aws-rds-setup) - Add RDS database monitoring
+- [AWS CloudFront Setup](/guides/aws-cloudfront-setup) - Monitor CloudFront CDN metrics
+
+## CloudWatch Usage Tips
+
+### Effective Alarm Configuration
+
+**Critical Alarms:**
+- CPU utilization > 80%
+- Memory utilization > 85%
+- Disk free space < 20%
+- Status check failures
+- RDS connection count > 80% of limit
+
+**Cost Alarms:**
+- Monthly estimated charges > budget
+- Specific service usage exceeded
+
+### Dashboard Optimization
+
+- **Infrastructure Dashboard**: EC2, RDS, ELB metrics
+- **Application Dashboard**: Custom metrics, API response times
+- **Cost Dashboard**: Estimated costs by service
+
+### Log Filters and Metrics
+
+Convert specific patterns in logs to metrics:
+
+1. Log group → **Create metric filter**
+2. Filter pattern: `[time, request_id, level = ERROR*, ...]`
+3. Create metric: `ErrorCount`
+4. Create alarms from this metric
+
+## Troubleshooting
+
+### Not Receiving Alarm Notifications
+
+1. **SNS Subscription**: Check if email subscription is confirmed
+2. **Alarm State**: Verify alarm is in "In alarm" state
+3. **Spam Folder**: Check if email was filtered as spam
+4. **SNS Topic Permissions**: Verify CloudWatch has permission to publish to SNS topic
+
+### CloudWatch Agent Not Sending Logs
+
+1. **IAM Role**: Verify EC2 instance has CloudWatch Logs write permissions
+2. **Agent Status**: Check if Agent is running
+3. **Log File Path**: Verify log path in configuration file is correct
+4. **Network**: Check if EC2 can reach CloudWatch endpoints
+
+### Metrics Not Displaying
+
+1. **Resource Active**: Verify resource being monitored is running
+2. **Time Period**: Wait sufficient time (5-minute delay possible)
+3. **Detailed Monitoring**: EC2 uses 5-minute intervals by default (1-minute requires separate activation)
+4. **Region**: Check if you're viewing the correct region
+
+### Worried About Free Tier Overages
+
+1. **Alarm Limit**: Keep under 10 alarms
+2. **Log Retention**: Set short retention period (1 week)
+3. **Dashboard Limit**: Stay under 3 dashboards, 50 metrics
+4. **Billing Alarms**: Set up cost alarms to prevent budget overruns
+
+<Callout type="tip">
+Many CloudWatch features are Always Free. 10 alarms, 5GB logs, and 3 dashboards remain free even after the 12-month Free tier period.
+</Callout>

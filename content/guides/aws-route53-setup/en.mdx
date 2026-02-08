@@ -1,0 +1,433 @@
+---
+title: "AWS Route 53 Setup"
+description: "Step-by-step guide to creating DNS hosted zones and managing domain records with AWS Route 53."
+---
+
+# AWS Route 53 Setup
+
+AWS Route 53 is a scalable and highly available cloud DNS (Domain Name System) web service. This guide walks you through creating hosted zones and configuring DNS records.
+
+<FreeTierInfo
+  limit="$0.50/month per hosted zone"
+  period="Ongoing"
+  conditions={[
+    "Hosted zone: $0.50/month (no free tier)",
+    "Alias queries to AWS resources: Free",
+    "Standard queries: First 1 billion/month $0.40"
+  ]}
+/>
+
+<Callout type="info">
+Route 53 doesn't have a free tier, but costs are very low. Each hosted zone costs $0.50/month, and Alias record queries to AWS resources (CloudFront, S3, ALB, etc.) are free.
+</Callout>
+
+## Prerequisites
+
+- AWS Account ([aws-account-setup](/guides/aws-account-setup) guide)
+- Registered Domain (Route 53 or external registrar)
+- Optional: CloudFront distribution or S3 website
+
+---
+
+<Step number={1} title="Access Route 53 Dashboard and Create Hosted Zone">
+
+Navigate to the Route 53 service in AWS Console and create a hosted zone.
+
+1. Log in to [AWS Console](https://console.aws.amazon.com/)
+2. Type "Route 53" in the top search bar and select it
+3. Click **Hosted zones** in the left menu
+4. Click **Create hosted zone** button
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-route53-setup/step1-create-hosted-zone-en.png"
+  alt="Create hosted zone button"
+  caption="Click Create hosted zone to start a new DNS hosted zone"
+/>
+
+### Configure Hosted Zone
+
+5. **Domain name**: Enter your owned domain (e.g., `example.com`)
+6. **Description**: Optional (e.g., `My website DNS`)
+7. **Type**: Select **Public hosted zone** (accessible from the internet)
+   - Public: Domain accessible from the internet
+   - Private: Domain used only within VPC
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-route53-setup/step1-configure-zone-en.png"
+  alt="Configure hosted zone"
+  caption="Set domain name and type"
+/>
+
+8. **Tags**: Optionally add tags
+9. Click **Create hosted zone** button
+
+### Check Name Servers
+
+10. The created hosted zone is displayed
+11. Click the hosted zone to view details
+12. Note the 4 name servers in the **Name Servers (NS)** record:
+    - `ns-1234.awsdns-12.org`
+    - `ns-5678.awsdns-34.co.uk`
+    - `ns-9012.awsdns-56.com`
+    - `ns-3456.awsdns-78.net`
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-route53-setup/step1-nameservers-en.png"
+  alt="Check name servers"
+  caption="Note the 4 name servers provided by Route 53"
+/>
+
+<Callout type="warning">
+These name server addresses must be configured at your domain registrar. DNS records won't work without changing the name servers.
+</Callout>
+
+</Step>
+
+<Step number={2} title="Change Name Servers at Domain Registrar">
+
+Change the name servers to Route 53 at your domain registrar (GoDaddy, Namecheap, etc.).
+
+### If You Registered Domain with Route 53
+
+- Name servers are automatically configured, skip this step
+
+### If You Registered Domain with External Registrar
+
+1. Log in to your domain registrar's management console
+2. Navigate to domain management or DNS settings page
+3. Find **Change name servers** or **Custom DNS** option
+4. Enter the 4 name servers from Route 53:
+
+<CopyBlock language="text">
+ns-1234.awsdns-12.org
+ns-5678.awsdns-34.co.uk
+ns-9012.awsdns-56.com
+ns-3456.awsdns-78.net
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-route53-setup/step2-registrar-nameservers-en.png"
+  alt="Registrar name server settings"
+  caption="Change to Route 53 name servers at external registrar"
+/>
+
+5. Save the changes
+
+<Callout type="info">
+Name server changes can take up to 48 hours to propagate worldwide. It typically completes within a few hours, but you must wait for full propagation.
+</Callout>
+
+### Verify Name Server Propagation
+
+6. Check name server propagation with this command in terminal:
+
+<CopyBlock language="bash">
+nslookup -type=NS example.com
+</CopyBlock>
+
+Or:
+
+<CopyBlock language="bash">
+dig example.com NS
+</CopyBlock>
+
+7. When Route 53 name servers appear, propagation is complete
+
+<Checkpoint
+  items={[
+    "Did you note the 4 Route 53 name servers?",
+    "Did you change name servers at your domain registrar?",
+    "Has name server propagation completed?"
+  ]}
+/>
+
+</Step>
+
+<Step number={3} title="Add A Records and CNAME Records">
+
+Add DNS records to connect your domain to IP addresses or other domains.
+
+### Add A Record (IPv4 Address)
+
+1. Click **Create record** button in the hosted zone details page
+2. **Record name**:
+   - Leave empty for root domain (`example.com`)
+   - Enter `www` for subdomain (`www.example.com`)
+3. **Record type**: Select **A - Routes traffic to an IPv4 address**
+4. **Value**: Enter your server's IP address (e.g., `192.0.2.1`)
+5. **TTL**: **300** seconds (5 minutes, default)
+6. **Routing policy**: Select **Simple routing**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-route53-setup/step3-a-record-en.png"
+  alt="Create A record"
+  caption="Add an A record to connect domain to IP address"
+/>
+
+7. Click **Create records** button
+
+### Add CNAME Record
+
+CNAME records connect a domain to another domain.
+
+8. Click **Create record** button again
+9. **Record name**: Enter subdomain (e.g., `blog`)
+10. **Record type**: Select **CNAME - Routes traffic to another domain name**
+11. **Value**: Enter target domain (e.g., `myblog.wordpress.com`)
+12. **TTL**: **300** seconds
+13. Click **Create records** button
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-route53-setup/step3-cname-record-en.png"
+  alt="Create CNAME record"
+  caption="Add a CNAME record to connect subdomain to another domain"
+/>
+
+<Callout type="warning">
+**Important Limitations:**
+- CNAME records cannot be used for root domain (`example.com`)
+- Root domain must use A record or Alias record
+- Cannot use CNAME with other records for the same name
+</Callout>
+
+### Add MX Record (For Email, Optional)
+
+14. If using email services, add an MX record:
+    - **Record name**: Leave empty (root domain)
+    - **Record type**: **MX - Routes traffic to mail servers**
+    - **Value**: `10 mail.example.com` (includes priority)
+    - **TTL**: **300** seconds
+
+</Step>
+
+<Step number={4} title="Connect AWS Resources with Alias Records">
+
+Use Alias records to connect to AWS resources like CloudFront, S3, Load Balancers, etc.
+
+### What are Alias Records?
+
+Alias records are a special Route 53 record type where queries to AWS resources are free and can be used for root domains.
+
+### Add Alias Record to CloudFront Distribution
+
+1. Click **Create record** button
+2. **Record name**:
+   - Leave empty for root domain
+   - Or enter subdomain (e.g., `www`)
+3. **Record type**: Select **A - Routes traffic to an IPv4 address**
+4. **Alias**: Enable **Yes**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-route53-setup/step4-alias-enable-en.png"
+  alt="Enable Alias"
+  caption="Enable alias option to connect to AWS resources"
+/>
+
+5. **Route traffic to**:
+   - Select **Alias to CloudFront distribution**
+   - Select CloudFront distribution from dropdown
+   - Or enter distribution domain name (e.g., `d111111abcdef8.cloudfront.net`)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-route53-setup/step4-alias-cloudfront-en.png"
+  alt="CloudFront Alias record"
+  caption="Add an Alias record to CloudFront distribution"
+/>
+
+6. Click **Create records** button
+
+### Add Alias Record to S3 Website Endpoint
+
+7. If using S3 static website hosting:
+   - **Record type**: **A**
+   - **Alias**: **Yes**
+   - **Route traffic to**: Select **Alias to S3 website endpoint**
+   - Select region and bucket
+
+### Add www Subdomain Too
+
+8. To connect `www.example.com` to the same resource:
+   - Repeat the above process, but enter `www` for record name
+   - Select the same AWS resource as target
+
+<DevTip title="Alias vs CNAME Differences">
+**Advantages of Alias Records:**
+- Queries to AWS resources are free
+- Can be used for root domain (apex)
+- Automatically tracks IP changes of target resource
+- Faster response for zone apex queries
+
+**CNAME Records:**
+- Used to connect to external domains
+- Cannot be used for root domain
+- Queries incur costs
+</DevTip>
+
+<Checkpoint
+  items={[
+    "Did you add Alias records to CloudFront or S3?",
+    "Did you configure both root domain and www subdomain?",
+    "Are Alias record statuses healthy?"
+  ]}
+/>
+
+</Step>
+
+<Step number={5} title="Test and Validate DNS Records">
+
+Test and validate that your configured DNS records are working correctly.
+
+### Check Record List
+
+1. Review all records added in the hosted zone details:
+   - **NS** record: Route 53 name servers (auto-created)
+   - **SOA** record: Hosted zone information (auto-created)
+   - **A** record or **Alias**: Root domain
+   - **CNAME** or **Alias**: www subdomain
+   - Other added records
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-route53-setup/step5-record-list-en.png"
+  alt="DNS record list"
+  caption="Review all DNS records added to the hosted zone"
+/>
+
+### Test DNS Lookup
+
+2. Test A record in terminal:
+
+<CopyBlock language="bash">
+nslookup example.com
+</CopyBlock>
+
+Or:
+
+<CopyBlock language="bash">
+dig example.com
+</CopyBlock>
+
+3. Test CNAME record:
+
+<CopyBlock language="bash">
+nslookup www.example.com
+</CopyBlock>
+
+4. Test Alias record (CloudFront):
+
+<CopyBlock language="bash">
+dig example.com
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-route53-setup/step5-dns-test-en.png"
+  alt="DNS lookup test"
+  caption="Verify DNS records with nslookup or dig commands"
+/>
+
+### Test in Web Browser
+
+5. Access your domain in a web browser:
+   - `https://example.com`
+   - `https://www.example.com`
+
+6. Verify correct content is displayed
+
+### Route 53 Health Checks (Optional)
+
+7. Click **Health checks** in the left menu
+8. Click **Create health check** button
+9. Configure these settings:
+   - **Name**: `example-com-health-check`
+   - **What to monitor**: **Endpoint**
+   - **Protocol**: **HTTPS**
+   - **Domain name**: `example.com`
+   - **Path**: `/` (or specific path)
+
+10. Click **Next** and configure notifications (SNS topic)
+11. Click **Create health check** button
+
+<Callout type="info">
+Health checks monitor endpoint availability and send notifications via SNS when issues occur. Health checks cost $0.50/month.
+</Callout>
+
+### Traffic Policies (Advanced, Optional)
+
+Route 53 traffic policies allow creating complex routing rules:
+
+- **Weighted routing**: A/B testing, canary deployments
+- **Latency-based routing**: Route to fastest region
+- **Geolocation routing**: Route based on user location
+- **Failover routing**: Configure primary/backup resources
+
+<Checkpoint
+  items={[
+    "Did DNS lookup tests succeed?",
+    "Can you access your domain in a web browser?",
+    "Have you set up health checks if needed?"
+  ]}
+/>
+
+</Step>
+
+## Next Steps
+
+You've successfully set up Route 53! Here's what you can do next:
+
+- [AWS CloudFront Setup](/guides/aws-cloudfront-setup) - Improve performance with CDN
+- [AWS S3 Bucket Setup](/guides/aws-s3-bucket-setup) - Static website hosting
+
+## Registering Domains with Route 53
+
+You can register domains directly with Route 53:
+
+1. Click **Domains → Registered domains** in Route 53 dashboard
+2. Click **Register domain** button
+3. Search for your desired domain
+4. If available, add to cart and proceed with payment
+5. Hosted zone is automatically created upon domain registration
+
+**Domain Pricing (Examples):**
+- .com: $13/year
+- .net: $13/year
+- .org: $13.70/year
+- .io: $49/year
+
+## Troubleshooting
+
+### DNS Not Propagating
+
+1. **Check Name Servers**: Verify name servers are correctly configured at registrar
+2. **Propagation Time**: Wait up to 48 hours (usually a few hours)
+3. **Clear Cache**: Clear local DNS cache:
+   ```bash
+   # Windows
+   ipconfig /flushdns
+
+   # Mac
+   sudo dscacheutil -flushcache
+
+   # Linux
+   sudo systemd-resolve --flush-caches
+   ```
+
+### Alias Records Not Working
+
+1. **Target Resource**: Verify CloudFront distribution or S3 bucket exists
+2. **Region**: Confirm correct region is selected
+3. **CloudFront CNAME**: Verify domain is added to CloudFront distribution's alternate domain names
+
+### HTTPS Certificate Errors
+
+1. **CloudFront Certificate**: CloudFront certificates must be issued in us-east-1
+2. **Domain Validation**: Ensure ACM certificate is fully validated
+3. **Alternate Domain**: Check alternate domain names in CloudFront distribution settings
+
+### High DNS Query Costs
+
+1. **Increase TTL**: Increase TTL to reduce query count (e.g., 300s → 3600s)
+2. **Use Alias**: Use Alias records instead of CNAME for AWS resources
+3. **Delete Unused Records**: Remove records that are no longer needed
+
+<Callout type="tip">
+Route 53 Alias records are always free when connecting to AWS resources, so use Alias records instead of CNAME for CloudFront, S3, ALB, API Gateway, etc.
+</Callout>

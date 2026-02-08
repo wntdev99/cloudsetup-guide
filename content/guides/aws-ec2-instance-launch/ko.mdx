@@ -1,0 +1,306 @@
+---
+title: "AWS EC2 인스턴스 시작하기"
+description: "AWS EC2 가상 서버를 생성하고 SSH로 접속하는 방법을 단계별로 안내합니다."
+---
+
+# AWS EC2 인스턴스 시작하기
+
+AWS EC2(Elastic Compute Cloud)는 클라우드에서 가상 서버를 제공하는 서비스입니다. 이 가이드에서는 EC2 인스턴스를 생성하고 SSH로 접속하는 방법을 안내합니다.
+
+<FreeTierInfo
+  limit="750시간/월 (t2.micro 또는 t3.micro)"
+  period="12개월"
+  conditions={[
+    "신규 AWS 계정 대상 12개월 무료",
+    "t2.micro 또는 t3.micro 인스턴스만 해당",
+    "750시간/월 (1개 인스턴스 24시간 운영 가능)"
+  ]}
+/>
+
+## 사전 준비사항
+
+- AWS 계정 ([aws-account-setup](/guides/aws-account-setup) 참고)
+- IAM 사용자 및 액세스 키 ([aws-iam-user-create](/guides/aws-iam-user-create) 참고)
+- SSH 클라이언트 (Linux/Mac: 터미널, Windows: PuTTY 또는 PowerShell)
+
+---
+
+<Step number={1} title="EC2 대시보드 접속 및 인스턴스 시작">
+
+AWS 콘솔에서 EC2 서비스로 이동하여 인스턴스 생성을 시작합니다.
+
+1. [AWS Console](https://console.aws.amazon.com/)에 로그인합니다
+2. 상단 검색창에 "EC2"를 입력하고 선택합니다
+3. 왼쪽 메뉴에서 **인스턴스**를 클릭합니다
+4. **인스턴스 시작** 버튼을 클릭합니다
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-ec2-instance-launch/step1-launch-instance-ko.png"
+  alt="EC2 인스턴스 시작 버튼"
+  caption="인스턴스 시작 버튼을 클릭하여 새 인스턴스 생성을 시작합니다"
+/>
+
+<Callout type="info">
+EC2 대시보드에서 실행 중인 인스턴스 수, 사용 중인 볼륨, Elastic IP 등의 현황을 확인할 수 있습니다.
+</Callout>
+
+</Step>
+
+<Step number={2} title="AMI 선택 및 인스턴스 타입 설정">
+
+운영체제 이미지(AMI)를 선택하고 인스턴스 타입을 설정합니다.
+
+### 이름 및 AMI 선택
+
+1. **이름 및 태그** 섹션에서 인스턴스 이름을 입력합니다 (예: `my-web-server`)
+2. **애플리케이션 및 OS 이미지(Amazon Machine Image)** 섹션에서 운영체제를 선택합니다
+   - 추천: **Amazon Linux 2023 AMI** (프리 티어 사용 가능 표시 확인)
+   - 또는 **Ubuntu Server 22.04 LTS** 선택 가능
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-ec2-instance-launch/step2-ami-selection-ko.png"
+  alt="AMI 선택 화면"
+  caption="프리 티어 사용 가능한 AMI를 선택합니다"
+/>
+
+### 인스턴스 타입 선택
+
+3. **인스턴스 유형** 섹션에서 **t2.micro** 또는 **t3.micro**를 선택합니다
+   - t2.micro: 1 vCPU, 1GB RAM (프리 티어)
+   - t3.micro: 2 vCPU, 1GB RAM (프리 티어)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-ec2-instance-launch/step2-instance-type-ko.png"
+  alt="인스턴스 타입 선택"
+  caption="프리 티어 적용 가능한 t2.micro 또는 t3.micro를 선택합니다"
+/>
+
+<DevTip title="인스턴스 타입 선택 팁">
+- **t2.micro**: 가장 일반적인 프리 티어 옵션, 안정적인 성능
+- **t3.micro**: 더 나은 CPU 성능, 버스트 크레딧 시스템 개선
+- 개발/테스트 용도라면 t3.micro를 추천합니다
+</DevTip>
+
+</Step>
+
+<Step number={3} title="키 페어 생성 및 네트워크 설정">
+
+SSH 접속을 위한 키 페어를 생성하고 네트워크를 구성합니다.
+
+### 키 페어 생성
+
+1. **키 페어(로그인)** 섹션에서 **새 키 페어 생성**을 클릭합니다
+2. 키 페어 이름을 입력합니다 (예: `my-ec2-key`)
+3. 키 페어 유형 선택:
+   - **RSA** 선택 (권장)
+4. 프라이빗 키 파일 형식:
+   - Linux/Mac: **.pem** 선택
+   - Windows (PuTTY): **.ppk** 선택
+5. **키 페어 생성** 버튼을 클릭합니다
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-ec2-instance-launch/step3-key-pair-ko.png"
+  alt="키 페어 생성"
+  caption="SSH 접속을 위한 키 페어를 생성하고 다운로드합니다"
+/>
+
+<Callout type="warning">
+다운로드한 키 페어 파일(.pem 또는 .ppk)은 안전한 곳에 보관하세요. 이 파일은 다시 다운로드할 수 없으며, 분실 시 인스턴스에 접속할 수 없습니다.
+</Callout>
+
+### 네트워크 설정
+
+6. **네트워크 설정** 섹션에서 기본 VPC를 사용합니다
+7. **퍼블릭 IP 자동 할당**: **활성화**로 설정합니다
+
+<Checkpoint
+  items={[
+    "키 페어 파일(.pem)이 다운로드되었나요?",
+    "퍼블릭 IP 자동 할당이 활성화되어 있나요?"
+  ]}
+/>
+
+</Step>
+
+<Step number={4} title="보안 그룹 구성">
+
+인스턴스에 대한 방화벽 규칙(보안 그룹)을 설정합니다.
+
+### 기본 보안 그룹 설정
+
+1. **방화벽(보안 그룹)** 섹션에서 **보안 그룹 생성** 선택
+2. 보안 그룹 이름: `my-web-server-sg`
+3. 설명: `Security group for web server`
+
+### 인바운드 규칙 추가
+
+기본적으로 SSH 규칙이 추가되어 있습니다. 웹 서버를 운영할 경우 추가 규칙을 설정합니다:
+
+4. **보안 그룹 규칙 추가** 버튼을 클릭하여 다음 규칙을 추가합니다:
+
+| 유형 | 프로토콜 | 포트 범위 | 소스 | 설명 |
+|------|----------|-----------|------|------|
+| SSH | TCP | 22 | 내 IP | SSH 접속 (자동 추가됨) |
+| HTTP | TCP | 80 | 0.0.0.0/0 | 웹 서버 (선택사항) |
+| HTTPS | TCP | 443 | 0.0.0.0/0 | 보안 웹 서버 (선택사항) |
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-ec2-instance-launch/step4-security-group-ko.png"
+  alt="보안 그룹 설정"
+  caption="SSH 및 웹 서버 접속을 위한 보안 그룹 규칙을 설정합니다"
+/>
+
+<Callout type="danger">
+**보안 주의사항:**
+- SSH(22번 포트)는 가능한 한 "내 IP"로 제한하세요
+- 모든 IP(0.0.0.0/0)를 허용하면 보안 위험이 증가합니다
+- 필요한 포트만 열고, 사용하지 않는 포트는 닫아두세요
+</Callout>
+
+</Step>
+
+<Step number={5} title="스토리지 구성 및 인스턴스 시작">
+
+스토리지를 설정하고 인스턴스를 시작합니다.
+
+### 스토리지 설정
+
+1. **스토리지 구성** 섹션에서:
+   - 볼륨 크기: **8 GiB** ~ **30 GiB** (프리 티어: 최대 30GB)
+   - 볼륨 유형: **gp3** (범용 SSD, 권장) 또는 **gp2**
+   - **종료 시 삭제**: 체크 (테스트 인스턴스의 경우)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-ec2-instance-launch/step5-storage-ko.png"
+  alt="스토리지 구성"
+  caption="프리 티어 범위 내에서 스토리지를 설정합니다"
+/>
+
+### 고급 세부 정보 (선택사항)
+
+2. **고급 세부 정보**를 펼쳐서 추가 설정이 가능합니다 (대부분 기본값 사용)
+
+### 요약 및 시작
+
+3. 오른쪽 **요약** 패널에서 설정을 검토합니다
+4. **인스턴스 시작** 버튼을 클릭합니다
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-ec2-instance-launch/step5-launch-ko.png"
+  alt="인스턴스 시작"
+  caption="모든 설정을 확인하고 인스턴스를 시작합니다"
+/>
+
+5. "성공적으로 인스턴스를 시작했습니다" 메시지가 표시됩니다
+6. **인스턴스 보기** 버튼을 클릭하여 인스턴스 목록으로 이동합니다
+
+<Callout type="info">
+인스턴스가 시작되고 실행 상태가 되기까지 1~2분 정도 소요됩니다. 상태 확인이 완료될 때까지 기다려주세요.
+</Callout>
+
+</Step>
+
+<Step number={6} title="SSH로 인스턴스 접속">
+
+생성한 인스턴스에 SSH로 접속합니다.
+
+### 퍼블릭 IP 확인
+
+1. 인스턴스 목록에서 생성한 인스턴스를 선택합니다
+2. 하단 **세부 정보** 탭에서 **퍼블릭 IPv4 주소**를 확인하고 복사합니다
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-ec2-instance-launch/step6-public-ip-ko.png"
+  alt="퍼블릭 IP 확인"
+  caption="인스턴스의 퍼블릭 IP 주소를 확인합니다"
+/>
+
+### SSH 접속 (Linux/Mac)
+
+3. 터미널을 열고 키 페어 파일의 권한을 설정합니다:
+
+<CopyBlock language="bash">
+chmod 400 ~/Downloads/my-ec2-key.pem
+</CopyBlock>
+
+4. SSH로 접속합니다:
+
+<CopyBlock language="bash">
+ssh -i ~/Downloads/my-ec2-key.pem ec2-user@YOUR_PUBLIC_IP
+</CopyBlock>
+
+**사용자명 참고:**
+- Amazon Linux: `ec2-user`
+- Ubuntu: `ubuntu`
+- Debian: `admin`
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-ec2-instance-launch/step6-ssh-connect-ko.png"
+  alt="SSH 접속 성공"
+  caption="SSH로 EC2 인스턴스에 성공적으로 접속했습니다"
+/>
+
+### SSH 접속 (Windows - PuTTY)
+
+Windows에서 PuTTY를 사용하는 경우:
+
+1. PuTTY를 실행합니다
+2. **Host Name**: `ec2-user@YOUR_PUBLIC_IP` 입력
+3. **Connection → SSH → Auth → Credentials**에서 .ppk 파일 선택
+4. **Open** 버튼을 클릭하여 접속합니다
+
+### Elastic IP 할당 (선택사항)
+
+인스턴스를 중지하고 다시 시작하면 퍼블릭 IP가 변경됩니다. 고정 IP가 필요한 경우:
+
+5. 왼쪽 메뉴에서 **네트워크 및 보안 → Elastic IP**를 클릭합니다
+6. **Elastic IP 주소 할당** 버튼을 클릭합니다
+7. **할당** 버튼을 클릭합니다
+8. 할당된 IP를 선택하고 **작업 → Elastic IP 주소 연결**을 클릭합니다
+9. 인스턴스를 선택하고 **연결** 버튼을 클릭합니다
+
+<Callout type="warning">
+Elastic IP는 인스턴스에 연결되어 있으면 무료지만, 연결되지 않은 상태로 보유하면 시간당 요금이 부과됩니다.
+</Callout>
+
+<Checkpoint
+  items={[
+    "SSH로 인스턴스에 정상적으로 접속되나요?",
+    "인스턴스 상태가 '실행 중'으로 표시되나요?",
+    "필요한 경우 Elastic IP를 할당했나요?"
+  ]}
+/>
+
+</Step>
+
+## 다음 단계
+
+EC2 인스턴스 생성을 완료했습니다! 이제 다음 단계를 진행해보세요:
+
+- [AWS RDS 데이터베이스 설정](/guides/aws-rds-setup) - 관리형 데이터베이스 생성
+- [AWS CloudWatch 모니터링 설정](/guides/aws-cloudwatch-setup) - 인스턴스 모니터링 및 알람 설정
+
+## 문제 해결
+
+### SSH 접속이 안 됩니다
+
+1. **보안 그룹 확인**: SSH(22번 포트)가 열려 있는지 확인
+2. **키 페어 권한**: `chmod 400`로 권한이 설정되었는지 확인
+3. **사용자명 확인**: AMI에 맞는 올바른 사용자명 사용
+4. **네트워크 확인**: 퍼블릭 IP가 할당되었는지 확인
+
+### 인스턴스가 시작되지 않습니다
+
+1. **인스턴스 한도**: 계정의 인스턴스 한도를 초과했는지 확인
+2. **리전 확인**: 올바른 리전에서 작업하고 있는지 확인
+3. **상태 확인**: 시스템 상태 검사 및 인스턴스 상태 검사 확인
+
+### 프리 티어 초과 걱정
+
+1. **Billing 대시보드**: 프리 티어 사용량을 정기적으로 확인
+2. **CloudWatch 알람**: 비용 알람을 설정하여 예산 초과 방지
+3. **인스턴스 중지**: 사용하지 않을 때는 인스턴스를 중지 (종료 아님)
+
+<Callout type="tip">
+인스턴스를 중지하면 컴퓨팅 비용은 청구되지 않지만, EBS 스토리지 비용은 계속 청구됩니다. 완전히 삭제하려면 인스턴스를 종료해야 합니다.
+</Callout>

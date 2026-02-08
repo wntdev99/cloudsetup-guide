@@ -1,0 +1,306 @@
+---
+title: "Launch AWS EC2 Instance"
+description: "Step-by-step guide to launching an AWS EC2 virtual server and connecting via SSH."
+---
+
+# Launch AWS EC2 Instance
+
+AWS EC2 (Elastic Compute Cloud) provides virtual servers in the cloud. This guide walks you through launching an EC2 instance and connecting to it via SSH.
+
+<FreeTierInfo
+  limit="750 hours/month (t2.micro or t3.micro)"
+  period="12 months"
+  conditions={[
+    "Available for new AWS accounts for 12 months",
+    "Only t2.micro or t3.micro instances eligible",
+    "750 hours/month (can run 1 instance 24/7)"
+  ]}
+/>
+
+## Prerequisites
+
+- AWS Account ([aws-account-setup](/guides/aws-account-setup) guide)
+- IAM User with Access Keys ([aws-iam-user-create](/guides/aws-iam-user-create) guide)
+- SSH Client (Linux/Mac: Terminal, Windows: PuTTY or PowerShell)
+
+---
+
+<Step number={1} title="Access EC2 Dashboard and Launch Instance">
+
+Navigate to the EC2 service in AWS Console and start launching an instance.
+
+1. Log in to [AWS Console](https://console.aws.amazon.com/)
+2. Type "EC2" in the top search bar and select it
+3. Click **Instances** in the left menu
+4. Click **Launch instances** button
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-ec2-instance-launch/step1-launch-instance-en.png"
+  alt="Launch instance button"
+  caption="Click Launch instances to start creating a new instance"
+/>
+
+<Callout type="info">
+The EC2 dashboard shows your running instances, volumes, Elastic IPs, and other resources at a glance.
+</Callout>
+
+</Step>
+
+<Step number={2} title="Select AMI and Configure Instance Type">
+
+Choose an operating system image (AMI) and configure the instance type.
+
+### Name and AMI Selection
+
+1. In **Name and tags** section, enter an instance name (e.g., `my-web-server`)
+2. In **Application and OS Images (Amazon Machine Image)** section, select an OS:
+   - Recommended: **Amazon Linux 2023 AMI** (check for Free tier eligible label)
+   - Or choose **Ubuntu Server 22.04 LTS**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-ec2-instance-launch/step2-ami-selection-en.png"
+  alt="AMI selection screen"
+  caption="Select a Free tier eligible AMI"
+/>
+
+### Instance Type Selection
+
+3. In **Instance type** section, select **t2.micro** or **t3.micro**:
+   - t2.micro: 1 vCPU, 1GB RAM (Free tier)
+   - t3.micro: 2 vCPU, 1GB RAM (Free tier)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-ec2-instance-launch/step2-instance-type-en.png"
+  alt="Instance type selection"
+  caption="Choose t2.micro or t3.micro for Free tier eligibility"
+/>
+
+<DevTip title="Instance Type Selection Tips">
+- **t2.micro**: Most common Free tier option, stable performance
+- **t3.micro**: Better CPU performance, improved burst credit system
+- For development/testing, t3.micro is recommended
+</DevTip>
+
+</Step>
+
+<Step number={3} title="Create Key Pair and Configure Network">
+
+Create a key pair for SSH access and configure network settings.
+
+### Create Key Pair
+
+1. In **Key pair (login)** section, click **Create new key pair**
+2. Enter a key pair name (e.g., `my-ec2-key`)
+3. Select key pair type:
+   - Choose **RSA** (recommended)
+4. Private key file format:
+   - Linux/Mac: Select **.pem**
+   - Windows (PuTTY): Select **.ppk**
+5. Click **Create key pair** button
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-ec2-instance-launch/step3-key-pair-en.png"
+  alt="Key pair creation"
+  caption="Create and download a key pair for SSH access"
+/>
+
+<Callout type="warning">
+Store the downloaded key pair file (.pem or .ppk) in a safe location. This file cannot be downloaded again, and you won't be able to access your instance without it.
+</Callout>
+
+### Network Settings
+
+6. In **Network settings** section, use the default VPC
+7. Set **Auto-assign public IP** to **Enable**
+
+<Checkpoint
+  items={[
+    "Did you download the key pair file (.pem)?",
+    "Is auto-assign public IP enabled?"
+  ]}
+/>
+
+</Step>
+
+<Step number={4} title="Configure Security Groups">
+
+Set up firewall rules (security groups) for your instance.
+
+### Basic Security Group Configuration
+
+1. In **Firewall (security groups)** section, select **Create security group**
+2. Security group name: `my-web-server-sg`
+3. Description: `Security group for web server`
+
+### Add Inbound Rules
+
+By default, an SSH rule is added. Add additional rules for web servers:
+
+4. Click **Add security group rule** button to add these rules:
+
+| Type | Protocol | Port Range | Source | Description |
+|------|----------|------------|--------|-------------|
+| SSH | TCP | 22 | My IP | SSH access (auto-added) |
+| HTTP | TCP | 80 | 0.0.0.0/0 | Web server (optional) |
+| HTTPS | TCP | 443 | 0.0.0.0/0 | Secure web server (optional) |
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-ec2-instance-launch/step4-security-group-en.png"
+  alt="Security group configuration"
+  caption="Configure security group rules for SSH and web server access"
+/>
+
+<Callout type="danger">
+**Security Best Practices:**
+- Restrict SSH (port 22) to "My IP" whenever possible
+- Allowing all IPs (0.0.0.0/0) increases security risks
+- Only open necessary ports, keep unused ports closed
+</Callout>
+
+</Step>
+
+<Step number={5} title="Configure Storage and Launch Instance">
+
+Configure storage settings and launch the instance.
+
+### Storage Configuration
+
+1. In **Configure storage** section:
+   - Volume size: **8 GiB** ~ **30 GiB** (Free tier: up to 30GB)
+   - Volume type: **gp3** (General Purpose SSD, recommended) or **gp2**
+   - **Delete on termination**: Check (for test instances)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-ec2-instance-launch/step5-storage-en.png"
+  alt="Storage configuration"
+  caption="Configure storage within Free tier limits"
+/>
+
+### Advanced Details (Optional)
+
+2. Expand **Advanced details** for additional settings (use defaults for most cases)
+
+### Review and Launch
+
+3. Review your configuration in the **Summary** panel on the right
+4. Click **Launch instance** button
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-ec2-instance-launch/step5-launch-en.png"
+  alt="Launch instance"
+  caption="Review all settings and launch the instance"
+/>
+
+5. You'll see "Successfully initiated launch of instance" message
+6. Click **View instances** button to go to the instances list
+
+<Callout type="info">
+It takes 1-2 minutes for the instance to start and reach running state. Wait for status checks to complete.
+</Callout>
+
+</Step>
+
+<Step number={6} title="Connect to Instance via SSH">
+
+Connect to your newly created instance using SSH.
+
+### Check Public IP
+
+1. Select your instance from the instances list
+2. In the **Details** tab below, find and copy the **Public IPv4 address**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-ec2-instance-launch/step6-public-ip-en.png"
+  alt="Check public IP"
+  caption="Find the instance's public IP address"
+/>
+
+### SSH Connection (Linux/Mac)
+
+3. Open Terminal and set key pair file permissions:
+
+<CopyBlock language="bash">
+chmod 400 ~/Downloads/my-ec2-key.pem
+</CopyBlock>
+
+4. Connect via SSH:
+
+<CopyBlock language="bash">
+ssh -i ~/Downloads/my-ec2-key.pem ec2-user@YOUR_PUBLIC_IP
+</CopyBlock>
+
+**Username reference:**
+- Amazon Linux: `ec2-user`
+- Ubuntu: `ubuntu`
+- Debian: `admin`
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-ec2-instance-launch/step6-ssh-connect-en.png"
+  alt="SSH connection success"
+  caption="Successfully connected to EC2 instance via SSH"
+/>
+
+### SSH Connection (Windows - PuTTY)
+
+For Windows users with PuTTY:
+
+1. Launch PuTTY
+2. **Host Name**: Enter `ec2-user@YOUR_PUBLIC_IP`
+3. Navigate to **Connection → SSH → Auth → Credentials** and select your .ppk file
+4. Click **Open** button to connect
+
+### Allocate Elastic IP (Optional)
+
+When you stop and restart an instance, the public IP changes. For a static IP:
+
+5. Click **Network & Security → Elastic IPs** in the left menu
+6. Click **Allocate Elastic IP address** button
+7. Click **Allocate** button
+8. Select the allocated IP and click **Actions → Associate Elastic IP address**
+9. Select your instance and click **Associate** button
+
+<Callout type="warning">
+Elastic IPs are free when associated with a running instance, but you're charged hourly for unassociated Elastic IPs.
+</Callout>
+
+<Checkpoint
+  items={[
+    "Can you connect to the instance via SSH successfully?",
+    "Does the instance show 'running' status?",
+    "Have you allocated an Elastic IP if needed?"
+  ]}
+/>
+
+</Step>
+
+## Next Steps
+
+You've successfully launched an EC2 instance! Here's what you can do next:
+
+- [AWS RDS Database Setup](/guides/aws-rds-setup) - Create a managed database
+- [AWS CloudWatch Monitoring Setup](/guides/aws-cloudwatch-setup) - Set up instance monitoring and alarms
+
+## Troubleshooting
+
+### Cannot Connect via SSH
+
+1. **Check Security Group**: Verify SSH (port 22) is open
+2. **Key Pair Permissions**: Ensure permissions are set with `chmod 400`
+3. **Check Username**: Use the correct username for your AMI
+4. **Network Check**: Verify public IP is assigned
+
+### Instance Won't Start
+
+1. **Instance Limits**: Check if you've exceeded account instance limits
+2. **Region Check**: Ensure you're working in the correct region
+3. **Status Checks**: Review system and instance status checks
+
+### Worried About Free Tier Overages
+
+1. **Billing Dashboard**: Regularly check Free tier usage
+2. **CloudWatch Alarms**: Set up billing alarms to prevent budget overruns
+3. **Stop Instance**: Stop (not terminate) instances when not in use
+
+<Callout type="tip">
+Stopping an instance eliminates compute charges but EBS storage charges continue. To completely remove charges, terminate the instance.
+</Callout>

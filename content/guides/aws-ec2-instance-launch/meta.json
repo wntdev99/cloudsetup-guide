@@ -1,0 +1,68 @@
+{
+  "slug": "aws-ec2-instance-launch",
+  "platform": "aws",
+  "service": "EC2 (Elastic Compute Cloud)",
+  "category": "compute",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 25,
+  "totalSteps": 6,
+  "freeTier": {
+    "limit": "750시간/월 (t2.micro 또는 t3.micro)",
+    "period": "12개월",
+    "amount": "$0",
+    "status": "available",
+    "conditions": [
+      "신규 AWS 계정 대상 12개월 무료",
+      "t2.micro 또는 t3.micro 인스턴스 타입만 해당",
+      "750시간/월 (1개 인스턴스 24시간 운영 가능)",
+      "30GB EBS 스토리지 포함",
+      "2백만 개 I/O 요청"
+    ]
+  },
+  "prerequisites": [
+    "aws-account-setup",
+    "aws-iam-user-create"
+  ],
+  "nextGuides": [
+    "aws-rds-setup",
+    "aws-cloudwatch-setup"
+  ],
+  "seo": {
+    "ko": {
+      "title": "AWS EC2 인스턴스 시작하기 | 가상 서버 생성 및 SSH 연결 가이드",
+      "description": "AWS EC2 인스턴스를 생성하고 SSH로 접속하는 방법을 단계별로 안내합니다. AMI 선택, 인스턴스 타입 설정, 보안 그룹 구성, 키 페어 생성, Elastic IP 할당 방법을 스크린샷과 함께 설명합니다.",
+      "keywords": [
+        "AWS EC2",
+        "EC2 인스턴스",
+        "가상 서버",
+        "SSH 접속",
+        "키 페어",
+        "보안 그룹",
+        "Elastic IP",
+        "t2.micro",
+        "AWS 프리티어",
+        "클라우드 서버"
+      ]
+    },
+    "en": {
+      "title": "Launch AWS EC2 Instance | Virtual Server Setup & SSH Connection Guide",
+      "description": "Step-by-step guide to launching an AWS EC2 instance and connecting via SSH. Learn how to choose AMI, configure instance types, set up security groups, create key pairs, and assign Elastic IP with detailed screenshots.",
+      "keywords": [
+        "AWS EC2",
+        "EC2 instance",
+        "virtual server",
+        "SSH connection",
+        "key pair",
+        "security group",
+        "Elastic IP",
+        "t2.micro",
+        "AWS free tier",
+        "cloud server"
+      ]
+    }
+  },
+  "tags": ["ec2", "compute", "ssh", "linux", "security-groups"],
+  "status": "published",
+  "lastVerified": "2026-02-08",
+  "updatedAt": "2026-02-08"
+}

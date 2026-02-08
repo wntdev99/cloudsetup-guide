@@ -1,0 +1,66 @@
+{
+  "slug": "aws-route53-setup",
+  "platform": "aws",
+  "service": "Route 53",
+  "category": "cdn",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 20,
+  "totalSteps": 5,
+  "freeTier": {
+    "limit": "호스팅 영역당 $0.50/월 (프리티어 없음)",
+    "period": "계속",
+    "amount": "$0.50",
+    "status": "paid",
+    "conditions": [
+      "호스팅 영역: $0.50/월",
+      "표준 쿼리: 처음 10억 개/월 $0.40",
+      "Alias 쿼리: AWS 리소스에 대해 무료",
+      "도메인 등록: 도메인당 연간 비용 별도 (.com $13/년)"
+    ]
+  },
+  "prerequisites": [
+    "aws-account-setup"
+  ],
+  "nextGuides": [
+    "aws-cloudfront-setup",
+    "aws-s3-bucket-setup"
+  ],
+  "seo": {
+    "ko": {
+      "title": "AWS Route 53 설정하기 | DNS 호스팅 영역 및 레코드 구성 가이드",
+      "description": "AWS Route 53으로 DNS 호스팅 영역을 생성하고 도메인 레코드를 설정하는 방법을 단계별로 안내합니다. A 레코드, CNAME, Alias 레코드 추가, CloudFront 연동, 도메인 등록 방법을 스크린샷과 함께 설명합니다.",
+      "keywords": [
+        "AWS Route 53",
+        "DNS",
+        "호스팅 영역",
+        "도메인 관리",
+        "A 레코드",
+        "CNAME",
+        "Alias 레코드",
+        "CloudFront 연동",
+        "도메인 등록",
+        "네임서버"
+      ]
+    },
+    "en": {
+      "title": "AWS Route 53 Setup | DNS Hosted Zone & Record Configuration Guide",
+      "description": "Step-by-step guide to creating DNS hosted zones and configuring domain records with AWS Route 53. Learn how to add A records, CNAME, Alias records, integrate with CloudFront, and register domains with detailed screenshots.",
+      "keywords": [
+        "AWS Route 53",
+        "DNS",
+        "hosted zone",
+        "domain management",
+        "A record",
+        "CNAME",
+        "Alias record",
+        "CloudFront integration",
+        "domain registration",
+        "nameservers"
+      ]
+    }
+  },
+  "tags": ["route53", "dns", "domain", "cloudfront", "alias-record"],
+  "status": "published",
+  "lastVerified": "2026-02-08",
+  "updatedAt": "2026-02-08"
+}

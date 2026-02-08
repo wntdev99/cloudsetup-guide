@@ -1,0 +1,68 @@
+{
+  "slug": "aws-rds-setup",
+  "platform": "aws",
+  "service": "RDS (Relational Database Service)",
+  "category": "database",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 20,
+  "totalSteps": 5,
+  "freeTier": {
+    "limit": "750시간/월 db.t2.micro, 20GB 스토리지",
+    "period": "12개월",
+    "amount": "$0",
+    "status": "available",
+    "conditions": [
+      "신규 AWS 계정 대상 12개월 무료",
+      "db.t2.micro 인스턴스만 해당",
+      "750시간/월 사용 가능",
+      "20GB 범용(SSD) 데이터베이스 스토리지",
+      "20GB 백업 스토리지 포함"
+    ]
+  },
+  "prerequisites": [
+    "aws-account-setup",
+    "aws-iam-user-create"
+  ],
+  "nextGuides": [
+    "aws-ec2-instance-launch",
+    "aws-cloudwatch-setup"
+  ],
+  "seo": {
+    "ko": {
+      "title": "AWS RDS 설정하기 | MySQL/PostgreSQL 관리형 데이터베이스 생성 가이드",
+      "description": "AWS RDS로 MySQL 또는 PostgreSQL 데이터베이스를 생성하고 연결하는 방법을 단계별로 안내합니다. DB 인스턴스 생성, 보안 그룹 설정, 연결 문자열 확인, 백업 설정 방법을 스크린샷과 함께 설명합니다.",
+      "keywords": [
+        "AWS RDS",
+        "MySQL",
+        "PostgreSQL",
+        "관리형 데이터베이스",
+        "DB 인스턴스",
+        "데이터베이스 연결",
+        "보안 그룹",
+        "자동 백업",
+        "AWS 프리티어",
+        "클라우드 데이터베이스"
+      ]
+    },
+    "en": {
+      "title": "AWS RDS Setup | MySQL/PostgreSQL Managed Database Creation Guide",
+      "description": "Step-by-step guide to creating and connecting MySQL or PostgreSQL databases with AWS RDS. Learn how to create DB instances, configure security groups, get connection strings, and set up automated backups with detailed screenshots.",
+      "keywords": [
+        "AWS RDS",
+        "MySQL",
+        "PostgreSQL",
+        "managed database",
+        "DB instance",
+        "database connection",
+        "security group",
+        "automated backup",
+        "AWS free tier",
+        "cloud database"
+      ]
+    }
+  },
+  "tags": ["rds", "database", "mysql", "postgresql", "backup"],
+  "status": "published",
+  "lastVerified": "2026-02-08",
+  "updatedAt": "2026-02-08"
+}

@@ -1,0 +1,481 @@
+---
+title: "AWS CloudWatch 설정하기"
+description: "AWS CloudWatch로 EC2, RDS 등 AWS 리소스를 모니터링하고 알람을 설정하는 방법을 단계별로 안내합니다."
+---
+
+# AWS CloudWatch 설정하기
+
+AWS CloudWatch는 AWS 리소스와 애플리케이션을 실시간으로 모니터링하는 서비스입니다. 이 가이드에서는 EC2 인스턴스 모니터링, 알람 설정, 대시보드 생성, 로그 수집 방법을 안내합니다.
+
+<FreeTierInfo
+  limit="10개 사용자 지정 지표, 10개 알람, 5GB 로그/월"
+  period="12개월 + 영구 무료"
+  conditions={[
+    "기본 모니터링 지표: 무료",
+    "10개 사용자 지정 지표/알람: 영구 무료",
+    "5GB 로그 수집: 영구 무료"
+  ]}
+/>
+
+## 사전 준비사항
+
+- AWS 계정 ([aws-account-setup](/guides/aws-account-setup) 참고)
+- 모니터링할 리소스 (예: EC2 인스턴스 - [aws-ec2-instance-launch](/guides/aws-ec2-instance-launch) 참고)
+- 선택사항: SNS 주제 (알림 수신용)
+
+---
+
+<Step number={1} title="CloudWatch 대시보드 접속 및 개요 확인">
+
+AWS 콘솔에서 CloudWatch 서비스로 이동하여 모니터링 상태를 확인합니다.
+
+1. [AWS Console](https://console.aws.amazon.com/)에 로그인합니다
+2. 상단 검색창에 "CloudWatch"를 입력하고 선택합니다
+3. CloudWatch 대시보드가 표시됩니다
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudwatch-setup/step1-dashboard-ko.png"
+  alt="CloudWatch 대시보드"
+  caption="CloudWatch 대시보드에서 AWS 리소스의 전반적인 상태를 확인합니다"
+/>
+
+### 주요 메뉴 이해하기
+
+왼쪽 메뉴에서 다음 주요 기능을 확인할 수 있습니다:
+
+- **대시보드**: 사용자 지정 모니터링 대시보드
+- **알람**: 지표 기반 알람 설정
+- **로그**: CloudWatch Logs로 로그 수집 및 분석
+- **지표**: 모든 AWS 서비스의 지표 탐색
+- **이벤트**: EventBridge로 이벤트 기반 자동화
+
+### 기본 지표 확인
+
+4. 왼쪽 메뉴에서 **지표 → 모든 지표**를 클릭합니다
+5. 네임스페이스 목록에서 사용 중인 서비스를 확인합니다:
+   - **EC2**: 인스턴스 CPU, 네트워크, 디스크 지표
+   - **RDS**: 데이터베이스 연결, CPU, 스토리지 지표
+   - **S3**: 버킷 크기, 요청 수 지표
+   - **CloudFront**: 요청 수, 에러율, 바이트 전송량
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudwatch-setup/step1-metrics-ko.png"
+  alt="CloudWatch 지표"
+  caption="AWS 서비스별로 수집되는 지표를 확인합니다"
+/>
+
+<Callout type="info">
+기본 모니터링은 대부분의 AWS 서비스에서 자동으로 활성화되며 무료입니다. EC2의 경우 5분 간격으로 지표가 수집됩니다. 1분 간격의 상세 모니터링은 추가 비용이 발생합니다.
+</Callout>
+
+</Step>
+
+<Step number={2} title="EC2 인스턴스 모니터링 및 알람 생성">
+
+EC2 인스턴스의 CPU 사용률을 모니터링하고 임계값 초과 시 알람을 설정합니다.
+
+### EC2 지표 확인
+
+1. 왼쪽 메뉴에서 **지표 → 모든 지표**를 클릭합니다
+2. **EC2**를 클릭하고 **인스턴스별**을 선택합니다
+3. 모니터링할 인스턴스를 찾고 **CPUUtilization** 지표를 선택합니다
+4. 그래프에서 CPU 사용률 추이를 확인합니다
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudwatch-setup/step2-ec2-metrics-ko.png"
+  alt="EC2 CPU 지표"
+  caption="EC2 인스턴스의 CPU 사용률 그래프를 확인합니다"
+/>
+
+### CPU 사용률 알람 생성
+
+5. 그래프 상단의 **종 모양 아이콘(알람 생성)** 버튼을 클릭합니다
+   - 또는 왼쪽 메뉴에서 **알람 → 모든 알람 → 알람 생성**을 클릭합니다
+
+6. **지표 선택** (이미 선택된 경우 건너뛰기):
+   - **EC2 → 인스턴스별 지표**
+   - **CPUUtilization** 선택
+   - **지표 선택** 버튼 클릭
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudwatch-setup/step2-select-metric-ko.png"
+  alt="지표 선택"
+  caption="알람을 생성할 EC2 CPU 지표를 선택합니다"
+/>
+
+### 알람 조건 설정
+
+7. **지표 및 조건 지정** 페이지에서:
+   - **통계**: **평균** 선택 (기본값)
+   - **기간**: **5분** 선택
+   - **임계값 유형**: **정적** 선택
+   - **알람 조건**: **보다 큼** 선택
+   - **임계값**: `80` 입력 (CPU 80% 초과 시 알람)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudwatch-setup/step2-alarm-conditions-ko.png"
+  alt="알람 조건 설정"
+  caption="CPU 사용률이 80%를 초과하면 알람이 발생하도록 설정합니다"
+/>
+
+8. **추가 구성** (선택사항):
+   - **누락된 데이터 처리**: **누락된 데이터를 정상(임계값 위반 아님)으로 처리** 선택
+   - **평가할 데이터 포인트**: `1/1` (1개 중 1개, 즉시 알람)
+
+9. **다음** 버튼을 클릭합니다
+
+<DevTip title="알람 임계값 설정 팁">
+**일반적인 임계값:**
+- **CPU**: 80% (높음), 90% (매우 높음)
+- **메모리**: 85% (높음)
+- **디스크**: 80% (높음)
+- **네트워크**: 애플리케이션에 따라 다름
+
+**평가 기간:**
+- 즉각 대응: `1/1` (1분 중 1분)
+- 일시적 스파이크 무시: `3/5` (5분 중 3분)
+- 안정적인 추세: `5/5` (5분 연속)
+</DevTip>
+
+</Step>
+
+<Step number={3} title="SNS 알림 구성 및 이메일 수신 설정">
+
+알람 발생 시 이메일로 알림을 받도록 SNS 주제를 설정합니다.
+
+### SNS 주제 생성
+
+1. **작업 구성** 페이지에서:
+   - **알람 상태 트리거**: **경보 상태** 선택
+   - **SNS 주제 선택**: **새 주제 생성** 선택
+
+2. 새 주제 생성:
+   - **주제 이름**: `cloudwatch-alarms` 입력
+   - **알림을 받을 이메일 엔드포인트**: 이메일 주소 입력 (예: `admin@example.com`)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudwatch-setup/step3-sns-topic-ko.png"
+  alt="SNS 주제 생성"
+  caption="알람 알림을 받을 SNS 주제를 생성하고 이메일을 등록합니다"
+/>
+
+3. **주제 생성** 버튼을 클릭합니다
+4. **다음** 버튼을 클릭합니다
+
+<Callout type="warning">
+이메일 주소를 입력한 후, AWS에서 구독 확인 이메일을 보냅니다. 이메일을 열고 **Confirm subscription** 링크를 클릭해야 알림을 받을 수 있습니다.
+</Callout>
+
+### 알람 이름 및 설명 설정
+
+5. **이름 및 설명 추가** 페이지에서:
+   - **알람 이름**: `high-cpu-utilization` 입력
+   - **알람 설명**: `EC2 instance CPU usage is above 80%` 입력 (선택사항)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudwatch-setup/step3-alarm-name-ko.png"
+  alt="알람 이름 설정"
+  caption="알람을 식별할 수 있는 이름과 설명을 입력합니다"
+/>
+
+6. **다음** 버튼을 클릭합니다
+
+### 알람 검토 및 생성
+
+7. **미리보기 및 생성** 페이지에서 모든 설정을 검토합니다
+8. **알람 생성** 버튼을 클릭합니다
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudwatch-setup/step3-alarm-created-ko.png"
+  alt="알람 생성 완료"
+  caption="알람이 성공적으로 생성되었습니다"
+/>
+
+### 이메일 구독 확인
+
+9. 등록한 이메일 주소로 AWS SNS 구독 확인 메일이 전송됩니다
+10. 이메일을 열고 **Confirm subscription** 링크를 클릭합니다
+11. "Subscription confirmed!" 메시지가 표시되면 완료입니다
+
+<Checkpoint
+  items={[
+    "EC2 CPU 사용률 알람을 생성했나요?",
+    "SNS 주제를 생성하고 이메일을 등록했나요?",
+    "이메일 구독을 확인했나요?"
+  ]}
+/>
+
+</Step>
+
+<Step number={4} title="커스텀 대시보드 생성 및 위젯 추가">
+
+여러 지표를 한눈에 볼 수 있는 커스텀 대시보드를 생성합니다.
+
+### 대시보드 생성
+
+1. 왼쪽 메뉴에서 **대시보드**를 클릭합니다
+2. **대시보드 생성** 버튼을 클릭합니다
+3. **대시보드 이름**: `my-infrastructure` 입력
+4. **대시보드 생성** 버튼을 클릭합니다
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudwatch-setup/step4-create-dashboard-ko.png"
+  alt="대시보드 생성"
+  caption="커스텀 모니터링 대시보드를 생성합니다"
+/>
+
+### EC2 CPU 위젯 추가
+
+5. **위젯 추가** 대화상자가 표시됩니다
+6. **선 그래프** 선택하고 **다음** 클릭
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudwatch-setup/step4-widget-type-ko.png"
+  alt="위젯 유형 선택"
+  caption="선 그래프 위젯을 선택하여 시간에 따른 지표 변화를 표시합니다"
+/>
+
+7. **지표** 탭에서:
+   - **EC2 → 인스턴스별 지표** 선택
+   - 인스턴스의 **CPUUtilization** 체크
+   - 필요하면 **NetworkIn**, **NetworkOut**도 추가
+
+8. **그래프 작성된 지표** 탭에서 지표 설정을 확인합니다
+9. **위젯 생성** 버튼을 클릭합니다
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudwatch-setup/step4-cpu-widget-ko.png"
+  alt="CPU 위젯 추가"
+  caption="EC2 인스턴스의 CPU 사용률을 표시하는 위젯을 추가합니다"
+/>
+
+### 추가 위젯 추가
+
+10. **위젯 추가** 버튼을 다시 클릭하여 다른 위젯을 추가합니다
+
+**메모리 사용률 위젯 (숫자):**
+- 위젯 유형: **숫자**
+- 지표: EC2 → 인스턴스별 → **MemoryUtilization** (CloudWatch Agent 설치 필요)
+
+**디스크 I/O 위젯:**
+- 위젯 유형: **적층 영역**
+- 지표: EC2 → 인스턴스별 → **DiskReadBytes**, **DiskWriteBytes**
+
+**RDS 연결 수 위젯 (RDS 사용 시):**
+- 위젯 유형: **선 그래프**
+- 지표: RDS → 데이터베이스 → **DatabaseConnections**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudwatch-setup/step4-dashboard-complete-ko.png"
+  alt="완성된 대시보드"
+  caption="여러 지표를 포함한 커스텀 대시보드가 완성되었습니다"
+/>
+
+### 대시보드 저장
+
+11. 모든 위젯 추가가 완료되면 **대시보드 저장** 버튼을 클릭합니다
+12. 위젯의 크기와 위치를 드래그하여 조정할 수 있습니다
+
+<Callout type="info">
+프리 티어에서는 최대 3개의 대시보드를 생성할 수 있으며, 각 대시보드당 50개의 지표까지 무료입니다. 이를 초과하면 대시보드당 월 $3의 비용이 발생합니다.
+</Callout>
+
+</Step>
+
+<Step number={5} title="CloudWatch Logs 설정 및 로그 수집">
+
+애플리케이션 로그를 CloudWatch Logs로 수집하고 분석합니다.
+
+### 로그 그룹 생성
+
+1. 왼쪽 메뉴에서 **로그 → 로그 그룹**을 클릭합니다
+2. **로그 그룹 생성** 버튼을 클릭합니다
+3. **로그 그룹 이름**: `/aws/ec2/my-app` 입력
+4. **보존 설정**: **1주** 선택 (비용 절감을 위해)
+5. **로그 그룹 생성** 버튼을 클릭합니다
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudwatch-setup/step5-log-group-ko.png"
+  alt="로그 그룹 생성"
+  caption="애플리케이션 로그를 수집할 로그 그룹을 생성합니다"
+/>
+
+<Callout type="info">
+로그 보존 기간을 짧게 설정하면 스토리지 비용을 절감할 수 있습니다. 프리 티어는 5GB 로그 수집 및 보관을 제공합니다.
+</Callout>
+
+### CloudWatch Agent 설치 (EC2)
+
+EC2 인스턴스에서 CloudWatch Agent를 설치하여 로그를 전송합니다.
+
+6. EC2 인스턴스에 SSH로 접속합니다
+7. CloudWatch Agent를 다운로드하고 설치합니다:
+
+**Amazon Linux 2 / Amazon Linux 2023:**
+
+<CopyBlock language="bash">
+sudo yum install -y amazon-cloudwatch-agent
+</CopyBlock>
+
+**Ubuntu:**
+
+<CopyBlock language="bash">
+wget https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
+sudo dpkg -i amazon-cloudwatch-agent.deb
+</CopyBlock>
+
+### CloudWatch Agent 구성
+
+8. Agent 구성 파일을 생성합니다:
+
+<CopyBlock language="bash">
+sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-config-wizard
+</CopyBlock>
+
+9. 마법사의 질문에 답합니다:
+   - **OS**: Linux
+   - **EC2 or On-Premise**: EC2
+   - **StatsD daemon**: No
+   - **CollectD**: No
+   - **Monitor host metrics**: Yes (CPU, 메모리, 디스크 등)
+   - **Log files to monitor**: Yes
+     - 로그 파일 경로: `/var/log/my-app/app.log`
+     - 로그 그룹 이름: `/aws/ec2/my-app`
+
+### Agent 시작
+
+10. CloudWatch Agent를 시작합니다:
+
+<CopyBlock language="bash">
+sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
+  -a fetch-config \
+  -m ec2 \
+  -s \
+  -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
+</CopyBlock>
+
+11. Agent 상태 확인:
+
+<CopyBlock language="bash">
+sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
+  -a query \
+  -m ec2 \
+  -s
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudwatch-setup/step5-agent-status-ko.png"
+  alt="CloudWatch Agent 상태"
+  caption="CloudWatch Agent가 정상적으로 실행되고 있는지 확인합니다"
+/>
+
+### 로그 스트림 확인
+
+12. CloudWatch 콘솔의 **로그 → 로그 그룹**으로 돌아갑니다
+13. 생성한 로그 그룹(`/aws/ec2/my-app`)을 클릭합니다
+14. 로그 스트림이 생성되고 로그가 수집되는 것을 확인합니다
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudwatch-setup/step5-log-streams-ko.png"
+  alt="로그 스트림 확인"
+  caption="EC2 인스턴스에서 전송된 로그가 CloudWatch Logs에 수집되고 있습니다"
+/>
+
+### 로그 인사이트 쿼리
+
+15. **로그 인사이트** 탭을 클릭합니다
+16. 로그 그룹을 선택하고 쿼리를 실행합니다:
+
+<CopyBlock language="text">
+fields @timestamp, @message
+| filter @message like /ERROR/
+| sort @timestamp desc
+| limit 20
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudwatch-setup/step5-log-insights-ko.png"
+  alt="로그 인사이트 쿼리"
+  caption="로그 인사이트로 에러 로그를 검색하고 분석합니다"
+/>
+
+<Checkpoint
+  items={[
+    "로그 그룹을 생성했나요?",
+    "EC2에 CloudWatch Agent를 설치하고 시작했나요?",
+    "로그가 CloudWatch Logs로 수집되고 있나요?"
+  ]}
+/>
+
+</Step>
+
+## 다음 단계
+
+CloudWatch 설정을 완료했습니다! 이제 다음 단계를 진행해보세요:
+
+- [AWS RDS 설정](/guides/aws-rds-setup) - RDS 데이터베이스 모니터링 추가
+- [AWS CloudFront 설정](/guides/aws-cloudfront-setup) - CloudFront CDN 지표 모니터링
+
+## CloudWatch 활용 팁
+
+### 효과적인 알람 설정
+
+**중요한 알람:**
+- CPU 사용률 > 80%
+- 메모리 사용률 > 85%
+- 디스크 여유 공간 < 20%
+- 상태 확인 실패
+- RDS 연결 수 > 80% 한도
+
+**비용 알람:**
+- 월별 예상 요금 > 예산
+- 특정 서비스 사용량 초과
+
+### 대시보드 최적화
+
+- **인프라 대시보드**: EC2, RDS, ELB 지표
+- **애플리케이션 대시보드**: 커스텀 지표, API 응답 시간
+- **비용 대시보드**: 서비스별 비용 추정
+
+### 로그 필터 및 지표
+
+로그에서 특정 패턴을 찾아 지표로 변환:
+
+1. 로그 그룹 → **지표 필터 생성**
+2. 필터 패턴: `[time, request_id, level = ERROR*, ...]`
+3. 지표 생성: `ErrorCount`
+4. 이 지표로 알람 생성 가능
+
+## 문제 해결
+
+### 알람 알림이 오지 않습니다
+
+1. **SNS 구독 확인**: 이메일 구독이 확인되었는지 체크
+2. **알람 상태**: 알람이 "경보" 상태인지 확인
+3. **스팸 폴더**: 이메일이 스팸으로 분류되지 않았는지 확인
+4. **SNS 주제 권한**: CloudWatch가 SNS 주제에 게시할 권한이 있는지 확인
+
+### CloudWatch Agent가 로그를 전송하지 않습니다
+
+1. **IAM 역할**: EC2 인스턴스에 CloudWatch Logs 쓰기 권한이 있는지 확인
+2. **Agent 상태**: Agent가 실행 중인지 확인
+3. **로그 파일 경로**: 구성 파일의 로그 경로가 올바른지 확인
+4. **네트워크**: EC2가 CloudWatch 엔드포인트에 접근할 수 있는지 확인
+
+### 지표가 표시되지 않습니다
+
+1. **리소스 활성화**: 모니터링할 리소스가 실행 중인지 확인
+2. **기간**: 충분한 시간이 지났는지 확인 (5분 지연 가능)
+3. **상세 모니터링**: EC2는 기본적으로 5분 간격 (1분 간격은 별도 활성화)
+4. **리전**: 올바른 리전에서 확인하고 있는지 체크
+
+### 프리 티어 초과 걱정
+
+1. **알람 수 제한**: 10개 이하로 유지
+2. **로그 보존**: 짧은 보존 기간 설정 (1주일)
+3. **대시보드 제한**: 3개 대시보드, 50개 지표 이하
+4. **Billing 알람**: 비용 알람으로 예산 초과 방지
+
+<Callout type="tip">
+CloudWatch의 많은 기능이 영구 무료입니다. 10개 알람, 5GB 로그, 3개 대시보드는 12개월 프리 티어 이후에도 계속 무료로 사용할 수 있습니다.
+</Callout>

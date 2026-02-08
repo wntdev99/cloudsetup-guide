@@ -1,0 +1,363 @@
+---
+title: "AWS CloudFront Setup"
+description: "Step-by-step guide to setting up AWS CloudFront CDN and connecting it with S3 for fast content delivery."
+---
+
+# AWS CloudFront Setup
+
+AWS CloudFront is a CDN (Content Delivery Network) service that delivers content quickly through edge locations worldwide. This guide walks you through creating a CloudFront distribution and connecting it with S3.
+
+<FreeTierInfo
+  limit="1TB data transfer, 10M HTTP/HTTPS requests/month"
+  period="12 months"
+  conditions={[
+    "Available for new AWS accounts for 12 months",
+    "1TB outbound data transfer",
+    "10 million HTTP/HTTPS requests"
+  ]}
+/>
+
+## Prerequisites
+
+- AWS Account ([aws-account-setup](/guides/aws-account-setup) guide)
+- S3 Bucket with Content ([aws-s3-bucket-setup](/guides/aws-s3-bucket-setup) guide)
+- Optional: Custom domain (Route 53 or external DNS)
+
+---
+
+<Step number={1} title="Start Creating CloudFront Distribution">
+
+Navigate to the CloudFront service in AWS Console and start creating a distribution.
+
+1. Log in to [AWS Console](https://console.aws.amazon.com/)
+2. Type "CloudFront" in the top search bar and select it
+3. Click **Create distribution** button
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudfront-setup/step1-create-distribution-en.png"
+  alt="Create distribution button"
+  caption="Click Create distribution to start a new CloudFront distribution"
+/>
+
+<Callout type="info">
+CloudFront distributions cache content at edge locations worldwide, providing fast response times to users. AWS operates over 400 edge locations globally.
+</Callout>
+
+</Step>
+
+<Step number={2} title="Configure Origin (Connect S3)">
+
+Set up the origin where CloudFront will fetch content.
+
+### Select Origin Domain
+
+1. Click the **Origin domain** field
+2. Select your S3 bucket from the dropdown list
+   - Example: `my-website-bucket.s3.ap-northeast-2.amazonaws.com`
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudfront-setup/step2-origin-domain-en.png"
+  alt="Origin domain selection"
+  caption="Select your S3 bucket as the origin domain"
+/>
+
+### Configure Origin Access
+
+3. In **Origin access** section:
+   - Select **Origin access control settings (recommended)**
+   - Click **Create control setting** button
+
+4. Create Origin access control (OAC):
+   - **Name**: Use auto-generated name (e.g., `my-website-bucket`)
+   - **Description**: Optional
+   - **Sign requests**: **Yes** (default)
+   - Click **Create** button
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudfront-setup/step2-oac-en.png"
+  alt="Origin Access Control creation"
+  caption="Create OAC to allow only CloudFront to access your S3 bucket"
+/>
+
+<Callout type="info">
+**What is Origin Access Control (OAC)?**
+
+OAC is a security feature that allows only CloudFront to access your S3 bucket. This lets you serve content through CloudFront without making your S3 bucket public.
+</Callout>
+
+### Additional Origin Settings
+
+5. **Origin path**: Leave empty (use entire bucket)
+6. **Enable Origin Shield**: **No** (incurs additional cost)
+
+<Checkpoint
+  items={[
+    "Did you select your S3 bucket as the origin?",
+    "Did you create Origin Access Control?"
+  ]}
+/>
+
+</Step>
+
+<Step number={3} title="Configure Default Cache Behavior and Settings">
+
+Configure cache behavior and viewer access settings.
+
+### Viewer Protocol Policy
+
+1. In **Viewer protocol policy** section:
+   - Select **Redirect HTTP to HTTPS** (recommended)
+   - This automatically redirects all HTTP requests to HTTPS
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudfront-setup/step3-https-en.png"
+  alt="HTTPS redirect configuration"
+  caption="Configure automatic HTTP to HTTPS redirect"
+/>
+
+### Allowed HTTP Methods
+
+2. In **Allowed HTTP methods** section:
+   - Select **GET, HEAD** (for static content)
+   - Or **GET, HEAD, OPTIONS** (if additional methods needed)
+
+### Cache Key and Origin Requests
+
+3. In **Cache key and origin requests** section:
+   - **Cache policy**: Select **CachingOptimized** (recommended)
+   - Or **CachingDisabled** (for dynamic content)
+
+<DevTip title="Cache Policy Selection Guide">
+- **CachingOptimized**: Static files (images, CSS, JS) - maximum caching
+- **CachingOptimizedForUncompressedObjects**: Uncompressed files
+- **CachingDisabled**: Dynamic content - no caching
+- **Elemental-MediaPackage**: For video streaming
+</DevTip>
+
+### Additional Settings
+
+4. **Response headers policy**: **None** (default)
+5. **Function associations**: Add CloudFront Functions if needed
+
+</Step>
+
+<Step number={4} title="Configure Distribution Settings and Create">
+
+Set up price class, SSL certificate, default root object, and create the distribution.
+
+### Price Class
+
+1. In **Price class** section:
+   - Select **Use all edge locations (best performance)** (includes Free tier)
+   - Or select specific regions to reduce costs
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudfront-setup/step4-price-class-en.png"
+  alt="Price class selection"
+  caption="Use all edge locations for best performance"
+/>
+
+### Alternate Domain Name (CNAME) - Optional
+
+2. In **Alternate domain name (CNAME)** section (for custom domains):
+   - Enter domain name (e.g., `www.example.com`)
+   - Multiple domains can be entered with line breaks
+
+### SSL/TLS Certificate
+
+3. In **Custom SSL certificate** section:
+   - Using default domain: Select **Default CloudFront SSL certificate**
+   - Using custom domain: Select **Custom SSL certificate**
+     - Must have certificate issued from ACM (AWS Certificate Manager)
+     - Certificate must be issued in **us-east-1 region**
+
+<Callout type="warning">
+SSL certificates for CloudFront must be issued in **us-east-1 (US East N. Virginia)** region. Certificates from other regions cannot be selected.
+</Callout>
+
+### Default Root Object
+
+4. In **Default root object** section:
+   - Enter `index.html`
+   - This file is displayed when users access the root URL (`https://d111111abcdef8.cloudfront.net/`)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudfront-setup/step4-root-object-en.png"
+  alt="Default root object configuration"
+  caption="Set index.html as the default root object"
+/>
+
+### Description (Optional)
+
+5. **Description**: Enter description for the distribution (e.g., `My website CDN`)
+
+### Create Distribution
+
+6. Click **Create distribution** button at the bottom of the page
+7. Distribution creation starts and **Deploying** status is displayed
+8. Distribution deployment takes 5-10 minutes to complete
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudfront-setup/step4-deploying-en.png"
+  alt="Distribution deploying"
+  caption="CloudFront distribution is being deployed to edge locations worldwide"
+/>
+
+### Update S3 Bucket Policy
+
+9. After distribution creation, a blue banner with **Copy policy** button appears
+10. Click **Copy policy** button to copy the policy
+11. Click **Go to S3 bucket permissions to update policy** link
+12. Navigate to **Permissions** tab of your S3 bucket, then to **Bucket policy**
+13. Paste the copied policy and click **Save changes**
+
+<Callout type="info">
+This bucket policy grants CloudFront permission to read objects from your S3 bucket. Skipping this step will prevent CloudFront from fetching content.
+</Callout>
+
+</Step>
+
+<Step number={5} title="Test Distribution and Cache Invalidation">
+
+Test your deployed CloudFront distribution and learn cache invalidation.
+
+### Check Distribution Domain
+
+1. Select your distribution from the distributions list
+2. Note the **Distribution domain name**
+   - Example: `d111111abcdef8.cloudfront.net`
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudfront-setup/step5-domain-name-en.png"
+  alt="Distribution domain name"
+  caption="Find your CloudFront distribution domain name"
+/>
+
+### Test Distribution
+
+3. Access the CloudFront domain in a web browser:
+   - `https://d111111abcdef8.cloudfront.net/`
+   - Your S3 content should be displayed
+
+4. Test specific file access:
+   - `https://d111111abcdef8.cloudfront.net/index.html`
+   - `https://d111111abcdef8.cloudfront.net/images/logo.png`
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudfront-setup/step5-test-en.png"
+  alt="CloudFront access test"
+  caption="Content is being served successfully through CloudFront"
+/>
+
+### Cache Invalidation
+
+If you update a file in S3 but CloudFront still shows the old version, you need to invalidate the cache.
+
+5. Click **Invalidations** tab in the distribution details page
+6. Click **Create invalidation** button
+7. In **Add object paths** section, enter:
+   - Specific file: `/index.html`
+   - All cache: `/*`
+   - Specific directory: `/images/*`
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudfront-setup/step5-invalidation-en.png"
+  alt="Create cache invalidation"
+  caption="Invalidate cache to immediately reflect updated content"
+/>
+
+8. Click **Create invalidation** button
+9. Invalidation takes a few minutes to complete
+
+<Callout type="tip">
+**Cache Invalidation Tips:**
+- Free tier includes 1,000 invalidation paths per month
+- `/*` counts as 1 path but invalidates entire cache
+- Using wildcard (`/*`) is more efficient than individual files
+- For frequently updated files, consider adjusting cache policy or using versioning
+</Callout>
+
+### Connect Custom Domain (Optional)
+
+To connect a custom domain:
+
+10. Add a CNAME record in your DNS provider (Route 53 or external DNS):
+    - **Name**: `www` (or desired subdomain)
+    - **Type**: `CNAME`
+    - **Value**: CloudFront distribution domain (`d111111abcdef8.cloudfront.net`)
+
+11. For Route 53, using an Alias record is recommended:
+    - **Name**: `www.example.com`
+    - **Type**: `A` (Alias)
+    - **Alias Target**: Select CloudFront distribution
+
+<Checkpoint
+  items={[
+    "Can you access content through the CloudFront domain?",
+    "Is HTTPS working properly?",
+    "Have you run cache invalidation if needed?"
+  ]}
+/>
+
+</Step>
+
+## Next Steps
+
+You've successfully set up CloudFront! Here's what you can do next:
+
+- [AWS Route 53 Setup](/guides/aws-route53-setup) - Connect custom domain
+- [AWS CloudWatch Monitoring Setup](/guides/aws-cloudwatch-setup) - Monitor CloudFront traffic
+
+## CloudFront Optimization Tips
+
+### Improve Cache Performance
+
+- **TTL Settings**: Set long TTL for static files (24 hours ~ 1 week)
+- **Query Strings**: Ignore query strings when not needed
+- **Enable Compression**: Automatic compression improves transfer speed
+- **Enable HTTP/2**: Enabled by default for performance improvement
+
+### Enhance Security
+
+- **Signed URLs**: Control access to sensitive content with signed URLs
+- **WAF Integration**: Block malicious traffic with AWS WAF
+- **Geo-Restriction**: Restrict access from specific countries
+- **Origin Protocol Policy**: Enforce HTTPS-only usage
+
+### Cost Optimization
+
+- **Adjust Price Class**: Select only needed regions to reduce costs
+- **Enable Compression**: Reduce data transfer amount
+- **CloudFront Functions**: Perform lightweight processing at the edge
+- **S3 Transfer Acceleration**: Use for large file uploads
+
+## Troubleshooting
+
+### 403 Access Denied Error
+
+1. **S3 Bucket Policy**: Verify CloudFront OAC policy is correctly configured
+2. **Object Permissions**: Ensure S3 objects haven't been deleted
+3. **Origin Settings**: Verify origin domain is correct
+
+### Content Not Updating
+
+1. **Cache Invalidation**: Run invalidation to clear cache
+2. **Check TTL**: Verify cache TTL isn't set too long
+3. **Versioning**: Add version numbers to file names (e.g., `style.v2.css`)
+
+### SSL Certificate Errors
+
+1. **Check Region**: Verify certificate was issued in us-east-1
+2. **Domain Validation**: Ensure ACM certificate is fully validated
+3. **CNAME Settings**: Verify alternate domain names are correctly configured
+
+### Poor Performance
+
+1. **Edge Locations**: Check if edge locations near users are being used
+2. **Origin Response Time**: Check S3 or origin server response time
+3. **Cache Hit Ratio**: Monitor cache hit ratio in CloudWatch
+4. **Compression**: Verify file compression is enabled
+
+<Callout type="tip">
+CloudFront distributions can be modified after creation, but changes take time to propagate to all edge locations. For important configuration changes, create a test distribution first for verification.
+</Callout>

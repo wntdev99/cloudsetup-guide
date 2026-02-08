@@ -1,0 +1,363 @@
+---
+title: "AWS CloudFront 설정하기"
+description: "AWS CloudFront CDN을 설정하고 S3와 연결하여 콘텐츠를 빠르게 전송하는 방법을 단계별로 안내합니다."
+---
+
+# AWS CloudFront 설정하기
+
+AWS CloudFront는 전 세계 엣지 로케이션을 통해 콘텐츠를 빠르게 전송하는 CDN(Content Delivery Network) 서비스입니다. 이 가이드에서는 CloudFront 배포를 생성하고 S3와 연결하는 방법을 안내합니다.
+
+<FreeTierInfo
+  limit="1TB 데이터 전송, 1,000만 HTTP/HTTPS 요청/월"
+  period="12개월"
+  conditions={[
+    "신규 AWS 계정 대상 12개월 무료",
+    "1TB 아웃바운드 데이터 전송",
+    "1,000만 HTTP/HTTPS 요청"
+  ]}
+/>
+
+## 사전 준비사항
+
+- AWS 계정 ([aws-account-setup](/guides/aws-account-setup) 참고)
+- S3 버킷 및 콘텐츠 ([aws-s3-bucket-setup](/guides/aws-s3-bucket-setup) 참고)
+- 선택사항: 사용자 정의 도메인 (Route 53 또는 외부 DNS)
+
+---
+
+<Step number={1} title="CloudFront 배포 생성 시작">
+
+AWS 콘솔에서 CloudFront 서비스로 이동하여 배포 생성을 시작합니다.
+
+1. [AWS Console](https://console.aws.amazon.com/)에 로그인합니다
+2. 상단 검색창에 "CloudFront"를 입력하고 선택합니다
+3. **배포 생성** 버튼을 클릭합니다
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudfront-setup/step1-create-distribution-ko.png"
+  alt="CloudFront 배포 생성 버튼"
+  caption="배포 생성 버튼을 클릭하여 새 CloudFront 배포를 시작합니다"
+/>
+
+<Callout type="info">
+CloudFront 배포는 콘텐츠를 전 세계 엣지 로케이션에 캐싱하여 사용자에게 빠른 응답 속도를 제공합니다. AWS는 전 세계 400개 이상의 엣지 로케이션을 운영합니다.
+</Callout>
+
+</Step>
+
+<Step number={2} title="Origin 설정 (S3 연결)">
+
+CloudFront가 콘텐츠를 가져올 Origin(원본)을 설정합니다.
+
+### Origin Domain 선택
+
+1. **Origin domain** 필드를 클릭합니다
+2. 드롭다운 목록에서 생성한 S3 버킷을 선택합니다
+   - 예: `my-website-bucket.s3.ap-northeast-2.amazonaws.com`
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudfront-setup/step2-origin-domain-ko.png"
+  alt="Origin 도메인 선택"
+  caption="S3 버킷을 Origin 도메인으로 선택합니다"
+/>
+
+### Origin Access 설정
+
+3. **Origin access** 섹션에서:
+   - **Origin access control settings (recommended)** 선택
+   - **Create control setting** 버튼을 클릭합니다
+
+4. Origin access control (OAC) 생성:
+   - **Name**: 자동 생성된 이름 사용 (예: `my-website-bucket`)
+   - **Description**: 선택사항
+   - **Sign requests**: **Yes** (기본값)
+   - **Create** 버튼을 클릭합니다
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudfront-setup/step2-oac-ko.png"
+  alt="Origin Access Control 생성"
+  caption="OAC를 생성하여 CloudFront에서만 S3 버킷에 접근할 수 있도록 합니다"
+/>
+
+<Callout type="info">
+**Origin Access Control (OAC)이란?**
+
+OAC는 CloudFront에서만 S3 버킷에 접근할 수 있도록 하는 보안 기능입니다. 이를 통해 S3 버킷을 퍼블릭으로 공개하지 않고도 CloudFront를 통해 콘텐츠를 제공할 수 있습니다.
+</Callout>
+
+### 추가 Origin 설정
+
+5. **Origin path**: 비워둡니다 (전체 버킷 사용)
+6. **Enable Origin Shield**: **No** (추가 비용 발생)
+
+<Checkpoint
+  items={[
+    "S3 버킷을 Origin으로 선택했나요?",
+    "Origin Access Control을 생성했나요?"
+  ]}
+/>
+
+</Step>
+
+<Step number={3} title="기본 캐시 동작 및 설정 구성">
+
+캐시 동작과 뷰어 액세스 설정을 구성합니다.
+
+### 뷰어 프로토콜 정책
+
+1. **Viewer protocol policy** 섹션에서:
+   - **Redirect HTTP to HTTPS** 선택 (권장)
+   - 이렇게 하면 모든 HTTP 요청이 자동으로 HTTPS로 리다이렉트됩니다
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudfront-setup/step3-https-ko.png"
+  alt="HTTPS 리다이렉트 설정"
+  caption="HTTP 요청을 HTTPS로 자동 리다이렉트하도록 설정합니다"
+/>
+
+### 허용된 HTTP 메서드
+
+2. **Allowed HTTP methods** 섹션:
+   - **GET, HEAD** 선택 (정적 콘텐츠의 경우)
+   - 또는 **GET, HEAD, OPTIONS** (추가 메서드 필요 시)
+
+### 캐시 키 및 Origin 요청
+
+3. **Cache key and origin requests** 섹션:
+   - **Cache policy**: **CachingOptimized** 선택 (권장)
+   - 또는 **CachingDisabled** (동적 콘텐츠의 경우)
+
+<DevTip title="캐시 정책 선택 가이드">
+- **CachingOptimized**: 정적 파일(이미지, CSS, JS) - 최대 캐싱
+- **CachingOptimizedForUncompressedObjects**: 압축되지 않은 파일
+- **CachingDisabled**: 동적 콘텐츠 - 캐싱 안 함
+- **Elemental-MediaPackage**: 비디오 스트리밍용
+</DevTip>
+
+### 추가 설정
+
+4. **Response headers policy**: **None** (기본값)
+5. **Function associations**: 필요한 경우 CloudFront Functions 추가
+
+</Step>
+
+<Step number={4} title="배포 설정 및 생성">
+
+배포의 가격 클래스, SSL 인증서, 기본 루트 객체 등을 설정하고 배포를 생성합니다.
+
+### 가격 클래스
+
+1. **Price class** 섹션:
+   - **Use all edge locations (best performance)** 선택 (프리 티어 포함)
+   - 또는 특정 지역만 선택하여 비용 절감
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudfront-setup/step4-price-class-ko.png"
+  alt="가격 클래스 선택"
+  caption="모든 엣지 로케이션을 사용하여 최상의 성능을 제공합니다"
+/>
+
+### 대체 도메인 이름 (CNAME) - 선택사항
+
+2. **Alternate domain name (CNAME)** 섹션 (사용자 정의 도메인 사용 시):
+   - 도메인 이름 입력 (예: `www.example.com`)
+   - 여러 도메인을 줄바꿈으로 구분하여 입력 가능
+
+### SSL/TLS 인증서
+
+3. **Custom SSL certificate** 섹션:
+   - 기본 도메인 사용 시: **Default CloudFront SSL certificate** 선택
+   - 사용자 정의 도메인 사용 시: **Custom SSL certificate** 선택
+     - ACM(AWS Certificate Manager)에서 인증서를 미리 발급받아야 함
+     - **us-east-1 리전**에서 발급받은 인증서만 사용 가능
+
+<Callout type="warning">
+CloudFront에서 사용할 SSL 인증서는 반드시 **us-east-1 (버지니아 북부)** 리전에서 발급받아야 합니다. 다른 리전의 인증서는 선택할 수 없습니다.
+</Callout>
+
+### 기본 루트 객체
+
+4. **Default root object** 섹션:
+   - `index.html` 입력
+   - 사용자가 루트 URL(`https://d111111abcdef8.cloudfront.net/`)에 접속할 때 표시할 파일
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudfront-setup/step4-root-object-ko.png"
+  alt="기본 루트 객체 설정"
+  caption="index.html을 기본 루트 객체로 설정합니다"
+/>
+
+### 설명 (선택사항)
+
+5. **Description**: 배포에 대한 설명 입력 (예: `My website CDN`)
+
+### 배포 생성
+
+6. 페이지 하단의 **배포 생성** 버튼을 클릭합니다
+7. 배포 생성이 시작되며, **Deploying** 상태가 표시됩니다
+8. 배포가 완료되기까지 5~10분 소요됩니다
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudfront-setup/step4-deploying-ko.png"
+  alt="배포 생성 중"
+  caption="CloudFront 배포가 전 세계 엣지 로케이션에 배포되고 있습니다"
+/>
+
+### S3 버킷 정책 업데이트
+
+9. 배포 생성 후, 파란색 배너에 **Copy policy** 버튼이 표시됩니다
+10. **Copy policy** 버튼을 클릭하여 정책을 복사합니다
+11. **Go to S3 bucket permissions to update policy** 링크를 클릭합니다
+12. S3 버킷의 **권한** 탭에서 **버킷 정책**으로 이동합니다
+13. 복사한 정책을 붙여넣고 **변경 사항 저장**을 클릭합니다
+
+<Callout type="info">
+이 버킷 정책은 CloudFront가 S3 버킷에서 객체를 읽을 수 있도록 권한을 부여합니다. 이 단계를 건너뛰면 CloudFront에서 콘텐츠를 가져올 수 없습니다.
+</Callout>
+
+</Step>
+
+<Step number={5} title="배포 테스트 및 캐시 무효화">
+
+배포된 CloudFront를 테스트하고 캐시 무효화 방법을 배웁니다.
+
+### 배포 도메인 확인
+
+1. 배포 목록에서 생성한 배포를 선택합니다
+2. **Distribution domain name**을 확인합니다
+   - 예: `d111111abcdef8.cloudfront.net`
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudfront-setup/step5-domain-name-ko.png"
+  alt="배포 도메인 이름"
+  caption="CloudFront 배포 도메인 이름을 확인합니다"
+/>
+
+### 배포 테스트
+
+3. 웹 브라우저에서 CloudFront 도메인으로 접속합니다:
+   - `https://d111111abcdef8.cloudfront.net/`
+   - S3에 업로드한 콘텐츠가 표시되어야 합니다
+
+4. 특정 파일 접근 테스트:
+   - `https://d111111abcdef8.cloudfront.net/index.html`
+   - `https://d111111abcdef8.cloudfront.net/images/logo.png`
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudfront-setup/step5-test-ko.png"
+  alt="CloudFront 접속 테스트"
+  caption="CloudFront를 통해 콘텐츠가 정상적으로 제공되고 있습니다"
+/>
+
+### 캐시 무효화 (Invalidation)
+
+S3에서 파일을 업데이트했는데 CloudFront에서 여전히 이전 버전이 표시되는 경우, 캐시를 무효화해야 합니다.
+
+5. 배포 세부 정보 페이지에서 **무효화** 탭을 클릭합니다
+6. **무효화 생성** 버튼을 클릭합니다
+7. **객체 경로 추가** 섹션에 다음을 입력:
+   - 특정 파일: `/index.html`
+   - 전체 캐시: `/*`
+   - 특정 디렉터리: `/images/*`
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-cloudfront-setup/step5-invalidation-ko.png"
+  alt="캐시 무효화 생성"
+  caption="캐시를 무효화하여 업데이트된 콘텐츠를 즉시 반영합니다"
+/>
+
+8. **무효화 생성** 버튼을 클릭합니다
+9. 무효화가 완료되기까지 몇 분 소요됩니다
+
+<Callout type="tip">
+**캐시 무효화 팁:**
+- 프리 티어에서는 월 1,000개의 무효화 경로가 무료입니다
+- `/*`는 1개의 경로로 계산되지만, 전체 캐시를 무효화합니다
+- 개별 파일 무효화보다 와일드카드(`/*`)를 사용하는 것이 효율적입니다
+- 빈번한 업데이트가 필요한 파일은 캐시 정책을 조정하거나 버전 관리를 고려하세요
+</Callout>
+
+### 커스텀 도메인 연결 (선택사항)
+
+사용자 정의 도메인을 연결하려면:
+
+10. DNS 제공자(Route 53 또는 외부 DNS)에서 CNAME 레코드를 추가합니다:
+    - **Name**: `www` (또는 원하는 서브도메인)
+    - **Type**: `CNAME`
+    - **Value**: CloudFront 배포 도메인 (`d111111abcdef8.cloudfront.net`)
+
+11. Route 53 사용 시 Alias 레코드를 사용하는 것이 좋습니다:
+    - **Name**: `www.example.com`
+    - **Type**: `A` (Alias)
+    - **Alias Target**: CloudFront 배포 선택
+
+<Checkpoint
+  items={[
+    "CloudFront 도메인으로 콘텐츠에 접속할 수 있나요?",
+    "HTTPS가 정상적으로 작동하나요?",
+    "필요한 경우 캐시 무효화를 실행했나요?"
+  ]}
+/>
+
+</Step>
+
+## 다음 단계
+
+CloudFront 설정을 완료했습니다! 이제 다음 단계를 진행해보세요:
+
+- [AWS Route 53 설정](/guides/aws-route53-setup) - 사용자 정의 도메인 연결
+- [AWS CloudWatch 모니터링 설정](/guides/aws-cloudwatch-setup) - CloudFront 트래픽 모니터링
+
+## CloudFront 최적화 팁
+
+### 캐시 성능 향상
+
+- **TTL 설정**: 정적 파일은 긴 TTL (24시간~1주일) 설정
+- **Query String**: 필요하지 않은 경우 Query String 무시
+- **압축 활성화**: 자동 압축으로 전송 속도 향상
+- **HTTP/2 활성화**: 기본으로 활성화되어 있으며 성능 개선
+
+### 보안 강화
+
+- **Signed URLs**: 민감한 콘텐츠는 Signed URL로 접근 제어
+- **WAF 연동**: AWS WAF로 악의적인 트래픽 차단
+- **Geo-Restriction**: 특정 국가에서의 접근 제한
+- **Origin Protocol Policy**: HTTPS만 사용하도록 강제
+
+### 비용 최적화
+
+- **가격 클래스 조정**: 필요한 지역만 선택하여 비용 절감
+- **압축 활성화**: 전송 데이터양 감소
+- **CloudFront Functions**: 경량 처리를 엣지에서 수행
+- **S3 Transfer Acceleration**: 큰 파일 업로드 시 사용
+
+## 문제 해결
+
+### 403 Access Denied 오류
+
+1. **S3 버킷 정책**: CloudFront OAC 정책이 올바르게 설정되었는지 확인
+2. **객체 권한**: S3 객체가 삭제되지 않았는지 확인
+3. **Origin 설정**: Origin 도메인이 올바른지 확인
+
+### 콘텐츠가 업데이트되지 않음
+
+1. **캐시 무효화**: 무효화를 실행하여 캐시 삭제
+2. **TTL 확인**: 캐시 TTL이 너무 길게 설정되지 않았는지 확인
+3. **버전 관리**: 파일 이름에 버전 번호 추가 (예: `style.v2.css`)
+
+### SSL 인증서 오류
+
+1. **리전 확인**: 인증서가 us-east-1에서 발급되었는지 확인
+2. **도메인 검증**: ACM 인증서가 완전히 검증되었는지 확인
+3. **CNAME 설정**: 대체 도메인 이름이 올바르게 설정되었는지 확인
+
+### 성능이 느립니다
+
+1. **엣지 로케이션**: 사용자와 가까운 엣지 로케이션이 사용되고 있는지 확인
+2. **Origin 응답 시간**: S3 또는 Origin 서버의 응답 시간 확인
+3. **캐시 히트율**: CloudWatch에서 캐시 히트율 모니터링
+4. **압축**: 파일 압축이 활성화되어 있는지 확인
+
+<Callout type="tip">
+CloudFront 배포는 생성 후 수정이 가능하지만, 변경 사항이 모든 엣지 로케이션에 전파되는 데 시간이 걸립니다. 중요한 설정 변경 시 테스트 배포를 먼저 생성하여 검증하는 것이 좋습니다.
+</Callout>

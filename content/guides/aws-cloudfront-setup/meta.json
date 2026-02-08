@@ -1,0 +1,68 @@
+{
+  "slug": "aws-cloudfront-setup",
+  "platform": "aws",
+  "service": "CloudFront",
+  "category": "cdn",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 20,
+  "totalSteps": 5,
+  "freeTier": {
+    "limit": "1TB 데이터 전송, 1,000만 HTTP/HTTPS 요청/월",
+    "period": "12개월",
+    "amount": "$0",
+    "status": "available",
+    "conditions": [
+      "신규 AWS 계정 대상 12개월 무료",
+      "1TB 아웃바운드 데이터 전송",
+      "1,000만 HTTP/HTTPS 요청 (2백만 CloudFront 함수 호출 포함)",
+      "200만 CloudFront Function 호출",
+      "모든 엣지 로케이션 포함"
+    ]
+  },
+  "prerequisites": [
+    "aws-account-setup",
+    "aws-s3-bucket-setup"
+  ],
+  "nextGuides": [
+    "aws-route53-setup",
+    "aws-cloudwatch-setup"
+  ],
+  "seo": {
+    "ko": {
+      "title": "AWS CloudFront 설정하기 | CDN 배포 및 HTTPS/SSL 구성 가이드",
+      "description": "AWS CloudFront CDN을 설정하고 S3와 연결하는 방법을 단계별로 안내합니다. 배포 생성, Origin 설정, SSL/TLS 인증서 적용, 캐시 무효화 방법을 스크린샷과 함께 설명합니다.",
+      "keywords": [
+        "AWS CloudFront",
+        "CDN",
+        "콘텐츠 전송 네트워크",
+        "S3 Origin",
+        "HTTPS",
+        "SSL 인증서",
+        "캐시 무효화",
+        "커스텀 도메인",
+        "AWS 프리티어",
+        "엣지 로케이션"
+      ]
+    },
+    "en": {
+      "title": "AWS CloudFront Setup | CDN Distribution & HTTPS/SSL Configuration Guide",
+      "description": "Step-by-step guide to setting up AWS CloudFront CDN and connecting it with S3. Learn how to create distributions, configure origins, apply SSL/TLS certificates, and invalidate cache with detailed screenshots.",
+      "keywords": [
+        "AWS CloudFront",
+        "CDN",
+        "content delivery network",
+        "S3 origin",
+        "HTTPS",
+        "SSL certificate",
+        "cache invalidation",
+        "custom domain",
+        "AWS free tier",
+        "edge locations"
+      ]
+    }
+  },
+  "tags": ["cloudfront", "cdn", "s3", "https", "ssl", "caching"],
+  "status": "published",
+  "lastVerified": "2026-02-08",
+  "updatedAt": "2026-02-08"
+}
