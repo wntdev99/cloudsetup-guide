@@ -1,0 +1,406 @@
+# Create Hugging Face Hub Account - Your First AI Model
+
+Hugging Face Hub is the world's largest repository of open-source AI models. From language models (LLMs) to computer vision models, you can access thousands of models for free. Let's create your account in just 10 minutes!
+
+<FreeTierInfo
+  service="Hugging Face Hub"
+  limit="Unlimited model access"
+  period="Forever free"
+  status="generous"
+/>
+
+## What is Hugging Face?
+
+<Callout type="info">
+🤗 **Hugging Face is the home of AI models**
+
+- **Model Hub**: Access 500,000+ models and datasets
+- **Community-driven**: Models contributed by researchers and developers worldwide
+- **Free inference**: Test models directly on the Hub
+- **Integration-ready**: Works with PyTorch, TensorFlow, JAX
+- **Datasets**: Plus 50,000+ datasets for training and fine-tuning
+
+Perfect for:
+- Machine learning researchers
+- AI application developers
+- Students learning AI
+- Production deployments
+</Callout>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Valid email address", required: true },
+  { text: "Internet connection", required: true },
+  { text: "GitHub account (optional but helpful)", required: false }
+]} />
+
+---
+
+<Step number={1} title="Visit Hugging Face Website">
+
+1. Open your web browser and go to [huggingface.co](https://huggingface.co)
+2. Look for the **Sign Up** button in the top right corner
+3. Click on **Sign Up** to start the registration process
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/huggingface-account-setup-step1-en.png"
+  alt="Hugging Face homepage"
+  caption="Navigate to huggingface.co and click Sign Up"
+/>
+
+<Callout type="tip">
+💡 **Tip**: You can also sign up using GitHub, Google, or Apple ID for faster registration.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Choose Registration Method">
+
+### Option A: Email Registration
+
+1. Click **Continue with Email**
+2. Enter your email address
+3. Create a secure password (at least 8 characters)
+4. Check the **I agree to Hugging Face** checkbox
+5. Click **Create Account**
+
+### Option B: Social Login
+
+For faster signup:
+1. Click **Continue with GitHub** or **Continue with Google**
+2. Authorize Hugging Face to access your account
+3. Skip to Step 3
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/huggingface-account-setup-step2-en.png"
+  alt="Registration options"
+  caption="Choose email or social login for registration"
+/>
+
+<DevTip>
+**Why use GitHub login?**
+
+- Faster registration
+- Automatic GitHub integration for model repos
+- Can share GitHub projects on Hugging Face
+- Easier collaboration with other developers
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="Verify Email and Complete Profile">
+
+1. Check your email inbox for a verification email from Hugging Face
+2. Click the **Verify email** link in the email
+3. You'll be redirected to your Hugging Face dashboard
+4. Complete your profile:
+   - Username (cannot be changed later)
+   - Full name
+   - Biography (optional)
+   - Profile picture (optional)
+   - Organization (if applicable)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/huggingface-account-setup-step3-en.png"
+  alt="Profile completion"
+  caption="Complete your profile with username and details"
+/>
+
+<Callout type="warning">
+⚠️ **Username is permanent**
+
+Your username cannot be changed after creation. Choose something:
+- Professional (works for your resume)
+- Memorable
+- Unique to you
+- Without special characters
+</Callout>
+
+<Checkpoint
+  title="Verify Email and Profile Setup"
+  items={[
+    "Did you receive the verification email?",
+    "Is your email confirmed with green checkmark?",
+    "Did you set your username?",
+    "Is your profile visible?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={4} title="Explore Hugging Face Models">
+
+Now that your account is ready, let's explore the model hub:
+
+1. Click on **Models** in the top navigation
+2. Browse by category:
+   - **Natural Language Processing**: BERT, GPT, T5
+   - **Computer Vision**: ResNet, ViT, YOLO
+   - **Audio**: Speech recognition, music generation
+   - **Multimodal**: CLIP, DALL-E, Stable Diffusion
+
+### Filtering Models
+
+Use the left sidebar to filter by:
+- **Task**: Classification, Translation, Image Generation
+- **Model Library**: PyTorch, TensorFlow, Transformers
+- **Language**: English, Chinese, Korean, etc.
+- **Dataset**: ImageNet, COCO, BookCorpus
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/huggingface-account-setup-step4-en.png"
+  alt="Models page"
+  caption="Browse and filter models by task, library, or language"
+/>
+
+### Try Your First Model
+
+1. Click on a model (e.g., "distilbert-base-uncased")
+2. Scroll to see the model card with:
+   - Model description
+   - Use cases and limitations
+   - Code snippets for usage
+3. Click **Run in widget** to test the model directly
+4. No installation needed - test in your browser!
+
+<CopyBlock
+  code="Example: Testing a sentiment analysis model on Hugging Face
+1. Go to: distilbert/distilbert-base-uncased-finetuned-sst-2-english
+2. Scroll down to Interactive Widget section
+3. Type any text: 'I love this!' or 'This is bad'
+4. Model returns sentiment: POSITIVE or NEGATIVE"
+  language="text"
+/>
+
+<Callout type="success">
+✅ **Your Hugging Face account is ready!** You can now explore, use, and contribute to the AI model community.
+</Callout>
+
+</Step>
+
+---
+
+## Understanding Model Cards
+
+Each model on Hugging Face has a model card with:
+
+<CopyBlock
+  code="Model Card Contents:
+
+📋 Model Information
+  - Model name and ID
+  - Description
+  - Creator/Organization
+  - License
+
+🔧 Model Details
+  - Architecture type
+  - Framework (PyTorch, TensorFlow)
+  - Input/output format
+  - Performance metrics
+
+📊 Benchmark Results
+  - Accuracy on common datasets
+  - Comparison with other models
+  - Speed and memory requirements
+
+⚠️ Limitations and Bias
+  - Known limitations
+  - Bias considerations
+  - Ethical use guidelines
+
+💻 Code Examples
+  - Python usage snippets
+  - Inference API calls
+  - Integration examples"
+  language="text"
+/>
+
+---
+
+## Popular Models to Try
+
+<Callout type="tip">
+🌟 **Great starter models for beginners**
+
+1. **distilbert-base-uncased-finetuned-sst-2-english**
+   - Sentiment analysis
+   - Fast and lightweight
+   - Perfect for learning
+
+2. **gpt2**
+   - Text generation
+   - ~124M parameters
+   - Easier than larger models
+
+3. **google/vit-base-patch16-224**
+   - Image classification
+   - Vision transformer
+   - CIFAR-10 dataset
+
+4. **openai/whisper-base**
+   - Speech recognition
+   - Fast inference
+   - 80 languages support
+</Callout>
+
+---
+
+## Setting Up Your Profile
+
+After signup, personalize your Hugging Face experience:
+
+### 1. Add a Profile Picture
+- Click your avatar (top right)
+- Go to **Settings**
+- Upload a profile image
+- Shows on model repos and comments
+
+### 2. Set Your Bio
+- Click **Settings** → **Account**
+- Add a bio (e.g., "ML Engineer | Python | AI enthusiast")
+- Add links to your portfolio or GitHub
+
+### 3. Enable Notifications
+- Go to **Notifications** settings
+- Receive updates on models you star
+- Get notifications on discussions
+
+### 4. Link Your GitHub
+- **Settings** → **Social accounts**
+- Connect GitHub to show your open source work
+- Cross-promote projects
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/huggingface-account-setup-step5-en.png"
+  alt="Settings page"
+  caption="Customize your profile and notification preferences"
+/>
+
+---
+
+## Creating Your API Token
+
+For programmatic access to models:
+
+1. Click your avatar → **Settings**
+2. Go to **Access Tokens**
+3. Click **New token**
+4. Give it a name: "My API Token"
+5. Select **Read** access level
+6. Click **Generate token**
+7. Copy and save the token (shown only once!)
+
+<Callout type="warning">
+⚠️ **Protect your API token**
+
+- Never commit to GitHub
+- Store in .env file
+- Treat like a password
+- Can be regenerated if compromised
+</Callout>
+
+---
+
+## Next Steps
+
+Now that you have a Hugging Face account:
+
+1. **[Model Integration](../huggingface-model-integration)** - Download and use models in your code
+2. **[LangChain Setup](../langchain-installation-setup)** - Build LLM apps with Hugging Face models
+3. **[Create Your Own Model](../huggingface-create-model)** - Share your fine-tuned models
+
+---
+
+## Frequently Asked Questions
+
+<Callout type="info">
+**Q. Is Hugging Face really free?**
+
+A. Yes! Core features are completely free. Premium services like commercial model hosting and priority inference are paid.
+</Callout>
+
+<Callout type="info">
+**Q. Can I use Hugging Face models commercially?**
+
+A. Depends on the model's license. Most models have MIT or Apache 2.0 licenses allowing commercial use. Check each model's card for license info.
+</Callout>
+
+<Callout type="info">
+**Q. How do I download models locally?**
+
+A. Use the Hugging Face `transformers` library:
+
+```python
+from transformers import AutoModel
+model = AutoModel.from_pretrained("model-name")
+```
+
+This downloads the model to your machine for offline use.
+</Callout>
+
+<Callout type="info">
+**Q. What's the difference between models and datasets?**
+
+A. Models are the AI weights trained on data. Datasets are collections of data used to train or evaluate models. Hugging Face hosts both.
+</Callout>
+
+---
+
+## Troubleshooting
+
+### Verification email not received
+
+- Check spam/junk folder
+- Wait 5 minutes for email delivery
+- Try resending from the signup page
+- Use GitHub/Google login if email fails
+
+### Username already taken
+
+- Usernames are globally unique
+- Try adding numbers: `username123`
+- Try adding your location: `username-us`
+- Cannot change username after creation
+
+### Can't access models
+
+- Check if model is private
+- Some models require authentication
+- Verify your account is confirmed
+- Try browser's incognito mode
+
+### Can't download models
+
+- Ensure stable internet connection
+- Check disk space available
+- Try `huggingface-hub` library instead of manual download
+- Some large models may timeout - be patient
+
+---
+
+## Pro Tips for Hugging Face Users
+
+<Callout type="tip">
+💡 **Make the most of Hugging Face**
+
+1. **Star your favorite models** - Creates a personalized feed
+2. **Subscribe to discussions** - Stay updated on popular models
+3. **Read model cards carefully** - Understand limitations before use
+4. **Try the Inference API** - Test models without coding
+5. **Join the community** - Ask questions in model discussions
+6. **Follow interesting researchers** - Get updates on new work
+7. **Contribute to open source** - Help improve community models
+8. **Create model spaces** - Build interactive demos with Gradio/Streamlit
+</Callout>
+
+---
+
+**Your Hugging Face journey begins!** 🤗 Explore, learn, and build amazing AI applications!

@@ -1,0 +1,404 @@
+# Hugging Face Hub 계정 만들기 - 첫 번째 AI 모델 시작
+
+Hugging Face Hub는 전 세계에서 가장 큰 오픈 소스 AI 모델 저장소입니다. 언어 모델(LLM)부터 컴퓨터 비전 모델까지 수천 개의 모델을 무료로 사용할 수 있습니다. 지금 바로 계정을 만들고 10분 안에 시작해보세요!
+
+<FreeTierInfo
+  service="Hugging Face Hub"
+  limit="무제한 모델 접근"
+  period="영구 무료"
+  status="generous"
+/>
+
+## Hugging Face란 무엇인가요?
+
+<Callout type="info">
+🤗 **Hugging Face는 AI 모델의 집**
+
+- **모델 허브**: 50만 개 이상의 모델과 데이터셋 접근
+- **커뮤니티 중심**: 전 세계의 연구자와 개발자가 모델 공유
+- **무료 추론**: 허브에서 바로 모델 테스트 가능
+- **통합 완벽**: PyTorch, TensorFlow, JAX와 호환
+- **데이터셋**: 5만 개 이상의 학습/평가 데이터셋
+
+이렇게 사용됩니다:
+- 머신러닝 연구자
+- AI 애플리케이션 개발자
+- AI를 배우는 학생
+- 프로덕션 배포
+</Callout>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "유효한 이메일 주소", required: true },
+  { text: "인터넷 연결", required: true },
+  { text: "GitHub 계정 (선택사항)", required: false }
+]} />
+
+---
+
+<Step number={1} title="Hugging Face 웹사이트 방문">
+
+1. 웹 브라우저를 열고 [huggingface.co](https://huggingface.co)로 이동하세요
+2. 오른쪽 상단에서 **Sign Up** 버튼을 찾으세요
+3. **Sign Up**을 클릭하여 가입 프로세스를 시작하세요
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/huggingface-account-setup-step1-ko.png"
+  alt="Hugging Face 홈페이지"
+  caption="huggingface.co로 이동한 후 Sign Up을 클릭하세요"
+/>
+
+<Callout type="tip">
+💡 **팁**: GitHub, Google, Apple ID로 더 빠르게 가입할 수도 있습니다.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="가입 방법 선택">
+
+### 방법 A: 이메일로 가입
+
+1. **Continue with Email**을 클릭하세요
+2. 이메일 주소를 입력하세요
+3. 안전한 비밀번호를 설정하세요 (최소 8자)
+4. **I agree to Hugging Face** 체크박스를 확인하세요
+5. **Create Account**를 클릭하세요
+
+### 방법 B: 소셜 로그인
+
+더 빠른 가입을 원하면:
+1. **Continue with GitHub** 또는 **Continue with Google**을 클릭하세요
+2. Hugging Face의 계정 접근 권한을 승인하세요
+3. 3단계로 넘어가세요
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/huggingface-account-setup-step2-ko.png"
+  alt="가입 옵션"
+  caption="이메일 또는 소셜 로그인으로 가입하세요"
+/>
+
+<DevTip>
+**GitHub 로그인을 사용하는 이유?**
+
+- 더 빠른 가입 프로세스
+- 자동 GitHub 통합
+- GitHub 프로젝트를 Hugging Face에서 공유 가능
+- 다른 개발자와의 협업 용이
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="이메일 확인 및 프로필 완성">
+
+1. 이메일 받은편지함에서 Hugging Face 확인 이메일을 확인하세요
+2. 이메일의 **Verify email** 링크를 클릭하세요
+3. Hugging Face 대시보드로 리다이렉트됩니다
+4. 프로필을 완성하세요:
+   - 사용자명 (이후 변경 불가)
+   - 전체 이름
+   - 소개 (선택사항)
+   - 프로필 사진 (선택사항)
+   - 조직 (해당되면)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/huggingface-account-setup-step3-ko.png"
+  alt="프로필 완성"
+  caption="사용자명과 세부정보로 프로필을 완성하세요"
+/>
+
+<Callout type="warning">
+⚠️ **사용자명은 영구적입니다**
+
+사용자명은 생성 후 변경할 수 없습니다. 다음을 고려하여 선택하세요:
+- 전문적 (이력서에도 사용 가능)
+- 기억하기 쉬운
+- 당신만의 고유한 이름
+- 특수문자 없이
+</Callout>
+
+<Checkpoint
+  title="이메일 확인 및 프로필 설정 검증"
+  items={[
+    "확인 이메일을 받았나요?",
+    "이메일이 녹색 체크마크로 확인되었나요?",
+    "사용자명을 설정했나요?",
+    "프로필이 보이나요?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={4} title="Hugging Face 모델 탐색">
+
+이제 계정이 준비되었으니 모델 허브를 탐색해봅시다:
+
+1. 상단 네비게이션에서 **Models**를 클릭하세요
+2. 카테고리별로 브라우즈하세요:
+   - **자연 언어 처리**: BERT, GPT, T5
+   - **컴퓨터 비전**: ResNet, ViT, YOLO
+   - **오디오**: 음성 인식, 음악 생성
+   - **멀티모달**: CLIP, DALL-E, Stable Diffusion
+
+### 모델 필터링
+
+왼쪽 사이드바를 사용하여 필터링하세요:
+- **작업**: 분류, 번역, 이미지 생성
+- **모델 라이브러리**: PyTorch, TensorFlow, Transformers
+- **언어**: 영어, 중국어, 한국어 등
+- **데이터셋**: ImageNet, COCO, BookCorpus
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/huggingface-account-setup-step4-ko.png"
+  alt="모델 페이지"
+  caption="작업, 라이브러리 또는 언어별로 모델을 브라우즈하고 필터링하세요"
+/>
+
+### 첫 번째 모델 시도
+
+1. 모델을 클릭하세요 (예: "distilbert-base-uncased")
+2. 아래로 스크롤하여 모델 카드를 확인하세요:
+   - 모델 설명
+   - 사용 사례 및 제한사항
+   - 사용 코드 스니펫
+3. **Run in widget**을 클릭하여 모델을 직접 테스트하세요
+4. 설치가 필요 없습니다 - 브라우저에서 바로 테스트하세요!
+
+<CopyBlock
+  code="예시: Hugging Face에서 감정 분석 모델 테스트하기
+1. 이동: distilbert/distilbert-base-uncased-finetuned-sst-2-english
+2. Interactive Widget 섹션까지 스크롤
+3. 텍스트 입력: 'I love this!' 또는 'This is bad'
+4. 모델이 반환: POSITIVE 또는 NEGATIVE"
+  language="text"
+/>
+
+<Callout type="success">
+✅ **Hugging Face 계정 준비 완료!** 이제 AI 모델 커뮤니티를 탐색, 사용, 기여할 수 있습니다.
+</Callout>
+
+</Step>
+
+---
+
+## 모델 카드 이해하기
+
+Hugging Face의 각 모델에는 모델 카드가 있습니다:
+
+<CopyBlock
+  code="모델 카드 내용:
+
+📋 모델 정보
+  - 모델명과 ID
+  - 설명
+  - 제작자/조직
+  - 라이선스
+
+🔧 모델 상세정보
+  - 아키텍처 유형
+  - 프레임워크 (PyTorch, TensorFlow)
+  - 입출력 형식
+  - 성능 지표
+
+📊 벤치마크 결과
+  - 공통 데이터셋에서의 정확도
+  - 다른 모델과의 비교
+  - 속도 및 메모리 요구사항
+
+⚠️ 제한사항 및 편향
+  - 알려진 제한사항
+  - 편향 고려사항
+  - 윤리적 사용 가이드라인
+
+💻 코드 예시
+  - Python 사용 스니펫
+  - 추론 API 호출
+  - 통합 예시"
+  language="text"
+/>
+
+---
+
+## 시도할 인기 모델
+
+<Callout type="tip">
+🌟 **초보자를 위한 훌륭한 시작 모델**
+
+1. **distilbert-base-uncased-finetuned-sst-2-english**
+   - 감정 분석
+   - 빠르고 가벼움
+   - 학습에 완벽
+
+2. **gpt2**
+   - 텍스트 생성
+   - 약 1억 2천만 개 파라미터
+   - 더 큰 모델보다 쉬움
+
+3. **google/vit-base-patch16-224**
+   - 이미지 분류
+   - Vision Transformer
+   - CIFAR-10 데이터셋
+
+4. **openai/whisper-base**
+   - 음성 인식
+   - 빠른 추론
+   - 80개 언어 지원
+</Callout>
+
+---
+
+## 프로필 설정하기
+
+가입 후 Hugging Face 경험을 개인화하세요:
+
+### 1. 프로필 사진 추가
+- 아바타 클릭 (오른쪽 상단)
+- **Settings** 이동
+- 프로필 이미지 업로드
+- 모델 리포와 댓글에 표시됨
+
+### 2. 소개 설정
+- **Settings** → **Account** 이동
+- 소개 추가 (예: "ML Engineer | Python | AI enthusiast")
+- 포트폴리오나 GitHub 링크 추가
+
+### 3. 알림 활성화
+- **Notifications** 설정으로 이동
+- 즐겨찾는 모델 업데이트 받기
+- 토론 알림 받기
+
+### 4. GitHub 연결
+- **Settings** → **Social accounts**
+- GitHub 연결하여 오픈 소스 작업 표시
+- 프로젝트 교차 홍보
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/huggingface-account-setup-step5-ko.png"
+  alt="설정 페이지"
+  caption="프로필을 사용자 정의하고 알림 설정을 조정하세요"
+/>
+
+---
+
+## API 토큰 생성하기
+
+프로그래밍 방식으로 모델에 접근하려면:
+
+1. 아바타 클릭 → **Settings**
+2. **Access Tokens** 이동
+3. **New token** 클릭
+4. 이름 지정: "My API Token"
+5. **Read** 접근 수준 선택
+6. **Generate token** 클릭
+7. 토큰 복사 및 저장 (한 번만 표시됨!)
+
+<Callout type="warning">
+⚠️ **API 토큰 보호하기**
+
+- GitHub에 커밋하지 마세요
+- .env 파일에 저장하세요
+- 비밀번호처럼 취급하세요
+- 손상된 경우 재생성 가능
+</Callout>
+
+---
+
+## 다음 단계
+
+이제 Hugging Face 계정이 있으니:
+
+1. **[모델 통합](../huggingface-model-integration)** - 코드에서 모델 다운로드 및 사용
+2. **[LangChain 설정](../langchain-installation-setup)** - Hugging Face 모델로 LLM 앱 구축
+3. **[자신의 모델 생성](../huggingface-create-model)** - 미세 조정된 모델 공유
+
+---
+
+## 자주 묻는 질문
+
+<Callout type="info">
+**Q. Hugging Face가 정말 무료인가요?**
+
+A. 네! 핵심 기능은 완전히 무료입니다. 상용 모델 호스팅 및 우선 추론과 같은 프리미엄 서비스는 유료입니다.
+</Callout>
+
+<Callout type="info">
+**Q. Hugging Face 모델을 상용으로 사용할 수 있나요?**
+
+A. 모델의 라이선스에 따라 다릅니다. 대부분의 모델은 상용 사용을 허용하는 MIT 또는 Apache 2.0 라이선스를 가지고 있습니다. 각 모델 카드에서 라이선스 정보를 확인하세요.
+</Callout>
+
+<Callout type="info">
+**Q. Hugging Face 모델을 로컬로 다운로드하려면?**
+
+A. Hugging Face 변환기 라이브러리를 사용하세요:
+
+from transformers import AutoModel
+model = AutoModel.from_pretrained("model-name")
+
+이는 모델을 오프라인 사용을 위해 컴퓨터에 다운로드합니다.
+</Callout>
+
+<Callout type="info">
+**Q. 모델과 데이터셋의 차이는?**
+
+A. 모델은 데이터로 훈련된 AI 가중치입니다. 데이터셋은 모델 훈련 또는 평가에 사용되는 데이터 모음입니다. Hugging Face는 둘 다 호스팅합니다.
+</Callout>
+
+---
+
+## 문제 해결
+
+### 확인 이메일을 받지 못했습니다
+
+- 스팸/정크 폴더 확인
+- 이메일 배송 5분 대기
+- 가입 페이지에서 재전송 시도
+- 이메일이 실패하면 GitHub/Google 로그인 사용
+
+### 사용자명이 이미 사용 중입니다
+
+- 사용자명은 전 세계적으로 고유합니다
+- 숫자 추가 시도: `username123`
+- 위치 추가 시도: `username-us`
+- 생성 후 사용자명 변경 불가
+
+### 모델에 접근할 수 없습니다
+
+- 모델이 비공개인지 확인
+- 일부 모델은 인증 필요
+- 계정이 확인되었는지 확인
+- 브라우저 시크릿 모드 시도
+
+### 모델을 다운로드할 수 없습니다
+
+- 안정적인 인터넷 연결 확인
+- 사용 가능한 디스크 공간 확인
+- 수동 다운로드 대신 변환기 라이브러리 시도
+- 일부 대형 모델은 타임아웃 가능 - 기다려주세요
+
+---
+
+## Hugging Face 사용자 팁
+
+<Callout type="tip">
+💡 **Hugging Face 최대한 활용하기**
+
+1. **좋아하는 모델 즐겨찾기** - 맞춤형 피드 생성
+2. **토론 구독** - 인기 모델의 업데이트 유지
+3. **모델 카드 주의 깊게 읽기** - 사용 전 제한사항 파악
+4. **추론 API 시도** - 코딩 없이 모델 테스트
+5. **커뮤니티 가입** - 모델 토론에서 질문하기
+6. **흥미로운 연구자 팔로우** - 새로운 작업 업데이트 받기
+7. **오픈 소스 기여** - 커뮤니티 모델 개선 도움
+8. **모델 스페이스 만들기** - Gradio/Streamlit으로 인터랙티브 데모 구축
+</Callout>
+
+---
+
+**Hugging Face 여정을 시작하세요!** 🤗 탐색하고, 배우고, 놀라운 AI 애플리케이션을 구축하세요!

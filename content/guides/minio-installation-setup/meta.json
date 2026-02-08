@@ -1,0 +1,60 @@
+{
+  "slug": "minio-installation-setup",
+  "platform": "minio",
+  "service": "MinIO Object Storage",
+  "category": "storage",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 20,
+  "totalSteps": 4,
+  "freeTier": {
+    "service": "MinIO Object Storage",
+    "limit": "무제한 저장소",
+    "period": "forever",
+    "status": "generous",
+    "conditions": [
+      "MinIO 완전 오픈소스 무료",
+      "로컬 머신 또는 서버에서 실행",
+      "무제한 저장 용량",
+      "완전한 S3 호환성",
+      "Docker 및 Kubernetes 지원"
+    ]
+  },
+  "prerequisites": [],
+  "nextGuides": [
+    "minio-storage-connection"
+  ],
+  "seo": {
+    "ko": {
+      "title": "MinIO 설치 및 실행 - S3 호환 객체 저장소 | CloudSetup.guide",
+      "description": "MinIO 객체 저장소를 설치하고 Docker 또는 바이너리로 실행하는 방법을 4단계로 배워보세요. S3 호환 클라우드 저장소를 로컬에서 구축하세요.",
+      "keywords": [
+        "MinIO 설치",
+        "객체 저장소",
+        "S3 호환",
+        "Docker MinIO",
+        "클라우드 저장소",
+        "MinIO 시작",
+        "로컬 S3",
+        "MinIO 서버"
+      ]
+    },
+    "en": {
+      "title": "Install MinIO - S3-Compatible Object Storage | CloudSetup.guide",
+      "description": "Learn how to install and run MinIO object storage with Docker or binary in 4 easy steps. Build S3-compatible cloud storage locally.",
+      "keywords": [
+        "install MinIO",
+        "object storage",
+        "S3 compatible",
+        "Docker MinIO",
+        "cloud storage",
+        "getting started MinIO",
+        "local S3",
+        "MinIO server"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T02:00:00.000Z",
+  "updatedAt": "2026-02-08T02:00:00.000Z",
+  "lastVerified": "2026-02-08T02:00:00.000Z",
+  "published": true
+}

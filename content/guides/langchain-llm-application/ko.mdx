@@ -1,0 +1,513 @@
+# LangChain으로 LLM 애플리케이션 구축 - 체인과 에이전트
+
+이제 LangChain이 설치되었으니, 실제 애플리케이션을 구축해봅시다! 25분 안에 체인, 프롬프트, 자율 에이전트를 만드는 방법을 배워봅시다.
+
+<FreeTierInfo
+  service="LangChain Framework"
+  limit="무제한 로컬 사용"
+  period="영구 무료"
+  status="generous"
+/>
+
+## 구축할 내용
+
+<Callout type="info">
+🚀 **이 가이드의 끝에서:**
+
+- 다단계 워크플로우용 LLM 체인 만들기
+- 동적 입력을 위한 프롬프트 템플릿 사용
+- 의미론적 질문 응답기 구축
+- 자율적 에이전트 생성
+- 오류 및 재시도 처리
+- 로컬 또는 클라우드에 배포
+</Callout>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "LangChain이 설치됨 (이전 가이드)", required: true },
+  { text: "API 키 구성됨 (OpenAI 또는 Hugging Face)", required: true },
+  { text: "Python 3.8+", required: true },
+  { text: "기본 Python 지식", required: false }
+]} />
+
+---
+
+<Step number={1} title="첫 번째 LangChain 체인 만들기">
+
+### Step 1.1: 간단한 순차 체인
+
+`my_first_chain.py` 만들기:
+
+<CopyBlock
+  code="from langchain_openai import ChatOpenAI
+from langchain.prompts import ChatPromptTemplate
+from langchain.chains import LLMChain
+
+# LLM 초기화
+llm = ChatOpenAI(model='gpt-3.5-turbo', temperature=0.7)
+
+# 프롬프트 템플릿 생성
+prompt_template = ChatPromptTemplate.from_template(
+  'Write a short product review for {product_name}'
+)
+
+# 체인 생성
+chain = LLMChain(llm=llm, prompt=prompt_template)
+
+# 체인 실행
+response = chain.invoke({'product_name': 'iPhone 15'})
+print(response['text'])"
+  language="python"
+/>
+
+실행하세요:
+
+<CopyBlock
+  code="python my_first_chain.py"
+  language="bash"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/langchain-llm-application-step1-ko.png"
+  alt="체인 출력"
+  caption="첫 번째 LangChain 체인이 상품 리뷰를 생성합니다"
+/>
+
+### Step 1.2: 여러 프롬프트 체인하기
+
+`sequential_chain.py` 만들기:
+
+<CopyBlock
+  code="from langchain_openai import ChatOpenAI
+from langchain.prompts import ChatPromptTemplate
+from langchain.chains import LLMChain, SequentialChain
+
+llm = ChatOpenAI(model='gpt-3.5-turbo')
+
+# 첫 번째 프롬프트: 상품명 생성
+product_prompt = ChatPromptTemplate.from_template(
+  'Generate a creative name for a {product_type} startup'
+)
+product_chain = LLMChain(llm=llm, prompt=product_prompt, output_key='product_name')
+
+# 두 번째 프롬프트: 첫 번째 출력 사용하여 태그라인 생성
+tagline_prompt = ChatPromptTemplate.from_template(
+  'Write a catchy tagline for {product_name}'
+)
+tagline_chain = LLMChain(llm=llm, prompt=tagline_prompt, output_key='tagline')
+
+# 순차 체인으로 결합
+overall_chain = SequentialChain(
+  chains=[product_chain, tagline_chain],
+  input_variables=['product_type'],
+  output_variables=['product_name', 'tagline']
+)
+
+result = overall_chain({'product_type': 'health tech'})
+print(f'Name: {result[\"product_name\"]}')
+print(f'Tagline: {result[\"tagline\"]}')"
+  language="python"
+/>
+
+<Callout type="tip">
+💡 **체인 개념:**
+
+- **LLMChain**: 간단한 입력→LLM→출력
+- **SequentialChain**: 순서대로 여러 체인
+- **output_key**: 각 출력에 이름 지정
+- **input_variables**: 체인이 예상하는 것
+</Callout>
+
+<Checkpoint
+  title="첫 번째 체인 완료"
+  items={[
+    "기본 LLMChain을 만들 수 있나요?",
+    "여러 프롬프트를 체인할 수 있나요?",
+    "출력이 예상 형식과 일치하나요?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="프롬프트 엔지니어링 마스터하기">
+
+### Step 2.1: 효과적인 프롬프트
+
+<CopyBlock
+  code="프롬프트 엔지니어링 팁:
+
+구체적이어야 합니다:
+  나쁜 예: 'Summarize this text'
+  좋은 예: 'Summarize in exactly 3 sentences for a 6th grader'
+
+컨텍스트 포함:
+  나쁜 예: 'Translate to French'
+  좋은 예: 'Translate this Python code documentation to French'
+
+예시 제공:
+  나쁜 예: 'Classify sentiment'
+  좋은 예: 'Classify as positive, negative, or neutral:
+           Example: Great product! -> positive'
+
+역할극 사용:
+  'You are an expert marketer. Write a product description.'
+
+명확한 형식 요청:
+  'Return JSON format with keys: name, price, description'"
+  language="text"
+/>
+
+### Step 2.2: Few-Shot 프롬팅
+
+`fewshot_example.py` 만들기:
+
+<CopyBlock
+  code="from langchain.prompts import FewShotChatMessagePromptTemplate
+from langchain.prompts import ChatPromptTemplate
+from langchain_openai import ChatOpenAI
+
+llm = ChatOpenAI(model='gpt-3.5-turbo')
+
+# Few-shot 학습 예제
+examples = [
+  {
+    'input': 'Happy Birthday!',
+    'output': 'Positive'
+  },
+  {
+    'input': 'This is terrible',
+    'output': 'Negative'
+  },
+  {
+    'input': 'The weather is okay',
+    'output': 'Neutral'
+  }
+]
+
+# Few-shot 프롬프트 생성
+example_prompt = ChatPromptTemplate.from_template(
+  'Text: {input}\nSentiment: {output}'
+)
+
+few_shot_prompt = FewShotChatMessagePromptTemplate(
+  examples=examples,
+  example_prompt=example_prompt,
+  prefix='Classify sentiment:',
+  suffix='Text: {text}\nSentiment:'
+)
+
+# 프롬프트 사용
+chain_prompt = few_shot_prompt.format(text='I love this!')
+result = llm.invoke(chain_prompt)
+print(result.content)"
+  language="python"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/langchain-llm-application-step2-ko.png"
+  alt="Few-shot 결과"
+  caption="Few-shot 프롬팅이 모델 정확도를 향상시킵니다"
+/>
+
+<DevTip>
+**Few-Shot vs Zero-Shot:**
+
+- **Zero-shot**: 예제 없음, 모델 지식에 의존
+- **Few-shot**: 2-5개 예제가 정확도를 크게 향상시킴
+- **Chain-of-thought**: 모델에게 추론 설명 요청
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="도구 및 외부 데이터 추가">
+
+### Step 3.1: 간단한 계산기 도구
+
+`tools_example.py` 만들기:
+
+<CopyBlock
+  code="from langchain.agents import tool
+from langchain_openai import ChatOpenAI
+from langchain.agents import AgentExecutor, create_openai_functions_agent
+from langchain.prompts import ChatPromptTemplate
+
+@tool
+def multiply(a: int, b: int) -> int:
+  '''Multiply two numbers'''
+  return a * b
+
+@tool
+def add(a: int, b: int) -> int:
+  '''Add two numbers'''
+  return a + b
+
+# 도구 목록
+tools = [multiply, add]
+
+# 에이전트 생성
+llm = ChatOpenAI(model='gpt-3.5-turbo')
+
+prompt = ChatPromptTemplate.from_messages([
+  ('system', 'You are a math assistant'),
+  ('user', '{input}')
+])
+
+agent = create_openai_functions_agent(llm, tools, prompt)
+executor = AgentExecutor(agent=agent, tools=tools)
+
+# 에이전트 사용
+result = executor.invoke({'input': 'What is 5 times 8 plus 3?'})
+print(result['output'])"
+  language="python"
+/>
+
+<Callout type="warning">
+⚠️ **도구 안전성**
+
+- 실행 전 모든 입력 검증
+- 명확함을 위해 유형 힌트 사용
+- 실행 범위 제한
+- 도구 사용 로깅
+- 오류를 우아하게 처리
+</Callout>
+
+### Step 3.2: 웹 검색 통합
+
+`search_agent.py` 만들기:
+
+<CopyBlock
+  code="from langchain.agents import tool
+from langchain_openai import ChatOpenAI
+from langchain.agents import AgentExecutor, create_openai_functions_agent
+from langchain.prompts import ChatPromptTemplate
+import requests
+
+@tool
+def search_web(query: str) -> str:
+  '''Search the web for information'''
+  # Google Custom Search 같은 실제 API 사용
+  # 지금은 모의 응답
+  return f'Search results for: {query}'
+
+tools = [search_web]
+llm = ChatOpenAI(model='gpt-3.5-turbo')
+
+prompt = ChatPromptTemplate.from_messages([
+  ('system', 'You are a helpful assistant with web search'),
+  ('user', '{input}')
+])
+
+agent = create_openai_functions_agent(llm, tools, prompt)
+executor = AgentExecutor(agent=agent, tools=tools)
+
+result = executor.invoke({'input': 'What are the latest AI developments?'})
+print(result['output'])"
+  language="python"
+/>
+
+</Step>
+
+---
+
+<Step number={4} title="완전한 챗봇 구축">
+
+### Step 4.1: 메모리가 있는 간단한 챗봇
+
+`chatbot.py` 만들기:
+
+<CopyBlock
+  code="from langchain.memory import ConversationBufferMemory
+from langchain.chains import ConversationChain
+from langchain_openai import ChatOpenAI
+
+# 대화 저장을 위한 메모리 생성
+memory = ConversationBufferMemory()
+
+# 대화 체인 생성
+llm = ChatOpenAI(model='gpt-3.5-turbo', temperature=0.7)
+
+conversation = ConversationChain(
+  llm=llm,
+  memory=memory,
+  verbose=True
+)
+
+# 대화 시뮬레이션
+print('Bot: Hi! I remember things from our chat.')
+print()
+
+response1 = conversation.predict(input='My name is Alice and I like Python')
+print(f'Bot: {response1}')
+print()
+
+response2 = conversation.predict(input='What was my name again?')
+print(f'Bot: {response2}')"
+  language="python"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/langchain-llm-application-step4-ko.png"
+  alt="메모리가 있는 챗봇"
+  caption="챇봇이 대화에서 이전 메시지를 기억합니다"
+/>
+
+<Callout type="tip">
+💡 **메모리 유형:**
+
+- **ConversationBufferMemory**: 모든 메시지 저장 (단순)
+- **ConversationSummaryMemory**: 토큰 절약을 위해 요약
+- **ConversationKGMemory**: 지식 그래프 기반
+- **ConversationTokenBufferMemory**: 토큰 수로 제한
+</Callout>
+
+</Step>
+
+---
+
+<Step number={5} title="배포 및 최적화">
+
+### Step 5.1: 오류 처리
+
+<CopyBlock
+  code="from langchain_openai import ChatOpenAI
+from langchain.chains import LLMChain
+from langchain.prompts import ChatPromptTemplate
+import time
+
+llm = ChatOpenAI(model='gpt-3.5-turbo')
+prompt = ChatPromptTemplate.from_template('Answer: {question}')
+chain = LLMChain(llm=llm, prompt=prompt)
+
+def safe_invoke(question, retries=3):
+  for attempt in range(retries):
+    try:
+      result = chain.invoke({'question': question})
+      return result['text']
+    except Exception as e:
+      if attempt < retries - 1:
+        print(f'Attempt {attempt + 1} failed: {e}')
+        time.sleep(2 ** attempt)  # Exponential backoff
+      else:
+        raise
+
+# 사용
+try:
+  answer = safe_invoke('What is AI?')
+  print(answer)
+except Exception as e:
+  print(f'Failed after retries: {e}')"
+  language="python"
+/>
+
+### Step 5.2: 성능 모니터링
+
+<CopyBlock
+  code="import time
+from langchain_openai import ChatOpenAI
+from langchain.callbacks import get_openai_callback
+
+llm = ChatOpenAI(model='gpt-3.5-turbo')
+
+# 토큰 사용량 및 비용 추적
+with get_openai_callback() as cb:
+  result = llm.invoke('Explain quantum computing')
+
+  print(f'Tokens used: {cb.total_tokens}')
+  print(f'Cost: {cb.total_cost}')
+  print(f'Completion tokens: {cb.completion_tokens}')"
+  language="python"
+/>
+
+<Checkpoint
+  title="애플리케이션 완료"
+  items={[
+    "다단계 체인을 만들 수 있나요?",
+    "에이전트에 도구를 추가할 수 있나요?",
+    "챗봇이 대화를 기억하나요?",
+    "오류를 우아하게 처리할 수 있나요?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **LLM 애플리케이션이 완료되었습니다!** 이제 정교한 AI 시스템을 구축할 수 있습니다.
+</Callout>
+
+</Step>
+
+---
+
+## 일반적인 애플리케이션 패턴
+
+<CopyBlock
+  code="인기 있는 LangChain 애플리케이션:
+
+1. Q&A 챗봇
+   - 문서에 대한 질문 답변
+   - RAG 사용하여 지식 기반
+
+2. 콘텐츠 생성
+   - 블로그 글
+   - 상품 설명
+   - 이메일 초안
+
+3. 코드 어시스턴트
+   - 코드 스니펫 생성
+   - 코드 설명
+   - 버그 감지
+
+4. 자율 에이전트
+   - 연구 어시스턴트
+   - 데이터 분석
+   - 이메일 자동화
+
+5. 번역 서비스
+   - 다국어 지원
+   - 컨텍스트 인식 번역
+   - 도메인 특정 용어"
+  language="text"
+/>
+
+---
+
+## 다음 단계
+
+1. **[문서 처리 추가](../langchain-rag-setup)** - RAG 시스템 구축
+2. **[FastAPI로 배포](../langchain-deployment)** - 웹 서비스 만들기
+3. **[모델 미세 조정](../huggingface-fine-tuning)** - 성능 개선
+
+---
+
+## 문제 해결
+
+### 속도 제한 오류
+
+```
+RateLimitError: Rate limit exceeded
+```
+
+해결책:
+- 호출 사이에 지연 추가
+- Exponential backoff 사용
+- API 요금제 업그레이드
+- 로컬 모델 대신 사용
+
+### 토큰 제한 초과
+
+```
+This model's maximum context length is 4096 tokens
+```
+
+해결책:
+- 처리 전 요약 사용
+- 긴 문서 분할
+- 더 긴 컨텍스트가 있는 모델 사용 (GPT-4)
+- 슬라이딩 윈도우 방식 구현
+
+---
+
+**LLM 애플리케이션이 프로덕션 준비가 되었습니다!** 🚀

@@ -1,0 +1,449 @@
+# Connect MinIO Storage - Application Integration
+
+Now that MinIO is running, let's connect real applications to upload and download files. Build complete file management in 25 minutes!
+
+<FreeTierInfo
+  service="MinIO Integration"
+  limit="Unlimited application connections"
+  period="Forever free"
+  status="generous"
+/>
+
+## What You'll Learn
+
+<Callout type="info">
+🚀 **By the end of this guide:**
+
+- Upload files to MinIO from applications
+- Download and retrieve files
+- List and manage buckets
+- Handle errors and validations
+- Implement file operations
+- Build file management utilities
+</Callout>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "MinIO server running locally", required: true },
+  { text: "Python 3.8+ with minio-client installed", required: true },
+  { text: "Test files to upload", required: false },
+  { text: "Basic programming knowledge", required: false }
+]} />
+
+---
+
+<Step number={1} title="File Upload Operations">
+
+### Step 1.1: Upload Single File
+
+Create `upload_file.py`:
+
+<CopyBlock
+  code="from minio import Minio
+from minio.error import S3Error
+
+# Connect
+client = Minio(
+  'localhost:9000',
+  access_key='minioadmin',
+  secret_key='minioadmin',
+  secure=False
+)
+
+# Upload file
+try:
+  result = client.fput_object(
+    bucket_name='my-bucket',
+    object_name='uploads/document.pdf',
+    file_path='/local/path/document.pdf',
+    content_type='application/pdf'
+  )
+  print(f'Uploaded {result.object_name}')
+except S3Error as e:
+  print(f'Error: {e}')"
+  language="python"
+/>
+
+### Step 1.2: Batch Upload Files
+
+<CopyBlock
+  code="import os
+from minio import Minio
+
+client = Minio(
+  'localhost:9000',
+  access_key='minioadmin',
+  secret_key='minioadmin',
+  secure=False
+)
+
+# Upload all files in directory
+directory = '/path/to/files'
+bucket = 'my-bucket'
+
+for filename in os.listdir(directory):
+  file_path = os.path.join(directory, filename)
+  if os.path.isfile(file_path):
+    client.fput_object(
+      bucket,
+      f'batch/{filename}',
+      file_path
+    )
+    print(f'Uploaded {filename}')"
+  language="python"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/minio-storage-connection-step1-en.png"
+  alt="Files uploaded"
+  caption="Multiple files successfully uploaded to MinIO bucket"
+/>
+
+<Callout type="tip">
+💡 **Upload Tips:**
+
+- Use `fput_object` for local files
+- Use `put_object` for byte streams
+- Set proper content-type for browser access
+- Use versioning for immutability
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="File Download and Retrieval">
+
+### Step 2.1: Download Single File
+
+Create `download_file.py`:
+
+<CopyBlock
+  code="from minio import Minio
+
+client = Minio(
+  'localhost:9000',
+  access_key='minioadmin',
+  secret_key='minioadmin',
+  secure=False
+)
+
+# Download file
+response = client.get_object('my-bucket', 'uploads/document.pdf')
+
+# Save to disk
+with open('downloaded.pdf', 'wb') as f:
+  for data in response.stream(32 * 1024):
+    f.write(data)
+
+print('File downloaded successfully!')"
+  language="python"
+/>
+
+### Step 2.2: Stream File to Response
+
+For web applications:
+
+<CopyBlock
+  code="from flask import Flask, send_file
+from minio import Minio
+import io
+
+app = Flask(__name__)
+client = Minio(
+  'localhost:9000',
+  access_key='minioadmin',
+  secret_key='minioadmin',
+  secure=False
+)
+
+@app.route('/download/<filename>')
+def download(filename):
+  response = client.get_object('my-bucket', filename)
+  return send_file(
+    io.BytesIO(response.read()),
+    download_name=filename
+  )"
+  language="python"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/minio-storage-connection-step2-en.png"
+  alt="File download"
+  caption="Files downloaded from MinIO to local storage"
+/>
+
+</Step>
+
+---
+
+<Step number={3} title="Manage Buckets and Objects">
+
+### Step 3.1: List and Delete Objects
+
+Create `manage_storage.py`:
+
+<CopyBlock
+  code="from minio import Minio
+
+client = Minio(
+  'localhost:9000',
+  access_key='minioadmin',
+  secret_key='minioadmin',
+  secure=False
+)
+
+# List all objects in bucket
+objects = client.list_objects('my-bucket')
+print('Objects in bucket:')
+for obj in objects:
+  print(f'  - {obj.object_name} ({obj.size} bytes)')
+
+# Delete object
+client.remove_object('my-bucket', 'uploads/old-file.txt')
+print('File deleted')
+
+# Delete multiple objects
+objects_to_delete = [
+  'file1.txt',
+  'file2.txt',
+  'file3.txt'
+]
+
+delete_errors = client.remove_objects(
+  'my-bucket',
+  objects_to_delete
+)
+
+for error in delete_errors:
+  print(f'Error deleting {error.object_name}')"
+  language="python"
+/>
+
+### Step 3.2: Get Object Metadata
+
+<CopyBlock
+  code="from minio import Minio
+
+client = Minio(
+  'localhost:9000',
+  access_key='minioadmin',
+  secret_key='minioadmin',
+  secure=False
+)
+
+# Get object metadata
+stat = client.stat_object('my-bucket', 'document.pdf')
+
+print(f'File: {stat.object_name}')
+print(f'Size: {stat.size} bytes')
+print(f'Modified: {stat.last_modified}')
+print(f'Content-Type: {stat.content_type}')"
+  language="python"
+/>
+
+<Checkpoint
+  title="Storage Management"
+  items={[
+    "Can you list objects?",
+    "Can you delete files?",
+    "Can you get metadata?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={4} title="Build File Management Application">
+
+### Step 4.1: Complete File Manager Class
+
+Create `file_manager.py`:
+
+<CopyBlock
+  code="from minio import Minio
+from minio.error import S3Error
+import os
+
+class FileManager:
+  def __init__(self, endpoint, access_key, secret_key):
+    self.client = Minio(
+      endpoint,
+      access_key=access_key,
+      secret_key=secret_key,
+      secure=False
+    )
+
+  def upload_file(self, bucket, local_path, object_name):
+    '''Upload file to MinIO'''
+    try:
+      self.client.fput_object(bucket, object_name, local_path)
+      return True, 'Upload successful'
+    except S3Error as e:
+      return False, str(e)
+
+  def download_file(self, bucket, object_name, local_path):
+    '''Download file from MinIO'''
+    try:
+      response = self.client.get_object(bucket, object_name)
+      with open(local_path, 'wb') as f:
+        f.write(response.read())
+      return True, 'Download successful'
+    except S3Error as e:
+      return False, str(e)
+
+  def list_files(self, bucket, prefix=''):
+    '''List all files in bucket'''
+    try:
+      objects = self.client.list_objects(bucket, prefix=prefix)
+      return [obj.object_name for obj in objects]
+    except S3Error as e:
+      print(f'Error: {e}')
+      return []
+
+  def delete_file(self, bucket, object_name):
+    '''Delete file from MinIO'''
+    try:
+      self.client.remove_object(bucket, object_name)
+      return True, 'Delete successful'
+    except S3Error as e:
+      return False, str(e)
+
+# Usage
+fm = FileManager('localhost:9000', 'minioadmin', 'minioadmin')
+
+# Upload
+success, msg = fm.upload_file(
+  'my-bucket',
+  '/local/file.txt',
+  'uploads/file.txt'
+)
+print(f'Upload: {msg}')
+
+# List
+files = fm.list_files('my-bucket', prefix='uploads/')
+print(f'Files: {files}')"
+  language="python"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/minio-storage-connection-step4-en.png"
+  alt="Complete application"
+  caption="File manager application handles uploads, downloads, and deletions"
+/>
+
+### Step 4.2: Environment Configuration
+
+Create `.env`:
+
+<CopyBlock
+  code="MINIO_ENDPOINT=localhost:9000
+MINIO_ACCESS_KEY=minioadmin
+MINIO_SECRET_KEY=minioadmin
+MINIO_BUCKET=my-bucket"
+  language="text"
+/>
+
+Load and use:
+
+<CopyBlock
+  code="import os
+from dotenv import load_dotenv
+from file_manager import FileManager
+
+load_dotenv()
+
+fm = FileManager(
+  os.getenv('MINIO_ENDPOINT'),
+  os.getenv('MINIO_ACCESS_KEY'),
+  os.getenv('MINIO_SECRET_KEY')
+)"
+  language="python"
+/>
+
+<Callout type="success">
+✅ **File management is working!** Your application can now manage cloud storage.
+</Callout>
+
+</Step>
+
+---
+
+## Common Patterns
+
+<CopyBlock
+  code="Popular MinIO Patterns:
+
+1. File Upload Service
+   - Accept files from users
+   - Validate and store
+   - Return download links
+
+2. Backup System
+   - Scheduled backups
+   - Versioning
+   - Retention policies
+
+3. Media Library
+   - Image/video storage
+   - Thumbnail generation
+   - CDN integration
+
+4. Data Lake
+   - Store datasets
+   - Query capabilities
+   - Analytics
+
+5. Log Storage
+   - Application logs
+   - Searchable archives
+   - Compliance retention"
+  language="text"
+/>
+
+---
+
+## Production Checklist
+
+<Callout type="tip">
+✅ **For production deployment:**
+
+1. **Security**
+   - Use HTTPS (secure=True)
+   - Create dedicated users
+   - Set restrictive IAM policies
+   - Enable versioning
+   - Set retention policies
+
+2. **Performance**
+   - Use connection pooling
+   - Batch operations
+   - Multipart uploads for large files
+   - Set appropriate timeouts
+
+3. **Monitoring**
+   - Track upload/download metrics
+   - Monitor bucket sizes
+   - Log all operations
+   - Set up alerts
+
+4. **Compliance**
+   - Encryption at rest
+   - Encryption in transit
+   - Access logging
+   - Data retention
+</Callout>
+
+---
+
+## Next Steps
+
+1. **[Web Application Integration](../minio-web-app)** - Build web upload UI
+2. **[Monitoring and Metrics](../minio-monitoring)** - Track usage
+3. **[High Availability](../minio-ha)** - Deploy for production
+
+---
+
+**Your file management system is complete!** 🎉

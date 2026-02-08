@@ -1,0 +1,60 @@
+{
+  "slug": "huggingface-account-setup",
+  "platform": "huggingface",
+  "service": "Hugging Face Hub",
+  "category": "ai-ml",
+  "difficulty": "beginner",
+  "estimatedMinutes": 10,
+  "totalSteps": 4,
+  "freeTier": {
+    "service": "Hugging Face Hub",
+    "limit": "무제한 모델 접근",
+    "period": "forever",
+    "status": "generous",
+    "conditions": [
+      "계정 생성 완전 무료",
+      "수천 개의 오픈 소스 모델 무료 사용",
+      "무제한 모델 다운로드",
+      "커뮤니티 모델 공유 가능",
+      "API 사용량 제한 있음 (추론 API)"
+    ]
+  },
+  "prerequisites": [],
+  "nextGuides": [
+    "huggingface-model-integration"
+  ],
+  "seo": {
+    "ko": {
+      "title": "Hugging Face Hub 계정 만들기 - 무료 AI 모델 시작 가이드 | CloudSetup.guide",
+      "description": "Hugging Face Hub에 회원가입하고 AI 모델을 탐색하는 방법을 4단계로 배워보세요. 무료 오픈 소스 모델에 접근하고 프로필을 설정하세요.",
+      "keywords": [
+        "Hugging Face 가입",
+        "Hugging Face Hub",
+        "AI 모델 다운로드",
+        "트랜스포머 모델",
+        "오픈 소스 AI",
+        "Hugging Face 시작",
+        "AI 모델 커뮤니티",
+        "Hugging Face 계정"
+      ]
+    },
+    "en": {
+      "title": "Create Hugging Face Hub Account - Free AI Models Guide | CloudSetup.guide",
+      "description": "Learn how to sign up for Hugging Face Hub and explore AI models in 4 easy steps. Access thousands of free open-source models and set up your profile.",
+      "keywords": [
+        "Hugging Face signup",
+        "Hugging Face Hub",
+        "download AI models",
+        "transformer models",
+        "open source AI",
+        "getting started Hugging Face",
+        "AI model community",
+        "Hugging Face account"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T02:00:00.000Z",
+  "updatedAt": "2026-02-08T02:00:00.000Z",
+  "lastVerified": "2026-02-08T02:00:00.000Z",
+  "published": true
+}

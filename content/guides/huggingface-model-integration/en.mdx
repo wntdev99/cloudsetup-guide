@@ -1,0 +1,555 @@
+# Integrate Hugging Face Models - Use AI Models in Python
+
+Now that you have a Hugging Face account, let's download and use real AI models in your Python code! This guide will show you how to use transformers library to build NLP applications in just 20 minutes.
+
+<FreeTierInfo
+  service="Hugging Face Transformers"
+  limit="Unlimited local model usage"
+  period="Forever free"
+  status="generous"
+/>
+
+## What You'll Learn
+
+<Callout type="info">
+🚀 **By the end of this guide, you can:**
+
+- Install the `transformers` library
+- Download models from Hugging Face
+- Run sentiment analysis on text
+- Build a text classification pipeline
+- Use models offline
+- Manage memory efficiently
+</Callout>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Python 3.7+ installed", required: true },
+  { text: "pip or conda package manager", required: true },
+  { text: "Hugging Face account (from previous guide)", required: false },
+  { text: "2GB disk space for models", required: true },
+  { text: "Optional: NVIDIA GPU", required: false }
+]} />
+
+---
+
+<Step number={1} title="Install Required Python Libraries">
+
+### Step 1.1: Install transformers Library
+
+Open your terminal or command prompt and run:
+
+<CopyBlock
+  code="pip install transformers
+pip install torch"
+  language="bash"
+/>
+
+### Step 1.2: Verify Installation
+
+Check if installation was successful:
+
+<CopyBlock
+  code="python -c 'import transformers; print(transformers.__version__)'"
+  language="bash"
+/>
+
+You should see a version number like `4.35.0` or higher.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/huggingface-model-integration-step1-en.png"
+  alt="Installation verification"
+  caption="Verify transformers library is installed with version check"
+/>
+
+### Step 1.3: Optional - Install Additional Libraries
+
+For GPU support (recommended for large models):
+
+<CopyBlock
+  code="# For NVIDIA GPU (CUDA)
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+
+# Or for CPU only (no GPU)
+# Already installed with pip install torch"
+  language="bash"
+/>
+
+<Callout type="tip">
+💡 **About GPU Support**
+
+- GPU accelerates model inference (faster results)
+- Not required for learning or small models
+- NVIDIA GPUs work with PyTorch/CUDA
+- Can add GPU support later without reinstalling
+</Callout>
+
+<Checkpoint
+  title="Verify Installation"
+  items={[
+    "Is transformers installed?",
+    "Does transformers version show 4.0 or higher?",
+    "Are torch libraries available?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="Download Your First Model">
+
+### Step 2.1: Simple Model Loading
+
+Create a new Python file `sentiment_analysis.py`:
+
+<CopyBlock
+  code="from transformers import pipeline
+
+# Download and load sentiment analysis model
+classifier = pipeline('sentiment-analysis')
+
+# Analyze text
+result = classifier('I love this! It is amazing!')
+print(result)"
+  language="python"
+/>
+
+Run the script:
+
+<CopyBlock
+  code="python sentiment_analysis.py"
+  language="bash"
+/>
+
+First time will take longer (downloading model ~600MB), then it's instant!
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/huggingface-model-integration-step2-en.png"
+  alt="First model output"
+  caption="Output shows sentiment POSITIVE with confidence score"
+/>
+
+### Step 2.2: Understanding the Output
+
+<CopyBlock
+  code="Output explanation:
+[
+  [
+    {'label': 'POSITIVE', 'score': 0.9995}
+  ]
+]
+
+label: Predicted sentiment (POSITIVE or NEGATIVE)
+score: Confidence (0-1, higher is more confident)"
+  language="text"
+/>
+
+<DevTip>
+**How models download:**
+
+- First use: Downloads to ~/.cache/huggingface/
+- Subsequent uses: Loads from cache (instant!)
+- Default model for sentiment-analysis is distilbert
+- File size varies: 200MB-2GB depending on model
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="Use Different Models">
+
+### Step 3.1: Available Pipelines
+
+Hugging Face provides pre-built pipelines for common tasks:
+
+<CopyBlock
+  code="# Text Classification
+classifier = pipeline('sentiment-analysis')
+
+# Text Generation
+generator = pipeline('text-generation', model='gpt2')
+
+# Named Entity Recognition (NER)
+ner = pipeline('ner')
+
+# Question Answering
+qa = pipeline('question-answering')
+
+# Machine Translation
+translator = pipeline('translation_en_to_de')
+
+# Text Summarization
+summarizer = pipeline('summarization')"
+  language="python"
+/>
+
+### Step 3.2: Load Specific Models
+
+Instead of defaults, use specific models:
+
+<CopyBlock
+  code="from transformers import pipeline
+
+# Load a specific model
+classifier = pipeline(
+  'sentiment-analysis',
+  model='distilbert-base-uncased-finetuned-sst-2-english'
+)
+
+# Use it
+result = classifier('This product is terrible!')
+print(result)"
+  language="python"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/huggingface-model-integration-step3-en.png"
+  alt="Different model pipelines"
+  caption="Test different model types for various NLP tasks"
+/>
+
+<Callout type="warning">
+⚠️ **Model Size Considerations**
+
+- Small models (DistilBERT): ~250MB, fast
+- Medium models (BERT): ~400MB, balanced
+- Large models (RoBERTa): ~500MB+, slower
+- Check model size before downloading
+- Monitor disk space usage
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="Build a Complete Application">
+
+### Step 4.1: Create a Text Analysis Application
+
+Create `text_analyzer.py`:
+
+<CopyBlock
+  code="from transformers import pipeline
+
+# Initialize pipelines
+sentiment = pipeline('sentiment-analysis')
+summarizer = pipeline('summarization')
+
+def analyze_text(text):
+    # Sentiment analysis
+    sentiment_result = sentiment(text)
+    label = sentiment_result[0]['label']
+    score = sentiment_result[0]['score']
+
+    print(f'Text: {text}')
+    print(f'Sentiment: {label}')
+    print(f'Confidence: {score:.2%}')
+    print()
+
+# Test with multiple texts
+texts = [
+    'This is the best product ever!',
+    'I am very disappointed with this service.',
+    'The experience was okay, nothing special.'
+]
+
+for text in texts:
+    analyze_text(text)"
+  language="python"
+/>
+
+Run it:
+
+<CopyBlock
+  code="python text_analyzer.py"
+  language="bash"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/huggingface-model-integration-step4-en.png"
+  alt="Application output"
+  caption="Application analyzes multiple texts with sentiment results"
+/>
+
+### Step 4.2: Save Downloaded Models Locally
+
+For production or offline use:
+
+<CopyBlock
+  code="from transformers import AutoModel, AutoTokenizer
+
+# Download and save
+model_name = 'distilbert-base-uncased'
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModel.from_pretrained(model_name)
+
+# Save to disk
+model.save_pretrained('./my_model')
+tokenizer.save_pretrained('./my_model')
+
+print('Model saved to ./my_model')"
+  language="python"
+/>
+
+Load from local:
+
+<CopyBlock
+  code="from transformers import AutoModel, AutoTokenizer
+
+# Load from disk
+model = AutoModel.from_pretrained('./my_model')
+tokenizer = AutoTokenizer.from_pretrained('./my_model')
+
+print('Model loaded from disk')"
+  language="python"
+/>
+
+<Callout type="tip">
+💡 **Why save models locally?**
+
+- Deploy without internet
+- Faster loading (no download)
+- Version control your models
+- Share model files with team
+- Reproducible ML pipelines
+</Callout>
+
+</Step>
+
+---
+
+<Step number={5} title="Optimize and Deploy">
+
+### Step 5.1: Memory-Efficient Loading
+
+For limited RAM systems:
+
+<CopyBlock
+  code="from transformers import pipeline, AutoModel
+
+# Load with reduced precision (saves memory)
+classifier = pipeline(
+  'sentiment-analysis',
+  model='distilbert-base-uncased-finetuned-sst-2-english',
+  device=0  # Use GPU (0 for first GPU, -1 for CPU)
+)
+
+# Or use smaller models
+small_classifier = pipeline(
+  'sentiment-analysis',
+  model='microsoft/distilbert-base-uncased-distilled-squad'
+)"
+  language="python"
+/>
+
+### Step 5.2: Batch Processing
+
+Analyze multiple texts efficiently:
+
+<CopyBlock
+  code="from transformers import pipeline
+
+classifier = pipeline('sentiment-analysis')
+
+# Batch process texts
+texts = [
+  'Great product!',
+  'Horrible experience',
+  'Acceptable service'
+]
+
+# This is more efficient than individual processing
+results = classifier(texts)
+
+for text, result in zip(texts, results):
+    print(f'{text} -> {result}')"
+  language="python"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/huggingface-model-integration-step5-en.png"
+  alt="Batch processing"
+  caption="Efficiently process multiple texts in batch"
+/>
+
+### Step 5.3: Using API Token for Private Models
+
+If using private models:
+
+<CopyBlock
+  code="from transformers import pipeline
+from huggingface_hub import login
+
+# Login with your token (from Settings on Hugging Face)
+login(token='hf_xxxxxxxxxxxxxxxxxxxx')
+
+# Now access private models
+classifier = pipeline(
+  'sentiment-analysis',
+  model='username/private-model-name'
+)"
+  language="python"
+/>
+
+Store token in environment variable:
+
+<CopyBlock
+  code="# Save to .env file (DO NOT commit!)
+export HF_TOKEN='hf_xxxxxxxxxxxxxxxxxxxx'
+
+# Then in Python
+import os
+from huggingface_hub import login
+login(token=os.getenv('HF_TOKEN'))"
+  language="bash"
+/>
+
+<Callout type="success">
+✅ **You can now use AI models!** Download, integrate, and deploy Hugging Face models in your applications.
+</Callout>
+
+</Step>
+
+---
+
+## Common Model Use Cases
+
+<CopyBlock
+  code="Use Case Examples:
+
+Text Classification:
+  - Sentiment analysis
+  - Spam detection
+  - Topic classification
+  - Intent detection
+
+Text Generation:
+  - Response generation
+  - Creative writing
+  - Code generation
+
+Information Extraction:
+  - Named entity recognition
+  - Question answering
+  - Summarization
+
+Translation:
+  - Machine translation
+  - Cross-lingual retrieval"
+  language="text"
+/>
+
+---
+
+## Model Selection Guide
+
+<Callout type="info">
+**Choosing the right model:**
+
+For **speed and small memory**:
+- DistilBERT
+- ALBERT
+- MobileBERT
+
+For **accuracy and nuance**:
+- RoBERTa
+- ELECTRA
+- ERNIE
+
+For **large scale tasks**:
+- BERT-large
+- GPT-2, GPT-3
+- T5
+
+For **specialized domains**:
+- BioBERT (biomedical)
+- FinBERT (finance)
+- ClinicalBERT (medical)
+</Callout>
+
+---
+
+## Next Steps
+
+1. **[LangChain Integration](../langchain-llm-application)** - Chain models together for complex tasks
+2. **[Build Chatbots](../langchain-llm-application)** - Create conversational AI
+3. **[Fine-tune Models](../huggingface-fine-tuning)** - Train models on your data
+
+---
+
+## Troubleshooting
+
+### Out of Memory Error
+
+```
+RuntimeError: CUDA out of memory
+```
+
+Solutions:
+- Use CPU instead: `device=-1`
+- Use smaller model
+- Process one item at a time
+- Reduce batch size
+
+### Model Not Found
+
+```
+OSError: [Errno 2] No such file or directory
+```
+
+Solutions:
+- Check internet connection
+- Check model name spelling
+- Verify Hugging Face API token
+- Try different mirror: `HF_ENDPOINT`
+
+### Slow First Run
+
+- First use downloads 200MB-2GB
+- Use WiFi with good speed
+- Models cache automatically after download
+- Subsequent runs are instant
+
+### Can't Find Cache Directory
+
+- Windows: `C:\Users\YourUser\.cache\huggingface`
+- Mac: `/Users/YourUser/.cache/huggingface`
+- Linux: `/home/youruser/.cache/huggingface`
+- Custom: Set `HF_HOME=/custom/path`
+
+---
+
+## Performance Tips
+
+<Callout type="tip">
+⚡ **Optimize your model usage**
+
+1. **Load once, use many times**
+   - Initialize pipeline outside loop
+   - Reuse same classifier object
+
+2. **Batch processing**
+   - Process multiple texts together
+   - More efficient than one-by-one
+
+3. **Use smaller models**
+   - Distilled versions are 4x faster
+   - Trade-off: slightly less accuracy
+
+4. **GPU acceleration**
+   - 10-100x faster with GPU
+   - Install CUDA for NVIDIA GPUs
+   - Check GPU availability: `torch.cuda.is_available()`
+
+5. **Cache models**
+   - Downloaded models are cached
+   - Use `device=0` for faster loading
+   - Set `HF_HOME` for custom location
+</Callout>
+
+---
+
+**Models downloaded! You're now ready to build AI applications!** 🤗

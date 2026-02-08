@@ -1,0 +1,495 @@
+# Implement Vector Search in Pinecone - Semantic Search
+
+Now that you have a Pinecone index, let's populate it with vectors and perform semantic searches. Build a semantic search system in 25 minutes!
+
+<FreeTierInfo
+  service="Pinecone Vector Search"
+  limit="Unlimited queries for 100K vectors"
+  period="Forever free"
+  status="generous"
+/>
+
+## What You'll Learn
+
+<Callout type="info">
+🔍 **By the end of this guide:**
+
+- Create text embeddings from documents
+- Upload vectors to Pinecone
+- Query your index for similar items
+- Build a semantic search application
+- Implement document similarity matching
+- Handle large-scale vector operations
+</Callout>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Pinecone account with index (from previous guide)", required: true },
+  { text: "Python 3.8+ with pinecone-client installed", required: true },
+  { text: "OpenAI API key (or Hugging Face)", required: true },
+  { text: "Sample documents or text data", required: false }
+]} />
+
+---
+
+<Step number={1} title="Generate Embeddings from Text">
+
+### Step 1.1: Create Embeddings from Documents
+
+Create `create_embeddings.py`:
+
+<CopyBlock
+  code="from openai import OpenAI
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+
+# Sample documents
+documents = [
+  'Machine learning is a subset of artificial intelligence',
+  'Neural networks are inspired by biological neurons',
+  'Deep learning uses multiple layers of abstraction',
+  'Python is a popular programming language',
+  'Data science combines statistics and programming'
+]
+
+def create_embedding(text):
+  response = client.embeddings.create(
+    input=text,
+    model='text-embedding-3-small'
+  )
+  return response.data[0].embedding
+
+# Create embeddings for all documents
+embeddings = []
+for doc in documents:
+  embedding = create_embedding(doc)
+  embeddings.append({
+    'text': doc,
+    'embedding': embedding,
+    'id': str(hash(doc))
+  })
+
+print(f'Created {len(embeddings)} embeddings')
+for emb in embeddings:
+  print(f'  - {emb[\"text\"][:50]}...')"
+  language="python"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/pinecone-vector-search-step1-en.png"
+  alt="Embeddings created"
+  caption="Text converted to vector embeddings ready for storage"
+/>
+
+### Step 1.2: Batch Embedding for Efficiency
+
+For multiple documents:
+
+<CopyBlock
+  code="from openai import OpenAI
+
+client = OpenAI()
+
+# Batch multiple texts at once (more efficient)
+documents = ['text1', 'text2', 'text3']
+
+response = client.embeddings.create(
+  input=documents,
+  model='text-embedding-3-small'
+)
+
+embeddings = [item.embedding for item in response.data]
+print(f'Batch created {len(embeddings)} embeddings')"
+  language="python"
+/>
+
+<Callout type="tip">
+💡 **Embedding Models:**
+
+- text-embedding-3-small: 1536 dimensions, fast
+- text-embedding-3-large: 3072 dimensions, more accurate
+- Hugging Face all-MiniLM: 384 dimensions, lightweight
+</Callout>
+
+<Checkpoint
+  title="Embeddings Created"
+  items={[
+    "Can you create embeddings?",
+    "Do embeddings have correct dimension?",
+    "Can you batch process documents?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="Upload Vectors to Pinecone">
+
+### Step 2.1: Connect and Upload
+
+Create `upload_to_pinecone.py`:
+
+<CopyBlock
+  code="import os
+from dotenv import load_dotenv
+from pinecone import Pinecone
+from openai import OpenAI
+
+load_dotenv()
+
+# Initialize Pinecone
+pc = Pinecone(api_key=os.getenv('PINECONE_API_KEY'))
+index = pc.Index(os.getenv('PINECONE_INDEX_NAME'))
+
+# Initialize OpenAI
+client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+
+# Sample documents
+documents = [
+  {'id': '1', 'text': 'Machine learning is a subset of AI'},
+  {'id': '2', 'text': 'Neural networks are inspired by brains'},
+  {'id': '3', 'text': 'Python is popular for data science'}
+]
+
+# Create embeddings
+vectors_to_upsert = []
+for doc in documents:
+  response = client.embeddings.create(
+    input=doc['text'],
+    model='text-embedding-3-small'
+  )
+  embedding = response.data[0].embedding
+
+  vectors_to_upsert.append({
+    'id': doc['id'],
+    'values': embedding,
+    'metadata': {'text': doc['text']}
+  })
+
+# Upload to Pinecone
+index.upsert(vectors=vectors_to_upsert)
+print(f'Uploaded {len(vectors_to_upsert)} vectors')"
+  language="python"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/pinecone-vector-search-step2-en.png"
+  alt="Vectors uploaded"
+  caption="Vectors successfully stored in Pinecone index"
+/>
+
+### Step 2.2: Understand Upsert Operation
+
+<CopyBlock
+  code="Upsert (Update/Insert) Behavior:
+
+- If ID exists: Update the vector
+- If ID doesn't exist: Insert new vector
+- Atomic operation: No duplicates
+- Efficient for bulk operations
+
+Format:
+[
+  {
+    'id': 'unique-id',
+    'values': [0.1, 0.2, 0.3, ...],  # Vector
+    'metadata': {'key': 'value'}      # Additional info
+  }
+]"
+  language="text"
+/>
+
+<Callout type="warning">
+⚠️ **Upload Limits**
+
+- Maximum 100 vectors per request
+- For larger batches, paginate
+- Wait between batches to avoid rate limits
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="Query and Find Similar Vectors">
+
+### Step 3.1: Basic Vector Search
+
+Create `search.py`:
+
+<CopyBlock
+  code="import os
+from dotenv import load_dotenv
+from pinecone import Pinecone
+from openai import OpenAI
+
+load_dotenv()
+
+# Initialize
+pc = Pinecone(api_key=os.getenv('PINECONE_API_KEY'))
+index = pc.Index(os.getenv('PINECONE_INDEX_NAME'))
+client = OpenAI()
+
+# Query text
+query = 'What is deep learning?'
+
+# Create query embedding
+query_response = client.embeddings.create(
+  input=query,
+  model='text-embedding-3-small'
+)
+query_embedding = query_response.data[0].embedding
+
+# Search for similar vectors
+results = index.query(
+  vector=query_embedding,
+  top_k=5,
+  include_metadata=True
+)
+
+# Display results
+print(f'Query: {query}')
+print('\nMost similar documents:')
+for match in results['matches']:
+  print(f'  Score: {match[\"score\"]:.2f}')
+  print(f'  Text: {match[\"metadata\"][\"text\"]}')"
+  language="python"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/pinecone-vector-search-step3-en.png"
+  alt="Search results"
+  caption="Query returns most similar vectors with relevance scores"
+/>
+
+### Step 3.2: Understanding Search Results
+
+<CopyBlock
+  code="Search Response Structure:
+
+{
+  'matches': [
+    {
+      'id': 'vector-id',
+      'score': 0.92,              # Cosine similarity 0-1
+      'values': [...],            # Vector values (optional)
+      'metadata': {               # Your stored metadata
+        'text': 'Document text'
+      }
+    }
+  ],
+  'namespace': 'default'
+}
+
+Score Interpretation:
+- 1.0: Perfect match
+- 0.8-1.0: Highly similar
+- 0.5-0.8: Somewhat related
+- less than 0.5: Weakly related"
+  language="text"
+/>
+
+<Callout type="tip">
+💡 **Query Tips:**
+
+- Always include_metadata to see original text
+- Adjust top_k based on use case (3-10 typical)
+- Filter by metadata for specific subsets
+- Add score threshold to exclude low-relevance results
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="Build a Complete Semantic Search App">
+
+### Step 4.1: Full Search Application
+
+Create `semantic_search_app.py`:
+
+<CopyBlock
+  code="import os
+from dotenv import load_dotenv
+from pinecone import Pinecone
+from openai import OpenAI
+
+class SemanticSearch:
+  def __init__(self):
+    load_dotenv()
+    self.pc = Pinecone(api_key=os.getenv('PINECONE_API_KEY'))
+    self.index = self.pc.Index(os.getenv('PINECONE_INDEX_NAME'))
+    self.client = OpenAI()
+
+  def add_document(self, doc_id, text):
+    '''Add a single document to the index'''
+    response = self.client.embeddings.create(
+      input=text,
+      model='text-embedding-3-small'
+    )
+    embedding = response.data[0].embedding
+
+    self.index.upsert([{
+      'id': doc_id,
+      'values': embedding,
+      'metadata': {'text': text}
+    }])
+
+  def search(self, query, top_k=5):
+    '''Search for similar documents'''
+    response = self.client.embeddings.create(
+      input=query,
+      model='text-embedding-3-small'
+    )
+    query_embedding = response.data[0].embedding
+
+    results = self.index.query(
+      vector=query_embedding,
+      top_k=top_k,
+      include_metadata=True
+    )
+
+    return results['matches']
+
+# Usage
+search_app = SemanticSearch()
+
+# Add documents
+search_app.add_document('1', 'AI and machine learning basics')
+search_app.add_document('2', 'Deep learning with neural networks')
+search_app.add_document('3', 'Python programming guide')
+
+# Search
+results = search_app.search('What is machine learning?')
+print('Search results:')
+for r in results:
+  print(f'  {r[\"metadata\"][\"text\"]} (Score: {r[\"score\"]:.2f})')"
+  language="python"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/pinecone-vector-search-step4-en.png"
+  alt="Complete app output"
+  caption="Semantic search application returns relevant documents"
+/>
+
+### Step 4.2: Production Considerations
+
+<CopyBlock
+  code="Production Ready Features:
+
+1. Error Handling
+   - Network timeout handling
+   - Retry logic with backoff
+   - Graceful degradation
+
+2. Caching
+   - Cache embeddings to reduce API calls
+   - Store frequently searched queries
+
+3. Monitoring
+   - Track search latency
+   - Monitor query costs
+   - Log failed searches
+
+4. Scaling
+   - Batch process large documents
+   - Use namespaces for data isolation
+   - Implement pagination for large result sets"
+  language="text"
+/>
+
+<Checkpoint
+  title="Search Complete"
+  items={[
+    "Can you create embeddings?",
+    "Can you upload to Pinecone?",
+    "Can you query and get results?",
+    "Does semantic search work correctly?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **Semantic search is working!** You can now build smart search applications.
+</Callout>
+
+</Step>
+
+---
+
+## Common Use Cases
+
+<CopyBlock
+  code="Popular Semantic Search Applications:
+
+1. Product Search
+   - Find similar products
+   - Recommendation engine
+   - Related items suggestions
+
+2. Document Search
+   - Content discovery
+   - Similarity matching
+   - Research assistant
+
+3. Question Answering
+   - FAQ matching
+   - Finding relevant documentation
+   - Support ticket routing
+
+4. Code Search
+   - Find similar functions
+   - Duplicate detection
+   - Code reuse discovery
+
+5. Recommendation System
+   - User preference matching
+   - Content personalization
+   - Cross-sell suggestions"
+  language="text"
+/>
+
+---
+
+## Optimization Tips
+
+<Callout type="tip">
+⚡ **Improve Search Quality:**
+
+1. **Better Embeddings**
+   - Use stronger models for better accuracy
+   - Try different embedding dimensions
+
+2. **Data Preprocessing**
+   - Clean and normalize text
+   - Remove duplicates
+   - Add relevant metadata
+
+3. **Search Tuning**
+   - Adjust top_k for recall
+   - Add metadata filters
+   - Implement reranking
+
+4. **Performance**
+   - Batch API calls
+   - Cache results
+   - Monitor costs
+</Callout>
+
+---
+
+## Next Steps
+
+1. **[RAG with LangChain](../langchain-rag-setup)** - Combine with LLMs
+2. **[Hybrid Search](../pinecone-hybrid-search)** - Mix vector and keyword search
+3. **[Advanced Indexing](../pinecone-namespaces)** - Organize with namespaces
+
+---
+
+**Semantic search is live! Time to power intelligent applications!** 🚀

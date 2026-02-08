@@ -1,0 +1,60 @@
+{
+  "slug": "vite-frontend-development",
+  "platform": "vite",
+  "service": "Vite Frontend Development",
+  "category": "compute",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 30,
+  "totalSteps": 5,
+  "freeTier": {
+    "service": "Vite Development",
+    "limit": "무제한 프로젝트 개발",
+    "period": "forever",
+    "status": "generous",
+    "conditions": [
+      "완전한 개발 환경",
+      "모든 기능 무료 사용",
+      "무제한 번들 생성",
+      "프로덕션 배포 가능",
+      "커뮤니티 플러그인"
+    ]
+  },
+  "prerequisites": [
+    "vite-installation-setup"
+  ],
+  "nextGuides": [],
+  "seo": {
+    "ko": {
+      "title": "Vite 프론트엔드 개발 - 컴포넌트와 라우팅 | CloudSetup.guide",
+      "description": "Vite에서 Vue/React 컴포넌트를 구축하고, 라우팅을 설정하고, 프로덕션에 배포하는 방법을 5단계로 배워보세요.",
+      "keywords": [
+        "Vite 개발",
+        "Vue 컴포넌트",
+        "React 개발",
+        "라우팅 설정",
+        "상태 관리",
+        "API 통합",
+        "Vite 배포",
+        "프론트엔드 개발"
+      ]
+    },
+    "en": {
+      "title": "Vite Frontend Development - Components & Routing | CloudSetup.guide",
+      "description": "Learn how to build Vue/React components, set up routing, and deploy to production with Vite in 5 easy steps.",
+      "keywords": [
+        "Vite development",
+        "Vue components",
+        "React development",
+        "routing setup",
+        "state management",
+        "API integration",
+        "Vite deployment",
+        "frontend development"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T02:00:00.000Z",
+  "updatedAt": "2026-02-08T02:00:00.000Z",
+  "lastVerified": "2026-02-08T02:00:00.000Z",
+  "published": true
+}

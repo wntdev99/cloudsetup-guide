@@ -1,0 +1,459 @@
+# Vite 프론트엔드 개발 - 현대적인 웹 앱 구축
+
+이제 Vite로 실제 기능을 구축해봅시다! 30분 안에 컴포넌트, 라우팅, 상태 관리, API 통합을 배워봅시다.
+
+<FreeTierInfo
+  service="Vite 개발"
+  limit="무제한 프로젝트 개발"
+  period="영구 무료"
+  status="generous"
+/>
+
+## 배우게 될 내용
+
+<Callout type="info">
+🚀 **이 가이드의 끝에서:**
+
+- 재사용 가능한 컴포넌트 만들기
+- 클라이언트 측 라우팅 설정
+- 애플리케이션 상태 관리
+- API와 통합
+- 환경 변수 사용
+- 프로덕션에 최적화
+- 애플리케이션 배포
+</Callout>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "Vite 프로젝트 생성됨 (이전 가이드)", required: true },
+  { text: "Node.js 14 이상 및 npm/yarn", required: true },
+  { text: "Vue 또는 React 지식", required: false },
+  { text: "컴포넌트 이해", required: false }
+]} />
+
+---
+
+<Step number={1} title="컴포넌트 및 페이지 만들기">
+
+### Step 1.1: Vue 컴포넌트 예제
+
+`src/components/HelloWorld.vue` 만들기:
+
+<CopyBlock
+  code="<template>
+  <div class='hello'>
+    <h1>Hello, {  { name } }</h1>
+    <button @click='count++'>Count: {  { count } }</button>
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+
+const name = ref('Vue')
+const count = ref(0)
+</script>
+
+<style scoped>
+.hello {
+  text-align: center;
+  padding: 2rem;
+}
+</style>"
+  language="vue"
+/>
+
+### Step 1.2: App.vue에서 컴포넌트 사용
+
+<CopyBlock
+  code="<template>
+  <div id='app'>
+    <HelloWorld />
+  </div>
+</template>
+
+<script setup>
+import HelloWorld from './components/HelloWorld.vue'
+</script>"
+  language="vue"
+/>
+
+### Step 1.3: React 컴포넌트 예제
+
+`src/components/HelloWorld.jsx` 만들기:
+
+<CopyBlock
+  code="import { useState } from 'react'
+
+export function HelloWorld() {
+  const [count, setCount] = useState(0)
+  const [name] = useState('React')
+
+  return (
+    <div className='hello'>
+      <h1>Hello, {name}</h1>
+      <button onClick={() => setCount(count + 1)}>
+        Count: {count}
+      </button>
+    </div>
+  )
+}"
+  language="javascript"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/vite-frontend-development-step1-ko.png"
+  alt="컴포넌트 렌더링됨"
+  caption="상태 관리로 Vue/React 컴포넌트 표시"
+/>
+
+<Callout type="tip">
+💡 **컴포넌트 모범 사례:**
+
+- 파일당 하나의 컴포넌트
+- 설명적 이름 지정
+- 입력에 Props 사용
+- 출력에 Emits (Vue) 또는 콜백 (React) 사용
+- 더 작은 부분에서 더 큰 UI 구성
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="라우팅 설정">
+
+### Step 2.1: Vue Router 설치
+
+<CopyBlock
+  code="npm install vue-router"
+  language="bash"
+/>
+
+### Step 2.2: 라우터 구성 만들기
+
+`src/router.js` 만들기:
+
+<CopyBlock
+  code="import { createRouter, createWebHistory } from 'vue-router'
+import Home from './pages/Home.vue'
+import About from './pages/About.vue'
+
+const routes = [
+  { path: '/', component: Home },
+  { path: '/about', component: About }
+]
+
+export const router = createRouter({
+  history: createWebHistory(),
+  routes
+})"
+  language="javascript"
+/>
+
+### Step 2.3: App에 라우터 추가
+
+<CopyBlock
+  code="// src/main.js
+import { createApp } from 'vue'
+import App from './App.vue'
+import { router } from './router'
+
+createApp(App)
+  .use(router)
+  .mount('#app')"
+  language="javascript"
+/>
+
+### Step 2.4: React Router 설정
+
+<CopyBlock
+  code="npm install react-router-dom"
+  language="bash"
+/>
+
+<CopyBlock
+  code="import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import Home from './pages/Home'
+import About from './pages/About'
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path='/' element={<Home />} />
+        <Route path='/about' element={<About />} />
+      </Routes>
+    </BrowserRouter>
+  )
+}"
+  language="javascript"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/vite-frontend-development-step2-ko.png"
+  alt="라우팅 작동"
+  caption="클라이언트 측 라우팅을 사용한 페이지 간 네비게이션"
+/>
+
+</Step>
+
+---
+
+<Step number={3} title="애플리케이션 상태 관리">
+
+### Step 3.1: Pinia를 사용한 Vue
+
+<CopyBlock
+  code="npm install pinia"
+  language="bash"
+/>
+
+`src/stores/counter.js` 만들기:
+
+<CopyBlock
+  code="import { defineStore } from 'pinia'
+import { ref } from 'vue'
+
+export const useCounterStore = defineStore('counter', () => {
+  const count = ref(0)
+
+  function increment() {
+    count.value++
+  }
+
+  return { count, increment }
+})"
+  language="javascript"
+/>
+
+### Step 3.2: Zustand를 사용한 React
+
+<CopyBlock
+  code="npm install zustand"
+  language="bash"
+/>
+
+<CopyBlock
+  code="import { create } from 'zustand'
+
+export const useStore = create((set) => ({
+  count: 0,
+  increment: () => set((state) => ({ count: state.count + 1 }))
+}))"
+  language="javascript"
+/>
+
+<Callout type="tip">
+💡 **상태 관리 라이브러리:**
+
+Vue:
+- Pinia (권장)
+- Vuex (구형)
+
+React:
+- Zustand (경량)
+- Redux (기능이 풍부)
+- Recoil (원자)
+- Context API (내장)
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="API와 통합">
+
+### Step 4.1: Vue에서 데이터 가져오기
+
+<CopyBlock
+  code="<script setup>
+import { ref, onMounted } from 'vue'
+
+const data = ref(null)
+const loading = ref(true)
+const error = ref(null)
+
+onMounted(async () => {
+  try {
+    const response = await fetch('https://api.example.com/data')
+    data.value = await response.json()
+  } catch (e) {
+    error.value = e.message
+  } finally {
+    loading.value = false
+  }
+})
+</script>
+
+<template>
+  <div v-if='loading'>Loading...</div>
+  <div v-else-if='error'>Error: {  { error } }</div>
+  <div v-else>{  { data } }</div>
+</template>"
+  language="vue"
+/>
+
+### Step 4.2: React API 통합
+
+<CopyBlock
+  code="import { useState, useEffect } from 'react'
+
+export function DataComponent() {
+  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    fetch('https://api.example.com/data')
+      .then(res => res.json())
+      .then(data => setData(data))
+      .catch(err => setError(err))
+      .finally(() => setLoading(false))
+  }, [])
+
+  if (loading) return <div>Loading...</div>
+  if (error) return <div>Error: {error}</div>
+  return <div>{JSON.stringify(data)}</div>
+}"
+  language="javascript"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/vite-frontend-development-step4-ko.png"
+  alt="API 데이터 표시됨"
+  caption="API에서 가져온 실제 데이터를 컴포넌트에 표시"
+/>
+
+</Step>
+
+---
+
+<Step number={5} title="환경 변수 및 배포">
+
+### Step 5.1: 환경 구성
+
+`.env` 만들기:
+
+<CopyBlock
+  code="VITE_API_URL=https://api.example.com
+VITE_APP_TITLE=My Vite App"
+  language="text"
+/>
+
+`.env.production` 만들기:
+
+<CopyBlock
+  code="VITE_API_URL=https://api.production.com
+VITE_APP_TITLE=My Vite App"
+  language="text"
+/>
+
+### Step 5.2: 환경 변수 사용
+
+<CopyBlock
+  code="// 코드에서 접근
+const apiUrl = import.meta.env.VITE_API_URL
+const appTitle = import.meta.env.VITE_APP_TITLE
+
+console.log(apiUrl)  // https://api.example.com"
+  language="javascript"
+/>
+
+### Step 5.3: 빌드 및 배포
+
+<CopyBlock
+  code="# 프로덕션을 위해 빌드
+npm run build
+
+# 빌드 미리보기
+npm run preview
+
+# Vercel에 배포
+npm install -g vercel
+vercel"
+  language="bash"
+/>
+
+<Callout type="success">
+✅ **Vite 앱이 프로덕션 준비가 되었습니다!** Vercel, Netlify 또는 모든 정적 호스트에 배포하세요.
+</Callout>
+
+</Step>
+
+---
+
+## 최적화 팁
+
+<CopyBlock
+  code="성능 최적화:
+
+1. 코드 분할
+   - 동적 임포트가 초기 번들 감소
+   - 라우트 및 컴포넌트 지연 로드
+
+2. 이미지 최적화
+   - WebP 형식 사용
+   - 크기 최적화
+   - 업로드 전 압축
+
+3. 캐싱
+   - ETags 및 캐시 헤더 사용
+   - 적절한 만료 헤더 설정
+   - 서비스 워커 사용
+
+4. 번들링
+   - 사용되지 않는 코드 제거 (tree-shaking)
+   - CSS 및 JS 축소
+   - gzip 압축 사용"
+  language="text"
+/>
+
+---
+
+## 인기 있는 Vite 플러그인
+
+<CopyBlock
+  code="유용한 플러그인:
+
+@vitejs/plugin-vue          Vue 3 지원
+@vitejs/plugin-react        React 지원
+@vitejs/plugin-vue-jsx      Vue with JSX
+vite-plugin-compression    Gzip 압축
+vite-plugin-inspect        구성 검사
+vitest                      단위 테스트
+vite-plugin-pwa             PWA 지원"
+  language="text"
+/>
+
+---
+
+## 배포 플랫폼
+
+<Callout type="tip">
+🚀 **쉬운 배포 옵션:**
+
+Vercel (Vite에 권장)
+- 제로 구성 배포
+- 자동 빌드
+- 무료 계정 사용 가능
+
+Netlify
+- 드래그 앤 드롭 배포
+- CI/CD 통합
+- 무료 호스팅
+
+GitHub Pages
+- 무료 정적 호스팅
+- Git 기반 워크플로우
+
+AWS Amplify
+- 풀스택 호스팅
+- CI/CD 파이프라인
+- 사용자 정의 도메인
+</Callout>
+
+---
+
+**Vite 프론트엔드 개발이 완료되었습니다!** 🎉

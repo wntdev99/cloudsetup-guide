@@ -1,0 +1,310 @@
+# MinIO 설치 - S3 호환 객체 저장소
+
+MinIO는 AWS S3와 호환되는 고성능 오픈소스 객체 저장소 서비스입니다. 20분 안에 로컬에서 자신의 S3 호환 저장소를 실행하세요!
+
+<FreeTierInfo
+  service="MinIO 객체 저장소"
+  limit="무제한 저장소"
+  period="영구 무료"
+  status="generous"
+/>
+
+## MinIO란?
+
+<Callout type="info">
+📦 **MinIO는 S3 호환 저장소를 제공합니다**
+
+- **S3 호환 API**: 기존 S3 도구와 작동
+- **오픈소스**: 자유롭게 사용 및 수정 가능
+- **고성능**: 클라우드 환경에 최적화
+- **쉬운 배포**: Docker, Kubernetes, 베어 메탈
+- **단일 바이너리**: 다운로드하고 실행하기만 하면 됨
+- **라이선스 없음**: 커뮤니티 및 엔터프라이즈 버전
+
+이렇게 사용됩니다:
+- 로컬 개발
+- 데이터 백업
+- 비디오/미디어 저장소
+- 데이터 레이크
+- ML 훈련 데이터
+- 마이크로서비스
+</Callout>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "Docker 설치됨 (권장)", required: false },
+  { text: "최소 2GB 디스크 공간", required: true },
+  { text: "포트 9000 사용 가능", required: true },
+  { text: "포트 9001 사용 가능 (콘솔)", required: false }
+]} />
+
+---
+
+<Step number={1} title="Docker로 MinIO 설치">
+
+### Step 1.1: MinIO 컨테이너 실행
+
+가장 쉬운 방법은 Docker:
+
+<CopyBlock
+  code="docker run -p 9000:9000 -p 9001:9001 \\
+  -e MINIO_ROOT_USER=minioadmin \\
+  -e MINIO_ROOT_PASSWORD=minioadmin \\
+  quay.io/minio/minio server /data --console-address ':9001'"
+  language="bash"
+/>
+
+### Step 1.2: 지속적 저장소 생성 (선택사항)
+
+데이터 지속성의 경우:
+
+<CopyBlock
+  code="# 볼륨 생성
+docker volume create minio-data
+
+# 지속적 볼륨으로 실행
+docker run -p 9000:9000 -p 9001:9001 \\
+  -e MINIO_ROOT_USER=minioadmin \\
+  -e MINIO_ROOT_PASSWORD=minioadmin \\
+  -v minio-data:/data \\
+  quay.io/minio/minio server /data --console-address ':9001'"
+  language="bash"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/minio-installation-setup-step1-ko.png"
+  alt="Docker에서 MinIO 실행"
+  caption="MinIO 컨테이너가 localhost에서 성공적으로 시작됨"
+/>
+
+<Callout type="tip">
+💡 **MinIO 포트:**
+
+- 9000: S3 API 엔드포인트
+- 9001: 웹 콘솔
+- 다음으로 변경: -p [your-port]:9000
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="MinIO 콘솔 액세스">
+
+### Step 2.1: 웹 콘솔 열기
+
+1. [http://localhost:9001](http://localhost:9001)로 이동
+2. 로그인 자격증:
+   - 사용자명: `minioadmin`
+   - 비밀번호: `minioadmin`
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/minio-installation-setup-step2-ko.png"
+  alt="MinIO 로그인"
+  caption="MinIO 웹 콘솔 로그인 페이지"
+/>
+
+### Step 2.2: 대시보드 탐색
+
+로그인 후 다음을 볼 수 있습니다:
+- **Buckets**: 저장소 버킷 생성 및 관리
+- **Browse**: 파일 업로드 및 다운로드
+- **Users**: 접근 사용자 관리
+- **Policies**: 권한 설정
+
+<Callout type="warning">
+⚠️ **기본 자격증 변경**
+
+프로덕션에서는 절대 기본 자격증을 사용하지 마세요:
+- minioadmin / minioadmin은 테스트용 전용
+- 강력한 비밀번호로 새 사용자 생성
+- 적절한 IAM 정책 설정
+</Callout>
+
+<Checkpoint
+  title="콘솔 액세스"
+  items={[
+    "콘솔에 접근할 수 있나요?",
+    "성공적으로 로그인했나요?",
+    "비어 있는 버킷 목록을 볼 수 있나요?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={3} title="첫 번째 버킷 만들기">
+
+### Step 3.1: 콘솔을 통해 버킷 만들기
+
+1. 왼쪽 메뉴에서 **Buckets** 클릭
+2. **Create Bucket** 클릭
+3. 버킷명 입력: `my-first-bucket`
+4. **Create** 클릭
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/minio-installation-setup-step3-ko.png"
+  alt="버킷 만들기"
+  caption="새 버킷이 성공적으로 생성됨"
+/>
+
+### Step 3.2: 파일 업로드
+
+1. 버킷명 클릭
+2. **Upload** 클릭
+3. 컴퓨터에서 파일 선택
+4. 파일이 버킷에 나타남
+
+<CopyBlock
+  code="버킷 이름 지정 규칙:
+
+- 소문자, 숫자, 하이픈
+- 3-63자
+- 문자 또는 숫자로 시작 및 종료
+- IP 주소 형식이 될 수 없음
+
+예시:
+- my-first-bucket ✅
+- data-backup-2024 ✅
+- MyBucket ❌ (대문자)
+- test ❌ (너무 짧음)"
+  language="text"
+/>
+
+</Step>
+
+---
+
+<Step number={4} title="Python에서 연결">
+
+### Step 4.1: Python 클라이언트 설치
+
+<CopyBlock
+  code="pip install minio python-dotenv"
+  language="bash"
+/>
+
+### Step 4.2: 연결 및 업로드
+
+`minio_test.py` 만들기:
+
+<CopyBlock
+  code="from minio import Minio
+import os
+
+# MinIO에 연결
+client = Minio(
+  'localhost:9000',
+  access_key='minioadmin',
+  secret_key='minioadmin',
+  secure=False  # 로컬은 False, 프로덕션은 True
+)
+
+# 버킷 생성 (존재하지 않으면)
+if not client.bucket_exists('test-bucket'):
+  client.make_bucket('test-bucket')
+
+# 파일 업로드
+client.fput_object(
+  'test-bucket',
+  'my-file.txt',
+  'path/to/local/file.txt'
+)
+
+print('File uploaded successfully!')
+
+# 버킷 나열
+buckets = client.list_buckets()
+for bucket in buckets:
+  print(f'Bucket: {bucket.name}')"
+  language="python"
+/>
+
+실행하세요:
+
+<CopyBlock
+  code="python minio_test.py"
+  language="bash"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/minio-installation-setup-step4-ko.png"
+  alt="Python 연결 작동"
+  caption="MinIO 클라이언트가 Python에서 성공적으로 연결됨"
+/>
+
+<Callout type="success">
+✅ **MinIO가 설치되고 실행 중입니다!** 로컬 S3 호환 저장소가 있습니다.
+</Callout>
+
+</Step>
+
+---
+
+## MinIO 배포 옵션
+
+<CopyBlock
+  code="설치 방법:
+
+1. Docker (권장)
+   - 가장 쉬운 설정
+   - 휴대용
+   - 개발에 좋음
+
+2. 바이너리 설치
+   - 단일 바이너리 파일
+   - Docker 필요 없음
+   - 모든 OS에서 작동
+
+3. Kubernetes
+   - 프로덕션 배포
+   - 고가용성
+   - 자동 확장 지원
+
+4. CloudFormation/Terraform
+   - 코드로서의 인프라
+   - 다중 노드 클러스터
+   - 클라우드 배포"
+  language="text"
+/>
+
+---
+
+## 일반적인 문제
+
+### 포트가 이미 사용 중입니다
+
+```
+Error: listen tcp :9000: bind: address already in use
+```
+
+해결책:
+- 포트 변경: `-p 9010:9000`
+- 포트 사용 프로세스 종료: `lsof -i :9000`
+- 다른 포트 범위 사용: `-p 9000-9002:9000-9002`
+
+### Docker 연결 문제
+
+```
+Cannot connect to localhost:9000
+```
+
+해결책:
+- Docker가 실행 중인지 확인
+- 포트 포워딩 확인: `docker ps`
+- 올바른 Docker IP 주소 사용
+- Windows/Mac의 경우 `host.docker.internal` 사용
+
+---
+
+## 다음 단계
+
+1. **[애플리케이션 연결](../minio-storage-connection)** - 코드에서 MinIO 사용
+2. **[정책 설정](../minio-permissions)** - 접근 제어 관리
+3. **[프로덕션에 배포](../minio-production)** - 저장소 확장
+
+---
+
+**MinIO가 준비되었습니다! 로컬 S3 호환 저장소를 손쉽게 사용할 수 있습니다!** 🚀

@@ -1,0 +1,430 @@
+# Install LangChain - Build LLM Applications in Python
+
+LangChain is a powerful framework for building applications with large language models (LLMs). It simplifies working with models like GPT-4, Claude, and open-source alternatives. Let's set it up in 15 minutes!
+
+<FreeTierInfo
+  service="LangChain Framework"
+  limit="Unlimited local usage"
+  period="Forever free"
+  status="generous"
+/>
+
+## What is LangChain?
+
+<Callout type="info">
+🔗 **LangChain simplifies LLM development**
+
+- **Model Integration**: Connect to OpenAI, Hugging Face, Anthropic, Cohere
+- **Chains**: Combine multiple LLM calls into workflows
+- **Memory**: Add conversation history and context
+- **Tools**: Integrate APIs, databases, search engines
+- **Agents**: Create autonomous systems that make decisions
+- **RAG**: Retrieve and augment information with documents
+
+Perfect for:
+- Chatbots and conversational AI
+- Document analysis and summarization
+- Question answering systems
+- Automated workflows
+- Content generation
+</Callout>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Python 3.8+ installed", required: true },
+  { text: "pip package manager", required: true },
+  { text: "Text editor or IDE", required: true },
+  { text: "Optional: API key (OpenAI, Hugging Face, etc)", required: false }
+]} />
+
+---
+
+<Step number={1} title="Install LangChain Package">
+
+### Step 1.1: Install via pip
+
+Open your terminal and install LangChain:
+
+<CopyBlock
+  code="pip install langchain"
+  language="bash"
+/>
+
+### Step 1.2: Install Required Dependencies
+
+LangChain works with various LLM providers. Install the one you need:
+
+<CopyBlock
+  code="# For OpenAI (GPT-4, GPT-3.5)
+pip install openai
+
+# For Hugging Face
+pip install huggingface-hub
+
+# For Anthropic (Claude)
+pip install anthropic
+
+# For local LLMs (Ollama integration)
+pip install ollama"
+  language="bash"
+/>
+
+### Step 1.3: Verify Installation
+
+Check if everything installed correctly:
+
+<CopyBlock
+  code="python -c 'import langchain; print(langchain.__version__)'"
+  language="bash"
+/>
+
+You should see a version number like `0.1.x` or higher.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/langchain-installation-setup-step1-en.png"
+  alt="Installation verification"
+  caption="Verify LangChain installation with version check"
+/>
+
+<Callout type="tip">
+💡 **Tip**: You can install LangChain with specific tools:
+
+pip install langchain[openai]
+pip install langchain[huggingface]
+</Callout>
+
+<Checkpoint
+  title="Verify Installation"
+  items={[
+    "Is LangChain installed?",
+    "Do you see version 0.1 or higher?",
+    "Are required dependencies installed?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="Set Up LLM Provider Access">
+
+### Step 2.1: Choose Your LLM Provider
+
+Select which LLM service you want to use:
+
+<CopyBlock
+  code="Available LLM Providers:
+
+1. OpenAI (Recommended for beginners)
+   - Models: GPT-4, GPT-3.5-turbo
+   - Paid (but has free trial credits)
+
+2. Hugging Face (Free)
+   - Models: Llama 2, Mistral, others
+   - Free inference API
+
+3. Local Models (Free)
+   - Ollama: Run models on your machine
+   - No API costs
+   - Privacy-friendly
+
+4. Anthropic (Claude)
+   - Model: Claude 3
+   - Different API than OpenAI"
+  language="text"
+/>
+
+### Step 2.2: Get Your API Key
+
+For OpenAI (most popular):
+
+1. Go to [OpenAI API Keys](https://platform.openai.com/api-keys)
+2. Sign up or log in to your OpenAI account
+3. Click **Create new secret key**
+4. Copy the key (it won't show again!)
+5. Save to environment variable:
+
+<CopyBlock
+  code="# On macOS/Linux
+export OPENAI_API_KEY='sk-xxxxxxxxxxxx'
+
+# On Windows (Command Prompt)
+set OPENAI_API_KEY=sk-xxxxxxxxxxxx
+
+# Or add to .env file
+OPENAI_API_KEY=sk-xxxxxxxxxxxx"
+  language="bash"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/langchain-installation-setup-step2-en.png"
+  alt="API key setup"
+  caption="Get your OpenAI API key from the platform dashboard"
+/>
+
+### Step 2.3: Create .env File
+
+Create a `.env` file in your project:
+
+<CopyBlock
+  code="# .env file (DO NOT commit to Git!)
+OPENAI_API_KEY=sk-your-key-here
+HUGGINGFACE_API_KEY=hf_your-key-here
+ANTHROPIC_API_KEY=sk-ant-your-key-here"
+  language="text"
+/>
+
+Load environment variables in Python:
+
+<CopyBlock
+  code="import os
+from dotenv import load_dotenv
+
+load_dotenv()
+api_key = os.getenv('OPENAI_API_KEY')
+print(f'API Key loaded: {api_key[0:10]}...')"
+  language="python"
+/>
+
+<Callout type="warning">
+⚠️ **Protect your API keys!**
+
+- Never commit .env to Git
+- Use .gitignore to exclude: *.env, .env.local
+- Regenerate keys if accidentally exposed
+- Rotate keys regularly
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="Test Your LangChain Installation">
+
+### Step 3.1: Create First LangChain Program
+
+Create `hello_langchain.py`:
+
+<CopyBlock
+  code="import os
+from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
+
+load_dotenv()
+
+# Initialize LLM
+llm = ChatOpenAI(model='gpt-3.5-turbo')
+
+# Simple call
+response = llm.invoke('What is LangChain?')
+print(response.content)"
+  language="python"
+/>
+
+Run it:
+
+<CopyBlock
+  code="python hello_langchain.py"
+  language="bash"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/langchain-installation-setup-step3-en.png"
+  alt="First program output"
+  caption="Your first LangChain program successfully calls an LLM"
+/>
+
+### Step 3.2: Test with Different Providers
+
+Try with Hugging Face:
+
+<CopyBlock
+  code="from langchain_huggingface import HuggingFaceHub
+
+# Free Hugging Face inference API
+llm = HuggingFaceHub(
+  repo_id='gpt2',
+  model_kwargs={'temperature': 0.7}
+)
+
+response = llm.invoke('Python is')
+print(response)"
+  language="python"
+/>
+
+Try with local model (Ollama):
+
+<CopyBlock
+  code="from langchain_community.llms import Ollama
+
+# Requires Ollama to be running locally
+llm = Ollama(model='llama2')
+
+response = llm.invoke('What is machine learning?')
+print(response)"
+  language="python"
+/>
+
+<DevTip>
+**Choosing a Provider for Learning:**
+
+- **OpenAI (Easiest)**: Works out of the box, free credits
+- **Hugging Face (Free)**: No credit card needed, completely free
+- **Local (Private)**: Run Llama 2 on your computer, no API costs
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={4} title="Understand LangChain Concepts">
+
+### Step 4.1: Key Components
+
+<CopyBlock
+  code="LangChain Building Blocks:
+
+1. LLM (Large Language Model)
+   - The AI model itself
+   - Examples: GPT-4, Claude, Llama 2
+
+2. Prompt Templates
+   - Pre-formatted prompts
+   - Variable substitution
+
+3. Chains
+   - Combine multiple steps
+   - LLM -> Process -> Output
+
+4. Memory
+   - Store conversation history
+   - Maintain context
+
+5. Tools
+   - External APIs
+   - Web search
+   - Calculator
+
+6. Agents
+   - Autonomous decision making
+   - Use tools based on tasks"
+  language="text"
+/>
+
+### Step 4.2: Your First Chain
+
+<CopyBlock
+  code="from langchain_openai import ChatOpenAI
+from langchain.prompts import ChatPromptTemplate
+from langchain.chains import LLMChain
+
+llm = ChatOpenAI(model='gpt-3.5-turbo')
+
+# Define a prompt template
+prompt = ChatPromptTemplate.from_template(
+  'Tell me about {topic} in 2 sentences.'
+)
+
+# Create chain
+chain = LLMChain(llm=llm, prompt=prompt)
+
+# Run chain
+result = chain.invoke({'topic': 'machine learning'})
+print(result['text'])"
+  language="python"
+/>
+
+### Step 4.3: Project Structure
+
+Organize your LangChain projects:
+
+<CopyBlock
+  code="my_langchain_app/
+├── .env                 # API keys (in .gitignore)
+├── .gitignore          # Exclude .env
+├── requirements.txt    # Dependencies
+├── main.py            # Entry point
+├── chains.py          # Define chains
+├── prompts.py         # Prompt templates
+├── tools.py           # Custom tools
+└── tests.py           # Unit tests"
+  language="text"
+/>
+
+<Checkpoint
+  title="Installation Complete"
+  items={[
+    "Is LangChain installed?",
+    "Can you invoke an LLM?",
+    "Did you set up your API key?",
+    "Can you create a simple chain?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **LangChain is installed!** You're ready to build LLM-powered applications.
+</Callout>
+
+</Step>
+
+---
+
+## Common Installation Issues
+
+### ImportError: No module named 'langchain'
+
+Make sure LangChain is installed:
+
+<CopyBlock
+  code="pip install langchain --upgrade"
+  language="bash"
+/>
+
+### API Key Not Found
+
+Check your environment setup:
+
+<CopyBlock
+  code="# Verify API key is set
+python -c 'import os; print(os.getenv(\"OPENAI_API_KEY\"))'
+
+# If None, set it:
+export OPENAI_API_KEY=sk-your-key-here"
+  language="bash"
+/>
+
+### SSL Certificate Error
+
+Update certificates on macOS:
+
+<CopyBlock
+  code="/Applications/Python 3.x/Install Certificates.command"
+  language="bash"
+/>
+
+---
+
+## Next Steps
+
+1. **[Build LLM Applications](../langchain-llm-application)** - Create chains and agents
+2. **[Add Memory to Chatbots](../langchain-memory-setup)** - Maintain conversation context
+3. **[Retrieve Augmented Generation](../langchain-rag-setup)** - Work with documents
+
+---
+
+## LangChain Community Resources
+
+<Callout type="tip">
+🌐 **Great resources for learning LangChain**
+
+1. **Official Documentation**: langchain.readthedocs.io
+2. **GitHub**: github.com/langchain-ai/langchain
+3. **Discord Community**: Join for support
+4. **YouTube Tutorials**: Search "LangChain tutorial"
+5. **LangSmith Platform**: Built-in debugging and monitoring
+</Callout>
+
+---
+
+**LangChain is ready! Time to build amazing applications!** 🔗

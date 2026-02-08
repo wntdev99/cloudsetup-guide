@@ -1,0 +1,62 @@
+{
+  "slug": "vite-installation-setup",
+  "platform": "vite",
+  "service": "Vite Build Tool",
+  "category": "compute",
+  "difficulty": "beginner",
+  "estimatedMinutes": 15,
+  "totalSteps": 4,
+  "freeTier": {
+    "service": "Vite",
+    "limit": "무제한 프로젝트",
+    "period": "forever",
+    "status": "generous",
+    "conditions": [
+      "Vite 완전 오픈소스 무료",
+      "모든 프로젝트에 사용 가능",
+      "빠른 개발 서버",
+      "최적화된 프로덕션 빌드",
+      "Vue, React, Svelte 지원"
+    ]
+  },
+  "prerequisites": [
+    "nodejs-installation"
+  ],
+  "nextGuides": [
+    "vite-frontend-development"
+  ],
+  "seo": {
+    "ko": {
+      "title": "Vite 설치 및 설정 - 빠른 프론트엔드 빌드 도구 | CloudSetup.guide",
+      "description": "Vite를 설치하고 새 프로젝트를 생성하는 방법을 4단계로 배워보세요. Vue, React, Svelte로 초고속 개발 환경을 시작하세요.",
+      "keywords": [
+        "Vite 설치",
+        "프론트엔드 빌드 도구",
+        "Vue 프로젝트",
+        "React Vite",
+        "Vite 시작",
+        "개발 서버",
+        "HMR",
+        "Vite 프로젝트"
+      ]
+    },
+    "en": {
+      "title": "Install Vite - Fast Frontend Build Tool | CloudSetup.guide",
+      "description": "Learn how to install Vite and create new projects in 4 easy steps. Start lightning-fast development with Vue, React, or Svelte.",
+      "keywords": [
+        "install Vite",
+        "frontend build tool",
+        "Vue project",
+        "React Vite",
+        "getting started Vite",
+        "dev server",
+        "HMR",
+        "Vite project"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T02:00:00.000Z",
+  "updatedAt": "2026-02-08T02:00:00.000Z",
+  "lastVerified": "2026-02-08T02:00:00.000Z",
+  "published": true
+}

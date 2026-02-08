@@ -1,0 +1,402 @@
+# Create Pinecone Account - Vector Database for AI Search
+
+Pinecone is a cloud-native vector database designed for AI applications. It enables fast semantic search, recommendation systems, and embeddings-based features. Let's set up your account in 15 minutes!
+
+<FreeTierInfo
+  service="Pinecone Vector Database"
+  limit="1 project, 100K vectors"
+  period="Forever free"
+  status="limited"
+/>
+
+## What is Pinecone?
+
+<Callout type="info">
+🔍 **Pinecone enables semantic search**
+
+- **Vector Storage**: Store and search high-dimensional vectors
+- **Fast Retrieval**: Find similar items in milliseconds
+- **Scalable**: Grows from thousands to billions of vectors
+- **Production Ready**: Used by Fortune 500 companies
+- **AI Integration**: Works seamlessly with embeddings from OpenAI, Hugging Face
+- **Serverless**: No infrastructure management
+
+Perfect for:
+- Semantic search
+- Recommendation engines
+- Similarity matching
+- Semantic recommendation
+- Document retrieval
+- Image search
+</Callout>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Email address", required: true },
+  { text: "Internet connection", required: true },
+  { text: "Google or GitHub account (optional)", required: false }
+]} />
+
+---
+
+<Step number={1} title="Sign Up for Pinecone">
+
+### Step 1.1: Visit Pinecone Website
+
+1. Go to [pinecone.io](https://pinecone.io)
+2. Click **Sign Up** button in the top right
+3. You'll see registration options
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/pinecone-account-setup-step1-en.png"
+  alt="Pinecone homepage"
+  caption="Navigate to pinecone.io and start signup"
+/>
+
+### Step 1.2: Create Your Account
+
+Choose your preferred sign-up method:
+
+<CopyBlock
+  code="Sign-up Options:
+
+1. Email Registration
+   - Email address
+   - Password (8+ characters)
+   - Company name (optional)
+
+2. Google OAuth
+   - Click 'Continue with Google'
+   - Select your Google account
+   - Authorize Pinecone
+
+3. GitHub OAuth
+   - Click 'Continue with GitHub'
+   - Authorize Pinecone access
+   - Link your GitHub profile"
+  language="text"
+/>
+
+<Callout type="tip">
+💡 **Tip**: Use Google or GitHub for faster signup and easier API integration.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Verify Email and Set Up Organization">
+
+### Step 2.1: Email Verification
+
+1. Check your email inbox for verification email
+2. Click the verification link
+3. You'll be redirected to Pinecone dashboard
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/pinecone-account-setup-step2-en.png"
+  alt="Email verification"
+  caption="Verify your email to activate account"
+/>
+
+### Step 2.2: Complete Your Profile
+
+When you first login:
+
+1. **Organization Name**: Name your workspace (e.g., "My AI Project")
+2. **Username**: Choose a username for your profile
+3. **Company Size** (optional): For better support recommendations
+4. Click **Continue** to proceed
+
+<Callout type="info">
+✨ **Organization Basics**
+
+- Free tier: 1 project per organization
+- Pro tier: Unlimited projects
+- Can create multiple organizations if needed
+- Switch between organizations easily
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="Create Your First Index">
+
+### Step 3.1: Navigate to Index Creation
+
+1. In the dashboard, click **Create Index**
+2. You'll see the index configuration form
+
+<CopyBlock
+  code="Index Creation Form:
+
+Name:
+  - Your index name (e.g., 'product-search')
+  - Lowercase, no spaces
+  - Cannot be changed after creation
+
+Dimension:
+  - Vector size (e.g., 1536 for OpenAI)
+  - Determined by embedding model
+  - Common values: 384, 768, 1536
+
+Metric:
+  - How to measure vector similarity
+  - cosine: Best for most cases
+  - euclidean: L2 distance
+  - dotproduct: For specific use cases"
+  language="text"
+/>
+
+### Step 3.2: Configure Your Index
+
+<CopyBlock
+  code="Example: Product Search Index
+
+Name: product-search
+Dimension: 1536  # OpenAI embeddings
+Metric: cosine
+Region: us-west-1 or closest to you"
+  language="text"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/pinecone-account-setup-step3-en.png"
+  alt="Index configuration"
+  caption="Configure your vector index with name, dimension, and metric"
+/>
+
+### Step 3.3: Confirm and Create
+
+1. Review your configuration
+2. Click **Create Index**
+3. Index creation takes 1-2 minutes
+4. You'll see "Creating..." status
+5. When ready, it shows "Ready" status
+
+<Callout type="warning">
+⚠️ **Index Considerations**
+
+- Name cannot be changed after creation
+- Dimension must match your embedding model
+- Changing metric requires recreating index
+- Choose region closest to you for latency
+</Callout>
+
+<Checkpoint
+  title="Index Creation Complete"
+  items={[
+    "Is your index showing 'Ready' status?",
+    "Can you see the index in your dashboard?",
+    "Do you know the dimension and metric?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={4} title="Get Your API Key and Test Connection">
+
+### Step 4.1: Generate API Key
+
+1. Click your profile avatar (top right)
+2. Go to **API Keys**
+3. Click **Create API Key**
+4. Give it a name: "My First Key"
+5. Choose **Starter** environment
+6. Click **Create**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/pinecone-account-setup-step4-en.png"
+  alt="API key generation"
+  caption="Generate your API key for authentication"
+/>
+
+### Step 4.2: Copy and Save Your Key
+
+<Callout type="warning">
+⚠️ **API Key Security**
+
+- Copy key immediately (shown only once!)
+- Never commit to GitHub
+- Store in environment variable
+- Treat like a password
+- Can be regenerated if lost
+</Callout>
+
+Save to `.env` file:
+
+<CopyBlock
+  code="# .env file
+PINECONE_API_KEY=your-api-key-here
+PINECONE_ENVIRONMENT=us-west-1
+PINECONE_INDEX_NAME=product-search"
+  language="text"
+/>
+
+### Step 4.3: Test Connection with Python
+
+Create `test_pinecone.py`:
+
+<CopyBlock
+  code="import os
+from dotenv import load_dotenv
+from pinecone import Pinecone
+
+load_dotenv()
+
+# Initialize Pinecone
+pc = Pinecone(api_key=os.getenv('PINECONE_API_KEY'))
+
+# List indexes
+indexes = pc.list_indexes()
+print('Your indexes:')
+for idx in indexes:
+  print(f'  - {idx.name}')"
+  language="python"
+/>
+
+Run it:
+
+<CopyBlock
+  code="pip install pinecone-client python-dotenv
+python test_pinecone.py"
+  language="bash"
+/>
+
+<Callout type="success">
+✅ **Pinecone account is ready!** You can now store and search vectors.
+</Callout>
+
+</Step>
+
+---
+
+## Understanding Vector Embeddings
+
+<CopyBlock
+  code="What are Vector Embeddings?
+
+Numbers Representation:
+  Text/Image -> AI Model -> Numbers (Vector)
+  Example: 'dog' -> [0.5, -0.3, 0.8, ...]
+
+Dimension:
+  Each embedding has fixed size
+  OpenAI: 1536 dimensions
+  Hugging Face: 384, 768, or 1536 dimensions
+
+Similarity:
+  Vectors close in space = similar meaning
+  dog [0.5, -0.3, 0.8]
+  puppy [0.52, -0.31, 0.79]  -> Very similar!
+  cat [0.3, 0.5, -0.2]       -> Different"
+  language="text"
+/>
+
+---
+
+## Index Types and Use Cases
+
+<Callout type="info">
+**When to use which index type:**
+
+Standard Index:
+  - General semantic search
+  - Product recommendations
+  - Document similarity
+  - Cost effective
+
+S1 Pod Serverless:
+  - High-scale production
+  - Auto-scaling required
+  - Pay per query
+  - No upfront costs
+</Callout>
+
+---
+
+## Common Vector Dimensions
+
+<CopyBlock
+  code="Popular Embedding Models and Dimensions:
+
+OpenAI:
+  - text-embedding-3-small: 1536
+  - text-embedding-3-large: 3072
+  - text-embedding-ada-002: 1536
+
+Hugging Face:
+  - all-MiniLM-L6-v2: 384
+  - all-mpnet-base-v2: 768
+  - sentence-transformers: 768-1024
+
+Google:
+  - text-embedding-004: 768
+
+Cohere:
+  - embed-english-v3.0: 1024"
+  language="text"
+/>
+
+---
+
+## Next Steps
+
+1. **[Vector Search Implementation](../pinecone-vector-search)** - Start querying your index
+2. **[RAG with Pinecone](../langchain-rag-setup)** - Combine with LLMs
+3. **[Scale Your Index](../pinecone-advanced)** - Handle millions of vectors
+
+---
+
+## Troubleshooting
+
+### Can't verify email
+
+- Check spam/junk folder
+- Try resending verification
+- Use alternative email
+- Contact support@pinecone.io
+
+### Dimension mismatch error
+
+```
+ValueError: expected dimension 1536 but got 384
+```
+
+Solutions:
+- Use embedding model matching your index dimension
+- Create new index with correct dimension
+- Change embedding model to match dimension
+
+### API key not working
+
+- Verify key is copied completely
+- Check .env file has correct variable name
+- Ensure key is for correct environment
+- Regenerate key if unsure
+
+---
+
+## Free Tier Limits
+
+<Callout type="tip">
+📊 **Pinecone Free Tier Includes:**
+
+- 1 project (1 index)
+- 100,000 vectors total
+- ~1 million operation units/month
+- Basic support
+- Full API access
+- Suitable for:
+  - Learning and prototyping
+  - Small apps under 100K vectors
+  - Development and testing
+</Callout>
+
+---
+
+**Your Pinecone account is live! Ready to build semantic search!** 🚀

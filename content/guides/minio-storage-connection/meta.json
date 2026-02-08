@@ -1,0 +1,60 @@
+{
+  "slug": "minio-storage-connection",
+  "platform": "minio",
+  "service": "MinIO Application Integration",
+  "category": "storage",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 25,
+  "totalSteps": 4,
+  "freeTier": {
+    "service": "MinIO Integration",
+    "limit": "무제한 애플리케이션 연결",
+    "period": "forever",
+    "status": "generous",
+    "conditions": [
+      "모든 애플리케이션에서 사용 가능",
+      "무제한 동시 연결",
+      "완전한 API 접근",
+      "다중 언어 SDK 지원",
+      "프로덕션 배포 가능"
+    ]
+  },
+  "prerequisites": [
+    "minio-installation-setup"
+  ],
+  "nextGuides": [],
+  "seo": {
+    "ko": {
+      "title": "MinIO 저장소 연결 - 애플리케이션 통합 가이드 | CloudSetup.guide",
+      "description": "MinIO를 Python, Node.js, Go 애플리케이션에 연결하는 방법을 4단계로 배워보세요. 파일 업로드, 다운로드, 관리 코드를 작성하세요.",
+      "keywords": [
+        "MinIO 연결",
+        "S3 통합",
+        "파일 업로드",
+        "MinIO SDK",
+        "객체 저장소 API",
+        "Python MinIO",
+        "저장소 관리",
+        "MinIO 애플리케이션"
+      ]
+    },
+    "en": {
+      "title": "Connect MinIO Storage - Application Integration Guide | CloudSetup.guide",
+      "description": "Learn how to connect MinIO to Python, Node.js, and Go applications in 4 easy steps. Write code to upload, download, and manage files.",
+      "keywords": [
+        "MinIO connection",
+        "S3 integration",
+        "file upload",
+        "MinIO SDK",
+        "object storage API",
+        "Python MinIO",
+        "storage management",
+        "MinIO application"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T02:00:00.000Z",
+  "updatedAt": "2026-02-08T02:00:00.000Z",
+  "lastVerified": "2026-02-08T02:00:00.000Z",
+  "published": true
+}

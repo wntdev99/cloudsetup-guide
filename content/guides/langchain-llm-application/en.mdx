@@ -1,0 +1,513 @@
+# Build LLM Applications with LangChain - Chains and Agents
+
+Now that you have LangChain installed, let's build real applications! Learn how to create chains, handle prompts, and build autonomous agents in 25 minutes.
+
+<FreeTierInfo
+  service="LangChain Framework"
+  limit="Unlimited local usage"
+  period="Forever free"
+  status="generous"
+/>
+
+## What You'll Build
+
+<Callout type="info">
+🚀 **By the end of this guide:**
+
+- Create LLM chains for multi-step workflows
+- Use prompt templates for dynamic inputs
+- Build a semantic question-answerer
+- Create an autonomous agent
+- Handle errors and retries
+- Deploy locally or to cloud
+</Callout>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "LangChain installed (from previous guide)", required: true },
+  { text: "API key configured (OpenAI or Hugging Face)", required: true },
+  { text: "Python 3.8+", required: true },
+  { text: "Basic Python knowledge", required: false }
+]} />
+
+---
+
+<Step number={1} title="Create Your First LangChain Chain">
+
+### Step 1.1: Simple Sequential Chain
+
+Create `my_first_chain.py`:
+
+<CopyBlock
+  code="from langchain_openai import ChatOpenAI
+from langchain.prompts import ChatPromptTemplate
+from langchain.chains import LLMChain
+
+# Initialize LLM
+llm = ChatOpenAI(model='gpt-3.5-turbo', temperature=0.7)
+
+# Create prompt template
+prompt_template = ChatPromptTemplate.from_template(
+  'Write a short product review for {product_name}'
+)
+
+# Create chain
+chain = LLMChain(llm=llm, prompt=prompt_template)
+
+# Run chain
+response = chain.invoke({'product_name': 'iPhone 15'})
+print(response['text'])"
+  language="python"
+/>
+
+Run it:
+
+<CopyBlock
+  code="python my_first_chain.py"
+  language="bash"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/langchain-llm-application-step1-en.png"
+  alt="Chain output"
+  caption="Your first LangChain chain generates a product review"
+/>
+
+### Step 1.2: Chain Multiple Prompts
+
+Create `sequential_chain.py`:
+
+<CopyBlock
+  code="from langchain_openai import ChatOpenAI
+from langchain.prompts import ChatPromptTemplate
+from langchain.chains import LLMChain, SequentialChain
+
+llm = ChatOpenAI(model='gpt-3.5-turbo')
+
+# First prompt: Generate product name
+product_prompt = ChatPromptTemplate.from_template(
+  'Generate a creative name for a {product_type} startup'
+)
+product_chain = LLMChain(llm=llm, prompt=product_prompt, output_key='product_name')
+
+# Second prompt: Create tagline using output from first
+tagline_prompt = ChatPromptTemplate.from_template(
+  'Write a catchy tagline for {product_name}'
+)
+tagline_chain = LLMChain(llm=llm, prompt=tagline_prompt, output_key='tagline')
+
+# Combine into sequential chain
+overall_chain = SequentialChain(
+  chains=[product_chain, tagline_chain],
+  input_variables=['product_type'],
+  output_variables=['product_name', 'tagline']
+)
+
+result = overall_chain({'product_type': 'health tech'})
+print(f'Name: {result[\"product_name\"]}')
+print(f'Tagline: {result[\"tagline\"]}')"
+  language="python"
+/>
+
+<Callout type="tip">
+💡 **Chain Concepts:**
+
+- **LLMChain**: Simple input→LLM→output
+- **SequentialChain**: Multiple chains in order
+- **output_key**: Gives each output a name
+- **input_variables**: What the chain expects
+</Callout>
+
+<Checkpoint
+  title="First Chains Complete"
+  items={[
+    "Can you create a basic LLMChain?",
+    "Can you chain multiple prompts?",
+    "Do outputs match expected format?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="Master Prompt Engineering">
+
+### Step 2.1: Effective Prompts
+
+<CopyBlock
+  code="Prompt Engineering Tips:
+
+Be Specific:
+  Bad: 'Summarize this text'
+  Good: 'Summarize in exactly 3 sentences for a 6th grader'
+
+Include Context:
+  Bad: 'Translate to French'
+  Good: 'Translate this Python code documentation to French'
+
+Give Examples:
+  Bad: 'Classify sentiment'
+  Good: 'Classify as positive, negative, or neutral:
+         Example: Great product! -> positive'
+
+Use Role Playing:
+  'You are an expert marketer. Write a product description.'
+
+Clear Format Requests:
+  'Return JSON format with keys: name, price, description'"
+  language="text"
+/>
+
+### Step 2.2: Few-Shot Prompting
+
+Create `fewshot_example.py`:
+
+<CopyBlock
+  code="from langchain.prompts import FewShotChatMessagePromptTemplate
+from langchain.prompts import ChatPromptTemplate
+from langchain_openai import ChatOpenAI
+
+llm = ChatOpenAI(model='gpt-3.5-turbo')
+
+# Examples for few-shot learning
+examples = [
+  {
+    'input': 'Happy Birthday!',
+    'output': 'Positive'
+  },
+  {
+    'input': 'This is terrible',
+    'output': 'Negative'
+  },
+  {
+    'input': 'The weather is okay',
+    'output': 'Neutral'
+  }
+]
+
+# Create few-shot prompt
+example_prompt = ChatPromptTemplate.from_template(
+  'Text: {input}\nSentiment: {output}'
+)
+
+few_shot_prompt = FewShotChatMessagePromptTemplate(
+  examples=examples,
+  example_prompt=example_prompt,
+  prefix='Classify sentiment:',
+  suffix='Text: {text}\nSentiment:'
+)
+
+# Use prompt
+chain_prompt = few_shot_prompt.format(text='I love this!')
+result = llm.invoke(chain_prompt)
+print(result.content)"
+  language="python"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/langchain-llm-application-step2-en.png"
+  alt="Few-shot results"
+  caption="Few-shot prompting improves model accuracy"
+/>
+
+<DevTip>
+**Few-Shot vs Zero-Shot:**
+
+- **Zero-shot**: No examples, rely on model knowledge
+- **Few-shot**: 2-5 examples improve accuracy significantly
+- **Chain-of-thought**: Ask model to explain reasoning
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="Add Tools and External Data">
+
+### Step 3.1: Simple Calculator Tool
+
+Create `tools_example.py`:
+
+<CopyBlock
+  code="from langchain.agents import tool
+from langchain_openai import ChatOpenAI
+from langchain.agents import AgentExecutor, create_openai_functions_agent
+from langchain.prompts import ChatPromptTemplate
+
+@tool
+def multiply(a: int, b: int) -> int:
+  '''Multiply two numbers'''
+  return a * b
+
+@tool
+def add(a: int, b: int) -> int:
+  '''Add two numbers'''
+  return a + b
+
+# List of tools
+tools = [multiply, add]
+
+# Create agent
+llm = ChatOpenAI(model='gpt-3.5-turbo')
+
+prompt = ChatPromptTemplate.from_messages([
+  ('system', 'You are a math assistant'),
+  ('user', '{input}')
+])
+
+agent = create_openai_functions_agent(llm, tools, prompt)
+executor = AgentExecutor(agent=agent, tools=tools)
+
+# Use the agent
+result = executor.invoke({'input': 'What is 5 times 8 plus 3?'})
+print(result['output'])"
+  language="python"
+/>
+
+<Callout type="warning">
+⚠️ **Tool Safety**
+
+- Validate all inputs before execution
+- Use type hints for clarity
+- Limit execution scope
+- Log tool usage
+- Handle errors gracefully
+</Callout>
+
+### Step 3.2: Web Search Integration
+
+Create `search_agent.py`:
+
+<CopyBlock
+  code="from langchain.agents import tool
+from langchain_openai import ChatOpenAI
+from langchain.agents import AgentExecutor, create_openai_functions_agent
+from langchain.prompts import ChatPromptTemplate
+import requests
+
+@tool
+def search_web(query: str) -> str:
+  '''Search the web for information'''
+  # Use a real API like Google Custom Search
+  # For now, mock response
+  return f'Search results for: {query}'
+
+tools = [search_web]
+llm = ChatOpenAI(model='gpt-3.5-turbo')
+
+prompt = ChatPromptTemplate.from_messages([
+  ('system', 'You are a helpful assistant with web search'),
+  ('user', '{input}')
+])
+
+agent = create_openai_functions_agent(llm, tools, prompt)
+executor = AgentExecutor(agent=agent, tools=tools)
+
+result = executor.invoke({'input': 'What are the latest AI developments?'})
+print(result['output'])"
+  language="python"
+/>
+
+</Step>
+
+---
+
+<Step number={4} title="Build a Complete Chatbot">
+
+### Step 4.1: Simple Chatbot with Memory
+
+Create `chatbot.py`:
+
+<CopyBlock
+  code="from langchain.memory import ConversationBufferMemory
+from langchain.chains import ConversationChain
+from langchain_openai import ChatOpenAI
+
+# Create memory to store conversation
+memory = ConversationBufferMemory()
+
+# Create conversation chain
+llm = ChatOpenAI(model='gpt-3.5-turbo', temperature=0.7)
+
+conversation = ConversationChain(
+  llm=llm,
+  memory=memory,
+  verbose=True
+)
+
+# Simulate conversation
+print('Bot: Hi! I remember things from our chat.')
+print()
+
+response1 = conversation.predict(input='My name is Alice and I like Python')
+print(f'Bot: {response1}')
+print()
+
+response2 = conversation.predict(input='What was my name again?')
+print(f'Bot: {response2}')"
+  language="python"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/langchain-llm-application-step4-en.png"
+  alt="Chatbot with memory"
+  caption="Chatbot remembers previous messages in conversation"
+/>
+
+<Callout type="tip">
+💡 **Memory Types:**
+
+- **ConversationBufferMemory**: Stores all messages (simple)
+- **ConversationSummaryMemory**: Summarizes to save tokens
+- **ConversationKGMemory**: Knowledge graph based
+- **ConversationTokenBufferMemory**: Limit by token count
+</Callout>
+
+</Step>
+
+---
+
+<Step number={5} title="Deploy and Optimize">
+
+### Step 5.1: Error Handling
+
+<CopyBlock
+  code="from langchain_openai import ChatOpenAI
+from langchain.chains import LLMChain
+from langchain.prompts import ChatPromptTemplate
+import time
+
+llm = ChatOpenAI(model='gpt-3.5-turbo')
+prompt = ChatPromptTemplate.from_template('Answer: {question}')
+chain = LLMChain(llm=llm, prompt=prompt)
+
+def safe_invoke(question, retries=3):
+  for attempt in range(retries):
+    try:
+      result = chain.invoke({'question': question})
+      return result['text']
+    except Exception as e:
+      if attempt < retries - 1:
+        print(f'Attempt {attempt + 1} failed: {e}')
+        time.sleep(2 ** attempt)  # Exponential backoff
+      else:
+        raise
+
+# Use it
+try:
+  answer = safe_invoke('What is AI?')
+  print(answer)
+except Exception as e:
+  print(f'Failed after retries: {e}')"
+  language="python"
+/>
+
+### Step 5.2: Performance Monitoring
+
+<CopyBlock
+  code="import time
+from langchain_openai import ChatOpenAI
+from langchain.callbacks import get_openai_callback
+
+llm = ChatOpenAI(model='gpt-3.5-turbo')
+
+# Track token usage and cost
+with get_openai_callback() as cb:
+  result = llm.invoke('Explain quantum computing')
+
+  print(f'Tokens used: {cb.total_tokens}')
+  print(f'Cost: {cb.total_cost}')
+  print(f'Completion tokens: {cb.completion_tokens}')"
+  language="python"
+/>
+
+<Checkpoint
+  title="Application Complete"
+  items={[
+    "Can you create multi-step chains?",
+    "Can you add tools to agents?",
+    "Does your chatbot remember conversation?",
+    "Can you handle errors gracefully?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **Your LLM application is complete!** You can now build sophisticated AI systems.
+</Callout>
+
+</Step>
+
+---
+
+## Common Application Patterns
+
+<CopyBlock
+  code="Popular LangChain Applications:
+
+1. Q&A Chatbots
+   - Answer questions about documents
+   - Use RAG for knowledge base
+
+2. Content Generation
+   - Blog posts
+   - Product descriptions
+   - Email drafts
+
+3. Code Assistant
+   - Generate code snippets
+   - Explain code
+   - Bug detection
+
+4. Autonomous Agents
+   - Research assistants
+   - Data analysis
+   - Email automation
+
+5. Translation Services
+   - Multi-language support
+   - Context-aware translation
+   - Domain-specific terms"
+  language="text"
+/>
+
+---
+
+## Next Steps
+
+1. **[Add Document Processing](../langchain-rag-setup)** - Build RAG systems
+2. **[Deploy with FastAPI](../langchain-deployment)** - Make it a web service
+3. **[Fine-tune Models](../huggingface-fine-tuning)** - Improve performance
+
+---
+
+## Troubleshooting
+
+### Rate Limit Errors
+
+```
+RateLimitError: Rate limit exceeded
+```
+
+Solutions:
+- Add delays between calls
+- Use exponential backoff
+- Upgrade your API plan
+- Use local models instead
+
+### Token Limit Exceeded
+
+```
+This model's maximum context length is 4096 tokens
+```
+
+Solutions:
+- Use summarization before processing
+- Split long documents
+- Use a model with longer context (GPT-4)
+- Implement sliding window approach
+
+---
+
+**Your LLM application is ready for production!** 🚀

@@ -1,0 +1,62 @@
+{
+  "slug": "langchain-llm-application",
+  "platform": "langchain",
+  "service": "LangChain Chains & Agents",
+  "category": "ai-ml",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 25,
+  "totalSteps": 5,
+  "freeTier": {
+    "service": "LangChain Framework",
+    "limit": "무제한 로컬 사용",
+    "period": "forever",
+    "status": "generous",
+    "conditions": [
+      "LangChain 프레임워크 완전 무료",
+      "모든 LLM 모델과 통합",
+      "무제한 체인 및 에이전트 생성",
+      "커뮤니티 템플릿 및 예제",
+      "프로덕션 배포 지원"
+    ]
+  },
+  "prerequisites": [
+    "langchain-installation-setup"
+  ],
+  "nextGuides": [
+    "huggingface-model-integration"
+  ],
+  "seo": {
+    "ko": {
+      "title": "LangChain으로 LLM 애플리케이션 구축 - 체인과 에이전트 | CloudSetup.guide",
+      "description": "LangChain을 사용하여 체인, 프롬프트, 도구로 완전한 LLM 애플리케이션을 구축하는 방법을 5단계로 배워보세요.",
+      "keywords": [
+        "LangChain 체인",
+        "LLM 에이전트",
+        "프롬프트 엔지니어링",
+        "LangChain 예제",
+        "AI 애플리케이션",
+        "챗봇 구축",
+        "LLM 통합",
+        "LangChain 튜토리얼"
+      ]
+    },
+    "en": {
+      "title": "Build LLM Applications with LangChain - Chains & Agents | CloudSetup.guide",
+      "description": "Learn how to build complete LLM applications with chains, prompts, and tools in LangChain in 5 easy steps.",
+      "keywords": [
+        "LangChain chains",
+        "LLM agents",
+        "prompt engineering",
+        "LangChain examples",
+        "AI applications",
+        "build chatbots",
+        "LLM integration",
+        "LangChain tutorial"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T02:00:00.000Z",
+  "updatedAt": "2026-02-08T02:00:00.000Z",
+  "lastVerified": "2026-02-08T02:00:00.000Z",
+  "published": false
+}

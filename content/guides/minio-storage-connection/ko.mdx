@@ -1,0 +1,449 @@
+# MinIO 저장소 연결 - 애플리케이션 통합
+
+이제 MinIO가 실행 중이니, 실제 애플리케이션을 연결하여 파일을 업로드 및 다운로드해봅시다. 25분 안에 완전한 파일 관리를 구축하세요!
+
+<FreeTierInfo
+  service="MinIO 통합"
+  limit="무제한 애플리케이션 연결"
+  period="영구 무료"
+  status="generous"
+/>
+
+## 배우게 될 내용
+
+<Callout type="info">
+🚀 **이 가이드의 끝에서:**
+
+- 애플리케이션에서 MinIO로 파일 업로드
+- 파일 다운로드 및 검색
+- 버킷 및 객체 나열 및 관리
+- 오류 처리 및 검증
+- 파일 작업 구현
+- 파일 관리 유틸리티 구축
+</Callout>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "MinIO 서버가 로컬에서 실행 중", required: true },
+  { text: "Python 3.8+ 및 minio-client 설치됨", required: true },
+  { text: "업로드할 테스트 파일", required: false },
+  { text: "기본 프로그래밍 지식", required: false }
+]} />
+
+---
+
+<Step number={1} title="파일 업로드 작업">
+
+### Step 1.1: 단일 파일 업로드
+
+`upload_file.py` 만들기:
+
+<CopyBlock
+  code="from minio import Minio
+from minio.error import S3Error
+
+# 연결
+client = Minio(
+  'localhost:9000',
+  access_key='minioadmin',
+  secret_key='minioadmin',
+  secure=False
+)
+
+# 파일 업로드
+try:
+  result = client.fput_object(
+    bucket_name='my-bucket',
+    object_name='uploads/document.pdf',
+    file_path='/local/path/document.pdf',
+    content_type='application/pdf'
+  )
+  print(f'Uploaded {result.object_name}')
+except S3Error as e:
+  print(f'Error: {e}')"
+  language="python"
+/>
+
+### Step 1.2: 배치 파일 업로드
+
+<CopyBlock
+  code="import os
+from minio import Minio
+
+client = Minio(
+  'localhost:9000',
+  access_key='minioadmin',
+  secret_key='minioadmin',
+  secure=False
+)
+
+# 디렉토리의 모든 파일 업로드
+directory = '/path/to/files'
+bucket = 'my-bucket'
+
+for filename in os.listdir(directory):
+  file_path = os.path.join(directory, filename)
+  if os.path.isfile(file_path):
+    client.fput_object(
+      bucket,
+      f'batch/{filename}',
+      file_path
+    )
+    print(f'Uploaded {filename}')"
+  language="python"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/minio-storage-connection-step1-ko.png"
+  alt="파일 업로드됨"
+  caption="여러 파일이 MinIO 버킷에 성공적으로 업로드됨"
+/>
+
+<Callout type="tip">
+💡 **업로드 팁:**
+
+- 로컬 파일의 경우 `fput_object` 사용
+- 바이트 스트림의 경우 `put_object` 사용
+- 브라우저 접근을 위해 적절한 content-type 설정
+- 불변성을 위해 버전 관리 사용
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="파일 다운로드 및 검색">
+
+### Step 2.1: 단일 파일 다운로드
+
+`download_file.py` 만들기:
+
+<CopyBlock
+  code="from minio import Minio
+
+client = Minio(
+  'localhost:9000',
+  access_key='minioadmin',
+  secret_key='minioadmin',
+  secure=False
+)
+
+# 파일 다운로드
+response = client.get_object('my-bucket', 'uploads/document.pdf')
+
+# 디스크에 저장
+with open('downloaded.pdf', 'wb') as f:
+  for data in response.stream(32 * 1024):
+    f.write(data)
+
+print('File downloaded successfully!')"
+  language="python"
+/>
+
+### Step 2.2: 응답으로 파일 스트리밍
+
+웹 애플리케이션의 경우:
+
+<CopyBlock
+  code="from flask import Flask, send_file
+from minio import Minio
+import io
+
+app = Flask(__name__)
+client = Minio(
+  'localhost:9000',
+  access_key='minioadmin',
+  secret_key='minioadmin',
+  secure=False
+)
+
+@app.route('/download/<filename>')
+def download(filename):
+  response = client.get_object('my-bucket', filename)
+  return send_file(
+    io.BytesIO(response.read()),
+    download_name=filename
+  )"
+  language="python"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/minio-storage-connection-step2-ko.png"
+  alt="파일 다운로드"
+  caption="MinIO에서 로컬 저장소로 파일 다운로드됨"
+/>
+
+</Step>
+
+---
+
+<Step number={3} title="버킷 및 객체 관리">
+
+### Step 3.1: 객체 나열 및 삭제
+
+`manage_storage.py` 만들기:
+
+<CopyBlock
+  code="from minio import Minio
+
+client = Minio(
+  'localhost:9000',
+  access_key='minioadmin',
+  secret_key='minioadmin',
+  secure=False
+)
+
+# 버킷의 모든 객체 나열
+objects = client.list_objects('my-bucket')
+print('Objects in bucket:')
+for obj in objects:
+  print(f'  - {obj.object_name} ({obj.size} bytes)')
+
+# 객체 삭제
+client.remove_object('my-bucket', 'uploads/old-file.txt')
+print('File deleted')
+
+# 여러 객체 삭제
+objects_to_delete = [
+  'file1.txt',
+  'file2.txt',
+  'file3.txt'
+]
+
+delete_errors = client.remove_objects(
+  'my-bucket',
+  objects_to_delete
+)
+
+for error in delete_errors:
+  print(f'Error deleting {error.object_name}')"
+  language="python"
+/>
+
+### Step 3.2: 객체 메타데이터 얻기
+
+<CopyBlock
+  code="from minio import Minio
+
+client = Minio(
+  'localhost:9000',
+  access_key='minioadmin',
+  secret_key='minioadmin',
+  secure=False
+)
+
+# 객체 메타데이터 가져오기
+stat = client.stat_object('my-bucket', 'document.pdf')
+
+print(f'File: {stat.object_name}')
+print(f'Size: {stat.size} bytes')
+print(f'Modified: {stat.last_modified}')
+print(f'Content-Type: {stat.content_type}')"
+  language="python"
+/>
+
+<Checkpoint
+  title="저장소 관리"
+  items={[
+    "객체를 나열할 수 있나요?",
+    "파일을 삭제할 수 있나요?",
+    "메타데이터를 가져올 수 있나요?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={4} title="파일 관리 애플리케이션 구축">
+
+### Step 4.1: 완전한 파일 관리자 클래스
+
+`file_manager.py` 만들기:
+
+<CopyBlock
+  code="from minio import Minio
+from minio.error import S3Error
+import os
+
+class FileManager:
+  def __init__(self, endpoint, access_key, secret_key):
+    self.client = Minio(
+      endpoint,
+      access_key=access_key,
+      secret_key=secret_key,
+      secure=False
+    )
+
+  def upload_file(self, bucket, local_path, object_name):
+    '''MinIO로 파일 업로드'''
+    try:
+      self.client.fput_object(bucket, object_name, local_path)
+      return True, 'Upload successful'
+    except S3Error as e:
+      return False, str(e)
+
+  def download_file(self, bucket, object_name, local_path):
+    '''MinIO에서 파일 다운로드'''
+    try:
+      response = self.client.get_object(bucket, object_name)
+      with open(local_path, 'wb') as f:
+        f.write(response.read())
+      return True, 'Download successful'
+    except S3Error as e:
+      return False, str(e)
+
+  def list_files(self, bucket, prefix=''):
+    '''버킷의 모든 파일 나열'''
+    try:
+      objects = self.client.list_objects(bucket, prefix=prefix)
+      return [obj.object_name for obj in objects]
+    except S3Error as e:
+      print(f'Error: {e}')
+      return []
+
+  def delete_file(self, bucket, object_name):
+    '''MinIO에서 파일 삭제'''
+    try:
+      self.client.remove_object(bucket, object_name)
+      return True, 'Delete successful'
+    except S3Error as e:
+      return False, str(e)
+
+# 사용
+fm = FileManager('localhost:9000', 'minioadmin', 'minioadmin')
+
+# 업로드
+success, msg = fm.upload_file(
+  'my-bucket',
+  '/local/file.txt',
+  'uploads/file.txt'
+)
+print(f'Upload: {msg}')
+
+# 나열
+files = fm.list_files('my-bucket', prefix='uploads/')
+print(f'Files: {files}')"
+  language="python"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/minio-storage-connection-step4-ko.png"
+  alt="완전한 애플리케이션"
+  caption="파일 관리자 애플리케이션이 업로드, 다운로드, 삭제 처리"
+/>
+
+### Step 4.2: 환경 구성
+
+`.env` 만들기:
+
+<CopyBlock
+  code="MINIO_ENDPOINT=localhost:9000
+MINIO_ACCESS_KEY=minioadmin
+MINIO_SECRET_KEY=minioadmin
+MINIO_BUCKET=my-bucket"
+  language="text"
+/>
+
+로드 및 사용:
+
+<CopyBlock
+  code="import os
+from dotenv import load_dotenv
+from file_manager import FileManager
+
+load_dotenv()
+
+fm = FileManager(
+  os.getenv('MINIO_ENDPOINT'),
+  os.getenv('MINIO_ACCESS_KEY'),
+  os.getenv('MINIO_SECRET_KEY')
+)"
+  language="python"
+/>
+
+<Callout type="success">
+✅ **파일 관리가 작동합니다!** 애플리케이션이 이제 클라우드 저장소를 관리할 수 있습니다.
+</Callout>
+
+</Step>
+
+---
+
+## 일반적인 패턴
+
+<CopyBlock
+  code="인기 있는 MinIO 패턴:
+
+1. 파일 업로드 서비스
+   - 사용자로부터 파일 수락
+   - 검증 및 저장
+   - 다운로드 링크 반환
+
+2. 백업 시스템
+   - 예약된 백업
+   - 버전 관리
+   - 보존 정책
+
+3. 미디어 라이브러리
+   - 이미지/비디오 저장
+   - 썸네일 생성
+   - CDN 통합
+
+4. 데이터 레이크
+   - 데이터셋 저장
+   - 쿼리 기능
+   - 분석
+
+5. 로그 저장소
+   - 애플리케이션 로그
+   - 검색 가능한 아카이브
+   - 규정 준수 보존"
+  language="text"
+/>
+
+---
+
+## 프로덕션 체크리스트
+
+<Callout type="tip">
+✅ **프로덕션 배포의 경우:**
+
+1. **보안**
+   - HTTPS 사용 (secure=True)
+   - 전용 사용자 생성
+   - 제한적인 IAM 정책 설정
+   - 버전 관리 활성화
+   - 보존 정책 설정
+
+2. **성능**
+   - 연결 풀링 사용
+   - 배치 작업
+   - 큰 파일의 경우 멀티파트 업로드
+   - 적절한 타임아웃 설정
+
+3. **모니터링**
+   - 업로드/다운로드 메트릭 추적
+   - 버킷 크기 모니터링
+   - 모든 작업 로깅
+   - 경고 설정
+
+4. **규정 준수**
+   - 저장 데이터 암호화
+   - 전송 중 암호화
+   - 접근 로깅
+   - 데이터 보존
+</Callout>
+
+---
+
+## 다음 단계
+
+1. **[웹 애플리케이션 통합](../minio-web-app)** - 웹 업로드 UI 구축
+2. **[모니터링 및 메트릭](../minio-monitoring)** - 사용량 추적
+3. **[고가용성](../minio-ha)** - 프로덕션에 배포
+
+---
+
+**파일 관리 시스템이 완료되었습니다!** 🎉

@@ -1,0 +1,343 @@
+# Vite 설치 - 빠른 프론트엔드 빌드 도구
+
+Vite는 현대적인 웹 개발을 위한 초고속 빌드 도구입니다. 15분 안에 첫 번째 Vite 프로젝트를 만들고 즉각적인 HMR(핫 모듈 교체)을 경험하세요!
+
+<FreeTierInfo
+  service="Vite"
+  limit="무제한 프로젝트"
+  period="영구 무료"
+  status="generous"
+/>
+
+## Vite란?
+
+<Callout type="info">
+⚡ **Vite는 빠른 프론트엔드 개발입니다**
+
+- **즉시 서버 시작**: 1초 미만의 시작 시간
+- **초고속 HMR**: 변경 사항이 즉시 반영됨
+- **최적화된 빌드**: 프로덕션을 위한 스마트 번들링
+- **프레임워크 무관**: Vue, React, Svelte와 작동
+- **네이티브 ESM**: 개발에서 ES 모듈 사용
+- **개발 및 프로덕션**: 동일한 도구, 다르게 최적화됨
+
+이렇게 사용됩니다:
+- 단일 페이지 애플리케이션 (SPA)
+- 컴포넌트 개발
+- 웹 게임
+- 프로그레시브 웹 앱
+- 빠른 프로토타이핑
+</Callout>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "Node.js 14 이상 설치됨", required: true },
+  { text: "npm 또는 yarn 패키지 매니저", required: true },
+  { text: "텍스트 에디터 또는 IDE", required: true },
+  { text: "기본 JavaScript 지식", required: false }
+]} />
+
+---
+
+<Step number={1} title="첫 번째 Vite 프로젝트 만들기">
+
+### Step 1.1: npm으로 프로젝트 만들기
+
+터미널을 열고 실행하세요:
+
+<CopyBlock
+  code="npm create vite@latest my-first-app -- --template vanilla"
+  language="bash"
+/>
+
+또는 yarn 사용:
+
+<CopyBlock
+  code="yarn create vite my-first-app --template vanilla"
+  language="bash"
+/>
+
+### Step 1.2: 템플릿 선택
+
+<CopyBlock
+  code="사용 가능한 템플릿:
+
+vanilla          JavaScript (프레임워크 없음)
+vanilla-ts       TypeScript
+vue              Vue 3
+vue-ts           Vue 3 + TypeScript
+react            React with JSX
+react-ts         React + TypeScript
+react-swc        React with SWC compiler
+preact           Preact
+preact-ts        Preact + TypeScript
+lit              Lit
+lit-ts           Lit + TypeScript
+svelte           Svelte
+svelte-ts        Svelte + TypeScript"
+  language="text"
+/>
+
+### Step 1.3: 이동 및 설치
+
+<CopyBlock
+  code="cd my-first-app
+npm install"
+  language="bash"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/vite-installation-setup-step1-ko.png"
+  alt="프로젝트 생성됨"
+  caption="Vite 프로젝트 스캐폴딩 완료, 종속성 설치됨"
+/>
+
+<Callout type="tip">
+💡 **프로젝트 구조:**
+
+```
+my-first-app/
+├── index.html
+├── package.json
+├── vite.config.js
+├── src/
+│   ├── main.js
+│   └── style.css
+└── public/
+    └── vite.svg
+```
+</Callout>
+
+<Checkpoint
+  title="프로젝트 생성됨"
+  items={[
+    "프로젝트 디렉토리가 생성되었나요?",
+    "종속성이 설치되었나요?",
+    "vite.config.js를 볼 수 있나요?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="개발 서버 시작">
+
+### Step 2.1: Dev 서버 실행
+
+<CopyBlock
+  code="npm run dev"
+  language="bash"
+/>
+
+다음과 같이 표시됩니다:
+
+<CopyBlock
+  code="VITE v5.0.0  ready in 245 ms
+
+  Local:    http://localhost:5173/
+  press h to show help"
+  language="bash"
+/>
+
+브라우저에서 [http://localhost:5173](http://localhost:5173)을 열어보세요.
+
+### Step 2.2: 핫 모듈 교체 시도
+
+1. `src/main.js` 열기
+2. 뭔가 변경:
+
+<CopyBlock
+  code="// src/main.js
+document.querySelector('#app').innerHTML = 'Hello Vite!';"
+  language="javascript"
+/>
+
+3. 파일 저장 - 브라우저가 즉시 업데이트됩니다!
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/vite-installation-setup-step2-ko.png"
+  alt="Dev 서버 실행 중"
+  caption="개발 서버가 실행 중이며 HMR이 활성화되어 즉시 업데이트됨"
+/>
+
+<DevTip>
+**HMR 이점:**
+
+- 페이지 새로 고침이 필요 없음
+- 업데이트 사이에 상태 유지됨
+- 변경된 모듈만 재평가됨
+- 개발 중 즉각적인 피드백
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="React/Vue 프로젝트 만들기">
+
+### Step 3.1: TypeScript가 있는 React
+
+<CopyBlock
+  code="npm create vite@latest react-app -- --template react-ts
+cd react-app
+npm install
+npm run dev"
+  language="bash"
+/>
+
+### Step 3.2: TypeScript가 있는 Vue 3
+
+<CopyBlock
+  code="npm create vite@latest vue-app -- --template vue-ts
+cd vue-app
+npm install
+npm run dev"
+  language="bash"
+/>
+
+<Callout type="info">
+**프레임워크 선택:**
+
+React:
+- 가장 큰 생태계
+- 가장 많은 채용 공고
+- 가파른 학습 곡선
+
+Vue:
+- 부드러운 학습 곡선
+- 우수한 문서
+- 초보자에게 완벽
+
+Svelte:
+- 가장 작은 번들 크기
+- 진정한 반응성
+- 배우기 재미있음
+</Callout>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/vite-installation-setup-step3-ko.png"
+  alt="프레임워크 템플릿"
+  caption="React 및 Vue 템플릿을 사용한 Vite 스캐폴딩"
+/>
+
+</Step>
+
+---
+
+<Step number={4} title="프로덕션을 위해 빌드">
+
+### Step 4.1: 프로덕션 빌드 만들기
+
+<CopyBlock
+  code="npm run build"
+  language="bash"
+/>
+
+출력:
+
+<CopyBlock
+  code="vite v5.0.0 building for production...
+✓ 2 modules transformed
+dist/index.html         0.46 kB
+dist/assets/main.abc123.js    12.34 kB / gzip: 4.56 kB"
+  language="bash"
+/>
+
+### Step 4.2: 로컬에서 빌드 미리보기
+
+<CopyBlock
+  code="npm run preview"
+  language="bash"
+/>
+
+[http://localhost:4173](http://localhost:4173)에서 프로덕션 빌드를 미리봅니다.
+
+<Callout type="success">
+✅ **Vite 프로젝트가 준비되었습니다!** 초고속 개발 및 최적화된 프로덕션 빌드입니다.
+</Callout>
+
+</Step>
+
+---
+
+## Vite 구성
+
+`vite.config.js` 만들기:
+
+<CopyBlock
+  code="import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+
+export default defineConfig({
+  plugins: [vue()],
+  server: {
+    port: 3000,
+    open: true,
+    host: 'localhost'
+  },
+  build: {
+    outDir: 'dist',
+    sourcemap: false
+  }
+})"
+  language="javascript"
+/>
+
+---
+
+## 일반적인 명령
+
+<CopyBlock
+  code="npm 명령:
+
+npm run dev       개발 서버 시작
+npm run build     프로덕션 빌드
+npm run preview   프로덕션 빌드 미리보기
+npm run lint      린터 실행 (구성된 경우)
+npm run type-check 유형 확인 (TypeScript의 경우)"
+  language="bash"
+/>
+
+---
+
+## 파일 구조 설명
+
+<CopyBlock
+  code="중요한 파일:
+
+index.html
+  - 진입점
+  - Vite가 여기서 모듈 발견
+
+src/main.js (또는 .ts)
+  - 애플리케이션 진입점
+  - 스타일, 컴포넌트 임포트
+
+vite.config.js
+  - Vite 구성
+  - 플러그인, 최적화 설정
+
+package.json
+  - 프로젝트 메타데이터
+  - 종속성
+  - 스크립트
+
+dist/
+  - 프로덕션 빌드 출력
+  - 배포할 파일"
+  language="text"
+/>
+
+---
+
+## 다음 단계
+
+1. **[프론트엔드 개발](../vite-frontend-development)** - Vue/React로 구축
+2. **[플러그인 추가](../vite-plugins)** - Vite 기능 확장
+3. **[프로덕션에 배포](../vite-deploy)** - 애플리케이션 호스팅
+
+---
+
+**Vite 개발 환경이 준비되었습니다!** ⚡

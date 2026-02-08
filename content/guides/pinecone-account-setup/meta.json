@@ -1,0 +1,60 @@
+{
+  "slug": "pinecone-account-setup",
+  "platform": "pinecone",
+  "service": "Pinecone Vector Database",
+  "category": "database",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 15,
+  "totalSteps": 4,
+  "freeTier": {
+    "service": "Pinecone Vector Database",
+    "limit": "1개 프로젝트, 100K 벡터",
+    "period": "forever",
+    "status": "limited",
+    "conditions": [
+      "무료 스타터 프로젝트 1개",
+      "최대 100,000개 벡터 저장",
+      "기본 쿼리 성능",
+      "월 1M 벡터 작업 포함",
+      "프로덕션 배포 가능"
+    ]
+  },
+  "prerequisites": [],
+  "nextGuides": [
+    "pinecone-vector-search"
+  ],
+  "seo": {
+    "ko": {
+      "title": "Pinecone 계정 만들기 - 벡터 데이터베이스 시작 | CloudSetup.guide",
+      "description": "Pinecone 벡터 데이터베이스에 가입하고 첫 인덱스를 생성하는 방법을 4단계로 배워보세요. AI/ML 의미 검색 구축을 시작하세요.",
+      "keywords": [
+        "Pinecone 가입",
+        "벡터 데이터베이스",
+        "의미 검색",
+        "벡터 임베딩",
+        "Pinecone API",
+        "벡터 인덱스",
+        "AI 검색",
+        "Pinecone 시작"
+      ]
+    },
+    "en": {
+      "title": "Create Pinecone Account - Vector Database Startup | CloudSetup.guide",
+      "description": "Learn how to sign up for Pinecone vector database and create your first index in 4 easy steps. Start building semantic search with AI.",
+      "keywords": [
+        "Pinecone signup",
+        "vector database",
+        "semantic search",
+        "vector embeddings",
+        "Pinecone API",
+        "vector index",
+        "AI search",
+        "getting started Pinecone"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T02:00:00.000Z",
+  "updatedAt": "2026-02-08T02:00:00.000Z",
+  "lastVerified": "2026-02-08T02:00:00.000Z",
+  "published": true
+}

@@ -1,0 +1,310 @@
+# Install MinIO - S3-Compatible Object Storage
+
+MinIO is a high-performance, open-source object storage service compatible with AWS S3. Run your own S3-compatible storage locally in 20 minutes!
+
+<FreeTierInfo
+  service="MinIO Object Storage"
+  limit="Unlimited storage"
+  period="Forever free"
+  status="generous"
+/>
+
+## What is MinIO?
+
+<Callout type="info">
+📦 **MinIO provides S3-compatible storage**
+
+- **S3 Compatible API**: Works with existing S3 tools
+- **Open Source**: Free to use and modify
+- **High Performance**: Optimized for cloud environments
+- **Easy Deployment**: Docker, Kubernetes, bare metal
+- **Single Binary**: Just download and run
+- **No Licensing**: Community and Enterprise versions
+
+Perfect for:
+- Local development
+- Data backup
+- Video/media storage
+- Data lakes
+- ML training data
+- Microservices
+</Callout>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Docker installed (recommended)", required: false },
+  { text: "2GB disk space minimum", required: true },
+  { text: "Port 9000 available", required: true },
+  { text: "Port 9001 available (console)", required: false }
+]} />
+
+---
+
+<Step number={1} title="Install MinIO with Docker">
+
+### Step 1.1: Run MinIO Container
+
+The easiest way is Docker:
+
+<CopyBlock
+  code="docker run -p 9000:9000 -p 9001:9001 \\
+  -e MINIO_ROOT_USER=minioadmin \\
+  -e MINIO_ROOT_PASSWORD=minioadmin \\
+  quay.io/minio/minio server /data --console-address ':9001'"
+  language="bash"
+/>
+
+### Step 1.2: Create Persistent Storage (Optional)
+
+For data persistence:
+
+<CopyBlock
+  code="# Create volume
+docker volume create minio-data
+
+# Run with persistent volume
+docker run -p 9000:9000 -p 9001:9001 \\
+  -e MINIO_ROOT_USER=minioadmin \\
+  -e MINIO_ROOT_PASSWORD=minioadmin \\
+  -v minio-data:/data \\
+  quay.io/minio/minio server /data --console-address ':9001'"
+  language="bash"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/minio-installation-setup-step1-en.png"
+  alt="MinIO running in Docker"
+  caption="MinIO container started successfully on localhost"
+/>
+
+<Callout type="tip">
+💡 **MinIO Ports:**
+
+- 9000: S3 API endpoint
+- 9001: Web console
+- Change with: -p [your-port]:9000
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Access MinIO Console">
+
+### Step 2.1: Open Web Console
+
+1. Go to [http://localhost:9001](http://localhost:9001)
+2. Login credentials:
+   - Username: `minioadmin`
+   - Password: `minioadmin`
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/minio-installation-setup-step2-en.png"
+  alt="MinIO login"
+  caption="MinIO web console login page"
+/>
+
+### Step 2.2: Explore the Dashboard
+
+After login, you see:
+- **Buckets**: Create and manage storage buckets
+- **Browse**: Upload and download files
+- **Users**: Manage access users
+- **Policies**: Set permissions
+
+<Callout type="warning">
+⚠️ **Change Default Credentials**
+
+NEVER use default credentials in production:
+- minioadmin / minioadmin is for testing only
+- Create new users with strong passwords
+- Set proper IAM policies
+</Callout>
+
+<Checkpoint
+  title="Console Access"
+  items={[
+    "Can you access the console?",
+    "Are you logged in successfully?",
+    "Do you see the empty buckets list?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={3} title="Create Your First Bucket">
+
+### Step 3.1: Create Bucket via Console
+
+1. Click **Buckets** in left menu
+2. Click **Create Bucket**
+3. Enter bucket name: `my-first-bucket`
+4. Click **Create**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/minio-installation-setup-step3-en.png"
+  alt="Create bucket"
+  caption="New bucket created successfully"
+/>
+
+### Step 3.2: Upload Files
+
+1. Click your bucket name
+2. Click **Upload**
+3. Select files from your computer
+4. Files appear in bucket
+
+<CopyBlock
+  code="Bucket Naming Rules:
+
+- Lowercase letters, numbers, hyphens
+- 3-63 characters
+- Start and end with letter or number
+- Cannot be IP address format
+
+Examples:
+- my-first-bucket ✅
+- data-backup-2024 ✅
+- MyBucket ❌ (uppercase)
+- test ❌ (too short)"
+  language="text"
+/>
+
+</Step>
+
+---
+
+<Step number={4} title="Connect from Python">
+
+### Step 4.1: Install Python Client
+
+<CopyBlock
+  code="pip install minio python-dotenv"
+  language="bash"
+/>
+
+### Step 4.2: Connect and Upload
+
+Create `minio_test.py`:
+
+<CopyBlock
+  code="from minio import Minio
+import os
+
+# Connect to MinIO
+client = Minio(
+  'localhost:9000',
+  access_key='minioadmin',
+  secret_key='minioadmin',
+  secure=False  # False for local, True for production
+)
+
+# Create bucket (if not exists)
+if not client.bucket_exists('test-bucket'):
+  client.make_bucket('test-bucket')
+
+# Upload file
+client.fput_object(
+  'test-bucket',
+  'my-file.txt',
+  'path/to/local/file.txt'
+)
+
+print('File uploaded successfully!')
+
+# List buckets
+buckets = client.list_buckets()
+for bucket in buckets:
+  print(f'Bucket: {bucket.name}')"
+  language="python"
+/>
+
+Run it:
+
+<CopyBlock
+  code="python minio_test.py"
+  language="bash"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/minio-installation-setup-step4-en.png"
+  alt="Python connection working"
+  caption="MinIO client successfully connects from Python"
+/>
+
+<Callout type="success">
+✅ **MinIO is installed and running!** You have local S3-compatible storage.
+</Callout>
+
+</Step>
+
+---
+
+## MinIO Deployment Options
+
+<CopyBlock
+  code="Installation Methods:
+
+1. Docker (Recommended)
+   - Easiest setup
+   - Portable
+   - Good for development
+
+2. Binary Installation
+   - Single binary file
+   - No Docker required
+   - Works on any OS
+
+3. Kubernetes
+   - Production deployment
+   - High availability
+   - Auto-scaling support
+
+4. CloudFormation/Terraform
+   - Infrastructure as code
+   - Multi-node clusters
+   - Cloud deployment"
+  language="text"
+/>
+
+---
+
+## Common Issues
+
+### Port Already in Use
+
+```
+Error: listen tcp :9000: bind: address already in use
+```
+
+Solutions:
+- Change port: `-p 9010:9000`
+- Kill process using port: `lsof -i :9000`
+- Use different port range: `-p 9000-9002:9000-9002`
+
+### Docker Connection Issues
+
+```
+Cannot connect to localhost:9000
+```
+
+Solutions:
+- Check Docker is running
+- Verify port forwarding: `docker ps`
+- Use proper Docker IP address
+- For Windows/Mac, use `host.docker.internal`
+
+---
+
+## Next Steps
+
+1. **[Connect Applications](../minio-storage-connection)** - Use MinIO from code
+2. **[Set Up Policies](../minio-permissions)** - Manage access control
+3. **[Deploy to Production](../minio-production)** - Scale your storage
+
+---
+
+**MinIO is ready! Local S3-compatible storage at your fingertips!** 🚀

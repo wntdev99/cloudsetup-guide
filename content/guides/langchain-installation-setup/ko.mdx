@@ -1,0 +1,430 @@
+# LangChain 설치 - Python으로 LLM 애플리케이션 구축
+
+LangChain은 대형 언어 모델(LLM)로 애플리케이션을 구축하기 위한 강력한 프레임워크입니다. GPT-4, Claude, 오픈 소스 대안과 같은 모델을 사용하는 것을 간소화합니다. 15분 안에 설정해봅시다!
+
+<FreeTierInfo
+  service="LangChain Framework"
+  limit="무제한 로컬 사용"
+  period="영구 무료"
+  status="generous"
+/>
+
+## LangChain이란?
+
+<Callout type="info">
+🔗 **LangChain은 LLM 개발을 간소화합니다**
+
+- **모델 통합**: OpenAI, Hugging Face, Anthropic, Cohere와 연결
+- **체인**: 여러 LLM 호출을 워크플로우로 결합
+- **메모리**: 대화 이력 및 컨텍스트 추가
+- **도구**: API, 데이터베이스, 검색 엔진 통합
+- **에이전트**: 자율적으로 의사결정하는 시스템 생성
+- **RAG**: 문서로 정보를 검색하고 증강
+
+이렇게 사용됩니다:
+- 챗봇 및 대화형 AI
+- 문서 분석 및 요약
+- 질문 답변 시스템
+- 자동화된 워크플로우
+- 콘텐츠 생성
+</Callout>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "Python 3.8 이상 설치됨", required: true },
+  { text: "pip 패키지 매니저", required: true },
+  { text: "텍스트 에디터 또는 IDE", required: true },
+  { text: "선택사항: API 키 (OpenAI, Hugging Face 등)", required: false }
+]} />
+
+---
+
+<Step number={1} title="LangChain 패키지 설치">
+
+### Step 1.1: pip를 통해 설치
+
+터미널을 열고 LangChain을 설치하세요:
+
+<CopyBlock
+  code="pip install langchain"
+  language="bash"
+/>
+
+### Step 1.2: 필수 종속성 설치
+
+LangChain은 다양한 LLM 공급자와 함께 작동합니다. 필요한 것을 설치하세요:
+
+<CopyBlock
+  code="# OpenAI (GPT-4, GPT-3.5)
+pip install openai
+
+# Hugging Face
+pip install huggingface-hub
+
+# Anthropic (Claude)
+pip install anthropic
+
+# 로컬 LLM (Ollama 통합)
+pip install ollama"
+  language="bash"
+/>
+
+### Step 1.3: 설치 확인
+
+모든 것이 올바르게 설치되었는지 확인하세요:
+
+<CopyBlock
+  code="python -c 'import langchain; print(langchain.__version__)'"
+  language="bash"
+/>
+
+`0.1.x` 이상의 버전 번호가 표시되어야 합니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/langchain-installation-setup-step1-ko.png"
+  alt="설치 확인"
+  caption="버전 확인으로 LangChain 설치를 검증하세요"
+/>
+
+<Callout type="tip">
+💡 **팁**: 특정 도구를 사용하여 LangChain을 설치할 수 있습니다:
+
+pip install langchain[openai]
+pip install langchain[huggingface]
+</Callout>
+
+<Checkpoint
+  title="설치 검증"
+  items={[
+    "LangChain이 설치되었나요?",
+    "버전 0.1 이상이 표시되나요?",
+    "필수 종속성이 설치되었나요?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="LLM 공급자 접근 설정">
+
+### Step 2.1: LLM 공급자 선택
+
+사용할 LLM 서비스를 선택하세요:
+
+<CopyBlock
+  code="사용 가능한 LLM 공급자:
+
+1. OpenAI (초보자에게 권장)
+   - 모델: GPT-4, GPT-3.5-turbo
+   - 유료 (하지만 무료 평가판 크레딧 있음)
+
+2. Hugging Face (무료)
+   - 모델: Llama 2, Mistral 등
+   - 무료 추론 API
+
+3. 로컬 모델 (무료)
+   - Ollama: 머신에서 모델 실행
+   - API 비용 없음
+   - 개인 정보 보호 친화적
+
+4. Anthropic (Claude)
+   - 모델: Claude 3
+   - OpenAI와 다른 API"
+  language="text"
+/>
+
+### Step 2.2: API 키 받기
+
+OpenAI의 경우 (가장 인기):
+
+1. [OpenAI API 키](https://platform.openai.com/api-keys)로 이동
+2. OpenAI 계정에 가입 또는 로그인
+3. **Create new secret key** 클릭
+4. 키 복사 (다시 표시되지 않습니다!)
+5. 환경 변수에 저장:
+
+<CopyBlock
+  code="# macOS/Linux
+export OPENAI_API_KEY='sk-xxxxxxxxxxxx'
+
+# Windows (명령 프롬프트)
+set OPENAI_API_KEY=sk-xxxxxxxxxxxx
+
+# 또는 .env 파일에 추가
+OPENAI_API_KEY=sk-xxxxxxxxxxxx"
+  language="bash"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/langchain-installation-setup-step2-ko.png"
+  alt="API 키 설정"
+  caption="플랫폼 대시보드에서 OpenAI API 키를 받으세요"
+/>
+
+### Step 2.3: .env 파일 만들기
+
+프로젝트에 `.env` 파일을 만드세요:
+
+<CopyBlock
+  code="# .env 파일 (Git에 커밋하지 마세요!)
+OPENAI_API_KEY=sk-your-key-here
+HUGGINGFACE_API_KEY=hf_your-key-here
+ANTHROPIC_API_KEY=sk-ant-your-key-here"
+  language="text"
+/>
+
+Python에서 환경 변수를 로드하세요:
+
+<CopyBlock
+  code="import os
+from dotenv import load_dotenv
+
+load_dotenv()
+api_key = os.getenv('OPENAI_API_KEY')
+print(f'API Key loaded: {api_key[0:10]}...')"
+  language="python"
+/>
+
+<Callout type="warning">
+⚠️ **API 키 보호하기!**
+
+- Git에 .env를 커밋하지 마세요
+- .gitignore 사용: *.env, .env.local
+- 실수로 노출되면 키 재생성
+- 정기적으로 키 교체
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="LangChain 설치 테스트">
+
+### Step 3.1: 첫 번째 LangChain 프로그램 만들기
+
+`hello_langchain.py` 파일을 만드세요:
+
+<CopyBlock
+  code="import os
+from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
+
+load_dotenv()
+
+# LLM 초기화
+llm = ChatOpenAI(model='gpt-3.5-turbo')
+
+# 간단한 호출
+response = llm.invoke('What is LangChain?')
+print(response.content)"
+  language="python"
+/>
+
+실행하세요:
+
+<CopyBlock
+  code="python hello_langchain.py"
+  language="bash"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/langchain-installation-setup-step3-ko.png"
+  alt="첫 번째 프로그램 출력"
+  caption="첫 번째 LangChain 프로그램이 성공적으로 LLM을 호출합니다"
+/>
+
+### Step 3.2: 다양한 공급자로 테스트
+
+Hugging Face로 시도:
+
+<CopyBlock
+  code="from langchain_huggingface import HuggingFaceHub
+
+# 무료 Hugging Face 추론 API
+llm = HuggingFaceHub(
+  repo_id='gpt2',
+  model_kwargs={'temperature': 0.7}
+)
+
+response = llm.invoke('Python is')
+print(response)"
+  language="python"
+/>
+
+로컬 모델로 시도 (Ollama):
+
+<CopyBlock
+  code="from langchain_community.llms import Ollama
+
+# Ollama가 로컬에서 실행 중이어야 합니다
+llm = Ollama(model='llama2')
+
+response = llm.invoke('What is machine learning?')
+print(response)"
+  language="python"
+/>
+
+<DevTip>
+**학습을 위한 공급자 선택:**
+
+- **OpenAI (가장 쉬움)**: 즉시 작동, 무료 크레딧
+- **Hugging Face (무료)**: 신용 카드 불필요, 완전 무료
+- **로컬 (비공개)**: 컴퓨터에서 Llama 2 실행, API 비용 없음
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={4} title="LangChain 개념 이해하기">
+
+### Step 4.1: 핵심 구성요소
+
+<CopyBlock
+  code="LangChain 구성 블록:
+
+1. LLM (대형 언어 모델)
+   - AI 모델 자체
+   - 예: GPT-4, Claude, Llama 2
+
+2. 프롬프트 템플릿
+   - 미리 형식화된 프롬프트
+   - 변수 대체
+
+3. 체인
+   - 여러 단계 결합
+   - LLM -> 처리 -> 출력
+
+4. 메모리
+   - 대화 이력 저장
+   - 컨텍스트 유지
+
+5. 도구
+   - 외부 API
+   - 웹 검색
+   - 계산기
+
+6. 에이전트
+   - 자율적 의사결정
+   - 작업 기반 도구 사용"
+  language="text"
+/>
+
+### Step 4.2: 첫 번째 체인
+
+<CopyBlock
+  code="from langchain_openai import ChatOpenAI
+from langchain.prompts import ChatPromptTemplate
+from langchain.chains import LLMChain
+
+llm = ChatOpenAI(model='gpt-3.5-turbo')
+
+# 프롬프트 템플릿 정의
+prompt = ChatPromptTemplate.from_template(
+  'Tell me about {topic} in 2 sentences.'
+)
+
+# 체인 생성
+chain = LLMChain(llm=llm, prompt=prompt)
+
+# 체인 실행
+result = chain.invoke({'topic': 'machine learning'})
+print(result['text'])"
+  language="python"
+/>
+
+### Step 4.3: 프로젝트 구조
+
+LangChain 프로젝트를 구성하세요:
+
+<CopyBlock
+  code="my_langchain_app/
+├── .env                 # API 키 (.gitignore에)
+├── .gitignore          # .env 제외
+├── requirements.txt    # 종속성
+├── main.py            # 진입점
+├── chains.py          # 체인 정의
+├── prompts.py         # 프롬프트 템플릿
+├── tools.py           # 사용자 정의 도구
+└── tests.py           # 단위 테스트"
+  language="text"
+/>
+
+<Checkpoint
+  title="설치 완료"
+  items={[
+    "LangChain이 설치되었나요?",
+    "LLM을 호출할 수 있나요?",
+    "API 키를 설정했나요?",
+    "간단한 체인을 만들 수 있나요?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **LangChain이 설치되었습니다!** LLM 기반 애플리케이션을 구축할 준비가 되었습니다.
+</Callout>
+
+</Step>
+
+---
+
+## 일반적인 설치 문제
+
+### ImportError: No module named 'langchain'
+
+LangChain이 설치되었는지 확인:
+
+<CopyBlock
+  code="pip install langchain --upgrade"
+  language="bash"
+/>
+
+### API 키를 찾을 수 없음
+
+환경 설정을 확인:
+
+<CopyBlock
+  code="# API 키가 설정되었는지 확인
+python -c 'import os; print(os.getenv(\"OPENAI_API_KEY\"))'
+
+# None이 표시되면 설정:
+export OPENAI_API_KEY=sk-your-key-here"
+  language="bash"
+/>
+
+### SSL 인증서 오류
+
+macOS에서 인증서 업데이트:
+
+<CopyBlock
+  code="/Applications/Python 3.x/Install Certificates.command"
+  language="bash"
+/>
+
+---
+
+## 다음 단계
+
+1. **[LLM 애플리케이션 구축](../langchain-llm-application)** - 체인 및 에이전트 생성
+2. **[챗봇에 메모리 추가](../langchain-memory-setup)** - 대화 컨텍스트 유지
+3. **[검색 증강 생성](../langchain-rag-setup)** - 문서 작업
+
+---
+
+## LangChain 커뮤니티 리소스
+
+<Callout type="tip">
+🌐 **LangChain 학습을 위한 훌륭한 리소스**
+
+1. **공식 문서**: langchain.readthedocs.io
+2. **GitHub**: github.com/langchain-ai/langchain
+3. **Discord 커뮤니티**: 지원을 위해 참여
+4. **YouTube 튜토리얼**: 'LangChain tutorial' 검색
+5. **LangSmith 플랫폼**: 내장 디버깅 및 모니터링
+</Callout>
+
+---
+
+**LangChain이 준비되었습니다! 이제 놀라운 애플리케이션을 구축할 시간입니다!** 🔗

@@ -1,0 +1,62 @@
+{
+  "slug": "huggingface-model-integration",
+  "platform": "huggingface",
+  "service": "Hugging Face Transformers",
+  "category": "ai-ml",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 20,
+  "totalSteps": 5,
+  "freeTier": {
+    "service": "Hugging Face Transformers Library",
+    "limit": "무제한 로컬 모델 사용",
+    "period": "forever",
+    "status": "generous",
+    "conditions": [
+      "transformers 라이브러리 완전 무료",
+      "로컬 머신에서 모델 다운로드 및 실행",
+      "무제한 모델 사용",
+      "GPU 가속 지원",
+      "API 토큰으로 비공개 모델 접근"
+    ]
+  },
+  "prerequisites": [
+    "huggingface-account-setup"
+  ],
+  "nextGuides": [
+    "langchain-llm-application"
+  ],
+  "seo": {
+    "ko": {
+      "title": "Hugging Face 모델 통합 - Python으로 AI 모델 다운로드 | CloudSetup.guide",
+      "description": "Hugging Face transformers 라이브러리를 설치하고 모델을 다운로드하여 Python 애플리케이션에 통합하는 방법을 5단계로 배워보세요.",
+      "keywords": [
+        "Hugging Face 모델 다운로드",
+        "transformers 라이브러리",
+        "BERT 모델 사용",
+        "Python AI 모델",
+        "감정 분석 모델",
+        "텍스트 분류",
+        "NLP 모델 사용",
+        "Hugging Face 통합"
+      ]
+    },
+    "en": {
+      "title": "Integrate Hugging Face Models - Download AI Models in Python | CloudSetup.guide",
+      "description": "Learn how to install the Hugging Face transformers library and integrate models into your Python applications in 5 easy steps.",
+      "keywords": [
+        "download Hugging Face models",
+        "transformers library",
+        "use BERT model",
+        "Python AI models",
+        "sentiment analysis model",
+        "text classification",
+        "NLP model integration",
+        "Hugging Face integration"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T02:00:00.000Z",
+  "updatedAt": "2026-02-08T02:00:00.000Z",
+  "lastVerified": "2026-02-08T02:00:00.000Z",
+  "published": true
+}
