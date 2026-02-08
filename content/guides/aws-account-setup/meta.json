@@ -1,0 +1,57 @@
+{
+  "slug": "aws-account-setup",
+  "platform": "aws",
+  "service": "AWS Account",
+  "category": "compute",
+  "difficulty": "beginner",
+  "estimatedMinutes": 10,
+  "totalSteps": 4,
+  "freeTier": {
+    "service": "AWS Free Tier",
+    "limit": "12개월",
+    "period": "12 months",
+    "amount": "무료",
+    "status": "generous",
+    "conditions": [
+      "12개월 무료 체험",
+      "EC2 750시간/월 무료",
+      "S3 5GB 스토리지 무료",
+      "RDS 750시간/월 무료"
+    ]
+  },
+  "prerequisites": [],
+  "nextGuides": [
+    "aws-iam-user-create",
+    "aws-s3-bucket-setup"
+  ],
+  "seo": {
+    "ko": {
+      "title": "AWS 계정 만들기 - 12개월 무료 체험 시작 | CloudSetup.guide",
+      "description": "Amazon Web Services 계정을 생성하고 12개월 무료 체험을 시작하는 방법을 4단계로 배워보세요. 신용카드 등록부터 계정 활성화까지 완벽 가이드.",
+      "keywords": [
+        "AWS 계정",
+        "AWS 가입",
+        "AWS 무료 체험",
+        "아마존 웹 서비스",
+        "AWS Free Tier",
+        "클라우드 계정 생성"
+      ]
+    },
+    "en": {
+      "title": "Create AWS Account - Start 12-Month Free Tier | CloudSetup.guide",
+      "description": "Learn how to create an Amazon Web Services account and start 12-month free tier in 4 easy steps. Complete guide from credit card registration to account activation.",
+      "keywords": [
+        "AWS account",
+        "AWS signup",
+        "AWS free tier",
+        "Amazon Web Services",
+        "cloud account creation",
+        "AWS registration"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T06:30:00.000Z",
+  "updatedAt": "2026-02-08T06:30:00.000Z",
+  "lastVerified": "2026-02-08T06:30:00.000Z",
+  "published": true
+}
