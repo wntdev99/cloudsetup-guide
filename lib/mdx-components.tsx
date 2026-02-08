@@ -6,6 +6,7 @@ import { Callout } from '@/components/guide/Callout';
 import { FreeTierInfo } from '@/components/guide/FreeTierInfo';
 import { DevTip } from '@/components/guide/DevTip';
 import { Checkpoint } from '@/components/guide/Checkpoint';
+import { PrerequisiteCheck } from '@/components/guide/PrerequisiteCheck';
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
@@ -16,6 +17,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     FreeTierInfo,
     DevTip,
     Checkpoint,
+    PrerequisiteCheck,
     ...components,
   };
 }

@@ -15,6 +15,7 @@ import { Callout } from '@/components/guide/Callout';
 import { FreeTierInfo } from '@/components/guide/FreeTierInfo';
 import { DevTip } from '@/components/guide/DevTip';
 import { Checkpoint } from '@/components/guide/Checkpoint';
+import { PrerequisiteCheck } from '@/components/guide/PrerequisiteCheck';
 
 interface GuidePageProps {
   params: {
@@ -63,6 +64,7 @@ export default async function GuidePage({ params }: GuidePageProps) {
     FreeTierInfo,
     DevTip,
     Checkpoint,
+    PrerequisiteCheck,
   };
 
   return (
