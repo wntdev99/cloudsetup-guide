@@ -1,0 +1,63 @@
+{
+  "slug": "gcp-project-create",
+  "platform": "gcp",
+  "service": "Google Cloud Projects",
+  "category": "general",
+  "difficulty": "beginner",
+  "estimatedMinutes": 5,
+  "totalSteps": 3,
+  "freeTier": {
+    "service": "Google Cloud Projects",
+    "limit": "무제한 프로젝트",
+    "period": "forever",
+    "status": "generous",
+    "conditions": [
+      "프로젝트 생성은 완전 무료",
+      "계정당 최대 25개 프로젝트 (기본값)",
+      "할당량 증가 요청 가능"
+    ]
+  },
+  "prerequisites": [
+    "gcp-account-setup",
+    "gcp-billing-setup"
+  ],
+  "nextGuides": [
+    "gcp-vision-api-setup",
+    "gcp-translation-api-setup",
+    "gcp-cloud-storage-setup"
+  ],
+  "seo": {
+    "ko": {
+      "title": "GCP 프로젝트 만들기 - 첫 번째 프로젝트 생성 방법 | CloudSetup.guide",
+      "description": "Google Cloud Platform(GCP)에서 프로젝트를 만드는 방법을 3단계로 쉽게 배워보세요. 프로젝트 ID 설정부터 결제 계정 연결까지 스크린샷과 함께 안내합니다.",
+      "keywords": [
+        "GCP 프로젝트 만들기",
+        "Google Cloud 프로젝트",
+        "GCP 프로젝트 생성",
+        "프로젝트 ID",
+        "GCP 시작하기",
+        "클라우드 프로젝트",
+        "GCP 설정",
+        "구글 클라우드 프로젝트"
+      ]
+    },
+    "en": {
+      "title": "Create GCP Project - First Project Setup Guide | CloudSetup.guide",
+      "description": "Learn how to create a Google Cloud Platform (GCP) project in 3 easy steps. From setting project ID to linking billing account, complete with screenshots.",
+      "keywords": [
+        "create GCP project",
+        "Google Cloud project",
+        "GCP project creation",
+        "project ID",
+        "getting started GCP",
+        "cloud project",
+        "GCP setup",
+        "Google Cloud project"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T02:00:00.000Z",
+  "updatedAt": "2026-02-08T02:00:00.000Z",
+  "lastVerified": "2026-02-08T02:00:00.000Z",
+  "published": true
+}

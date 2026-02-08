@@ -1,0 +1,303 @@
+# Create GCP Project - Your First Project Setup
+
+Everything in GCP happens within a **project**. To use APIs, create VMs, or set up databases, you first need a project. Follow this guide to create your first project in just 5 minutes!
+
+<FreeTierInfo
+  service="Google Cloud Projects"
+  limit="Unlimited projects"
+  period="Forever free"
+  status="generous"
+/>
+
+## What is a Project?
+
+<Callout type="info">
+📦 **Projects are containers for resources**
+
+A GCP project serves these purposes:
+- **Resource grouping**: Manage VMs, databases, storage as one unit
+- **Access control**: Grant team members permissions per project
+- **Cost tracking**: View costs separately by project
+- **API management**: Enable APIs independently per project
+
+Examples:
+- `my-blog-project`: For blog website
+- `ai-experiment`: For AI/ML experiments
+- `company-website`: For company homepage
+</Callout>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "GCP account created", required: true },
+  { text: "Billing account set up", required: true },
+  { text: "Project name idea", required: false }
+]} />
+
+---
+
+<Step number={1} title="Open Project Selection Menu">
+
+1. Log in to [Google Cloud Console](https://console.cloud.google.com).
+2. Click the **Project selection** dropdown in the top menu bar.
+   - Shows "My First Project" or "Select a project"
+3. In the popup, click the **NEW PROJECT** button.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-project-create-step1-en.png"
+  alt="Project selection dropdown"
+  caption="Select 'New Project' from the project dropdown at the top"
+/>
+
+<Callout type="tip">
+💡 **Tip**: Can't find the project selection button? Use the search bar and type "new project".
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Enter Project Information">
+
+### 2-1. Project Name
+
+1. Enter your desired name in the **Project name** field.
+   - Example: "My First GCP Project"
+   - Example: "AI Experiments"
+   - Example: "Personal Blog"
+
+<Callout type="info">
+✨ **Project Name vs Project ID**
+
+- **Project name**: Human-readable name (can be changed)
+- **Project ID**: Globally unique identifier (cannot be changed)
+
+When you enter a project name, a project ID is automatically generated.
+</Callout>
+
+### 2-2. Project ID (Optional)
+
+You can use the auto-generated project ID or click **EDIT** to customize it.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-project-create-step2-en.png"
+  alt="Project name and ID input"
+  caption="Project ID is auto-generated from your project name"
+/>
+
+<DevTip>
+**Project ID Selection Tips**
+
+- Only lowercase letters, numbers, and hyphens (-)
+- 6-30 characters
+- Must be globally unique (red warning if already taken)
+- Cannot be changed after creation
+- Choose something memorable
+
+Examples:
+- `my-first-gcp-2024` ✅
+- `ai-experiments-john` ✅
+- `MyProject123` ❌ (no uppercase)
+</DevTip>
+
+### 2-3. Organization (Optional)
+
+- **Organization**: Select if you have a company/team, otherwise "No organization"
+- **Location**: Automatically set to "No organization" for individuals
+
+</Step>
+
+---
+
+<Step number={3} title="Create Project and Link Billing">
+
+1. Click the **CREATE** button.
+2. Project creation takes a few seconds.
+3. You'll automatically switch to the new project when complete.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-project-create-step3-en.png"
+  alt="Project creation complete"
+  caption="Project created and dashboard loads"
+/>
+
+### Verify Billing Account Connection
+
+After creating your project, verify the billing account is linked:
+
+1. Click **Billing** in the left menu
+2. If you see "This project has no billing account":
+   - Click **LINK A BILLING ACCOUNT**
+   - Select your free trial account
+   - Click **SET ACCOUNT**
+
+<Callout type="warning">
+⚠️ **APIs won't work without a billing account**
+
+Most GCP services require a linked billing account to function. Even with free credits, you must link a billing account.
+</Callout>
+
+<Checkpoint
+  title="Verify Project Creation"
+  items={[
+    "Is your new project name shown at the top?",
+    "Can you see project information in the dashboard?",
+    "Is the billing account linked?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **Congratulations!** Your first GCP project is created. You can now enable APIs and use services!
+</Callout>
+
+</Step>
+
+---
+
+## Explore the Project Dashboard
+
+After creating your project, you'll see a dashboard showing:
+
+<CopyBlock
+  code="Project Dashboard includes:
+
+📊 Project Information
+  - Project name
+  - Project ID
+  - Project number
+
+📈 Resource Monitoring
+  - Currently running resources
+  - API usage
+  - Errors and logs
+
+💰 Billing Information
+  - Current costs
+  - Credit balance
+  - Budget alerts
+"
+  language="text"
+/>
+
+---
+
+## Next Steps
+
+Now that you have a project, start using GCP services:
+
+1. **[Vision API Setup](../gcp-vision-api-setup)** - Enable image analysis API
+2. **[Translation API Setup](../gcp-translation-api-setup)** - Try the translation API
+3. **[Cloud Storage Setup](../gcp-cloud-storage-setup)** - Create file storage
+
+---
+
+## Project Management Tips
+
+### Creating Multiple Projects
+
+Separate projects by purpose:
+
+```
+Personal Project Structure Example:
+
+📦 learning-gcp (Learning)
+  - Vision API experiments
+  - Cloud Functions tests
+
+📦 personal-blog (Blog)
+  - Cloud Run web server
+  - Cloud Storage
+
+📦 side-project (Side Project)
+  - Firestore DB
+  - Cloud Functions
+```
+
+### Switching Between Projects
+
+To quickly switch between projects:
+1. Click the project dropdown at the top
+2. Select desired project
+3. Keyboard shortcut: Type project name in search
+
+---
+
+## Frequently Asked Questions
+
+<Callout type="info">
+**Q. How many projects can I create?**
+
+A. By default, you can create up to **25 projects** per account. You can request a quota increase if needed.
+</Callout>
+
+<Callout type="info">
+**Q. Can I change the project ID?**
+
+A. No. Project ID **cannot be changed** after creation. Project name can be changed anytime.
+</Callout>
+
+<Callout type="info">
+**Q. What happens when I delete a project?**
+
+A. When you delete a project:
+- All resources are deleted
+- Can be recovered for 30 days
+- After 30 days, permanently deleted and cannot be recovered
+- Project ID becomes permanently unusable
+</Callout>
+
+<Callout type="info">
+**Q. Can I use GCP without a project?**
+
+A. No. All GCP resources must exist within a project.
+</Callout>
+
+---
+
+## Troubleshooting
+
+### "Project ID already in use"
+
+- Project IDs must be globally unique
+- Choose a different ID or add numbers/hyphens
+- Example: `my-project` → `my-project-2024` or `my-project-john`
+
+### Can't create project
+
+- Check if you've exceeded the 25 project limit
+- Delete unused projects
+- Or request quota increase
+
+### Can't link billing account
+
+- Verify free trial account is active
+- Check you have billing account permissions
+- Refresh browser and retry
+
+---
+
+## Project Naming Best Practices
+
+<Callout type="tip">
+📝 **Choosing Good Project Names**
+
+**Name (for humans)**:
+- Clear and descriptive: "My AI Project" ✅
+- Avoid vague names: "Project 1" ❌
+
+**ID (for systems)**:
+- Include environment: `myapp-dev`, `myapp-prod`
+- Include date: `learning-gcp-2024`
+- Include team/person: `blog-john`
+- Keep it short: `ai-exp` ✅ vs `artificial-intelligence-experiments-project` ❌
+
+Examples:
+- `learning-gcp-2024` (for learning)
+- `portfolio-prod` (portfolio production)
+- `blog-dev` (blog development)
+- `ai-research-personal` (personal AI research)
+</Callout>
+
+---
+
+**Project Created!** 🎉 Time to start using GCP services!
