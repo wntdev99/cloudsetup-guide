@@ -56,15 +56,15 @@ Create **package.json** file:
 <CopyBlock
   code="cat > package.json << 'EOF'
 {
-  \"name\": \"my-docker-app\",
-  \"version\": \"1.0.0\",
-  \"description\": \"Simple Docker Node.js app\",
-  \"main\": \"app.js\",
-  \"scripts\": {
-    \"start\": \"node app.js\"
+  "name": "my-docker-app",
+  "version": "1.0.0",
+  "description": "Simple Docker Node.js app",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
   },
-  \"dependencies\": {
-    \"express\": \"^4.18.2\"
+  "dependencies": {
+    "express": "^4.18.2"
   }
 }
 EOF"
@@ -126,7 +126,7 @@ COPY . .
 EXPOSE 3000
 
 # 7. Command to run when container starts
-CMD [\"npm\", \"start\"]
+CMD ["npm", "start"]
 EOF"
   language="bash"
 />
@@ -197,7 +197,7 @@ Step 3/7 : COPY package*.json ./
 Step 4/7 : RUN npm install --production
 Step 5/7 : COPY . .
 Step 6/7 : EXPOSE 3000
-Step 7/7 : CMD [\"npm\", \"start\"]
+Step 7/7 : CMD ["npm", "start"]
 Successfully built abc123def456
 Successfully tagged my-app:1.0"
   language="bash"
@@ -302,7 +302,7 @@ Output:
 
 <CopyBlock
   code="CONTAINER ID   IMAGE        COMMAND          CREATED         STATUS         PORTS                    NAMES
-abc123def456   my-app:1.0   \"npm start\"   10 seconds ago  Up 8 seconds   0.0.0.0:3000->3000/tcp   my-container"
+abc123def456   my-app:1.0   npm start     10 seconds ago  Up 8 seconds   0.0.0.0:3000->3000/tcp   my-container"
   language="bash"
 />
 

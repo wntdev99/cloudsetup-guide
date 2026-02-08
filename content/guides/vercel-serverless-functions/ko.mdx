@@ -33,8 +33,7 @@ API Routes는 Next.js 프로젝트 내에서 서버리스 함수를 만드는 �
 
 1. 프로젝트 루트에서 `app/api/hello/route.ts` 파일을 생성합니다:
 
-<CopyBlock language="typescript">
-{`// app/api/hello/route.ts
+<CopyBlock language="typescript" code="// app/api/hello/route.ts
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
@@ -51,8 +50,7 @@ export async function POST(request: Request) {
     received: body,
     message: 'Data received successfully',
   });
-}`}
-</CopyBlock>
+}"></CopyBlock>
 
 2. 로컬에서 개발 서버를 실행합니다:
 
@@ -67,9 +65,7 @@ npm run dev
 curl http://localhost:3000/api/hello
 
 # POST 요청
-curl -X POST http://localhost:3000/api/hello \
-  -H "Content-Type: application/json" \
-  -d '{"name": "Vercel"}'
+curl -X POST http://localhost:3000/api/hello -H "Content-Type: application/json" -d '{"name": "Vercel"}'
 </CopyBlock>
 
 <Screenshot
@@ -88,8 +84,7 @@ App Router에서는 각 HTTP 메서드(GET, POST, PUT, DELETE 등)를 개별 함
 
 `app/api/users/[id]/route.ts` 파일을 생성합니다:
 
-<CopyBlock language="typescript">
-{`// app/api/users/[id]/route.ts
+<CopyBlock language="typescript" code="// app/api/users/[id]/route.ts
 import { NextResponse } from 'next/server';
 
 export async function GET(
@@ -119,8 +114,7 @@ export async function DELETE(
     success: true,
     message: 'User ' + userId + ' deleted',
   });
-}`}
-</CopyBlock>
+}"></CopyBlock>
 
 테스트:
 <CopyBlock language="bash">
@@ -384,8 +378,7 @@ export async function GET(request: Request) {
 curl https://my-vercel-app.vercel.app/api/protected/data
 
 # 올바른 토큰으로 호출 - 성공
-curl https://my-vercel-app.vercel.app/api/protected/data \
-  -H "Authorization: Bearer valid-token-123"
+curl https://my-vercel-app.vercel.app/api/protected/data -H "Authorization: Bearer valid-token-123"
 </CopyBlock>
 
 <DevTip title="Middleware 활용 아이디어">

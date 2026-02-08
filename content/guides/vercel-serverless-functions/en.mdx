@@ -33,8 +33,7 @@ API Routes are the simplest way to create serverless functions within a Next.js 
 
 1. Create `app/api/hello/route.ts` file from project root:
 
-<CopyBlock language="typescript">
-{`// app/api/hello/route.ts
+<CopyBlock language="typescript" code="// app/api/hello/route.ts
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
@@ -51,8 +50,7 @@ export async function POST(request: Request) {
     received: body,
     message: 'Data received successfully',
   });
-}`}
-</CopyBlock>
+}"></CopyBlock>
 
 2. Run development server locally:
 
@@ -67,9 +65,7 @@ npm run dev
 curl http://localhost:3000/api/hello
 
 # POST request
-curl -X POST http://localhost:3000/api/hello \
-  -H "Content-Type: application/json" \
-  -d '{"name": "Vercel"}'
+curl -X POST http://localhost:3000/api/hello -H "Content-Type: application/json" -d '{"name": "Vercel"}'
 </CopyBlock>
 
 <Screenshot
@@ -88,8 +84,7 @@ To create an API that accepts parameters, use dynamic segments in `[id]` format.
 
 Create `app/api/users/[id]/route.ts` file:
 
-<CopyBlock language="typescript">
-{`// app/api/users/[id]/route.ts
+<CopyBlock language="typescript" code="// app/api/users/[id]/route.ts
 import { NextResponse } from 'next/server';
 
 export async function GET(
@@ -119,8 +114,7 @@ export async function DELETE(
     success: true,
     message: 'User ' + userId + ' deleted',
   });
-}`}
-</CopyBlock>
+}"></CopyBlock>
 
 Test:
 <CopyBlock language="bash">
@@ -384,8 +378,7 @@ Test:
 curl https://my-vercel-app.vercel.app/api/protected/data
 
 # Call with correct token - success
-curl https://my-vercel-app.vercel.app/api/protected/data \
-  -H "Authorization: Bearer valid-token-123"
+curl https://my-vercel-app.vercel.app/api/protected/data -H "Authorization: Bearer valid-token-123"
 </CopyBlock>
 
 <DevTip title="Middleware Use Case Ideas">

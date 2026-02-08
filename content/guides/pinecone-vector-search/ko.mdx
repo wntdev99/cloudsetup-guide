@@ -76,7 +76,7 @@ for doc in documents:
 
 print(f'Created {len(embeddings)} embeddings')
 for emb in embeddings:
-  print(f'  - {emb[\"text\"][:50]}...')"
+  print('  -', emb['text'][:50] + '...')"
   language="python"
 />
 
@@ -257,8 +257,8 @@ results = index.query(
 print(f'Query: {query}')
 print('\nMost similar documents:')
 for match in results['matches']:
-  print(f'  Score: {match[\"score\"]:.2f}')
-  print(f'  Text: {match[\"metadata\"][\"text\"]}')"
+  print(f'  Score: {match['score']:.2f}')
+  print(f'  Text: {match['metadata']['text']}')"
   language="python"
 />
 
@@ -369,7 +369,7 @@ search_app.add_document('3', 'Python programming guide')
 results = search_app.search('What is machine learning?')
 print('Search results:')
 for r in results:
-  print(f'  {r[\"metadata\"][\"text\"]} (Score: {r[\"score\"]:.2f})')"
+  print(f'  {r['metadata']['text']} (Score: {r['score']:.2f})')"
   language="python"
 />
 

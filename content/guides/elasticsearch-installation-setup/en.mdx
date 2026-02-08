@@ -41,13 +41,7 @@ If Docker is not installed, download it from the [Docker official website](https
 ### Run Elasticsearch with Docker
 
 <CopyBlock language="bash" title="Start Elasticsearch Docker container">
-docker run -d \
-  --name elasticsearch \
-  -e discovery.type=single-node \
-  -e xpack.security.enabled=false \
-  -p 9200:9200 \
-  -p 9300:9300 \
-  docker.elastic.co/elasticsearch/elasticsearch:8.13.0
+docker run -d --name elasticsearch -e discovery.type=single-node -e xpack.security.enabled=false -p 9200:9200 -p 9300:9300 docker.elastic.co/elasticsearch/elasticsearch:8.13.0
 </CopyBlock>
 
 Command explanation:
@@ -197,12 +191,7 @@ Kibana is a visualization and management tool for Elasticsearch.
 ### Run Kibana with Docker
 
 <CopyBlock language="bash" title="Start Kibana container">
-docker run -d \
-  --name kibana \
-  -p 5601:5601 \
-  -e ELASTICSEARCH_HOSTS=http://elasticsearch:9200 \
-  --network bridge \
-  docker.elastic.co/kibana/kibana:8.13.0
+docker run -d --name kibana -p 5601:5601 -e ELASTICSEARCH_HOSTS=http://elasticsearch:9200 --network bridge docker.elastic.co/kibana/kibana:8.13.0
 </CopyBlock>
 
 Then open your browser:
@@ -245,12 +234,7 @@ You've installed Elasticsearch! Next, you can:
 Change to a different port:
 
 <CopyBlock language="bash" title="Use different port">
-docker run -d \
-  --name elasticsearch \
-  -e discovery.type=single-node \
-  -e xpack.security.enabled=false \
-  -p 9201:9200 \
-  docker.elastic.co/elasticsearch/elasticsearch:8.13.0
+docker run -d --name elasticsearch -e discovery.type=single-node -e xpack.security.enabled=false -p 9201:9200 docker.elastic.co/elasticsearch/elasticsearch:8.13.0
 </CopyBlock>
 
 Then access at `http://localhost:9201`.
@@ -260,13 +244,7 @@ Then access at `http://localhost:9201`.
 Elasticsearch allocates 2GB RAM by default. Adjust with environment variables:
 
 <CopyBlock language="bash" title="Adjust memory allocation">
-docker run -d \
-  --name elasticsearch \
-  -e discovery.type=single-node \
-  -e xpack.security.enabled=false \
-  -e "ES_JAVA_OPTS=-Xms512m -Xmx512m" \
-  -p 9200:9200 \
-  docker.elastic.co/elasticsearch/elasticsearch:8.13.0
+docker run -d --name elasticsearch -e discovery.type=single-node -e xpack.security.enabled=false -e "ES_JAVA_OPTS=-Xms512m -Xmx512m" -p 9200:9200 docker.elastic.co/elasticsearch/elasticsearch:8.13.0
 </CopyBlock>
 
 ### Check Docker Logs

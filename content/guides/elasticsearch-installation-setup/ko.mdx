@@ -41,13 +41,7 @@ Docker가 설치되지 않았다면 [Docker 공식 사이트](https://www.docker
 ### Docker로 Elasticsearch 실행하기
 
 <CopyBlock language="bash" title="Elasticsearch Docker 컨테이너 실행">
-docker run -d \
-  --name elasticsearch \
-  -e discovery.type=single-node \
-  -e xpack.security.enabled=false \
-  -p 9200:9200 \
-  -p 9300:9300 \
-  docker.elastic.co/elasticsearch/elasticsearch:8.13.0
+docker run -d --name elasticsearch -e discovery.type=single-node -e xpack.security.enabled=false -p 9200:9200 -p 9300:9300 docker.elastic.co/elasticsearch/elasticsearch:8.13.0
 </CopyBlock>
 
 명령어 설명:
@@ -197,12 +191,7 @@ Kibana는 Elasticsearch를 시각화하고 관리하는 도구입니다.
 ### Docker로 Kibana 실행
 
 <CopyBlock language="bash" title="Kibana 컨테이너 시작">
-docker run -d \
-  --name kibana \
-  -p 5601:5601 \
-  -e ELASTICSEARCH_HOSTS=http://elasticsearch:9200 \
-  --network bridge \
-  docker.elastic.co/kibana/kibana:8.13.0
+docker run -d --name kibana -p 5601:5601 -e ELASTICSEARCH_HOSTS=http://elasticsearch:9200 --network bridge docker.elastic.co/kibana/kibana:8.13.0
 </CopyBlock>
 
 그 다음 웹 브라우저에서:
@@ -245,12 +234,7 @@ Kibana를 사용하면 인덱스 관리, 쿼리 시각화, 로그 분석 등을 
 다른 포트로 변경:
 
 <CopyBlock language="bash" title="다른 포트 사용">
-docker run -d \
-  --name elasticsearch \
-  -e discovery.type=single-node \
-  -e xpack.security.enabled=false \
-  -p 9201:9200 \
-  docker.elastic.co/elasticsearch/elasticsearch:8.13.0
+docker run -d --name elasticsearch -e discovery.type=single-node -e xpack.security.enabled=false -p 9201:9200 docker.elastic.co/elasticsearch/elasticsearch:8.13.0
 </CopyBlock>
 
 그 다음 `http://localhost:9201`로 접속합니다.
@@ -260,13 +244,7 @@ docker run -d \
 Elasticsearch는 기본적으로 2GB의 RAM을 할당합니다. 환경 변수로 조정:
 
 <CopyBlock language="bash" title="메모리 할당 조정">
-docker run -d \
-  --name elasticsearch \
-  -e discovery.type=single-node \
-  -e xpack.security.enabled=false \
-  -e "ES_JAVA_OPTS=-Xms512m -Xmx512m" \
-  -p 9200:9200 \
-  docker.elastic.co/elasticsearch/elasticsearch:8.13.0
+docker run -d --name elasticsearch -e discovery.type=single-node -e xpack.security.enabled=false -e "ES_JAVA_OPTS=-Xms512m -Xmx512m" -p 9200:9200 docker.elastic.co/elasticsearch/elasticsearch:8.13.0
 </CopyBlock>
 
 ### Docker 로그 확인

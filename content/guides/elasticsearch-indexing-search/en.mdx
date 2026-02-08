@@ -48,19 +48,7 @@ Response:
 Create with detailed field definitions:
 
 <CopyBlock language="bash" title="Create index with mappings">
-curl -X PUT http://localhost:9200/articles \
-  -H "Content-Type: application/json" \
-  -d '{
-    "mappings": {
-      "properties": {
-        "title": { "type": "text" },
-        "content": { "type": "text" },
-        "author": { "type": "keyword" },
-        "published_date": { "type": "date" },
-        "tags": { "type": "keyword" }
-      }
-    }
-  }'
+curl -X PUT http://localhost:9200/articles -H "Content-Type: application/json" -d '{"mappings":{"properties":{"title":{"type":"text"},"content":{"type":"text"},"author":{"type":"keyword"},"published_date":{"type":"date"},"tags":{"type":"keyword"}}}}'
 </CopyBlock>
 
 <Screenshot
@@ -89,15 +77,7 @@ Add documents to your index.
 ### Add a Single Document
 
 <CopyBlock language="bash" title="Add document">
-curl -X POST http://localhost:9200/products/_doc \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Laptop",
-    "price": 1200000,
-    "category": "Electronics",
-    "in_stock": true,
-    "description": "High-performance laptop, 8-core processor, 16GB RAM"
-  }'
+curl -X POST http://localhost:9200/products/_doc -H "Content-Type: application/json" -d '{"name":"Laptop","price":1200000,"category":"Electronics","in_stock":true,"description":"High-performance laptop, 8-core processor, 16GB RAM"}'
 </CopyBlock>
 
 Response shows the created ID:
@@ -116,33 +96,7 @@ Response shows the created ID:
 Index many documents at once for faster ingestion:
 
 <CopyBlock language="bash" title="Bulk indexing">
-curl -X POST http://localhost:9200/products/_bulk \
-  -H "Content-Type: application/json" \
-  -d '{
-    "index": {}
-  }
-  {
-    "name": "Mouse",
-    "price": 50000,
-    "category": "Accessories"
-  }
-  {
-    "index": {}
-  }
-  {
-    "name": "Keyboard",
-    "price": 150000,
-    "category": "Accessories"
-  }
-  {
-    "index": {}
-  }
-  {
-    "name": "Monitor",
-    "price": 350000,
-    "category": "Electronics"
-  }
-  '
+curl -X POST http://localhost:9200/products/_bulk -H "Content-Type: application/json" -d '{"index":{}}\n{"name":"Mouse","price":50000,"category":"Accessories"}\n{"index":{}}\n{"name":"Keyboard","price":150000,"category":"Accessories"}\n{"index":{}}\n{"name":"Monitor","price":350000,"category":"Electronics"}'
 </CopyBlock>
 
 <Screenshot
@@ -170,15 +124,7 @@ Did documents get added successfully? Did you get an _id in the response?
 Search for documents containing specific words:
 
 <CopyBlock language="bash" title="Match query">
-curl -X GET http://localhost:9200/products/_search \
-  -H "Content-Type: application/json" \
-  -d '{
-    "query": {
-      "match": {
-        "description": "processor"
-      }
-    }
-  }'
+curl -X GET http://localhost:9200/products/_search -H "Content-Type: application/json" -d '{"query":{"match":{"description":"processor"}}}'
 </CopyBlock>
 
 ### Term Query (Exact Match)
@@ -186,15 +132,7 @@ curl -X GET http://localhost:9200/products/_search \
 Search for exact values:
 
 <CopyBlock language="bash" title="Term query">
-curl -X GET http://localhost:9200/products/_search \
-  -H "Content-Type: application/json" \
-  -d '{
-    "query": {
-      "term": {
-        "category": "Accessories"
-      }
-    }
-  }'
+curl -X GET http://localhost:9200/products/_search -H "Content-Type: application/json" -d '{"query":{"term":{"category":"Accessories"}}}'
 </CopyBlock>
 
 ### Range Query
@@ -202,18 +140,7 @@ curl -X GET http://localhost:9200/products/_search \
 Search for documents within a price range:
 
 <CopyBlock language="bash" title="Range query">
-curl -X GET http://localhost:9200/products/_search \
-  -H "Content-Type: application/json" \
-  -d '{
-    "query": {
-      "range": {
-        "price": {
-          "gte": 100000,
-          "lte": 500000
-        }
-      }
-    }
-  }'
+curl -X GET http://localhost:9200/products/_search -H "Content-Type: application/json" -d '{"query":{"range":{"price":{"gte":100000,"lte":500000}}}}'
 </CopyBlock>
 
 ### Bool Query (Complex Conditions)
@@ -221,20 +148,7 @@ curl -X GET http://localhost:9200/products/_search \
 Combine multiple conditions:
 
 <CopyBlock language="bash" title="Bool query">
-curl -X GET http://localhost:9200/products/_search \
-  -H "Content-Type: application/json" \
-  -d '{
-    "query": {
-      "bool": {
-        "must": [
-          { "match": { "category": "Electronics" } }
-        ],
-        "filter": [
-          { "range": { "price": { "gte": 1000000 } } }
-        ]
-      }
-    }
-  }'
+curl -X GET http://localhost:9200/products/_search -H "Content-Type: application/json" -d '{"query":{"bool":{"must":[{"match":{"category":"Electronics"}}],"filter":[{"range":{"price":{"gte":1000000}}}]}}}'
 </CopyBlock>
 
 <Screenshot
@@ -258,14 +172,7 @@ Do you see search results? Are documents in the hits array?
 Search with results sorted by price:
 
 <CopyBlock language="bash" title="Sort by price">
-curl -X GET http://localhost:9200/products/_search \
-  -H "Content-Type: application/json" \
-  -d '{
-    "query": { "match_all": {} },
-    "sort": [
-      { "price": { "order": "desc" } }
-    ]
-  }'
+curl -X GET http://localhost:9200/products/_search -H "Content-Type: application/json" -d '{"query":{"match_all":{}},"sort":[{"price":{"order":"desc"}}]}'
 </CopyBlock>
 
 ### Pagination
@@ -273,13 +180,7 @@ curl -X GET http://localhost:9200/products/_search \
 Use from and size for paginated results:
 
 <CopyBlock language="bash" title="Pagination">
-curl -X GET http://localhost:9200/products/_search \
-  -H "Content-Type: application/json" \
-  -d '{
-    "query": { "match_all": {} },
-    "from": 0,
-    "size": 10
-  }'
+curl -X GET http://localhost:9200/products/_search -H "Content-Type: application/json" -d '{"query":{"match_all":{}},"from":0,"size":10}'
 </CopyBlock>
 
 ### Select Specific Fields
@@ -287,12 +188,7 @@ curl -X GET http://localhost:9200/products/_search \
 Return only needed fields:
 
 <CopyBlock language="bash" title="Select fields">
-curl -X GET http://localhost:9200/products/_search \
-  -H "Content-Type: application/json" \
-  -d '{
-    "query": { "match_all": {} },
-    "_source": ["name", "price", "category"]
-  }'
+curl -X GET http://localhost:9200/products/_search -H "Content-Type: application/json" -d '{"query":{"match_all":{}},"_source":["name","price","category"]}'
 </CopyBlock>
 
 <Screenshot
@@ -310,17 +206,7 @@ curl -X GET http://localhost:9200/products/_search \
 ### Count Documents by Category
 
 <CopyBlock language="bash" title="Aggregation query">
-curl -X GET http://localhost:9200/products/_search \
-  -H "Content-Type: application/json" \
-  -d '{
-    "aggs": {
-      "category_counts": {
-        "terms": {
-          "field": "category"
-        }
-      }
-    }
-  }'
+curl -X GET http://localhost:9200/products/_search -H "Content-Type: application/json" -d '{"aggs":{"category_counts":{"terms":{"field":"category"}}}}'
 </CopyBlock>
 
 Response:
@@ -346,17 +232,7 @@ Response:
 ### Calculate Average Price
 
 <CopyBlock language="bash" title="Calculate average">
-curl -X GET http://localhost:9200/products/_search \
-  -H "Content-Type: application/json" \
-  -d '{
-    "aggs": {
-      "avg_price": {
-        "avg": {
-          "field": "price"
-        }
-      }
-    }
-  }'
+curl -X GET http://localhost:9200/products/_search -H "Content-Type: application/json" -d '{"aggs":{"avg_price":{"avg":{"field":"price"}}}}'
 </CopyBlock>
 
 <Callout type="success">
