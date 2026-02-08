@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 interface TocItem {
   id: string;
@@ -11,6 +11,7 @@ interface TocItem {
 export function TableOfContents() {
   const [toc, setToc] = useState<TocItem[]>([]);
   const [activeId, setActiveId] = useState('');
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
     const headings = document.querySelectorAll('h2[id^="step-"]');
@@ -19,25 +20,43 @@ export function TableOfContents() {
     headings.forEach((heading) => {
       const id = heading.id;
       const title = heading.textContent || '';
-      const step = parseInt(id.replace('step-', ''));
-      items.push({ id, title, step });
+      const step = parseInt(id.replace('step-', ''), 10);
+      if (!isNaN(step)) {
+        items.push({ id, title, step });
+      }
     });
 
     setToc(items);
 
-    const handleScroll = () => {
-      let current = '';
-      headings.forEach((heading) => {
-        const rect = heading.getBoundingClientRect();
-        if (rect.top < window.innerHeight / 3) {
-          current = heading.id;
-        }
-      });
-      setActiveId(current);
+    // Use IntersectionObserver for better performance
+    const options: IntersectionObserverInit = {
+      root: null,
+      rootMargin: '-20% 0px -35% 0px', // Trigger when heading is in upper third of viewport
+      threshold: 0,
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    observerRef.current = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setActiveId(entry.target.id);
+        }
+      });
+    }, options);
+
+    // Observe all headings
+    headings.forEach((heading) => {
+      observerRef.current?.observe(heading);
+    });
+
+    // Cleanup
+    return () => {
+      if (observerRef.current) {
+        headings.forEach((heading) => {
+          observerRef.current?.unobserve(heading);
+        });
+        observerRef.current.disconnect();
+      }
+    };
   }, []);
 
   const scrollToSection = (id: string) => {

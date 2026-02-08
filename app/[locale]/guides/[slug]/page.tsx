@@ -8,6 +8,13 @@ import { ProgressBar } from '@/components/guide/ProgressBar';
 import { TableOfContents } from '@/components/guide/TableOfContents';
 import { GuideNavigation } from '@/components/guide/GuideNavigation';
 import { generateMetadata as genMeta, generateGuideJsonLd } from '@/lib/seo';
+import { Step } from '@/components/guide/Step';
+import { Screenshot } from '@/components/guide/Screenshot';
+import { CopyBlock } from '@/components/guide/CopyBlock';
+import { Callout } from '@/components/guide/Callout';
+import { FreeTierInfo } from '@/components/guide/FreeTierInfo';
+import { DevTip } from '@/components/guide/DevTip';
+import { Checkpoint } from '@/components/guide/Checkpoint';
 
 interface GuidePageProps {
   params: {
@@ -47,6 +54,17 @@ export default async function GuidePage({ params }: GuidePageProps) {
 
   const jsonLd = generateGuideJsonLd(guide.meta, locale);
 
+  // Define MDX components for server component
+  const components = {
+    Step,
+    Screenshot,
+    CopyBlock,
+    Callout,
+    FreeTierInfo,
+    DevTip,
+    Checkpoint,
+  };
+
   return (
     <>
       <script
@@ -61,7 +79,7 @@ export default async function GuidePage({ params }: GuidePageProps) {
           <main>
             <article className="prose prose-slate lg:prose-lg dark:prose-invert max-w-none">
               <GuideHeader meta={guide.meta} locale={locale} />
-              <MDXRemote source={guide.content} />
+              <MDXRemote source={guide.content} components={components} />
             </article>
 
             <GuideNavigation

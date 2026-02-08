@@ -1,12 +1,16 @@
-let pagefind: any = null;
+import type { PagefindInstance, PagefindSearchResult } from '@/types/pagefind';
 
-export async function initPagefind() {
+let pagefind: PagefindInstance | null = null;
+
+export async function initPagefind(): Promise<PagefindInstance | null> {
   if (typeof window === 'undefined') return null;
   if (pagefind) return pagefind;
 
   try {
-    // @ts-ignore
-    pagefind = await import(/* webpackIgnore: true */ '/pagefind/pagefind.js');
+    // Dynamic import of Pagefind library
+    // Pagefind is generated at build time and not available during type checking
+    // @ts-ignore - webpackIgnore tells webpack to not try to bundle this
+    pagefind = (await import(/* webpackIgnore: true */ '/pagefind/pagefind.js')) as unknown as PagefindInstance;
     return pagefind;
   } catch (error) {
     console.warn('Pagefind not loaded:', error);
@@ -26,10 +30,10 @@ export async function search(query: string): Promise<SearchResult[]> {
   if (!pf) return [];
 
   try {
-    const search = await pf.search(query);
+    const searchResults = await pf.search(query);
     const results = await Promise.all(
-      search.results.slice(0, 10).map(async (r: any) => {
-        const data = await r.data();
+      searchResults.results.slice(0, 10).map(async (result: PagefindSearchResult) => {
+        const data = await result.data();
         return {
           id: data.url,
           url: data.url,

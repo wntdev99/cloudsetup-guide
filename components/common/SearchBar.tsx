@@ -1,17 +1,24 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { search, type SearchResult } from '@/lib/pagefind';
 import Link from 'next/link';
+
+// Remove HTML tags from search excerpts to prevent XSS
+function stripHtmlTags(html: string): string {
+  return html.replace(/<[^>]*>/g, '');
+}
 
 export function SearchBar() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
+  // Handle search with debounce
   useEffect(() => {
     const delayDebounce = setTimeout(async () => {
       if (query.length >= 2) {
@@ -29,15 +36,26 @@ export function SearchBar() {
     return () => clearTimeout(delayDebounce);
   }, [query]);
 
+  // Handle clicks outside to close results
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+        setShowResults(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   return (
-    <div className="w-full max-w-2xl relative">
+    <div ref={wrapperRef} className="w-full max-w-2xl relative">
       <Input
         type="search"
         placeholder="Search guides... (e.g., 'GCP Vision API')"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         onFocus={() => query.length >= 2 && setShowResults(true)}
-        onBlur={() => setTimeout(() => setShowResults(false), 200)}
         className="h-12 text-lg"
       />
 
@@ -50,10 +68,9 @@ export function SearchBar() {
               {results.map((result) => (
                 <Link key={result.id} href={result.url} className="block p-4 hover:bg-muted">
                   <div className="font-semibold mb-1">{result.title}</div>
-                  <div
-                    className="text-sm text-muted-foreground line-clamp-2"
-                    dangerouslySetInnerHTML={{ __html: result.excerpt }}
-                  />
+                  <div className="text-sm text-muted-foreground line-clamp-2">
+                    {stripHtmlTags(result.excerpt)}
+                  </div>
                 </Link>
               ))}
             </div>

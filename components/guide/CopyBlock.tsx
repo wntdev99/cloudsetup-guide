@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 
 interface CopyBlockProps {
@@ -9,12 +10,42 @@ interface CopyBlockProps {
 }
 
 export function CopyBlock({ code, language = 'bash' }: CopyBlockProps) {
+  const t = useTranslations('guide');
   const [copied, setCopied] = useState(false);
+  const [copyError, setCopyError] = useState(false);
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(code);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      // Modern Clipboard API (requires HTTPS or localhost)
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(code);
+      } else {
+        // Fallback for older browsers or non-HTTPS environments
+        const textArea = document.createElement('textarea');
+        textArea.value = code;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textArea);
+
+        if (!successful) {
+          throw new Error('Fallback copy failed');
+        }
+      }
+
+      setCopied(true);
+      setCopyError(false);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error('Copy failed:', error);
+      setCopyError(true);
+      setTimeout(() => setCopyError(false), 2000);
+    }
   };
 
   return (
@@ -28,7 +59,7 @@ export function CopyBlock({ code, language = 'bash' }: CopyBlockProps) {
         onClick={handleCopy}
         className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
       >
-        {copied ? '복사됨!' : '복사'}
+        {copied ? t('copied') : copyError ? t('copyFailed') : t('copy')}
       </Button>
     </div>
   );

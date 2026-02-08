@@ -21,6 +21,7 @@
     "lastVerified": "Last Verified",
     "copy": "Copy",
     "copied": "Copied",
+    "copyFailed": "Failed",
     "checkpoint": "Checkpoint",
     "freeTier": "Free Tier"
   },

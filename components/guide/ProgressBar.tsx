@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 interface ProgressBarProps {
   totalSteps: number;
@@ -8,24 +8,43 @@ interface ProgressBarProps {
 
 export function ProgressBar({ totalSteps }: ProgressBarProps) {
   const [currentStep, setCurrentStep] = useState(1);
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const steps = document.querySelectorAll('[id^="step-"]');
-      let current = 1;
-
-      steps.forEach((step, index) => {
-        const rect = step.getBoundingClientRect();
-        if (rect.top < window.innerHeight / 2) {
-          current = index + 1;
-        }
-      });
-
-      setCurrentStep(current);
+    // Use IntersectionObserver for better performance
+    const options: IntersectionObserverInit = {
+      root: null,
+      rootMargin: '-50% 0px -50% 0px', // Trigger when element is at center of viewport
+      threshold: 0,
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    observerRef.current = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const stepId = entry.target.id;
+          const stepNumber = parseInt(stepId.replace('step-', ''), 10);
+          if (!isNaN(stepNumber)) {
+            setCurrentStep(stepNumber);
+          }
+        }
+      });
+    }, options);
+
+    // Observe all step elements
+    const steps = document.querySelectorAll('[id^="step-"]');
+    steps.forEach((step) => {
+      observerRef.current?.observe(step);
+    });
+
+    // Cleanup
+    return () => {
+      if (observerRef.current) {
+        steps.forEach((step) => {
+          observerRef.current?.unobserve(step);
+        });
+        observerRef.current.disconnect();
+      }
+    };
   }, []);
 
   const progress = (currentStep / totalSteps) * 100;
