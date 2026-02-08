@@ -1,0 +1,63 @@
+{
+  "slug": "gcp-text-to-speech-setup",
+  "platform": "gcp",
+  "service": "Cloud Text-to-Speech API",
+  "category": "ai-ml",
+  "difficulty": "beginner",
+  "estimatedMinutes": 12,
+  "totalSteps": 5,
+  "freeTier": {
+    "service": "Cloud Text-to-Speech API",
+    "limit": "월 100만자",
+    "period": "month",
+    "amount": "무료",
+    "status": "generous",
+    "conditions": [
+      "WaveNet: 월 100만자 무료",
+      "Standard: 월 400만자 무료",
+      "초과 시 100만자당 $4~$16"
+    ]
+  },
+  "prerequisites": [
+    "gcp-account-setup",
+    "gcp-project-create"
+  ],
+  "nextGuides": [
+    "gcp-speech-to-text-setup",
+    "gcp-translation-api-setup"
+  ],
+  "seo": {
+    "ko": {
+      "title": "GCP Text-to-Speech API 설정 - 텍스트를 음성으로 변환 | CloudSetup.guide",
+      "description": "Google Cloud Text-to-Speech API를 활성화하고 첫 번째 음성 합성을 실행하는 방법을 5단계로 배워보세요. API 키 생성부터 실제 테스트까지 완벽 가이드.",
+      "keywords": [
+        "GCP Text-to-Speech",
+        "Google Cloud TTS",
+        "음성 합성 API",
+        "TTS API",
+        "텍스트를 음성으로",
+        "Text-to-Speech 설정",
+        "GCP API 키",
+        "음성 생성"
+      ]
+    },
+    "en": {
+      "title": "Setup GCP Text-to-Speech API - Convert Text to Speech | CloudSetup.guide",
+      "description": "Learn how to enable Google Cloud Text-to-Speech API and run your first speech synthesis in 5 easy steps. Complete guide from API key creation to testing.",
+      "keywords": [
+        "GCP Text-to-Speech",
+        "Google Cloud TTS",
+        "speech synthesis API",
+        "TTS API",
+        "text to speech",
+        "Text-to-Speech setup",
+        "GCP API key",
+        "voice generation"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T04:30:00.000Z",
+  "updatedAt": "2026-02-08T04:30:00.000Z",
+  "lastVerified": "2026-02-08T04:30:00.000Z",
+  "published": true
+}

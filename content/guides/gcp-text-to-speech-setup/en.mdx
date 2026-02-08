@@ -1,0 +1,562 @@
+# Setup GCP Text-to-Speech API - Convert Text to Speech
+
+Google Cloud Text-to-Speech API **converts text to natural-sounding speech**, supports **40+ languages and 220+ voices**, and uses **WaveNet AI technology** to generate high-quality voices that are nearly indistinguishable from humans. Follow this guide to enable Text-to-Speech API and run your first speech synthesis in just 12 minutes!
+
+<FreeTierInfo
+  service="Cloud Text-to-Speech API"
+  limit="WaveNet 1M characters/month"
+  period="Monthly"
+  status="generous"
+/>
+
+## What Can Text-to-Speech API Do?
+
+<Callout type="info">
+🔊 **Key Text-to-Speech API Features**
+
+- **Speech Synthesis**: Automatically convert text to natural-sounding speech
+- **Variety of Voices**: 220+ voices (male, female, neutral)
+- **Multilingual Support**: 40+ languages and dialects
+- **WaveNet AI**: DeepMind's AI technology for highest quality voices
+- **SSML Support**: Fine-tune pronunciation, rate, and pitch
+- **Audio Formats**: Support for MP3, WAV, OGG, and more
+
+**Use Cases**:
+- Automatic audiobook generation
+- IVR (automated response system) voices
+- Accessibility enhancement (visually impaired support)
+- Video narration
+</Callout>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "GCP account and project created", required: true },
+  { text: "Billing account linked", required: true },
+  { text: "Sample text to convert to speech ready", required: false }
+]} />
+
+<Callout type="tip">
+💡 **Free Tier**: WaveNet voices up to 1M characters/month, Standard voices up to 4M characters/month!
+</Callout>
+
+---
+
+<Step number={1} title="Enable Text-to-Speech API">
+
+1. Log in to [Google Cloud Console](https://console.cloud.google.com).
+2. Verify the correct project is selected.
+3. Type **"Text-to-Speech"** in the top search bar.
+4. Click **Cloud Text-to-Speech API** from the results.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-text-to-speech-step1-en.png"
+  alt="Search for Text-to-Speech API"
+  caption="Find Text-to-Speech API using the search bar"
+/>
+
+5. Click the **ENABLE** button.
+6. API activation takes a few seconds.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-text-to-speech-step1b-en.png"
+  alt="Enable Text-to-Speech API"
+  caption="Click ENABLE to activate the API"
+/>
+
+<Checkpoint
+  title="Verify API Enabled"
+  items={[
+    "Is the API enabled?",
+    "Did you navigate to the 'API enabled' page?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="Prepare API Key">
+
+To use Text-to-Speech API, you need an **API key** or **service account**.
+
+### 2-1. Reuse Existing API Key
+
+If you've already created an API key for other GCP APIs:
+
+1. Click **Credentials** in the left menu
+2. Check existing API keys
+3. Add **Cloud Text-to-Speech API** to the key's **API restrictions** section:
+   - Click the API key name
+   - Select **Restrict key** in **API restrictions**
+   - Check the **Cloud Text-to-Speech API** checkbox
+   - Click **Save**
+
+### 2-2. Create New API Key
+
+1. On the **Credentials** page, click **+ CREATE CREDENTIALS**
+2. Select **API key**
+3. **Copy** the generated API key and save it securely
+4. Click **Restrict Key** button to configure security:
+   - **API restrictions**: Select "Restrict key"
+   - Check only **Cloud Text-to-Speech API**
+   - Click **Save**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-text-to-speech-step2-en.png"
+  alt="Create and restrict API key"
+  caption="Restrict to Text-to-Speech API only for security"
+/>
+
+<Callout type="warning">
+⚠️ **API Key Security**
+
+API keys are like passwords that anyone can use:
+- Never upload to GitHub, blogs, or public repositories
+- Store in environment variables or config files and add to .gitignore
+- Use service accounts for production
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="Test Text-to-Speech API - Web Console">
+
+The easiest way is to test directly in the GCP console.
+
+1. Return to the Text-to-Speech API page.
+2. Click **TRY THIS API** button.
+3. The right panel opens.
+
+### 3-1. Test with Sample Text
+
+1. Enter the following JSON in the **Request body** section:
+
+<CopyBlock
+  code='{
+  "input": {
+    "text": "Hello, this is Google Cloud Text-to-Speech."
+  },
+  "voice": {
+    "languageCode": "en-US",
+    "name": "en-US-Wavenet-D"
+  },
+  "audioConfig": {
+    "audioEncoding": "MP3"
+  }
+}'
+  language="json"
+/>
+
+2. Scroll down and click **EXECUTE**.
+3. Click **Allow** when prompted for Google account permissions.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-text-to-speech-step3-en.png"
+  alt="Test Text-to-Speech API"
+  caption="Execute sample request to test the API"
+/>
+
+### 3-2. Check Results
+
+You'll receive a response like:
+
+<CopyBlock
+  code='{
+  "audioContent": "//NExAAQVAH8AUkQACMA4AA..."
+}'
+  language="json"
+/>
+
+`audioContent` is Base64-encoded audio data. Decode it to get an MP3 file.
+
+<Callout type="success">
+✅ **Success!** Text-to-Speech API converted text to speech!
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="Test Text-to-Speech API - cURL">
+
+In real development, you'll call the API from code or command line.
+
+### 4-1. Convert Text to Speech
+
+Open terminal or command prompt and run:
+
+<CopyBlock
+  code='curl -X POST \
+  -H "Content-Type: application/json" \
+  "https://texttospeech.googleapis.com/v1/text:synthesize?key=YOUR_API_KEY" \
+  -d "{
+    \"input\": {
+      \"text\": \"Hello, the weather is nice today.\"
+    },
+    \"voice\": {
+      \"languageCode\": \"en-US\",
+      \"name\": \"en-US-Wavenet-D\"
+    },
+    \"audioConfig\": {
+      \"audioEncoding\": \"MP3\"
+    }
+  }"'
+  language="bash"
+/>
+
+**Note**: Replace `YOUR_API_KEY` with your actual API key!
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-text-to-speech-step4-en.png"
+  alt="Call API with cURL"
+  caption="Call Text-to-Speech API directly from terminal"
+/>
+
+### 4-2. Save as Audio File
+
+Decode Base64 response and save as MP3:
+
+<CopyBlock
+  code='# 1. Call API and save JSON response
+curl -X POST \
+  -H "Content-Type: application/json" \
+  "https://texttospeech.googleapis.com/v1/text:synthesize?key=YOUR_API_KEY" \
+  -d "{
+    \"input\": {\"text\": \"Hello, world!\"},
+    \"voice\": {\"languageCode\": \"en-US\", \"name\": \"en-US-Wavenet-D\"},
+    \"audioConfig\": {\"audioEncoding\": \"MP3\"}
+  }" > response.json
+
+# 2. Extract audioContent and decode Base64
+cat response.json | jq -r ".audioContent" | base64 --decode > output.mp3
+
+# 3. Play audio (macOS)
+afplay output.mp3
+
+# Or (Linux)
+mpg123 output.mp3'
+  language="bash"
+/>
+
+### 4-3. Use Different Voices
+
+Choose from male, female, and neutral voices:
+
+<CopyBlock
+  code='# English female voice (WaveNet)
+"voice": {
+  "languageCode": "en-US",
+  "name": "en-US-Wavenet-F"
+}
+
+# English male voice (WaveNet)
+"voice": {
+  "languageCode": "en-US",
+  "name": "en-US-Wavenet-D"
+}
+
+# Korean female voice (WaveNet)
+"voice": {
+  "languageCode": "ko-KR",
+  "name": "ko-KR-Wavenet-A"
+}
+
+# English male voice (Standard)
+"voice": {
+  "languageCode": "en-US",
+  "name": "en-US-Standard-B"
+}'
+  language="json"
+/>
+
+<Checkpoint
+  title="Verify API Test Success"
+  items={[
+    "Did the cURL command execute without errors?",
+    "Does the JSON response include audioContent?",
+    "Does the audio file play normally?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={5} title="Use in Real Code">
+
+Now call Text-to-Speech API from your programming language.
+
+### 5-1. Python Example
+
+<CopyBlock
+  code='import requests
+import base64
+
+API_KEY = "YOUR_API_KEY"
+url = f"https://texttospeech.googleapis.com/v1/text:synthesize?key={API_KEY}"
+
+# Speech synthesis request
+request_body = {
+    "input": {
+        "text": "Hello, this is an example of converting text to speech."
+    },
+    "voice": {
+        "languageCode": "en-US",
+        "name": "en-US-Wavenet-D"
+    },
+    "audioConfig": {
+        "audioEncoding": "MP3",
+        "speakingRate": 1.0,  # Speaking rate (0.25 ~ 4.0)
+        "pitch": 0.0          # Pitch (-20.0 ~ 20.0)
+    }
+}
+
+response = requests.post(url, json=request_body)
+result = response.json()
+
+# Decode Base64 and save as MP3
+if "audioContent" in result:
+    audio_content = base64.b64decode(result["audioContent"])
+
+    with open("output.mp3", "wb") as out:
+        out.write(audio_content)
+
+    print("Audio file saved to output.mp3!")
+else:
+    print("Error:", result)'
+  language="python"
+/>
+
+### 5-2. Node.js Example
+
+<CopyBlock
+  code='const axios = require("axios");
+const fs = require("fs");
+
+const API_KEY = "YOUR_API_KEY";
+const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${API_KEY}`;
+
+// Speech synthesis request
+const requestBody = {
+  input: {
+    text: "Hello, this is a text-to-speech example."
+  },
+  voice: {
+    languageCode: "en-US",
+    name: "en-US-Wavenet-D"
+  },
+  audioConfig: {
+    audioEncoding: "MP3",
+    speakingRate: 1.0,  // Speaking rate (0.25 ~ 4.0)
+    pitch: 0.0          // Pitch (-20.0 ~ 20.0)
+  }
+};
+
+axios.post(url, requestBody)
+  .then(response => {
+    const audioContent = response.data.audioContent;
+
+    // Base64 decode and save as MP3
+    const audioBuffer = Buffer.from(audioContent, "base64");
+    fs.writeFileSync("output.mp3", audioBuffer);
+
+    console.log("Audio saved to output.mp3!");
+  })
+  .catch(error => console.error("Error:", error.response?.data || error.message));'
+  language="javascript"
+/>
+
+### 5-3. Use SSML
+
+Use SSML (Speech Synthesis Markup Language) for fine control over pronunciation, rate, and pitch:
+
+<CopyBlock
+  code='import requests
+import base64
+
+API_KEY = "YOUR_API_KEY"
+url = f"https://texttospeech.googleapis.com/v1/text:synthesize?key={API_KEY}"
+
+# Fine control with SSML
+ssml_text = """
+<speak>
+  Hello!
+  <break time="1s"/>
+  Today is <prosody rate="slow" pitch="+2st">a beautiful day</prosody>.
+  <break time="500ms"/>
+  This is <emphasis level="strong">emphasized text</emphasis>.
+</speak>
+"""
+
+request_body = {
+    "input": {
+        "ssml": ssml_text  # Use "ssml" instead of "text"
+    },
+    "voice": {
+        "languageCode": "en-US",
+        "name": "en-US-Wavenet-D"
+    },
+    "audioConfig": {
+        "audioEncoding": "MP3"
+    }
+}
+
+response = requests.post(url, json=request_body)
+result = response.json()
+
+audio_content = base64.b64decode(result["audioContent"])
+with open("output_ssml.mp3", "wb") as out:
+    out.write(audio_content)
+
+print("SSML audio file generated!")'
+  language="python"
+/>
+
+### 5-4. Query Available Voices
+
+Retrieve all supported voices:
+
+<CopyBlock
+  code='import requests
+
+API_KEY = "YOUR_API_KEY"
+url = f"https://texttospeech.googleapis.com/v1/voices?key={API_KEY}"
+
+response = requests.get(url)
+voices = response.json()["voices"]
+
+# Filter English voices only
+en_voices = [v for v in voices if "en-US" in v["languageCodes"]]
+
+for voice in en_voices:
+    name = voice["name"]
+    gender = voice["ssmlGender"]
+    print(f"{name} ({gender})")'
+  language="python"
+/>
+
+<Callout type="success">
+🎉 **Complete!** You've enabled Text-to-Speech API and successfully synthesized speech!
+</Callout>
+
+</Step>
+
+---
+
+## Cost Management
+
+<Callout type="info">
+💰 **Text-to-Speech API Pricing**
+
+- **Free tier**:
+  - WaveNet voices: 1M characters/month
+  - Standard voices: 4M characters/month
+  - Voice list query: Free (unlimited)
+
+- **Overage pricing** (per 1M characters):
+  - WaveNet voices: $16
+  - Neural2 voices: $16
+  - Standard voices: $4
+
+**Example**: 3M characters/month with WaveNet voices
+- Free: 1M characters
+- Paid: 2M × ($16 / 1M) = **$32**
+</Callout>
+
+---
+
+## Next Steps
+
+Now that you've mastered Text-to-Speech API, try other AI APIs:
+
+1. **[Speech-to-Text API Setup](../gcp-speech-to-text-setup)** - Convert speech to text
+2. **[Translation API Setup](../gcp-translation-api-setup)** - Auto-translate 100+ languages
+3. **[Vision API Setup](../gcp-vision-api-setup)** - Image analysis AI
+
+---
+
+## Frequently Asked Questions
+
+<Callout type="info">
+**Q. What's the difference between WaveNet and Standard?**
+
+A. Quality and price:
+- **WaveNet**: DeepMind AI technology, nearly indistinguishable from humans, expensive ($16/1M chars)
+- **Neural2**: Similar quality to WaveNet, same price ($16/1M chars)
+- **Standard**: Basic quality, cheaper ($4/1M chars)
+
+Recommended: WaveNet for general use, Standard for bulk generation
+</Callout>
+
+<Callout type="info">
+**Q. Which languages are supported?**
+
+A. 40+ languages and 220+ voices:
+- Korean (ko-KR): 4 voices (2 male, 2 female)
+- English (en-US): 30+ voices
+- Japanese (ja-JP): 4 voices
+- Chinese (zh-CN, zh-TW): 4 voices each
+- Spanish, French, German, etc.
+
+Full list: Query via `/voices` API endpoint
+</Callout>
+
+<Callout type="info">
+**Q. What is SSML?**
+
+A. Speech Synthesis Markup Language:
+- Fine control over pronunciation, rate, and pitch
+- Pauses (`<break>`)
+- Emphasis (`<emphasis>`)
+- Rate/pitch adjustment (`<prosody>`)
+- Example: `<speak>Hello <break time="1s"/> Nice to meet you</speak>`
+
+See the [SSML guide](https://cloud.google.com/text-to-speech/docs/ssml) for details.
+</Callout>
+
+<Callout type="info">
+**Q. What audio formats are supported?**
+
+A. Various formats:
+- **MP3**: Most universal, high compression
+- **LINEAR16** (WAV): Uncompressed, highest quality
+- **OGG_OPUS**: Suitable for web streaming
+- **MULAW**: For phone systems
+
+Recommended: MP3 for general use, LINEAR16 for high quality
+</Callout>
+
+---
+
+## Troubleshooting
+
+### "Invalid voice name" error
+
+- Verify language code matches voice name
+- Query available voices via `/voices` API
+- Example: `en-US-Wavenet-D` exists, but `en-US-Wavenet-Z` doesn't
+
+### audioContent is empty
+
+- Verify API key is correct
+- Check request body JSON format is valid
+- Verify quota not exceeded
+
+### Voice sounds unnatural
+
+- Use WaveNet or Neural2 voices
+- Fine-tune pronunciation with SSML
+- Adjust `speakingRate` and `pitch`
+- Test with different voices
+
+### File size too large
+
+- Use MP3 encoding (smaller than LINEAR16)
+- Increase `speakingRate` to reduce playback time
+- Split text into multiple chunks
+
+---
+
+**Text-to-Speech API Setup Complete!** 🎊 Now freely use speech synthesis services!
