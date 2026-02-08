@@ -1,0 +1,608 @@
+# GCP Speech-to-Text API 설정 - 음성을 텍스트로 변환하기
+
+Google Cloud Speech-to-Text API는 **음성을 텍스트로 변환**하고, **125개 언어를 지원**하며, **실시간 음성 인식**을 제공하는 강력한 AI 서비스입니다. 이 가이드를 따라 Speech-to-Text API를 활성화하고 첫 번째 음성 인식을 15분 안에 실행해보세요!
+
+<FreeTierInfo
+  service="Cloud Speech-to-Text API"
+  limit="월 60분"
+  period="월간"
+  status="generous"
+/>
+
+## Speech-to-Text API로 무엇을 할 수 있나요?
+
+<Callout type="info">
+🎤 **주요 Speech-to-Text API 기능**
+
+- **음성 인식**: 음성 파일을 텍스트로 자동 변환
+- **실시간 스트리밍**: 실시간 음성을 즉시 텍스트로 변환
+- **다국어 지원**: 125개 이상 언어 및 방언 지원
+- **자동 구두점**: 마침표, 쉼표 자동 삽입
+- **화자 분리**: 여러 화자를 구별하여 인식 (고급)
+- **단어별 타임스탬프**: 각 단어의 시작/끝 시간 제공
+
+**사용 사례**:
+- 회의록 자동 작성
+- 동영상 자막 생성
+- 음성 명령 인식
+- 고객 센터 통화 분석
+</Callout>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "GCP 계정 및 프로젝트 생성 완료", required: true },
+  { text: "결제 계정 연결 완료", required: true },
+  { text: "테스트용 음성 파일 준비 (선택)", required: false }
+]} />
+
+<Callout type="tip">
+💡 **무료 체험**: 매월 60분까지 무료로 음성 인식 가능합니다. 학습과 소규모 프로젝트에 충분합니다!
+</Callout>
+
+---
+
+<Step number={1} title="Speech-to-Text API 활성화">
+
+1. [Google Cloud Console](https://console.cloud.google.com)에 로그인합니다.
+2. 올바른 프로젝트가 선택되었는지 확인하세요.
+3. 상단 검색창에 **"Speech-to-Text"**를 입력합니다.
+4. 검색 결과에서 **Cloud Speech-to-Text API**를 클릭합니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-speech-to-text-step1-ko.png"
+  alt="Speech-to-Text API 검색"
+  caption="검색창에서 Speech-to-Text API를 찾으세요"
+/>
+
+5. **사용 설정(ENABLE)** 버튼을 클릭합니다.
+6. API 활성화에 몇 초 정도 소요됩니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-speech-to-text-step1b-ko.png"
+  alt="Speech-to-Text API 활성화"
+  caption="사용 설정 버튼을 클릭하여 API를 활성화하세요"
+/>
+
+<Checkpoint
+  title="API 활성화 확인"
+  items={[
+    "API가 활성화되었나요?",
+    "'API 사용 설정됨' 페이지로 이동했나요?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="API 키 준비">
+
+Speech-to-Text API를 사용하려면 **API 키** 또는 **서비스 계정**이 필요합니다.
+
+### 2-1. 기존 API 키 재사용
+
+이미 다른 GCP API를 위해 API 키를 만든 경우:
+
+1. 왼쪽 메뉴에서 **사용자 인증 정보(Credentials)** 클릭
+2. 기존 API 키 확인
+3. API 키의 **API 제한사항** 섹션에 **Cloud Speech-to-Text API** 추가:
+   - API 키 이름 클릭
+   - **API 제한사항**에서 **키 제한** 선택
+   - **Cloud Speech-to-Text API** 체크박스 선택
+   - **저장** 클릭
+
+### 2-2. 새 API 키 만들기
+
+1. **사용자 인증 정보(Credentials)** 페이지에서 **+ 사용자 인증 정보 만들기** 클릭
+2. **API 키** 선택
+3. 생성된 API 키를 **복사**하여 안전하게 보관
+4. **키 제한** 버튼 클릭하여 보안 설정:
+   - **API 제한사항**: "키 제한" 선택
+   - **Cloud Speech-to-Text API**만 체크
+   - **저장** 클릭
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-speech-to-text-step2-ko.png"
+  alt="API 키 생성 및 제한"
+  caption="Speech-to-Text API만 사용 가능하도록 제한하세요"
+/>
+
+<Callout type="warning">
+⚠️ **API 키 보안**
+
+API 키는 누구나 사용할 수 있는 비밀번호와 같습니다:
+- GitHub, 블로그, 공개 저장소에 절대 업로드하지 마세요
+- 환경 변수나 설정 파일에 저장하고 .gitignore에 추가하세요
+- 프로덕션에서는 서비스 계정을 사용하세요
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="Speech-to-Text API 테스트 - 웹 콘솔">
+
+가장 쉬운 방법은 GCP 콘솔에서 직접 테스트하는 것입니다.
+
+1. Speech-to-Text API 페이지로 돌아갑니다.
+2. **이 API 사용해 보기(TRY THIS API)** 버튼을 클릭합니다.
+3. 오른쪽 패널이 열립니다.
+
+### 3-1. 샘플 오디오로 테스트
+
+1. **Request body** 섹션에 샘플 JSON이 미리 채워져 있습니다.
+2. 기본 샘플 오디오 URI 확인:
+
+<CopyBlock
+  code='{
+  "config": {
+    "encoding": "LINEAR16",
+    "sampleRateHertz": 16000,
+    "languageCode": "en-US"
+  },
+  "audio": {
+    "uri": "gs://cloud-samples-tests/speech/brooklyn.flac"
+  }
+}'
+  language="json"
+/>
+
+3. 아래로 스크롤하여 **실행(EXECUTE)** 버튼을 클릭합니다.
+4. Google 계정 권한 요청이 나타나면 **허용(Allow)** 클릭합니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-speech-to-text-step3-ko.png"
+  alt="Speech-to-Text API 테스트"
+  caption="샘플 요청을 실행하여 API를 테스트하세요"
+/>
+
+### 3-2. 결과 확인
+
+다음과 같은 응답을 받게 됩니다:
+
+<CopyBlock
+  code='{
+  "results": [
+    {
+      "alternatives": [
+        {
+          "transcript": "how old is the Brooklyn Bridge",
+          "confidence": 0.98267895
+        }
+      ]
+    }
+  ]
+}'
+  language="json"
+/>
+
+<Callout type="success">
+✅ **성공!** Speech-to-Text API가 음성을 텍스트로 변환했습니다!
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="Speech-to-Text API 테스트 - cURL">
+
+실제 개발에서는 코드나 명령줄에서 API를 호출하게 됩니다.
+
+### 4-1. Base64로 인코딩된 오디오 사용
+
+로컬 오디오 파일을 Base64로 인코딩하여 전송할 수 있습니다:
+
+<CopyBlock
+  code='# 1. 오디오 파일을 Base64로 인코딩
+base64 audio.wav > audio_base64.txt
+
+# 2. API 호출
+curl -X POST \
+  -H "Content-Type: application/json" \
+  "https://speech.googleapis.com/v1/speech:recognize?key=YOUR_API_KEY" \
+  -d "{
+    \"config\": {
+      \"encoding\": \"LINEAR16\",
+      \"sampleRateHertz\": 16000,
+      \"languageCode\": \"ko-KR\"
+    },
+    \"audio\": {
+      \"content\": \"$(cat audio_base64.txt)\"
+    }
+  }"'
+  language="bash"
+/>
+
+**주의**: `YOUR_API_KEY`를 실제 API 키로 바꾸세요!
+
+### 4-2. Cloud Storage URI 사용
+
+오디오 파일을 Cloud Storage에 업로드한 경우:
+
+<CopyBlock
+  code='curl -X POST \
+  -H "Content-Type: application/json" \
+  "https://speech.googleapis.com/v1/speech:recognize?key=YOUR_API_KEY" \
+  -d "{
+    \"config\": {
+      \"encoding\": \"FLAC\",
+      \"languageCode\": \"ko-KR\",
+      \"enableAutomaticPunctuation\": true
+    },
+    \"audio\": {
+      \"uri\": \"gs://your-bucket/audio.flac\"
+    }
+  }"'
+  language="bash"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-speech-to-text-step4-ko.png"
+  alt="cURL로 API 호출"
+  caption="터미널에서 직접 Speech-to-Text API를 호출하세요"
+/>
+
+### 4-3. 응답 확인
+
+다음과 같은 JSON 응답을 받게 됩니다:
+
+<CopyBlock
+  code='{
+  "results": [
+    {
+      "alternatives": [
+        {
+          "transcript": "안녕하세요. 오늘 날씨가 정말 좋네요.",
+          "confidence": 0.9456789
+        }
+      ]
+    }
+  ]
+}'
+  language="json"
+/>
+
+<Checkpoint
+  title="API 테스트 성공 확인"
+  items={[
+    "cURL 명령이 오류 없이 실행되었나요?",
+    "JSON 응답에 transcript가 포함되어 있나요?",
+    "음성이 정확하게 텍스트로 변환되었나요?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={5} title="고급 기능 사용하기">
+
+Speech-to-Text API의 다양한 기능을 시험해봅시다.
+
+### 5-1. 자동 구두점 추가
+
+자동으로 마침표, 쉼표를 추가합니다:
+
+<CopyBlock
+  code='{
+  "config": {
+    "encoding": "LINEAR16",
+    "sampleRateHertz": 16000,
+    "languageCode": "ko-KR",
+    "enableAutomaticPunctuation": true
+  },
+  "audio": {
+    "uri": "gs://your-bucket/audio.wav"
+  }
+}'
+  language="json"
+/>
+
+### 5-2. 단어별 타임스탬프
+
+각 단어의 시작/끝 시간을 가져옵니다:
+
+<CopyBlock
+  code='{
+  "config": {
+    "encoding": "LINEAR16",
+    "sampleRateHertz": 16000,
+    "languageCode": "ko-KR",
+    "enableWordTimeOffsets": true
+  },
+  "audio": {
+    "uri": "gs://your-bucket/audio.wav"
+  }
+}'
+  language="json"
+/>
+
+응답:
+
+<CopyBlock
+  code='{
+  "results": [
+    {
+      "alternatives": [
+        {
+          "transcript": "안녕하세요",
+          "confidence": 0.95,
+          "words": [
+            {
+              "startTime": "0s",
+              "endTime": "0.8s",
+              "word": "안녕하세요"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}'
+  language="json"
+/>
+
+### 5-3. 여러 언어 지원
+
+다양한 언어로 음성 인식:
+
+<CopyBlock
+  code='# 한국어
+"languageCode": "ko-KR"
+
+# 영어 (미국)
+"languageCode": "en-US"
+
+# 일본어
+"languageCode": "ja-JP"
+
+# 중국어 (간체)
+"languageCode": "zh-CN"
+
+# 스페인어
+"languageCode": "es-ES"'
+  language="json"
+/>
+
+<DevTip>
+**언어 코드 찾기**: 125개 이상의 언어 코드는 [공식 문서](https://cloud.google.com/speech-to-text/docs/languages)에서 확인할 수 있습니다.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={6} title="실제 코드에서 사용하기">
+
+이제 프로그래밍 언어에서 Speech-to-Text API를 호출해봅시다.
+
+### 6-1. Python 예제
+
+<CopyBlock
+  code='import requests
+import base64
+
+API_KEY = "YOUR_API_KEY"
+url = f"https://speech.googleapis.com/v1/speech:recognize?key={API_KEY}"
+
+# 로컬 오디오 파일 읽기 및 Base64 인코딩
+with open("audio.wav", "rb") as audio_file:
+    audio_content = base64.b64encode(audio_file.read()).decode("utf-8")
+
+# 음성 인식 요청
+request_body = {
+    "config": {
+        "encoding": "LINEAR16",
+        "sampleRateHertz": 16000,
+        "languageCode": "ko-KR",
+        "enableAutomaticPunctuation": True
+    },
+    "audio": {
+        "content": audio_content
+    }
+}
+
+response = requests.post(url, json=request_body)
+result = response.json()
+
+# 결과 출력
+if "results" in result:
+    transcript = result["results"][0]["alternatives"][0]["transcript"]
+    confidence = result["results"][0]["alternatives"][0]["confidence"]
+
+    print(f"인식 결과: {transcript}")
+    print(f"정확도: {confidence:.2%}")
+else:
+    print("음성 인식 실패:", result)'
+  language="python"
+/>
+
+### 6-2. Node.js 예제
+
+<CopyBlock
+  code='const axios = require("axios");
+const fs = require("fs");
+
+const API_KEY = "YOUR_API_KEY";
+const url = `https://speech.googleapis.com/v1/speech:recognize?key=${API_KEY}`;
+
+// 오디오 파일을 Base64로 인코딩
+const audioBuffer = fs.readFileSync("audio.wav");
+const audioContent = audioBuffer.toString("base64");
+
+// 음성 인식 요청
+const requestBody = {
+  config: {
+    encoding: "LINEAR16",
+    sampleRateHertz: 16000,
+    languageCode: "ko-KR",
+    enableAutomaticPunctuation: true
+  },
+  audio: {
+    content: audioContent
+  }
+};
+
+axios.post(url, requestBody)
+  .then(response => {
+    const result = response.data.results[0].alternatives[0];
+    console.log("인식 결과:", result.transcript);
+    console.log("정확도:", (result.confidence * 100).toFixed(2) + "%");
+  })
+  .catch(error => console.error("Error:", error.response?.data || error.message));'
+  language="javascript"
+/>
+
+### 6-3. Cloud Storage 오디오 파일 사용
+
+<CopyBlock
+  code='import requests
+
+API_KEY = "YOUR_API_KEY"
+url = f"https://speech.googleapis.com/v1/speech:recognize?key={API_KEY}"
+
+# Cloud Storage URI 사용
+request_body = {
+    "config": {
+        "encoding": "FLAC",
+        "sampleRateHertz": 44100,
+        "languageCode": "ko-KR",
+        "enableAutomaticPunctuation": True,
+        "enableWordTimeOffsets": True
+    },
+    "audio": {
+        "uri": "gs://your-bucket-name/audio-file.flac"
+    }
+}
+
+response = requests.post(url, json=request_body)
+result = response.json()
+
+# 단어별 타임스탬프 출력
+for word_info in result["results"][0]["alternatives"][0].get("words", []):
+    word = word_info["word"]
+    start = word_info["startTime"]
+    end = word_info["endTime"]
+    print(f"{word}: {start} ~ {end}")'
+  language="python"
+/>
+
+<Callout type="success">
+🎉 **완료!** Speech-to-Text API를 활성화하고 성공적으로 음성을 인식했습니다!
+</Callout>
+
+</Step>
+
+---
+
+## 비용 관리
+
+<Callout type="info">
+💰 **Speech-to-Text API 가격 정책**
+
+- **무료 티어**: 월 60분 무료
+- **초과 시 요금** (15초 단위):
+  - 표준 모델: 15초당 $0.006
+  - 향상된 모델: 15초당 $0.009
+  - 스트리밍 인식: 15초당 $0.010
+
+**예시**: 월 180분 음성 인식 (표준 모델)
+- 무료: 60분 = 240개 × 15초
+- 유료: 120분 = 480개 × 15초 × $0.006 = **$2.88**
+</Callout>
+
+---
+
+## 다음 단계
+
+Speech-to-Text API를 마스터했으니, 다른 AI API도 사용해보세요:
+
+1. **[Text-to-Speech API 설정](../gcp-text-to-speech-setup)** - 텍스트를 음성으로 변환
+2. **[Translation API 설정](../gcp-translation-api-setup)** - 100개 언어 자동 번역
+3. **[Vision API 설정](../gcp-vision-api-setup)** - 이미지 분석 AI
+
+---
+
+## 자주 묻는 질문
+
+<Callout type="info">
+**Q. 지원하는 오디오 형식은 무엇인가요?**
+
+A. 다양한 형식을 지원합니다:
+- **FLAC** (권장): 무손실 압축, 최고 품질
+- **WAV** (LINEAR16): 비압축, 높은 품질
+- **MP3**: 압축 형식, 낮은 품질
+- **OGG_OPUS**: 스트리밍에 적합
+- **WEBM_OPUS**: 웹 오디오
+
+권장: FLAC 또는 WAV 형식 사용
+</Callout>
+
+<Callout type="info">
+**Q. 최대 오디오 길이는?**
+
+A. 인식 방식에 따라 다릅니다:
+- **동기 인식** (`speech:recognize`): 최대 60초
+- **비동기 인식** (`speech:longrunningrecognize`): 최대 480분 (8시간)
+- **스트리밍 인식**: 무제한 (세션당 5분 단위로 나눠짐)
+
+긴 오디오는 비동기 인식을 사용하세요.
+</Callout>
+
+<Callout type="info">
+**Q. 인식 정확도를 높이려면?**
+
+A. 다음을 시도해보세요:
+- 높은 샘플레이트 사용 (16,000Hz 이상)
+- 배경 소음 최소화
+- 명확한 발음
+- 올바른 언어 코드 설정
+- 향상된 모델 사용 (`useEnhanced: true`)
+- 음성 적응 기능 활용 (고급)
+</Callout>
+
+<Callout type="info">
+**Q. 실시간 스트리밍 인식이 가능한가요?**
+
+A. 네! 스트리밍 인식을 사용하면:
+- 실시간으로 음성을 텍스트로 변환
+- WebSocket 또는 gRPC 사용
+- 라이브 자막, 음성 명령 등에 활용
+- 별도의 엔드포인트 사용: `streamingRecognize`
+
+자세한 내용은 [스트리밍 인식 가이드](https://cloud.google.com/speech-to-text/docs/streaming-recognize)를 참고하세요.
+</Callout>
+
+---
+
+## 문제 해결
+
+### "Invalid audio content" 오류
+
+- 오디오 형식과 encoding 설정이 일치하는지 확인
+- sampleRateHertz가 실제 오디오 샘플레이트와 일치하는지 확인
+- Base64 인코딩이 올바른지 확인
+
+### "Audio too long" 오류
+
+- 동기 인식은 최대 60초까지만 가능
+- 긴 오디오는 `speech:longrunningrecognize` 사용
+- 또는 오디오를 여러 조각으로 나눠서 처리
+
+### 인식 결과가 정확하지 않아요
+
+- 올바른 언어 코드 설정 확인
+- 오디오 품질 향상 (샘플레이트, 비트레이트)
+- 배경 소음 제거
+- 향상된 모델 사용: `"model": "default"` 대신 `"useEnhanced": true`
+
+### Cloud Storage URI가 작동하지 않아요
+
+- URI 형식 확인: `gs://bucket-name/file.wav`
+- 버킷이 공개되어 있거나 서비스 계정에 권한이 있는지 확인
+- 파일이 실제로 존재하는지 확인
+
+---
+
+**Speech-to-Text API 설정 완료!** 🎊 이제 자유롭게 음성 인식 서비스를 활용하세요!

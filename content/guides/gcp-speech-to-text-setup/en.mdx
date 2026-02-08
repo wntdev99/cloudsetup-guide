@@ -1,0 +1,613 @@
+# Setup GCP Speech-to-Text API - Convert Speech to Text
+
+Google Cloud Speech-to-Text API provides powerful AI services for **converting speech to text**, **supporting 125+ languages**, and **real-time speech recognition**. Follow this guide to enable Speech-to-Text API and run your first speech recognition in just 15 minutes!
+
+<FreeTierInfo
+  service="Cloud Speech-to-Text API"
+  limit="60 minutes/month"
+  period="Monthly"
+  status="generous"
+/>
+
+## What Can Speech-to-Text API Do?
+
+<Callout type="info">
+🎤 **Key Speech-to-Text API Features**
+
+- **Speech Recognition**: Automatically convert audio files to text
+- **Real-time Streaming**: Convert live speech to text instantly
+- **Multilingual Support**: 125+ languages and dialects supported
+- **Automatic Punctuation**: Auto-insert periods and commas
+- **Speaker Diarization**: Distinguish multiple speakers (advanced)
+- **Word-level Timestamps**: Provide start/end time for each word
+
+**Use Cases**:
+- Automatic meeting transcription
+- Video subtitle generation
+- Voice command recognition
+- Call center conversation analysis
+</Callout>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "GCP account and project created", required: true },
+  { text: "Billing account linked", required: true },
+  { text: "Test audio file ready (optional)", required: false }
+]} />
+
+<Callout type="tip">
+💡 **Free Tier**: Recognize up to 60 minutes of audio per month for free. Perfect for learning and small projects!
+</Callout>
+
+---
+
+<Step number={1} title="Enable Speech-to-Text API">
+
+1. Log in to [Google Cloud Console](https://console.cloud.google.com).
+2. Verify the correct project is selected.
+3. Type **"Speech-to-Text"** in the top search bar.
+4. Click **Cloud Speech-to-Text API** from the results.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-speech-to-text-step1-en.png"
+  alt="Search for Speech-to-Text API"
+  caption="Find Speech-to-Text API using the search bar"
+/>
+
+5. Click the **ENABLE** button.
+6. API activation takes a few seconds.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-speech-to-text-step1b-en.png"
+  alt="Enable Speech-to-Text API"
+  caption="Click ENABLE to activate the API"
+/>
+
+<Checkpoint
+  title="Verify API Enabled"
+  items={[
+    "Is the API enabled?",
+    "Did you navigate to the 'API enabled' page?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="Prepare API Key">
+
+To use Speech-to-Text API, you need an **API key** or **service account**.
+
+### 2-1. Reuse Existing API Key
+
+If you've already created an API key for other GCP APIs:
+
+1. Click **Credentials** in the left menu
+2. Check existing API keys
+3. Add **Cloud Speech-to-Text API** to the key's **API restrictions** section:
+   - Click the API key name
+   - Select **Restrict key** in **API restrictions**
+   - Check the **Cloud Speech-to-Text API** checkbox
+   - Click **Save**
+
+### 2-2. Create New API Key
+
+1. On the **Credentials** page, click **+ CREATE CREDENTIALS**
+2. Select **API key**
+3. **Copy** the generated API key and save it securely
+4. Click **Restrict Key** button to configure security:
+   - **API restrictions**: Select "Restrict key"
+   - Check only **Cloud Speech-to-Text API**
+   - Click **Save**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-speech-to-text-step2-en.png"
+  alt="Create and restrict API key"
+  caption="Restrict to Speech-to-Text API only for security"
+/>
+
+<Callout type="warning">
+⚠️ **API Key Security**
+
+API keys are like passwords that anyone can use:
+- Never upload to GitHub, blogs, or public repositories
+- Store in environment variables or config files and add to .gitignore
+- Use service accounts for production
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="Test Speech-to-Text API - Web Console">
+
+The easiest way is to test directly in the GCP console.
+
+1. Return to the Speech-to-Text API page.
+2. Click **TRY THIS API** button.
+3. The right panel opens.
+
+### 3-1. Test with Sample Audio
+
+1. Sample JSON is pre-filled in the **Request body** section.
+2. Check the default sample audio URI:
+
+<CopyBlock
+  code='{
+  "config": {
+    "encoding": "LINEAR16",
+    "sampleRateHertz": 16000,
+    "languageCode": "en-US"
+  },
+  "audio": {
+    "uri": "gs://cloud-samples-tests/speech/brooklyn.flac"
+  }
+}'
+  language="json"
+/>
+
+3. Scroll down and click **EXECUTE**.
+4. Click **Allow** when prompted for Google account permissions.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-speech-to-text-step3-en.png"
+  alt="Test Speech-to-Text API"
+  caption="Execute sample request to test the API"
+/>
+
+### 3-2. Check Results
+
+You'll receive a response like:
+
+<CopyBlock
+  code='{
+  "results": [
+    {
+      "alternatives": [
+        {
+          "transcript": "how old is the Brooklyn Bridge",
+          "confidence": 0.98267895
+        }
+      ]
+    }
+  ]
+}'
+  language="json"
+/>
+
+<Callout type="success">
+✅ **Success!** Speech-to-Text API converted speech to text!
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="Test Speech-to-Text API - cURL">
+
+In real development, you'll call the API from code or command line.
+
+### 4-1. Use Base64-Encoded Audio
+
+Encode a local audio file to Base64 and send it:
+
+<CopyBlock
+  code='# 1. Encode audio file to Base64
+base64 audio.wav > audio_base64.txt
+
+# 2. Call the API
+curl -X POST \
+  -H "Content-Type: application/json" \
+  "https://speech.googleapis.com/v1/speech:recognize?key=YOUR_API_KEY" \
+  -d "{
+    \"config\": {
+      \"encoding\": \"LINEAR16\",
+      \"sampleRateHertz\": 16000,
+      \"languageCode\": \"en-US\"
+    },
+    \"audio\": {
+      \"content\": \"$(cat audio_base64.txt)\"
+    }
+  }"'
+  language="bash"
+/>
+
+**Note**: Replace `YOUR_API_KEY` with your actual API key!
+
+### 4-2. Use Cloud Storage URI
+
+If you uploaded the audio file to Cloud Storage:
+
+<CopyBlock
+  code='curl -X POST \
+  -H "Content-Type: application/json" \
+  "https://speech.googleapis.com/v1/speech:recognize?key=YOUR_API_KEY" \
+  -d "{
+    \"config\": {
+      \"encoding\": \"FLAC\",
+      \"languageCode\": \"en-US\",
+      \"enableAutomaticPunctuation\": true
+    },
+    \"audio\": {
+      \"uri\": \"gs://your-bucket/audio.flac\"
+    }
+  }"'
+  language="bash"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-speech-to-text-step4-en.png"
+  alt="Call API with cURL"
+  caption="Call Speech-to-Text API directly from terminal"
+/>
+
+### 4-3. Check Response
+
+You'll receive a JSON response like:
+
+<CopyBlock
+  code='{
+  "results": [
+    {
+      "alternatives": [
+        {
+          "transcript": "Hello. The weather is really nice today.",
+          "confidence": 0.9456789
+        }
+      ]
+    }
+  ]
+}'
+  language="json"
+/>
+
+<Checkpoint
+  title="Verify API Test Success"
+  items={[
+    "Did the cURL command execute without errors?",
+    "Does the JSON response include transcript?",
+    "Was the speech accurately converted to text?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={5} title="Use Advanced Features">
+
+Try various Speech-to-Text API features!
+
+### 5-1. Add Automatic Punctuation
+
+Automatically add periods and commas:
+
+<CopyBlock
+  code='{
+  "config": {
+    "encoding": "LINEAR16",
+    "sampleRateHertz": 16000,
+    "languageCode": "en-US",
+    "enableAutomaticPunctuation": true
+  },
+  "audio": {
+    "uri": "gs://your-bucket/audio.wav"
+  }
+}'
+  language="json"
+/>
+
+### 5-2. Word-level Timestamps
+
+Get start/end time for each word:
+
+<CopyBlock
+  code='{
+  "config": {
+    "encoding": "LINEAR16",
+    "sampleRateHertz": 16000,
+    "languageCode": "en-US",
+    "enableWordTimeOffsets": true
+  },
+  "audio": {
+    "uri": "gs://your-bucket/audio.wav"
+  }
+}'
+  language="json"
+/>
+
+Response:
+
+<CopyBlock
+  code='{
+  "results": [
+    {
+      "alternatives": [
+        {
+          "transcript": "hello world",
+          "confidence": 0.95,
+          "words": [
+            {
+              "startTime": "0s",
+              "endTime": "0.5s",
+              "word": "hello"
+            },
+            {
+              "startTime": "0.6s",
+              "endTime": "1.0s",
+              "word": "world"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}'
+  language="json"
+/>
+
+### 5-3. Multiple Language Support
+
+Recognize speech in various languages:
+
+<CopyBlock
+  code='# Korean
+"languageCode": "ko-KR"
+
+# English (US)
+"languageCode": "en-US"
+
+# Japanese
+"languageCode": "ja-JP"
+
+# Chinese (Simplified)
+"languageCode": "zh-CN"
+
+# Spanish
+"languageCode": "es-ES"'
+  language="json"
+/>
+
+<DevTip>
+**Finding Language Codes**: Check the [official documentation](https://cloud.google.com/speech-to-text/docs/languages) for 125+ language codes.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={6} title="Use in Real Code">
+
+Now call Speech-to-Text API from your programming language.
+
+### 6-1. Python Example
+
+<CopyBlock
+  code='import requests
+import base64
+
+API_KEY = "YOUR_API_KEY"
+url = f"https://speech.googleapis.com/v1/speech:recognize?key={API_KEY}"
+
+# Read local audio file and Base64 encode
+with open("audio.wav", "rb") as audio_file:
+    audio_content = base64.b64encode(audio_file.read()).decode("utf-8")
+
+# Speech recognition request
+request_body = {
+    "config": {
+        "encoding": "LINEAR16",
+        "sampleRateHertz": 16000,
+        "languageCode": "en-US",
+        "enableAutomaticPunctuation": True
+    },
+    "audio": {
+        "content": audio_content
+    }
+}
+
+response = requests.post(url, json=request_body)
+result = response.json()
+
+# Print results
+if "results" in result:
+    transcript = result["results"][0]["alternatives"][0]["transcript"]
+    confidence = result["results"][0]["alternatives"][0]["confidence"]
+
+    print(f"Transcript: {transcript}")
+    print(f"Confidence: {confidence:.2%}")
+else:
+    print("Recognition failed:", result)'
+  language="python"
+/>
+
+### 6-2. Node.js Example
+
+<CopyBlock
+  code='const axios = require("axios");
+const fs = require("fs");
+
+const API_KEY = "YOUR_API_KEY";
+const url = `https://speech.googleapis.com/v1/speech:recognize?key=${API_KEY}`;
+
+// Base64 encode audio file
+const audioBuffer = fs.readFileSync("audio.wav");
+const audioContent = audioBuffer.toString("base64");
+
+// Speech recognition request
+const requestBody = {
+  config: {
+    encoding: "LINEAR16",
+    sampleRateHertz: 16000,
+    languageCode: "en-US",
+    enableAutomaticPunctuation: true
+  },
+  audio: {
+    content: audioContent
+  }
+};
+
+axios.post(url, requestBody)
+  .then(response => {
+    const result = response.data.results[0].alternatives[0];
+    console.log("Transcript:", result.transcript);
+    console.log("Confidence:", (result.confidence * 100).toFixed(2) + "%");
+  })
+  .catch(error => console.error("Error:", error.response?.data || error.message));'
+  language="javascript"
+/>
+
+### 6-3. Use Cloud Storage Audio File
+
+<CopyBlock
+  code='import requests
+
+API_KEY = "YOUR_API_KEY"
+url = f"https://speech.googleapis.com/v1/speech:recognize?key={API_KEY}"
+
+# Use Cloud Storage URI
+request_body = {
+    "config": {
+        "encoding": "FLAC",
+        "sampleRateHertz": 44100,
+        "languageCode": "en-US",
+        "enableAutomaticPunctuation": True,
+        "enableWordTimeOffsets": True
+    },
+    "audio": {
+        "uri": "gs://your-bucket-name/audio-file.flac"
+    }
+}
+
+response = requests.post(url, json=request_body)
+result = response.json()
+
+# Print word-level timestamps
+for word_info in result["results"][0]["alternatives"][0].get("words", []):
+    word = word_info["word"]
+    start = word_info["startTime"]
+    end = word_info["endTime"]
+    print(f"{word}: {start} ~ {end}")'
+  language="python"
+/>
+
+<Callout type="success">
+🎉 **Complete!** You've enabled Speech-to-Text API and successfully recognized speech!
+</Callout>
+
+</Step>
+
+---
+
+## Cost Management
+
+<Callout type="info">
+💰 **Speech-to-Text API Pricing**
+
+- **Free tier**: 60 minutes/month
+- **Overage pricing** (per 15 seconds):
+  - Standard model: $0.006 per 15 seconds
+  - Enhanced model: $0.009 per 15 seconds
+  - Streaming recognition: $0.010 per 15 seconds
+
+**Example**: 180 minutes/month (standard model)
+- Free: 60 minutes = 240 × 15 seconds
+- Paid: 120 minutes = 480 × 15 seconds × $0.006 = **$2.88**
+</Callout>
+
+---
+
+## Next Steps
+
+Now that you've mastered Speech-to-Text API, try other AI APIs:
+
+1. **[Text-to-Speech API Setup](../gcp-text-to-speech-setup)** - Convert text to speech
+2. **[Translation API Setup](../gcp-translation-api-setup)** - Auto-translate 100+ languages
+3. **[Vision API Setup](../gcp-vision-api-setup)** - Image analysis AI
+
+---
+
+## Frequently Asked Questions
+
+<Callout type="info">
+**Q. What audio formats are supported?**
+
+A. Various formats are supported:
+- **FLAC** (recommended): Lossless compression, best quality
+- **WAV** (LINEAR16): Uncompressed, high quality
+- **MP3**: Compressed format, lower quality
+- **OGG_OPUS**: Suitable for streaming
+- **WEBM_OPUS**: Web audio
+
+Recommended: Use FLAC or WAV format
+</Callout>
+
+<Callout type="info">
+**Q. What is the maximum audio length?**
+
+A. Depends on recognition method:
+- **Synchronous recognition** (`speech:recognize`): Max 60 seconds
+- **Asynchronous recognition** (`speech:longrunningrecognize`): Max 480 minutes (8 hours)
+- **Streaming recognition**: Unlimited (divided into 5-minute sessions)
+
+Use asynchronous recognition for long audio.
+</Callout>
+
+<Callout type="info">
+**Q. How to improve recognition accuracy?**
+
+A. Try the following:
+- Use higher sample rate (16,000Hz or higher)
+- Minimize background noise
+- Clear pronunciation
+- Set correct language code
+- Use enhanced model (`useEnhanced: true`)
+- Utilize speech adaptation (advanced)
+</Callout>
+
+<Callout type="info">
+**Q. Is real-time streaming recognition possible?**
+
+A. Yes! With streaming recognition:
+- Convert speech to text in real-time
+- Use WebSocket or gRPC
+- Suitable for live captions, voice commands, etc.
+- Uses separate endpoint: `streamingRecognize`
+
+See the [streaming recognition guide](https://cloud.google.com/speech-to-text/docs/streaming-recognize) for details.
+</Callout>
+
+---
+
+## Troubleshooting
+
+### "Invalid audio content" error
+
+- Verify audio format matches encoding setting
+- Check sampleRateHertz matches actual audio sample rate
+- Verify Base64 encoding is correct
+
+### "Audio too long" error
+
+- Synchronous recognition supports max 60 seconds
+- Use `speech:longrunningrecognize` for long audio
+- Or split audio into multiple chunks
+
+### Recognition results are inaccurate
+
+- Verify correct language code is set
+- Improve audio quality (sample rate, bitrate)
+- Remove background noise
+- Use enhanced model: `"useEnhanced": true` instead of `"model": "default"`
+
+### Cloud Storage URI not working
+
+- Check URI format: `gs://bucket-name/file.wav`
+- Verify bucket is public or service account has permissions
+- Confirm file actually exists
+
+---
+
+**Speech-to-Text API Setup Complete!** 🎊 Now freely use speech recognition services!

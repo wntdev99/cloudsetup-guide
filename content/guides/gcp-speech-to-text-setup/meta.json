@@ -1,0 +1,63 @@
+{
+  "slug": "gcp-speech-to-text-setup",
+  "platform": "gcp",
+  "service": "Cloud Speech-to-Text API",
+  "category": "ai-ml",
+  "difficulty": "beginner",
+  "estimatedMinutes": 15,
+  "totalSteps": 6,
+  "freeTier": {
+    "service": "Cloud Speech-to-Text API",
+    "limit": "월 60분",
+    "period": "month",
+    "amount": "무료",
+    "status": "generous",
+    "conditions": [
+      "월 60분 음성 인식 무료",
+      "초과 시 15초당 $0.006~$0.009",
+      "125개 언어 지원"
+    ]
+  },
+  "prerequisites": [
+    "gcp-account-setup",
+    "gcp-project-create"
+  ],
+  "nextGuides": [
+    "gcp-text-to-speech-setup",
+    "gcp-vision-api-setup"
+  ],
+  "seo": {
+    "ko": {
+      "title": "GCP Speech-to-Text API 설정 - 음성을 텍스트로 변환 | CloudSetup.guide",
+      "description": "Google Cloud Speech-to-Text API를 활성화하고 첫 번째 음성 인식을 실행하는 방법을 6단계로 배워보세요. API 키 생성부터 실제 테스트까지 완벽 가이드.",
+      "keywords": [
+        "GCP Speech-to-Text",
+        "Google Cloud Speech",
+        "음성 인식 API",
+        "STT API",
+        "음성을 텍스트로",
+        "Speech-to-Text 설정",
+        "GCP API 키",
+        "음성 인식"
+      ]
+    },
+    "en": {
+      "title": "Setup GCP Speech-to-Text API - Convert Speech to Text | CloudSetup.guide",
+      "description": "Learn how to enable Google Cloud Speech-to-Text API and run your first speech recognition in 6 easy steps. Complete guide from API key creation to testing.",
+      "keywords": [
+        "GCP Speech-to-Text",
+        "Google Cloud Speech",
+        "speech recognition API",
+        "STT API",
+        "speech to text",
+        "Speech-to-Text setup",
+        "GCP API key",
+        "voice recognition"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T04:00:00.000Z",
+  "updatedAt": "2026-02-08T04:00:00.000Z",
+  "lastVerified": "2026-02-08T04:00:00.000Z",
+  "published": true
+}
