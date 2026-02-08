@@ -1,0 +1,56 @@
+{
+  "slug": "aws-s3-bucket-setup",
+  "platform": "aws",
+  "service": "S3 (Simple Storage Service)",
+  "category": "storage",
+  "difficulty": "beginner",
+  "estimatedMinutes": 20,
+  "totalSteps": 6,
+  "freeTier": {
+    "limit": "5GB 스토리지, 20,000 GET 요청, 2,000 PUT 요청",
+    "period": "월간",
+    "amount": "무료",
+    "status": "available",
+    "conditions": [
+      "S3 Standard 스토리지 5GB",
+      "GET 요청 20,000건/월",
+      "PUT, COPY, POST, LIST 요청 2,000건/월",
+      "15GB 데이터 전송(아웃)",
+      "12개월간 무료"
+    ]
+  },
+  "prerequisites": ["aws-account-setup", "aws-iam-user-create"],
+  "nextGuides": ["aws-lambda-setup", "aws-dynamodb-setup"],
+  "tags": ["s3", "storage", "static-website", "file-upload", "lifecycle", "bucket"],
+  "seo": {
+    "ko": {
+      "title": "AWS S3 버킷 생성 및 설정 가이드 - CloudSetup.guide",
+      "description": "AWS S3 버킷을 생성하고 파일 업로드, 권한 설정, 정적 웹사이트 호스팅, 수명 주기 규칙을 설정하는 방법을 단계별로 안내합니다.",
+      "keywords": [
+        "AWS S3",
+        "S3 버킷 생성",
+        "S3 파일 업로드",
+        "S3 권한 설정",
+        "S3 정적 웹사이트",
+        "S3 수명 주기",
+        "AWS 스토리지"
+      ]
+    },
+    "en": {
+      "title": "AWS S3 Bucket Creation and Setup Guide - CloudSetup.guide",
+      "description": "Step-by-step guide to creating AWS S3 buckets, uploading files, setting permissions, enabling static website hosting, and configuring lifecycle rules.",
+      "keywords": [
+        "AWS S3",
+        "S3 bucket creation",
+        "S3 file upload",
+        "S3 permissions",
+        "S3 static website",
+        "S3 lifecycle",
+        "AWS storage"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08"
+}

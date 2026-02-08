@@ -1,0 +1,56 @@
+{
+  "slug": "aws-dynamodb-setup",
+  "platform": "aws",
+  "service": "DynamoDB",
+  "category": "database",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 20,
+  "totalSteps": 5,
+  "freeTier": {
+    "limit": "25GB 스토리지, 25 WCU, 25 RCU",
+    "period": "월간",
+    "amount": "무료",
+    "status": "available",
+    "conditions": [
+      "25GB 저장 공간",
+      "25개의 프로비저닝된 쓰기 용량 단위(WCU)",
+      "25개의 프로비저닝된 읽기 용량 단위(RCU)",
+      "2억 건의 온디맨드 읽기/쓰기 요청 충분",
+      "영구 무료 (12개월 제한 없음)"
+    ]
+  },
+  "prerequisites": ["aws-account-setup", "aws-iam-user-create"],
+  "nextGuides": ["aws-lambda-setup", "aws-s3-bucket-setup"],
+  "tags": ["dynamodb", "database", "nosql", "boto3", "aws-sdk", "key-value"],
+  "seo": {
+    "ko": {
+      "title": "AWS DynamoDB 테이블 생성 및 설정 가이드 - CloudSetup.guide",
+      "description": "AWS DynamoDB NoSQL 데이터베이스 테이블을 생성하고 데이터를 추가, 조회하는 방법을 Python boto3와 Node.js AWS SDK 예제와 함께 안내합니다.",
+      "keywords": [
+        "AWS DynamoDB",
+        "DynamoDB 테이블",
+        "NoSQL 데이터베이스",
+        "DynamoDB boto3",
+        "DynamoDB SDK",
+        "AWS 데이터베이스",
+        "DynamoDB 쿼리"
+      ]
+    },
+    "en": {
+      "title": "AWS DynamoDB Table Creation and Setup Guide - CloudSetup.guide",
+      "description": "Step-by-step guide to creating AWS DynamoDB NoSQL database tables, adding and querying data with Python boto3 and Node.js AWS SDK examples.",
+      "keywords": [
+        "AWS DynamoDB",
+        "DynamoDB table",
+        "NoSQL database",
+        "DynamoDB boto3",
+        "DynamoDB SDK",
+        "AWS database",
+        "DynamoDB query"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08"
+}

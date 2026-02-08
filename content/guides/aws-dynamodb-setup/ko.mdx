@@ -1,0 +1,525 @@
+---
+title: "AWS DynamoDB 테이블 생성 및 설정하기"
+description: "AWS DynamoDB NoSQL 데이터베이스를 설정하고 데이터 추가, 조회, SDK 사용 방법을 배워보세요"
+---
+
+# AWS DynamoDB 테이블 생성 및 설정하기
+
+AWS DynamoDB는 완전관리형 NoSQL 데이터베이스 서비스로, 빠른 성능과 무제한 확장성을 제공합니다. 키-값 및 문서 데이터 모델을 지원하며, 서버리스 아키텍처에 최적화되어 있습니다.
+
+<FreeTierInfo />
+
+<Callout type="info" title="DynamoDB의 주요 특징">
+- **완전관리형**: 서버 프로비저닝, 패치, 백업 자동화
+- **높은 성능**: 한 자릿수 밀리초 응답 시간
+- **유연한 스키마**: 스키마리스 설계로 자유로운 데이터 구조
+- **자동 확장**: 트래픽에 따라 자동으로 처리량 조정
+- **글로벌 테이블**: 다중 리전 복제 지원
+</Callout>
+
+<PrerequisiteCheck prerequisites={["aws-account-setup", "aws-iam-user-create"]} />
+
+---
+
+<Step number={1} title="DynamoDB 서비스로 이동">
+
+AWS Management Console에서 DynamoDB 서비스로 이동합니다.
+
+1. AWS Management Console 상단의 검색창에 **"DynamoDB"** 입력
+2. 검색 결과에서 **DynamoDB** 클릭
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-dynamodb-setup/step1-dynamodb-console-ko.png"
+  alt="AWS Console에서 DynamoDB 검색"
+  caption="검색창에서 DynamoDB를 찾아 클릭합니다"
+/>
+
+<Checkpoint>
+DynamoDB 대시보드에 접속했나요? "테이블", "PartiQL 편집기", "백업" 메뉴가 보여야 합니다.
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={2} title="새 DynamoDB 테이블 생성">
+
+첫 번째 DynamoDB 테이블을 생성합니다.
+
+1. **"테이블 만들기"** 버튼 클릭
+2. **테이블 세부 정보** 입력:
+   - **테이블 이름**: `Users` (영문, 숫자, 언더스코어, 하이픈, 점 사용 가능)
+   - **파티션 키**: `userId` (타입: **String**)
+   - (선택) **정렬 키**: 필요 시 추가 (예: `timestamp`)
+
+3. **테이블 설정** 선택:
+   - **테이블 클래스**: **DynamoDB Standard** (기본값)
+   - **용량 모드**: **온디맨드** (권장 - 트래픽에 따라 자동 확장)
+     - 또는 **프로비저닝됨** (예측 가능한 트래픽)
+
+4. 나머지 설정은 기본값 유지
+5. **"테이블 만들기"** 클릭
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-dynamodb-setup/step2-create-table-ko.png"
+  alt="DynamoDB 테이블 생성 화면"
+  caption="테이블 이름과 파티션 키를 설정합니다"
+/>
+
+<Callout type="tip" title="파티션 키와 정렬 키">
+- **파티션 키 (Partition Key)**: 필수, 데이터 분산에 사용
+  - 고유성이 높은 값 선택 (userId, orderId, sessionId 등)
+- **정렬 키 (Sort Key)**: 선택, 같은 파티션 키 내에서 데이터 정렬
+  - 시간순 조회가 필요하면 timestamp 사용
+  - 파티션 키 + 정렬 키 = 복합 기본 키
+</Callout>
+
+<DevTip title="온디맨드 vs 프로비저닝됨">
+**온디맨드 모드** (권장):
+- 트래픽 패턴을 예측할 수 없을 때
+- 간헐적이고 급증하는 워크로드
+- 사용량만큼 과금
+
+**프로비저닝됨 모드**:
+- 예측 가능하고 일정한 트래픽
+- 비용 최적화 필요 (Auto Scaling 설정 가능)
+- 읽기/쓰기 용량 단위(RCU/WCU) 지정
+
+프리 티어는 프로비저닝됨 모드에서 25 RCU/WCU까지 무료입니다.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="테이블에 데이터 추가">
+
+DynamoDB 테이블에 아이템(항목)을 추가합니다.
+
+### 콘솔에서 수동 추가
+
+1. 생성한 테이블 클릭 (예: `Users`)
+2. **"항목 탐색"** 탭 선택
+3. **"항목 생성"** 버튼 클릭
+4. **속성 추가**:
+   - `userId` (String): `user001`
+   - **"새 속성 추가"** 클릭 → **String** 선택
+   - 속성 이름: `name`, 값: `홍길동`
+   - **"새 속성 추가"** → **Number** 선택
+   - 속성 이름: `age`, 값: `25`
+   - **"새 속성 추가"** → **String** 선택
+   - 속성 이름: `email`, 값: `hong@example.com`
+5. **"항목 생성"** 클릭
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-dynamodb-setup/step3-add-item-ko.png"
+  alt="DynamoDB 항목 추가 화면"
+  caption="새 항목을 생성하고 속성을 추가합니다"
+/>
+
+<Checkpoint>
+항목이 정상적으로 추가되었나요? 테이블의 항목 목록에서 방금 추가한 데이터를 확인할 수 있어야 합니다.
+</Checkpoint>
+
+<DevTip title="DynamoDB 데이터 타입">
+DynamoDB는 다양한 데이터 타입을 지원합니다:
+
+- **스칼라 타입**: String, Number, Binary, Boolean, Null
+- **문서 타입**: List, Map (JSON과 유사)
+- **Set 타입**: String Set, Number Set, Binary Set
+
+예시 (JSON 형식):
+```json
+{
+  "userId": "user001",
+  "name": "홍길동",
+  "age": 25,
+  "tags": ["developer", "aws"],
+  "address": {
+    "city": "서울",
+    "zipCode": "12345"
+  }
+}
+```
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={4} title="데이터 조회 및 쿼리">
+
+DynamoDB에서 데이터를 조회하는 방법을 배웁니다.
+
+### 스캔 (Scan) - 전체 테이블 읽기
+
+1. **"항목 탐색"** 탭에서 기본적으로 **스캔** 수행
+2. 모든 항목이 표시됨
+3. **필터** 추가 가능 (예: `age > 20`)
+
+### 쿼리 (Query) - 파티션 키로 검색
+
+1. **"스캔/쿼리 항목"** 드롭다운에서 **"쿼리"** 선택
+2. **파티션 키** 값 입력 (예: `userId = user001`)
+3. (정렬 키가 있는 경우) 정렬 키 조건 추가 가능
+4. **"실행"** 클릭
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-dynamodb-setup/step4-query-ko.png"
+  alt="DynamoDB 쿼리 화면"
+  caption="파티션 키로 데이터를 쿼리합니다"
+/>
+
+<Callout type="warning" title="Scan vs Query 성능">
+- **Query**: 파티션 키를 사용하여 효율적으로 검색 (권장)
+- **Scan**: 전체 테이블을 읽어서 비효율적, 비용 많이 발생
+- 가능한 한 Query를 사용하고, 필요한 경우에만 Scan 사용
+</Callout>
+
+<DevTip title="PartiQL로 SQL 스타일 쿼리">
+DynamoDB는 PartiQL을 지원하여 SQL과 유사한 쿼리를 작성할 수 있습니다.
+
+**PartiQL 편집기**에서:
+```sql
+-- 모든 사용자 조회
+SELECT * FROM Users
+
+-- 특정 사용자 조회
+SELECT * FROM Users WHERE userId = 'user001'
+
+-- 나이가 20 이상인 사용자
+SELECT name, email FROM Users WHERE age >= 20
+
+-- 항목 추가
+INSERT INTO Users VALUE {
+  'userId': 'user002',
+  'name': '김철수',
+  'age': 30
+}
+
+-- 항목 수정
+UPDATE Users SET age = 26 WHERE userId = 'user001'
+
+-- 항목 삭제
+DELETE FROM Users WHERE userId = 'user002'
+```
+
+PartiQL은 학습 곡선이 낮지만, 프로덕션에서는 SDK 사용을 권장합니다.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={5} title="SDK를 사용한 프로그래매틱 액세스">
+
+Python boto3와 Node.js AWS SDK로 DynamoDB를 사용하는 방법을 배웁니다.
+
+### Python boto3 예제
+
+먼저 boto3 설치:
+```bash
+pip install boto3
+```
+
+<CopyBlock language="python" title="DynamoDB Python 예제">
+```python
+import boto3
+from decimal import Decimal
+
+# DynamoDB 리소스 생성
+dynamodb = boto3.resource('dynamodb', region_name='ap-northeast-2')
+table = dynamodb.Table('Users')
+
+# 1. 항목 추가 (Put Item)
+table.put_item(
+    Item={
+        'userId': 'user003',
+        'name': '이영희',
+        'age': 28,
+        'email': 'lee@example.com',
+        'tags': ['designer', 'ui-ux']
+    }
+)
+print("항목 추가 완료")
+
+# 2. 항목 조회 (Get Item)
+response = table.get_item(
+    Key={'userId': 'user003'}
+)
+item = response.get('Item')
+print(f"조회된 항목: {item}")
+
+# 3. 항목 업데이트 (Update Item)
+table.update_item(
+    Key={'userId': 'user003'},
+    UpdateExpression='SET age = :val1',
+    ExpressionAttributeValues={
+        ':val1': 29
+    }
+)
+print("항목 업데이트 완료")
+
+# 4. 쿼리 (Query)
+response = table.query(
+    KeyConditionExpression='userId = :userId',
+    ExpressionAttributeValues={
+        ':userId': 'user003'
+    }
+)
+for item in response['Items']:
+    print(f"쿼리 결과: {item}")
+
+# 5. 스캔 (Scan) - 필터 적용
+response = table.scan(
+    FilterExpression='age > :age',
+    ExpressionAttributeValues={
+        ':age': 25
+    }
+)
+for item in response['Items']:
+    print(f"나이 > 25: {item}")
+
+# 6. 항목 삭제 (Delete Item)
+table.delete_item(
+    Key={'userId': 'user003'}
+)
+print("항목 삭제 완료")
+```
+</CopyBlock>
+
+### Node.js AWS SDK v3 예제
+
+먼저 패키지 설치:
+```bash
+npm install @aws-sdk/client-dynamodb @aws-sdk/lib-dynamodb
+```
+
+<CopyBlock language="javascript" title="DynamoDB Node.js 예제">
+```javascript
+const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
+const {
+  DynamoDBDocumentClient,
+  PutCommand,
+  GetCommand,
+  UpdateCommand,
+  QueryCommand,
+  ScanCommand,
+  DeleteCommand
+} = require('@aws-sdk/lib-dynamodb');
+
+// DynamoDB 클라이언트 생성
+const client = new DynamoDBClient({ region: 'ap-northeast-2' });
+const docClient = DynamoDBDocumentClient.from(client);
+
+const tableName = 'Users';
+
+// 1. 항목 추가
+async function putItem() {
+  const command = new PutCommand({
+    TableName: tableName,
+    Item: {
+      userId: 'user004',
+      name: '박민수',
+      age: 32,
+      email: 'park@example.com',
+      tags: ['backend', 'nodejs']
+    }
+  });
+
+  await docClient.send(command);
+  console.log('항목 추가 완료');
+}
+
+// 2. 항목 조회
+async function getItem() {
+  const command = new GetCommand({
+    TableName: tableName,
+    Key: { userId: 'user004' }
+  });
+
+  const response = await docClient.send(command);
+  console.log('조회된 항목:', response.Item);
+}
+
+// 3. 항목 업데이트
+async function updateItem() {
+  const command = new UpdateCommand({
+    TableName: tableName,
+    Key: { userId: 'user004' },
+    UpdateExpression: 'SET age = :age',
+    ExpressionAttributeValues: {
+      ':age': 33
+    }
+  });
+
+  await docClient.send(command);
+  console.log('항목 업데이트 완료');
+}
+
+// 4. 쿼리
+async function queryItems() {
+  const command = new QueryCommand({
+    TableName: tableName,
+    KeyConditionExpression: 'userId = :userId',
+    ExpressionAttributeValues: {
+      ':userId': 'user004'
+    }
+  });
+
+  const response = await docClient.send(command);
+  console.log('쿼리 결과:', response.Items);
+}
+
+// 5. 스캔 (필터 적용)
+async function scanItems() {
+  const command = new ScanCommand({
+    TableName: tableName,
+    FilterExpression: 'age > :age',
+    ExpressionAttributeValues: {
+      ':age': 30
+    }
+  });
+
+  const response = await docClient.send(command);
+  console.log('스캔 결과:', response.Items);
+}
+
+// 6. 항목 삭제
+async function deleteItem() {
+  const command = new DeleteCommand({
+    TableName: tableName,
+    Key: { userId: 'user004' }
+  });
+
+  await docClient.send(command);
+  console.log('항목 삭제 완료');
+}
+
+// 실행
+(async () => {
+  await putItem();
+  await getItem();
+  await updateItem();
+  await queryItems();
+  await scanItems();
+  await deleteItem();
+})();
+```
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-dynamodb-setup/step5-sdk-code-ko.png"
+  alt="DynamoDB SDK 코드 예제"
+  caption="Python과 Node.js SDK로 DynamoDB를 사용합니다"
+/>
+
+<Callout type="tip" title="IAM 권한 설정">
+SDK를 사용하려면 적절한 IAM 권한이 필요합니다. IAM 사용자나 역할에 다음 정책을 연결하세요:
+
+- **AmazonDynamoDBFullAccess**: 모든 DynamoDB 작업 (개발용)
+- **AmazonDynamoDBReadOnlyAccess**: 읽기 전용
+- 또는 커스텀 정책으로 특정 테이블에만 접근 권한 부여
+</Callout>
+
+<DevTip title="로컬 DynamoDB 개발">
+AWS 비용 없이 로컬에서 개발하려면 DynamoDB Local을 사용하세요:
+
+```bash
+# Docker로 DynamoDB Local 실행
+docker run -p 8000:8000 amazon/dynamodb-local
+
+# Python boto3에서 로컬 DynamoDB 사용
+dynamodb = boto3.resource(
+    'dynamodb',
+    endpoint_url='http://localhost:8000',
+    region_name='local',
+    aws_access_key_id='dummy',
+    aws_secret_access_key='dummy'
+)
+```
+
+프로덕션 배포 시에는 endpoint_url을 제거하여 실제 DynamoDB를 사용합니다.
+</DevTip>
+
+</Step>
+
+---
+
+## 다음 단계
+
+DynamoDB 테이블 설정을 완료했습니다! 이제 다음 작업을 시도해보세요:
+
+- **Lambda와 연동**: 서버리스 백엔드 구축
+- **보조 인덱스 생성**: GSI/LSI로 다양한 쿼리 패턴 지원
+- **DynamoDB Streams**: 데이터 변경 이벤트 실시간 처리
+- **백업 및 복원**: 온디맨드 백업 또는 자동 백업 설정
+- **글로벌 테이블**: 다중 리전 복제로 글로벌 애플리케이션 구축
+
+<CopyBlock language="python" title="Lambda에서 DynamoDB 사용">
+```python
+import boto3
+import json
+from decimal import Decimal
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('Users')
+
+def lambda_handler(event, context):
+    # API Gateway에서 전달된 데이터
+    body = json.loads(event['body'])
+
+    # DynamoDB에 사용자 추가
+    table.put_item(
+        Item={
+            'userId': body['userId'],
+            'name': body['name'],
+            'email': body['email'],
+            'createdAt': body['timestamp']
+        }
+    )
+
+    return {
+        'statusCode': 200,
+        'headers': {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        },
+        'body': json.dumps({
+            'message': 'User created successfully',
+            'userId': body['userId']
+        })
+    }
+```
+</CopyBlock>
+
+<CopyBlock language="javascript" title="보조 인덱스(GSI) 쿼리 예제">
+```javascript
+// 이메일로 사용자 검색 (GSI: email-index)
+const command = new QueryCommand({
+  TableName: 'Users',
+  IndexName: 'email-index',
+  KeyConditionExpression: 'email = :email',
+  ExpressionAttributeValues: {
+    ':email': 'hong@example.com'
+  }
+});
+
+const response = await docClient.send(command);
+console.log('이메일로 검색:', response.Items);
+```
+</CopyBlock>
+
+<Callout type="info" title="DynamoDB 모범 사례">
+1. **파티션 키 설계**: 데이터를 고르게 분산시키는 키 선택
+2. **정렬 키 활용**: 범위 쿼리나 정렬이 필요한 경우 활용
+3. **보조 인덱스**: 다양한 액세스 패턴 지원 (최대 20개 GSI)
+4. **배치 작업**: BatchGetItem, BatchWriteItem으로 여러 항목 동시 처리
+5. **조건부 쓰기**: 동시성 제어를 위한 ConditionExpression 사용
+6. **TTL 설정**: 만료 데이터 자동 삭제로 비용 절감
+</Callout>
+
+<Callout type="info" title="관련 가이드">
+- [AWS Lambda 함수 생성하기](/guides/aws-lambda-setup) - DynamoDB와 Lambda 연동
+- [AWS S3 버킷 설정하기](/guides/aws-s3-bucket-setup) - S3와 DynamoDB 함께 사용
+</Callout>

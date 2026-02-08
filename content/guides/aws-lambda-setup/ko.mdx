@@ -1,0 +1,438 @@
+---
+title: "AWS Lambda 함수 생성 및 설정하기"
+description: "AWS Lambda 서버리스 함수를 만들고 코드 작성, 테스트, 트리거 설정, 모니터링하는 방법을 배워보세요"
+---
+
+# AWS Lambda 함수 생성 및 설정하기
+
+AWS Lambda는 서버를 프로비저닝하거나 관리할 필요 없이 코드를 실행할 수 있는 서버리스 컴퓨팅 서비스입니다. 이벤트에 응답하여 코드를 자동으로 실행하고 사용한 컴퓨팅 시간에 대해서만 비용을 지불합니다.
+
+<FreeTierInfo />
+
+<Callout type="info" title="Lambda의 주요 특징">
+- **서버리스**: 서버 관리 불필요, 코드에만 집중
+- **자동 확장**: 요청량에 따라 자동으로 스케일링
+- **비용 효율적**: 실행 시간과 메모리에 대해서만 과금
+- **다양한 트리거**: API Gateway, S3, DynamoDB, EventBridge 등과 연동
+- **다양한 언어 지원**: Python, Node.js, Java, Go, .NET, Ruby 등
+</Callout>
+
+<PrerequisiteCheck prerequisites={["aws-account-setup", "aws-iam-user-create"]} />
+
+---
+
+<Step number={1} title="Lambda 서비스로 이동">
+
+AWS Management Console에서 Lambda 서비스로 이동합니다.
+
+1. AWS Management Console 상단의 검색창에 **"Lambda"** 입력
+2. 검색 결과에서 **Lambda** 클릭
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-lambda-setup/step1-lambda-console-ko.png"
+  alt="AWS Console에서 Lambda 검색"
+  caption="검색창에서 Lambda를 찾아 클릭합니다"
+/>
+
+<Checkpoint>
+Lambda 대시보드에 접속했나요? "함수", "애플리케이션", "계층" 메뉴가 보여야 합니다.
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={2} title="새 Lambda 함수 생성">
+
+첫 번째 Lambda 함수를 생성합니다.
+
+1. **"함수 생성"** 버튼 클릭
+2. **"새로 작성"** 선택 (처음부터 함수 만들기)
+3. **기본 정보** 입력:
+   - **함수 이름**: `my-first-lambda` (영문, 숫자, 하이픈, 언더스코어만 사용)
+   - **런타임**: **Python 3.12** 또는 **Node.js 20.x** 선택
+   - **아키텍처**: **x86_64** (기본값)
+4. **실행 역할** 설정:
+   - **"기본 Lambda 권한을 가진 새 역할 생성"** 선택
+5. **"함수 생성"** 클릭
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-lambda-setup/step2-create-function-ko.png"
+  alt="Lambda 함수 생성 화면"
+  caption="함수 이름, 런타임, 실행 역할을 설정합니다"
+/>
+
+<Callout type="tip" title="런타임 선택 가이드">
+- **Python**: 데이터 처리, 머신러닝, 자동화 스크립트
+- **Node.js**: 웹 API, 실시간 처리, JSON 데이터 작업
+- **Go**: 고성능, 낮은 지연시간이 필요한 경우
+- **Java**: 기존 Java 애플리케이션 마이그레이션
+</Callout>
+
+<DevTip title="실행 역할(Execution Role)이란?">
+Lambda 함수가 다른 AWS 서비스(S3, DynamoDB 등)에 접근하기 위해 필요한 IAM 역할입니다. 기본 역할은 CloudWatch Logs에 로그를 쓰는 권한만 포함합니다.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="함수 코드 작성 및 배포">
+
+Lambda 함수 코드를 작성하고 배포합니다.
+
+### Python 예제
+
+Lambda 함수 편집기에서 다음 코드를 입력합니다:
+
+<CopyBlock language="python" title="lambda_function.py">
+```python
+import json
+
+def lambda_handler(event, context):
+    # 이벤트에서 이름 가져오기 (기본값: 'World')
+    name = event.get('name', 'World')
+
+    # 응답 메시지 생성
+    message = f'Hello, {name}!'
+
+    # 응답 반환
+    return {
+        'statusCode': 200,
+        'body': json.dumps({
+            'message': message,
+            'input': event
+        })
+    }
+```
+</CopyBlock>
+
+### Node.js 예제
+
+또는 Node.js를 선택했다면:
+
+<CopyBlock language="javascript" title="index.mjs">
+```javascript
+export const handler = async (event) => {
+    // 이벤트에서 이름 가져오기 (기본값: 'World')
+    const name = event.name || 'World';
+
+    // 응답 메시지 생성
+    const message = `Hello, ${name}!`;
+
+    // 응답 반환
+    const response = {
+        statusCode: 200,
+        body: JSON.stringify({
+            message: message,
+            input: event
+        })
+    };
+
+    return response;
+};
+```
+</CopyBlock>
+
+코드 작성 후:
+1. **"Deploy"** 버튼 클릭 (코드 저장 및 배포)
+2. 배포 완료 메시지 확인
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-lambda-setup/step3-code-editor-ko.png"
+  alt="Lambda 코드 편집기"
+  caption="코드를 작성하고 Deploy 버튼을 클릭합니다"
+/>
+
+<Checkpoint>
+"Successfully deployed" 메시지가 표시되었나요?
+</Checkpoint>
+
+<DevTip title="환경 변수 사용하기">
+민감한 정보나 설정값은 환경 변수로 관리하세요.
+
+1. **"구성"** 탭 → **"환경 변수"** 클릭
+2. **"편집"** → **"환경 변수 추가"** 클릭
+3. 키-값 쌍 입력 (예: `API_KEY`, `DATABASE_URL`)
+
+코드에서 접근:
+```python
+import os
+api_key = os.environ['API_KEY']
+```
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={4} title="함수 테스트">
+
+Lambda 함수를 테스트하여 정상 작동하는지 확인합니다.
+
+1. **"Test"** 탭 클릭
+2. **"새 이벤트 생성"** 선택
+3. **이벤트 이름** 입력 (예: `TestEvent`)
+4. **이벤트 JSON** 수정:
+
+<CopyBlock language="json" title="테스트 이벤트 JSON">
+```json
+{
+  "name": "AWS Lambda"
+}
+```
+</CopyBlock>
+
+5. **"저장"** 클릭
+6. **"Test"** 버튼 클릭하여 함수 실행
+
+테스트 결과를 확인합니다:
+- **실행 결과**: Success 또는 Error
+- **응답**: 함수가 반환한 값
+- **로그 출력**: 함수 실행 중 출력된 로그
+- **요청 ID, 소요 시간, 메모리 사용량** 확인
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-lambda-setup/step4-test-function-ko.png"
+  alt="Lambda 함수 테스트"
+  caption="테스트 이벤트를 생성하고 함수를 실행합니다"
+/>
+
+<Checkpoint>
+테스트가 성공했나요? 응답에서 "Hello, AWS Lambda!" 메시지를 확인할 수 있어야 합니다.
+</Checkpoint>
+
+<DevTip title="다양한 테스트 이벤트">
+실제 서비스에서는 다양한 입력을 받을 수 있으므로 여러 테스트 이벤트를 생성하세요:
+
+```json
+// 빈 이벤트 테스트
+{}
+
+// 복잡한 데이터 테스트
+{
+  "name": "User",
+  "age": 25,
+  "items": ["item1", "item2"]
+}
+```
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={5} title="트리거 추가 (이벤트 소스 연결)">
+
+Lambda 함수를 자동으로 실행할 트리거를 추가합니다.
+
+### API Gateway 트리거 (HTTP 엔드포인트 생성)
+
+1. 함수 페이지에서 **"트리거 추가"** 클릭
+2. **트리거 소스** 선택: **API Gateway**
+3. **API** 설정:
+   - **API 생성**: **"새 API 생성"** 선택
+   - **API 유형**: **HTTP API** (간단하고 저렴)
+   - **보안**: **"열기"** (누구나 호출 가능) 또는 **"IAM"** (인증 필요)
+4. **"추가"** 클릭
+
+트리거 추가 후:
+- **API 엔드포인트 URL** 복사 (예: `https://abc123.execute-api.ap-northeast-2.amazonaws.com/default/my-first-lambda`)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-lambda-setup/step5-add-trigger-ko.png"
+  alt="Lambda 트리거 추가"
+  caption="API Gateway 트리거를 추가하여 HTTP 엔드포인트를 생성합니다"
+/>
+
+### 트리거 테스트
+
+웹 브라우저나 curl로 API 엔드포인트를 호출합니다:
+
+<CopyBlock language="bash" title="API 엔드포인트 호출">
+```bash
+# curl로 테스트
+curl -X POST https://abc123.execute-api.ap-northeast-2.amazonaws.com/default/my-first-lambda \
+  -H "Content-Type: application/json" \
+  -d '{"name": "API User"}'
+
+# 응답 예시
+{"message":"Hello, API User!","input":{"name":"API User"}}
+```
+</CopyBlock>
+
+<Checkpoint>
+API 엔드포인트를 호출했을 때 정상적인 응답을 받았나요?
+</Checkpoint>
+
+<DevTip title="다른 트리거 옵션">
+Lambda는 다양한 AWS 서비스와 연동 가능합니다:
+
+- **S3**: 파일 업로드 시 자동 처리 (이미지 리사이징, 로그 분석)
+- **DynamoDB Streams**: 데이터베이스 변경 시 실시간 처리
+- **EventBridge**: 예약된 작업 (cron jobs)
+- **SNS/SQS**: 메시지 큐 처리
+- **CloudWatch Logs**: 로그 필터링 및 알림
+
+예: S3 트리거로 이미지 업로드 시 썸네일 자동 생성
+```python
+import boto3
+from PIL import Image
+
+s3 = boto3.client('s3')
+
+def lambda_handler(event, context):
+    # S3 이벤트에서 버킷과 키 추출
+    bucket = event['Records'][0]['s3']['bucket']['name']
+    key = event['Records'][0]['s3']['object']['key']
+
+    # 이미지 처리 로직...
+    return {'statusCode': 200}
+```
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={6} title="모니터링 및 로그 확인">
+
+Lambda 함수의 실행 로그와 성능을 모니터링합니다.
+
+### CloudWatch Logs 확인
+
+1. 함수 페이지에서 **"모니터"** 탭 클릭
+2. **"CloudWatch에서 로그 보기"** 클릭
+3. 최근 로그 스트림 선택
+4. 함수 실행 로그, 에러, print/console.log 출력 확인
+
+### 메트릭 확인
+
+**"모니터"** 탭에서 다음 메트릭을 확인할 수 있습니다:
+- **호출 횟수**: 함수가 실행된 총 횟수
+- **지속 시간**: 평균/최대 실행 시간
+- **오류**: 실패한 호출 횟수
+- **제한**: 동시 실행 제한에 도달한 횟수
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-lambda-setup/step6-monitoring-ko.png"
+  alt="Lambda 모니터링 대시보드"
+  caption="CloudWatch에서 함수 실행 로그와 메트릭을 확인합니다"
+/>
+
+<Callout type="tip" title="로그 출력 추가하기">
+디버깅을 위해 코드에 로그를 추가하세요:
+
+**Python:**
+```python
+import logging
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+def lambda_handler(event, context):
+    logger.info(f"Received event: {event}")
+    # 코드...
+```
+
+**Node.js:**
+```javascript
+export const handler = async (event) => {
+    console.log('Received event:', JSON.stringify(event));
+    // 코드...
+};
+```
+</Callout>
+
+<DevTip title="비용 최적화 팁">
+Lambda 비용은 실행 시간과 메모리 사용량으로 결정됩니다:
+
+1. **메모리 설정 최적화**:
+   - "구성" → "일반 구성"에서 메모리 조정 (128MB ~ 10,240MB)
+   - 메모리를 늘리면 CPU 성능도 증가하여 실행 시간이 단축될 수 있음
+
+2. **타임아웃 설정**:
+   - 기본 3초, 최대 15분
+   - 필요한 만큼만 설정하여 무한 실행 방지
+
+3. **프로비저닝된 동시성 사용 주의**:
+   - 콜드 스타트를 없애지만 비용 증가
+   - 프리 티어에 포함되지 않음
+
+4. **ARM64 아키텍처 고려**:
+   - Graviton2 프로세서로 최대 34% 비용 절감
+   - 대부분의 런타임 지원
+</DevTip>
+
+</Step>
+
+---
+
+## 다음 단계
+
+Lambda 함수 설정을 완료했습니다! 이제 다음 작업을 시도해보세요:
+
+- **DynamoDB와 연동**: Lambda에서 데이터베이스 읽기/쓰기
+- **S3 트리거 설정**: 파일 업로드 시 자동 처리
+- **Layer 사용**: 공통 라이브러리 재사용
+- **CI/CD 구축**: GitHub Actions나 AWS CodePipeline으로 자동 배포
+- **Step Functions**: 복잡한 워크플로우 오케스트레이션
+
+<CopyBlock language="python" title="DynamoDB와 Lambda 연동 예제">
+```python
+import boto3
+import json
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('MyTable')
+
+def lambda_handler(event, context):
+    # DynamoDB에 아이템 추가
+    table.put_item(
+        Item={
+            'id': event['id'],
+            'name': event['name'],
+            'timestamp': event['timestamp']
+        }
+    )
+
+    return {
+        'statusCode': 200,
+        'body': json.dumps('Item added successfully')
+    }
+```
+</CopyBlock>
+
+<CopyBlock language="javascript" title="S3와 Lambda 연동 예제 (Node.js)">
+```javascript
+import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
+
+const s3Client = new S3Client({ region: 'ap-northeast-2' });
+
+export const handler = async (event) => {
+    // S3 이벤트에서 버킷과 키 추출
+    const bucket = event.Records[0].s3.bucket.name;
+    const key = decodeURIComponent(event.Records[0].s3.object.key.replace(/\+/g, ' '));
+
+    // S3에서 파일 가져오기
+    const command = new GetObjectCommand({
+        Bucket: bucket,
+        Key: key
+    });
+
+    const response = await s3Client.send(command);
+    const fileContent = await response.Body.transformToString();
+
+    console.log('File content:', fileContent);
+
+    return {
+        statusCode: 200,
+        body: JSON.stringify('File processed successfully')
+    };
+};
+```
+</CopyBlock>
+
+<Callout type="info" title="관련 가이드">
+- [AWS S3 버킷 설정하기](/guides/aws-s3-bucket-setup) - Lambda와 S3 연동
+- [AWS DynamoDB 설정하기](/guides/aws-dynamodb-setup) - Lambda와 DynamoDB 연동
+</Callout>

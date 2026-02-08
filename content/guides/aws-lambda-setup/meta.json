@@ -1,0 +1,55 @@
+{
+  "slug": "aws-lambda-setup",
+  "platform": "aws",
+  "service": "Lambda",
+  "category": "compute",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 25,
+  "totalSteps": 6,
+  "freeTier": {
+    "limit": "100만 건 요청, 400,000 GB-초 컴퓨팅 시간",
+    "period": "월간",
+    "amount": "무료",
+    "status": "available",
+    "conditions": [
+      "매월 100만 건 무료 요청",
+      "매월 400,000 GB-초 컴퓨팅 시간",
+      "영구 무료 (12개월 제한 없음)",
+      "128MB 메모리 함수 기준 320만 초 실행 가능"
+    ]
+  },
+  "prerequisites": ["aws-account-setup", "aws-iam-user-create"],
+  "nextGuides": ["aws-dynamodb-setup", "aws-s3-bucket-setup"],
+  "tags": ["lambda", "serverless", "function", "python", "nodejs", "compute", "faas"],
+  "seo": {
+    "ko": {
+      "title": "AWS Lambda 함수 생성 및 설정 가이드 - CloudSetup.guide",
+      "description": "AWS Lambda 서버리스 함수를 생성하고 코드 작성, 테스트, 트리거 추가, 로그 모니터링하는 방법을 Python과 Node.js 예제와 함께 안내합니다.",
+      "keywords": [
+        "AWS Lambda",
+        "Lambda 함수",
+        "서버리스",
+        "Python Lambda",
+        "Node.js Lambda",
+        "Lambda 트리거",
+        "AWS 컴퓨팅"
+      ]
+    },
+    "en": {
+      "title": "AWS Lambda Function Creation and Setup Guide - CloudSetup.guide",
+      "description": "Step-by-step guide to creating AWS Lambda serverless functions with code examples in Python and Node.js, testing, triggers, and log monitoring.",
+      "keywords": [
+        "AWS Lambda",
+        "Lambda function",
+        "serverless",
+        "Python Lambda",
+        "Node.js Lambda",
+        "Lambda triggers",
+        "AWS compute"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08"
+}

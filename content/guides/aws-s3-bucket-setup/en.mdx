@@ -1,0 +1,318 @@
+---
+title: "Create and Configure AWS S3 Bucket"
+description: "Learn how to create an AWS S3 bucket, upload files, manage permissions, and set up static website hosting"
+---
+
+# Create and Configure AWS S3 Bucket
+
+AWS S3 (Simple Storage Service) is a scalable object storage service used for file storage, backups, static website hosting, and more. This guide walks you through creating an S3 bucket and configuring basic settings step by step.
+
+<FreeTierInfo />
+
+<Callout type="info" title="Key Features of S3">
+- **Durability**: 99.999999999% (11 nines) data durability
+- **Scalability**: Unlimited storage capacity
+- **Storage Classes**: Standard, IA, Glacier for cost optimization
+- **Security**: Encryption, access control, and versioning support
+</Callout>
+
+<PrerequisiteCheck prerequisites={["aws-account-setup", "aws-iam-user-create"]} />
+
+---
+
+<Step number={1} title="Navigate to S3 Service">
+
+Go to the S3 service in the AWS Management Console.
+
+1. Type **"S3"** in the search bar at the top of the AWS Management Console
+2. Click **S3** from the search results
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-s3-bucket-setup/step1-s3-console-en.png"
+  alt="Search for S3 in AWS Console"
+  caption="Find and click S3 from the search bar"
+/>
+
+<Checkpoint>
+Are you on the S3 dashboard? You should see a bucket list and a "Create bucket" button.
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={2} title="Create a New S3 Bucket">
+
+Create your first S3 bucket.
+
+1. Click the **"Create bucket"** button
+2. Enter a **Bucket name** (must be globally unique)
+   - Example: `my-app-storage-2026` (lowercase letters, numbers, hyphens only)
+   - Must be DNS-compatible (3-63 characters)
+3. Select **AWS Region**
+   - For Korean users: **"Asia Pacific (Seoul) ap-northeast-2"** recommended
+4. Keep the remaining settings as default
+5. Click **"Create bucket"** at the bottom of the page
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-s3-bucket-setup/step2-create-bucket-en.png"
+  alt="S3 bucket creation screen"
+  caption="Set bucket name and region"
+/>
+
+<Callout type="warning" title="Bucket Naming Rules">
+- Bucket names must be globally unique
+- Use only lowercase letters, numbers, and hyphens (-)
+- Cannot use IP address format (192.168.1.1)
+- Names cannot be changed, so choose carefully
+</Callout>
+
+<DevTip title="Region Selection Tips">
+Choose a region close to your users to minimize data latency. Seoul region (ap-northeast-2) provides the best performance for Korean users.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="Upload Files">
+
+Upload files to your newly created bucket.
+
+1. Click on the bucket you just created from the bucket list
+2. Click the **"Upload"** button
+3. Click **"Add files"** or **"Add folder"**
+4. Select files to upload (e.g., images, PDFs, HTML files)
+5. (Optional) Select **Storage class**
+   - **S3 Standard**: Frequently accessed data (default)
+   - **S3 Standard-IA**: Infrequently accessed data (cost savings)
+   - **S3 Glacier**: Archive data (lowest cost)
+6. Click **"Upload"** at the bottom of the page
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-s3-bucket-setup/step3-upload-file-en.png"
+  alt="S3 file upload screen"
+  caption="Select files and specify storage class"
+/>
+
+<Checkpoint>
+Did the files upload successfully? You should be able to see the uploaded files in the bucket's object list.
+</Checkpoint>
+
+<DevTip title="Large File Uploads">
+For files larger than 100MB, using AWS CLI or SDK is more efficient. You can use multipart upload for reliable large file transfers.
+
+```bash
+# Upload file with AWS CLI
+aws s3 cp large-file.zip s3://my-app-storage-2026/
+
+# Sync entire folder
+aws s3 sync ./local-folder s3://my-app-storage-2026/backup/
+```
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={4} title="Configure Bucket Permissions and Public Access">
+
+Set access permissions for your files.
+
+### Unblock Public Access (only if needed)
+
+1. Click the **"Permissions"** tab on the bucket page
+2. Click **"Edit"** in the **"Block public access"** section
+3. Unblock as needed (required for static website hosting)
+4. Enter confirmation text and click **"Confirm"**
+
+### Make Individual Files Public
+
+1. Select a file from the **"Objects"** tab in the bucket
+2. Click **"Actions"** → **"Make public using ACL"**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-s3-bucket-setup/step4-permissions-en.png"
+  alt="S3 bucket permissions settings"
+  caption="Manage public access block settings"
+/>
+
+<Callout type="danger" title="Security Warning">
+Public access allows anyone to access your files. Never make buckets with sensitive data public. Use bucket policies or presigned URLs when necessary.
+</Callout>
+
+<DevTip title="Fine-grained Access Control with Bucket Policies">
+Use bucket policies to allow access only under specific conditions.
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "PublicReadGetObject",
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::my-app-storage-2026/public/*"
+    }
+  ]
+}
+```
+
+This policy allows public read access only to files in the `public/` folder.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={5} title="Enable Static Website Hosting">
+
+Host a static website using S3.
+
+1. Click the **"Properties"** tab on the bucket page
+2. Find the **"Static website hosting"** section at the bottom
+3. Click **"Edit"**
+4. Select **"Enable"**
+5. **Hosting type**: Select **"Host a static website"**
+6. Enter **Index document**: `index.html`
+7. (Optional) Enter **Error document**: `error.html`
+8. Click **"Save changes"**
+9. Copy the generated **Bucket website endpoint** URL
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-s3-bucket-setup/step5-static-website-en.png"
+  alt="S3 static website hosting settings"
+  caption="Enable static website hosting"
+/>
+
+<Checkpoint>
+Does the index.html file display when you access the website endpoint URL?
+</Checkpoint>
+
+<DevTip title="Sample index.html">
+Test index.html file:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My S3 Website</title>
+</head>
+<body>
+  <h1>AWS S3 Static Website Hosting Success!</h1>
+  <p>This page is served from an S3 bucket.</p>
+</body>
+</html>
+```
+
+Upload this file to your bucket and access it via the website endpoint.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={6} title="Configure Lifecycle Rules (Cost Optimization)">
+
+Automatically delete old files or move them to cheaper storage classes.
+
+1. Click the **"Management"** tab on the bucket page
+2. Click **"Create lifecycle rule"** in the **"Lifecycle rules"** section
+3. Enter **Lifecycle rule name** (e.g., `auto-archive-old-files`)
+4. Select **Rule scope**:
+   - Apply to all objects or specific prefix/tags
+5. Select **Lifecycle rule actions**:
+   - **"Transition current versions of objects"**: Move to Standard-IA after 30 days
+   - **"Expire current versions of objects"**: Delete after 90 days
+6. Click **"Create rule"**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-s3-bucket-setup/step6-lifecycle-en.png"
+  alt="S3 lifecycle rule settings"
+  caption="Optimize storage costs with lifecycle rules"
+/>
+
+<Callout type="tip" title="Cost Optimization Strategies">
+- Infrequently accessed log files: Move to Standard-IA after 30 days
+- Archive backups: Move to Glacier after 90 days
+- Temporary files: Auto-delete after 7 days
+</Callout>
+
+<DevTip title="S3 Intelligent-Tiering">
+If access patterns are unpredictable, use **S3 Intelligent-Tiering**. It automatically moves objects to the appropriate storage class to optimize costs.
+
+```bash
+# Set Intelligent-Tiering with CLI
+aws s3api put-bucket-intelligent-tiering-configuration \
+  --bucket my-app-storage-2026 \
+  --id EntireBucket \
+  --intelligent-tiering-configuration file://tiering.json
+```
+</DevTip>
+
+</Step>
+
+---
+
+## Next Steps
+
+You've completed S3 bucket setup! Try these next:
+
+- **Integrate with Lambda**: Trigger Lambda functions with S3 events
+- **Connect with CloudFront**: Deliver content globally via CDN
+- **Enable Versioning**: Track and restore file changes
+- **Set up Encryption**: Protect data with server-side encryption (SSE-S3, SSE-KMS)
+- **Use S3 SDK**: Programmatic access with Python boto3 or Node.js AWS SDK
+
+<CopyBlock language="python" title="Using S3 with Python boto3">
+```python
+import boto3
+
+# Create S3 client
+s3 = boto3.client('s3')
+
+# Upload file
+s3.upload_file('local-file.txt', 'my-app-storage-2026', 'uploaded-file.txt')
+
+# Download file
+s3.download_file('my-app-storage-2026', 'uploaded-file.txt', 'downloaded-file.txt')
+
+# List files
+response = s3.list_objects_v2(Bucket='my-app-storage-2026')
+for obj in response.get('Contents', []):
+    print(obj['Key'])
+```
+</CopyBlock>
+
+<CopyBlock language="javascript" title="Using S3 with Node.js AWS SDK">
+```javascript
+const { S3Client, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
+const fs = require('fs');
+
+const s3Client = new S3Client({ region: 'ap-northeast-2' });
+
+// Upload file
+async function uploadFile() {
+  const fileContent = fs.readFileSync('local-file.txt');
+
+  const command = new PutObjectCommand({
+    Bucket: 'my-app-storage-2026',
+    Key: 'uploaded-file.txt',
+    Body: fileContent
+  });
+
+  await s3Client.send(command);
+  console.log('File uploaded successfully');
+}
+
+uploadFile();
+```
+</CopyBlock>
+
+<Callout type="info" title="Related Guides">
+- [Create AWS Lambda Function](/guides/aws-lambda-setup) - Set up S3 event triggers
+- [Set up AWS DynamoDB](/guides/aws-dynamodb-setup) - Database to use with S3
+</Callout>

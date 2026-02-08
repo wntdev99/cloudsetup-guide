@@ -1,0 +1,438 @@
+---
+title: "Create and Configure AWS Lambda Function"
+description: "Learn how to create AWS Lambda serverless functions, write code, test, set up triggers, and monitor logs"
+---
+
+# Create and Configure AWS Lambda Function
+
+AWS Lambda is a serverless computing service that lets you run code without provisioning or managing servers. It automatically executes code in response to events and charges only for the compute time you use.
+
+<FreeTierInfo />
+
+<Callout type="info" title="Key Features of Lambda">
+- **Serverless**: No server management, focus only on code
+- **Auto-scaling**: Automatically scales with request volume
+- **Cost-effective**: Pay only for execution time and memory
+- **Multiple Triggers**: Integrate with API Gateway, S3, DynamoDB, EventBridge, etc.
+- **Language Support**: Python, Node.js, Java, Go, .NET, Ruby, and more
+</Callout>
+
+<PrerequisiteCheck prerequisites={["aws-account-setup", "aws-iam-user-create"]} />
+
+---
+
+<Step number={1} title="Navigate to Lambda Service">
+
+Go to the Lambda service in the AWS Management Console.
+
+1. Type **"Lambda"** in the search bar at the top of the AWS Management Console
+2. Click **Lambda** from the search results
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-lambda-setup/step1-lambda-console-en.png"
+  alt="Search for Lambda in AWS Console"
+  caption="Find and click Lambda from the search bar"
+/>
+
+<Checkpoint>
+Are you on the Lambda dashboard? You should see "Functions", "Applications", and "Layers" menus.
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={2} title="Create a New Lambda Function">
+
+Create your first Lambda function.
+
+1. Click the **"Create function"** button
+2. Select **"Author from scratch"** (create function from scratch)
+3. Enter **Basic information**:
+   - **Function name**: `my-first-lambda` (letters, numbers, hyphens, underscores only)
+   - **Runtime**: Select **Python 3.12** or **Node.js 20.x**
+   - **Architecture**: **x86_64** (default)
+4. Set **Execution role**:
+   - Select **"Create a new role with basic Lambda permissions"**
+5. Click **"Create function"**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-lambda-setup/step2-create-function-en.png"
+  alt="Lambda function creation screen"
+  caption="Set function name, runtime, and execution role"
+/>
+
+<Callout type="tip" title="Runtime Selection Guide">
+- **Python**: Data processing, machine learning, automation scripts
+- **Node.js**: Web APIs, real-time processing, JSON data operations
+- **Go**: High performance, low latency requirements
+- **Java**: Migrating existing Java applications
+</Callout>
+
+<DevTip title="What is an Execution Role?">
+An IAM role that Lambda needs to access other AWS services (S3, DynamoDB, etc.). The basic role only includes permissions to write logs to CloudWatch Logs.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="Write and Deploy Function Code">
+
+Write and deploy your Lambda function code.
+
+### Python Example
+
+Enter the following code in the Lambda function editor:
+
+<CopyBlock language="python" title="lambda_function.py">
+```python
+import json
+
+def lambda_handler(event, context):
+    # Get name from event (default: 'World')
+    name = event.get('name', 'World')
+
+    # Create response message
+    message = f'Hello, {name}!'
+
+    # Return response
+    return {
+        'statusCode': 200,
+        'body': json.dumps({
+            'message': message,
+            'input': event
+        })
+    }
+```
+</CopyBlock>
+
+### Node.js Example
+
+Or if you selected Node.js:
+
+<CopyBlock language="javascript" title="index.mjs">
+```javascript
+export const handler = async (event) => {
+    // Get name from event (default: 'World')
+    const name = event.name || 'World';
+
+    // Create response message
+    const message = `Hello, ${name}!`;
+
+    // Return response
+    const response = {
+        statusCode: 200,
+        body: JSON.stringify({
+            message: message,
+            input: event
+        })
+    };
+
+    return response;
+};
+```
+</CopyBlock>
+
+After writing the code:
+1. Click the **"Deploy"** button (save and deploy code)
+2. Confirm deployment success message
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-lambda-setup/step3-code-editor-en.png"
+  alt="Lambda code editor"
+  caption="Write your code and click the Deploy button"
+/>
+
+<Checkpoint>
+Did you see the "Successfully deployed" message?
+</Checkpoint>
+
+<DevTip title="Using Environment Variables">
+Manage sensitive information or configuration values as environment variables.
+
+1. Click **"Configuration"** tab → **"Environment variables"**
+2. Click **"Edit"** → **"Add environment variable"**
+3. Enter key-value pairs (e.g., `API_KEY`, `DATABASE_URL`)
+
+Access in code:
+```python
+import os
+api_key = os.environ['API_KEY']
+```
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={4} title="Test Function">
+
+Test your Lambda function to verify it works correctly.
+
+1. Click the **"Test"** tab
+2. Select **"Create new event"**
+3. Enter **Event name** (e.g., `TestEvent`)
+4. Modify **Event JSON**:
+
+<CopyBlock language="json" title="Test Event JSON">
+```json
+{
+  "name": "AWS Lambda"
+}
+```
+</CopyBlock>
+
+5. Click **"Save"**
+6. Click the **"Test"** button to execute the function
+
+Review the test results:
+- **Execution result**: Success or Error
+- **Response**: Value returned by the function
+- **Log output**: Logs printed during execution
+- **Request ID, duration, memory usage**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-lambda-setup/step4-test-function-en.png"
+  alt="Lambda function testing"
+  caption="Create a test event and execute the function"
+/>
+
+<Checkpoint>
+Was the test successful? You should see "Hello, AWS Lambda!" in the response.
+</Checkpoint>
+
+<DevTip title="Multiple Test Events">
+Create various test events since real services receive different inputs:
+
+```json
+// Empty event test
+{}
+
+// Complex data test
+{
+  "name": "User",
+  "age": 25,
+  "items": ["item1", "item2"]
+}
+```
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={5} title="Add Trigger (Connect Event Source)">
+
+Add a trigger to automatically execute your Lambda function.
+
+### API Gateway Trigger (Create HTTP Endpoint)
+
+1. Click **"Add trigger"** on the function page
+2. Select **Trigger source**: **API Gateway**
+3. Configure **API**:
+   - **Create API**: Select **"Create a new API"**
+   - **API type**: **HTTP API** (simple and cost-effective)
+   - **Security**: **"Open"** (anyone can call) or **"IAM"** (authentication required)
+4. Click **"Add"**
+
+After adding trigger:
+- Copy the **API endpoint URL** (e.g., `https://abc123.execute-api.ap-northeast-2.amazonaws.com/default/my-first-lambda`)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-lambda-setup/step5-add-trigger-en.png"
+  alt="Add Lambda trigger"
+  caption="Add API Gateway trigger to create an HTTP endpoint"
+/>
+
+### Test the Trigger
+
+Call the API endpoint using a web browser or curl:
+
+<CopyBlock language="bash" title="Call API Endpoint">
+```bash
+# Test with curl
+curl -X POST https://abc123.execute-api.ap-northeast-2.amazonaws.com/default/my-first-lambda \
+  -H "Content-Type: application/json" \
+  -d '{"name": "API User"}'
+
+# Example response
+{"message":"Hello, API User!","input":{"name":"API User"}}
+```
+</CopyBlock>
+
+<Checkpoint>
+Did you receive a valid response when calling the API endpoint?
+</Checkpoint>
+
+<DevTip title="Other Trigger Options">
+Lambda integrates with various AWS services:
+
+- **S3**: Auto-process on file upload (image resizing, log analysis)
+- **DynamoDB Streams**: Real-time processing on database changes
+- **EventBridge**: Scheduled tasks (cron jobs)
+- **SNS/SQS**: Message queue processing
+- **CloudWatch Logs**: Log filtering and alerts
+
+Example: Auto-generate thumbnail on S3 image upload
+```python
+import boto3
+from PIL import Image
+
+s3 = boto3.client('s3')
+
+def lambda_handler(event, context):
+    # Extract bucket and key from S3 event
+    bucket = event['Records'][0]['s3']['bucket']['name']
+    key = event['Records'][0]['s3']['object']['key']
+
+    # Image processing logic...
+    return {'statusCode': 200}
+```
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={6} title="Monitor and View Logs">
+
+Monitor Lambda function execution logs and performance.
+
+### Check CloudWatch Logs
+
+1. Click the **"Monitor"** tab on the function page
+2. Click **"View CloudWatch logs"**
+3. Select the most recent log stream
+4. Review function execution logs, errors, print/console.log output
+
+### Check Metrics
+
+In the **"Monitor"** tab, you can view these metrics:
+- **Invocations**: Total number of function executions
+- **Duration**: Average/maximum execution time
+- **Errors**: Number of failed invocations
+- **Throttles**: Times concurrent execution limit was reached
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-lambda-setup/step6-monitoring-en.png"
+  alt="Lambda monitoring dashboard"
+  caption="View function execution logs and metrics in CloudWatch"
+/>
+
+<Callout type="tip" title="Add Log Output">
+Add logs to your code for debugging:
+
+**Python:**
+```python
+import logging
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+def lambda_handler(event, context):
+    logger.info(f"Received event: {event}")
+    # Code...
+```
+
+**Node.js:**
+```javascript
+export const handler = async (event) => {
+    console.log('Received event:', JSON.stringify(event));
+    // Code...
+};
+```
+</Callout>
+
+<DevTip title="Cost Optimization Tips">
+Lambda cost is determined by execution time and memory usage:
+
+1. **Optimize Memory Settings**:
+   - Adjust memory in "Configuration" → "General configuration" (128MB ~ 10,240MB)
+   - Increasing memory also increases CPU performance, potentially reducing execution time
+
+2. **Timeout Settings**:
+   - Default 3 seconds, max 15 minutes
+   - Set only what's needed to prevent infinite execution
+
+3. **Use Provisioned Concurrency Carefully**:
+   - Eliminates cold starts but increases cost
+   - Not included in free tier
+
+4. **Consider ARM64 Architecture**:
+   - Graviton2 processor saves up to 34% cost
+   - Supported by most runtimes
+</DevTip>
+
+</Step>
+
+---
+
+## Next Steps
+
+You've completed Lambda function setup! Try these next:
+
+- **Integrate with DynamoDB**: Read/write database from Lambda
+- **Set up S3 Trigger**: Auto-process on file upload
+- **Use Layers**: Reuse common libraries
+- **Build CI/CD**: Auto-deploy with GitHub Actions or AWS CodePipeline
+- **Step Functions**: Orchestrate complex workflows
+
+<CopyBlock language="python" title="Lambda with DynamoDB Example">
+```python
+import boto3
+import json
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('MyTable')
+
+def lambda_handler(event, context):
+    # Add item to DynamoDB
+    table.put_item(
+        Item={
+            'id': event['id'],
+            'name': event['name'],
+            'timestamp': event['timestamp']
+        }
+    )
+
+    return {
+        'statusCode': 200,
+        'body': json.dumps('Item added successfully')
+    }
+```
+</CopyBlock>
+
+<CopyBlock language="javascript" title="Lambda with S3 Example (Node.js)">
+```javascript
+import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
+
+const s3Client = new S3Client({ region: 'ap-northeast-2' });
+
+export const handler = async (event) => {
+    // Extract bucket and key from S3 event
+    const bucket = event.Records[0].s3.bucket.name;
+    const key = decodeURIComponent(event.Records[0].s3.object.key.replace(/\+/g, ' '));
+
+    // Get file from S3
+    const command = new GetObjectCommand({
+        Bucket: bucket,
+        Key: key
+    });
+
+    const response = await s3Client.send(command);
+    const fileContent = await response.Body.transformToString();
+
+    console.log('File content:', fileContent);
+
+    return {
+        statusCode: 200,
+        body: JSON.stringify('File processed successfully')
+    };
+};
+```
+</CopyBlock>
+
+<Callout type="info" title="Related Guides">
+- [Set up AWS S3 Bucket](/guides/aws-s3-bucket-setup) - Integrate Lambda with S3
+- [Set up AWS DynamoDB](/guides/aws-dynamodb-setup) - Integrate Lambda with DynamoDB
+</Callout>

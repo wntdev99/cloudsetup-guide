@@ -1,0 +1,525 @@
+---
+title: "Create and Configure AWS DynamoDB Table"
+description: "Learn how to set up AWS DynamoDB NoSQL database, add data, query, and use SDK with Python and Node.js"
+---
+
+# Create and Configure AWS DynamoDB Table
+
+AWS DynamoDB is a fully managed NoSQL database service that provides fast performance and unlimited scalability. It supports key-value and document data models, optimized for serverless architectures.
+
+<FreeTierInfo />
+
+<Callout type="info" title="Key Features of DynamoDB">
+- **Fully Managed**: Automated server provisioning, patching, and backups
+- **High Performance**: Single-digit millisecond response times
+- **Flexible Schema**: Schema-less design for flexible data structures
+- **Auto-scaling**: Automatically adjusts throughput based on traffic
+- **Global Tables**: Multi-region replication support
+</Callout>
+
+<PrerequisiteCheck prerequisites={["aws-account-setup", "aws-iam-user-create"]} />
+
+---
+
+<Step number={1} title="Navigate to DynamoDB Service">
+
+Go to the DynamoDB service in the AWS Management Console.
+
+1. Type **"DynamoDB"** in the search bar at the top of the AWS Management Console
+2. Click **DynamoDB** from the search results
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-dynamodb-setup/step1-dynamodb-console-en.png"
+  alt="Search for DynamoDB in AWS Console"
+  caption="Find and click DynamoDB from the search bar"
+/>
+
+<Checkpoint>
+Are you on the DynamoDB dashboard? You should see "Tables", "PartiQL editor", and "Backups" menus.
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={2} title="Create a New DynamoDB Table">
+
+Create your first DynamoDB table.
+
+1. Click the **"Create table"** button
+2. Enter **Table details**:
+   - **Table name**: `Users` (letters, numbers, underscores, hyphens, dots allowed)
+   - **Partition key**: `userId` (Type: **String**)
+   - (Optional) **Sort key**: Add if needed (e.g., `timestamp`)
+
+3. Select **Table settings**:
+   - **Table class**: **DynamoDB Standard** (default)
+   - **Capacity mode**: **On-demand** (recommended - auto-scales with traffic)
+     - Or **Provisioned** (predictable traffic)
+
+4. Keep remaining settings as default
+5. Click **"Create table"**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-dynamodb-setup/step2-create-table-en.png"
+  alt="DynamoDB table creation screen"
+  caption="Set table name and partition key"
+/>
+
+<Callout type="tip" title="Partition Key and Sort Key">
+- **Partition Key**: Required, used for data distribution
+  - Choose values with high cardinality (userId, orderId, sessionId)
+- **Sort Key**: Optional, sorts data within the same partition key
+  - Use timestamp for chronological queries
+  - Partition key + Sort key = Composite primary key
+</Callout>
+
+<DevTip title="On-demand vs Provisioned">
+**On-demand mode** (recommended):
+- Unpredictable traffic patterns
+- Intermittent and spiky workloads
+- Pay only for what you use
+
+**Provisioned mode**:
+- Predictable and consistent traffic
+- Cost optimization needed (Auto Scaling available)
+- Specify read/write capacity units (RCU/WCU)
+
+Free tier includes up to 25 RCU/WCU in provisioned mode.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="Add Data to Table">
+
+Add items to your DynamoDB table.
+
+### Manually Add via Console
+
+1. Click on the table you created (e.g., `Users`)
+2. Select the **"Explore table items"** tab
+3. Click the **"Create item"** button
+4. **Add attributes**:
+   - `userId` (String): `user001`
+   - Click **"Add new attribute"** → Select **String**
+   - Attribute name: `name`, Value: `John Doe`
+   - Click **"Add new attribute"** → Select **Number**
+   - Attribute name: `age`, Value: `25`
+   - Click **"Add new attribute"** → Select **String**
+   - Attribute name: `email`, Value: `john@example.com`
+5. Click **"Create item"**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-dynamodb-setup/step3-add-item-en.png"
+  alt="DynamoDB add item screen"
+  caption="Create a new item and add attributes"
+/>
+
+<Checkpoint>
+Was the item added successfully? You should see the newly added data in the table's item list.
+</Checkpoint>
+
+<DevTip title="DynamoDB Data Types">
+DynamoDB supports various data types:
+
+- **Scalar types**: String, Number, Binary, Boolean, Null
+- **Document types**: List, Map (similar to JSON)
+- **Set types**: String Set, Number Set, Binary Set
+
+Example (JSON format):
+```json
+{
+  "userId": "user001",
+  "name": "John Doe",
+  "age": 25,
+  "tags": ["developer", "aws"],
+  "address": {
+    "city": "Seoul",
+    "zipCode": "12345"
+  }
+}
+```
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={4} title="Query and Scan Data">
+
+Learn how to retrieve data from DynamoDB.
+
+### Scan - Read Entire Table
+
+1. In the **"Explore table items"** tab, **Scan** is performed by default
+2. All items are displayed
+3. **Filters** can be added (e.g., `age > 20`)
+
+### Query - Search by Partition Key
+
+1. Select **"Query"** from the **"Scan/Query items"** dropdown
+2. Enter **Partition key** value (e.g., `userId = user001`)
+3. (If sort key exists) Add sort key conditions
+4. Click **"Run"**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-dynamodb-setup/step4-query-en.png"
+  alt="DynamoDB query screen"
+  caption="Query data by partition key"
+/>
+
+<Callout type="warning" title="Scan vs Query Performance">
+- **Query**: Efficient search using partition key (recommended)
+- **Scan**: Reads entire table, inefficient and costly
+- Use Query whenever possible, Scan only when necessary
+</Callout>
+
+<DevTip title="SQL-style Queries with PartiQL">
+DynamoDB supports PartiQL for SQL-like queries.
+
+In **PartiQL editor**:
+```sql
+-- Get all users
+SELECT * FROM Users
+
+-- Get specific user
+SELECT * FROM Users WHERE userId = 'user001'
+
+-- Users with age >= 20
+SELECT name, email FROM Users WHERE age >= 20
+
+-- Add item
+INSERT INTO Users VALUE {
+  'userId': 'user002',
+  'name': 'Jane Smith',
+  'age': 30
+}
+
+-- Update item
+UPDATE Users SET age = 26 WHERE userId = 'user001'
+
+-- Delete item
+DELETE FROM Users WHERE userId = 'user002'
+```
+
+PartiQL has a low learning curve, but SDK usage is recommended for production.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={5} title="Programmatic Access with SDK">
+
+Learn how to use DynamoDB with Python boto3 and Node.js AWS SDK.
+
+### Python boto3 Example
+
+First, install boto3:
+```bash
+pip install boto3
+```
+
+<CopyBlock language="python" title="DynamoDB Python Example">
+```python
+import boto3
+from decimal import Decimal
+
+# Create DynamoDB resource
+dynamodb = boto3.resource('dynamodb', region_name='ap-northeast-2')
+table = dynamodb.Table('Users')
+
+# 1. Put Item
+table.put_item(
+    Item={
+        'userId': 'user003',
+        'name': 'Alice Johnson',
+        'age': 28,
+        'email': 'alice@example.com',
+        'tags': ['designer', 'ui-ux']
+    }
+)
+print("Item added")
+
+# 2. Get Item
+response = table.get_item(
+    Key={'userId': 'user003'}
+)
+item = response.get('Item')
+print(f"Retrieved item: {item}")
+
+# 3. Update Item
+table.update_item(
+    Key={'userId': 'user003'},
+    UpdateExpression='SET age = :val1',
+    ExpressionAttributeValues={
+        ':val1': 29
+    }
+)
+print("Item updated")
+
+# 4. Query
+response = table.query(
+    KeyConditionExpression='userId = :userId',
+    ExpressionAttributeValues={
+        ':userId': 'user003'
+    }
+)
+for item in response['Items']:
+    print(f"Query result: {item}")
+
+# 5. Scan with filter
+response = table.scan(
+    FilterExpression='age > :age',
+    ExpressionAttributeValues={
+        ':age': 25
+    }
+)
+for item in response['Items']:
+    print(f"Age > 25: {item}")
+
+# 6. Delete Item
+table.delete_item(
+    Key={'userId': 'user003'}
+)
+print("Item deleted")
+```
+</CopyBlock>
+
+### Node.js AWS SDK v3 Example
+
+First, install packages:
+```bash
+npm install @aws-sdk/client-dynamodb @aws-sdk/lib-dynamodb
+```
+
+<CopyBlock language="javascript" title="DynamoDB Node.js Example">
+```javascript
+const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
+const {
+  DynamoDBDocumentClient,
+  PutCommand,
+  GetCommand,
+  UpdateCommand,
+  QueryCommand,
+  ScanCommand,
+  DeleteCommand
+} = require('@aws-sdk/lib-dynamodb');
+
+// Create DynamoDB client
+const client = new DynamoDBClient({ region: 'ap-northeast-2' });
+const docClient = DynamoDBDocumentClient.from(client);
+
+const tableName = 'Users';
+
+// 1. Put Item
+async function putItem() {
+  const command = new PutCommand({
+    TableName: tableName,
+    Item: {
+      userId: 'user004',
+      name: 'Bob Wilson',
+      age: 32,
+      email: 'bob@example.com',
+      tags: ['backend', 'nodejs']
+    }
+  });
+
+  await docClient.send(command);
+  console.log('Item added');
+}
+
+// 2. Get Item
+async function getItem() {
+  const command = new GetCommand({
+    TableName: tableName,
+    Key: { userId: 'user004' }
+  });
+
+  const response = await docClient.send(command);
+  console.log('Retrieved item:', response.Item);
+}
+
+// 3. Update Item
+async function updateItem() {
+  const command = new UpdateCommand({
+    TableName: tableName,
+    Key: { userId: 'user004' },
+    UpdateExpression: 'SET age = :age',
+    ExpressionAttributeValues: {
+      ':age': 33
+    }
+  });
+
+  await docClient.send(command);
+  console.log('Item updated');
+}
+
+// 4. Query
+async function queryItems() {
+  const command = new QueryCommand({
+    TableName: tableName,
+    KeyConditionExpression: 'userId = :userId',
+    ExpressionAttributeValues: {
+      ':userId': 'user004'
+    }
+  });
+
+  const response = await docClient.send(command);
+  console.log('Query result:', response.Items);
+}
+
+// 5. Scan with filter
+async function scanItems() {
+  const command = new ScanCommand({
+    TableName: tableName,
+    FilterExpression: 'age > :age',
+    ExpressionAttributeValues: {
+      ':age': 30
+    }
+  });
+
+  const response = await docClient.send(command);
+  console.log('Scan result:', response.Items);
+}
+
+// 6. Delete Item
+async function deleteItem() {
+  const command = new DeleteCommand({
+    TableName: tableName,
+    Key: { userId: 'user004' }
+  });
+
+  await docClient.send(command);
+  console.log('Item deleted');
+}
+
+// Execute
+(async () => {
+  await putItem();
+  await getItem();
+  await updateItem();
+  await queryItems();
+  await scanItems();
+  await deleteItem();
+})();
+```
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/guides/aws-dynamodb-setup/step5-sdk-code-en.png"
+  alt="DynamoDB SDK code examples"
+  caption="Use DynamoDB with Python and Node.js SDKs"
+/>
+
+<Callout type="tip" title="IAM Permissions Setup">
+SDK usage requires appropriate IAM permissions. Attach these policies to your IAM user or role:
+
+- **AmazonDynamoDBFullAccess**: All DynamoDB operations (development)
+- **AmazonDynamoDBReadOnlyAccess**: Read-only access
+- Or create custom policies for specific table access
+</Callout>
+
+<DevTip title="Local DynamoDB Development">
+Use DynamoDB Local for cost-free local development:
+
+```bash
+# Run DynamoDB Local with Docker
+docker run -p 8000:8000 amazon/dynamodb-local
+
+# Use local DynamoDB with Python boto3
+dynamodb = boto3.resource(
+    'dynamodb',
+    endpoint_url='http://localhost:8000',
+    region_name='local',
+    aws_access_key_id='dummy',
+    aws_secret_access_key='dummy'
+)
+```
+
+Remove endpoint_url when deploying to production to use real DynamoDB.
+</DevTip>
+
+</Step>
+
+---
+
+## Next Steps
+
+You've completed DynamoDB table setup! Try these next:
+
+- **Integrate with Lambda**: Build serverless backends
+- **Create Secondary Indexes**: Support various query patterns with GSI/LSI
+- **DynamoDB Streams**: Real-time processing of data changes
+- **Backup and Restore**: Set up on-demand or automatic backups
+- **Global Tables**: Build global applications with multi-region replication
+
+<CopyBlock language="python" title="Using DynamoDB with Lambda">
+```python
+import boto3
+import json
+from decimal import Decimal
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('Users')
+
+def lambda_handler(event, context):
+    # Data from API Gateway
+    body = json.loads(event['body'])
+
+    # Add user to DynamoDB
+    table.put_item(
+        Item={
+            'userId': body['userId'],
+            'name': body['name'],
+            'email': body['email'],
+            'createdAt': body['timestamp']
+        }
+    )
+
+    return {
+        'statusCode': 200,
+        'headers': {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        },
+        'body': json.dumps({
+            'message': 'User created successfully',
+            'userId': body['userId']
+        })
+    }
+```
+</CopyBlock>
+
+<CopyBlock language="javascript" title="Query Secondary Index (GSI) Example">
+```javascript
+// Search user by email (GSI: email-index)
+const command = new QueryCommand({
+  TableName: 'Users',
+  IndexName: 'email-index',
+  KeyConditionExpression: 'email = :email',
+  ExpressionAttributeValues: {
+    ':email': 'john@example.com'
+  }
+});
+
+const response = await docClient.send(command);
+console.log('Search by email:', response.Items);
+```
+</CopyBlock>
+
+<Callout type="info" title="DynamoDB Best Practices">
+1. **Partition Key Design**: Choose keys that distribute data evenly
+2. **Use Sort Keys**: For range queries or sorting
+3. **Secondary Indexes**: Support various access patterns (max 20 GSIs)
+4. **Batch Operations**: Use BatchGetItem, BatchWriteItem for multiple items
+5. **Conditional Writes**: Use ConditionExpression for concurrency control
+6. **TTL Settings**: Auto-delete expired data to reduce costs
+</Callout>
+
+<Callout type="info" title="Related Guides">
+- [Create AWS Lambda Function](/guides/aws-lambda-setup) - Integrate DynamoDB with Lambda
+- [Set up AWS S3 Bucket](/guides/aws-s3-bucket-setup) - Use S3 and DynamoDB together
+</Callout>
