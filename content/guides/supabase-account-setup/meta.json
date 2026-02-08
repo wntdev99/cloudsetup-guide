@@ -1,0 +1,63 @@
+{
+  "slug": "supabase-account-setup",
+  "platform": "supabase",
+  "service": "Supabase Account",
+  "category": "database",
+  "difficulty": "beginner",
+  "estimatedMinutes": 10,
+  "totalSteps": 4,
+  "freeTier": {
+    "limit": "500MB database, 1GB file storage, 2GB bandwidth",
+    "period": "month",
+    "amount": 0,
+    "status": "available",
+    "conditions": [
+      "2 free projects per organization",
+      "Projects paused after 1 week of inactivity",
+      "Community support only"
+    ]
+  },
+  "prerequisites": [],
+  "nextGuides": [
+    "supabase-database-setup",
+    "supabase-auth-setup",
+    "supabase-storage-setup"
+  ],
+  "tags": [
+    "supabase",
+    "database",
+    "backend",
+    "postgresql",
+    "account-setup"
+  ],
+  "seo": {
+    "ko": {
+      "title": "Supabase 계정 생성 및 프로젝트 설정 가이드",
+      "description": "Supabase 계정을 만들고 첫 번째 프로젝트를 설정하는 방법을 단계별로 알아봅니다. 무료 티어로 500MB 데이터베이스와 1GB 스토리지를 사용할 수 있습니다.",
+      "keywords": [
+        "Supabase 시작하기",
+        "Supabase 계정 만들기",
+        "Supabase 프로젝트 생성",
+        "Supabase 무료 티어",
+        "백엔드 서비스",
+        "PostgreSQL 호스팅"
+      ]
+    },
+    "en": {
+      "title": "Supabase Account Setup and Project Creation Guide",
+      "description": "Learn how to create a Supabase account and set up your first project step by step. Get 500MB database and 1GB storage with the free tier.",
+      "keywords": [
+        "Supabase getting started",
+        "Supabase account creation",
+        "Supabase project setup",
+        "Supabase free tier",
+        "backend service",
+        "PostgreSQL hosting"
+      ]
+    }
+  },
+  "published": true,
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z"
+}

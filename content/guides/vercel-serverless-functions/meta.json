@@ -43,8 +43,8 @@
       "keywords": ["Vercel Serverless", "Next.js API Routes", "Edge Functions", "Vercel Middleware", "Serverless Functions"]
     }
   },
-  "published": true,
-  "featured": true,
+  "published": false,
+  "featured": false,
   "createdAt": "2026-02-08T00:00:00.000Z",
   "updatedAt": "2026-02-08T00:00:00.000Z",
   "lastVerified": "2026-02-08T00:00:00.000Z"

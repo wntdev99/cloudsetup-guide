@@ -1,0 +1,324 @@
+---
+title: "Supabase Account Setup and Project Creation Guide"
+description: "Learn how to create a Supabase account and set up your first project step by step."
+---
+
+# Supabase Account Setup and Project Creation Guide
+
+Supabase is an open-source Firebase alternative that provides PostgreSQL database, authentication, storage, and real-time features as a backend platform. This guide will walk you through creating a Supabase account and setting up your first project.
+
+<FreeTierInfo
+  limit="500MB database, 1GB file storage, 2GB bandwidth"
+  period="month"
+  status="available"
+/>
+
+## Before You Begin
+
+Make sure you have the following ready.
+
+- Valid email address
+- GitHub account (optional, for OAuth login)
+- Stable internet connection
+
+<Callout type="info">
+Supabase offers 2 free projects per organization on the free tier. Projects are paused after 1 week of inactivity, but you can resume them anytime.
+</Callout>
+
+<Step number={1} title="Sign Up for Supabase">
+
+Visit the Supabase website and create an account.
+
+1. Navigate to [https://supabase.com](https://supabase.com) in your browser
+2. Click the **Start your project** button in the top right
+3. Sign up using one of the following methods:
+   - **Sign up with GitHub** (recommended): Quick signup with GitHub integration
+   - **Sign up with Email**: Enter email and password to sign up
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/supabase-account-setup/step1-signup-en.png"
+  alt="Supabase sign up page"
+  caption="You can sign up with GitHub or email on the Supabase sign up page"
+/>
+
+<Callout type="tip">
+Signing up with GitHub makes it easier to integrate with GitHub Actions. If you plan to set up CI/CD pipelines, we recommend GitHub signup.
+</Callout>
+
+If you signed up with email, click the verification link in your email to activate your account.
+
+<Checkpoint>
+- [ ] Supabase account created
+- [ ] Email verified (if signed up with email)
+- [ ] Logged into dashboard
+</Checkpoint>
+
+</Step>
+
+<Step number={2} title="Create an Organization">
+
+In Supabase, projects are managed at the organization level.
+
+1. After logging in, you'll automatically be directed to the organization creation page
+2. Enter an organization name in **Organization name**
+   - Personal projects: Your name or personal ID
+   - Team projects: Team or company name
+3. Select **Free** on the **Plan** selection screen
+4. Click the **Create organization** button
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/supabase-account-setup/step2-organization-en.png"
+  alt="Create Supabase organization"
+  caption="Enter organization name and select the free plan"
+/>
+
+<DevTip title="Relationship between Organizations and Projects">
+- **Organization**: Top-level unit that manages multiple projects
+- **Project**: Actual backend instance for an application
+- You can create multiple projects within one organization
+- Free tier allows up to 2 projects per organization
+</DevTip>
+
+<Checkpoint>
+- [ ] Organization name entered
+- [ ] Free plan selected
+- [ ] Organization created
+</Checkpoint>
+
+</Step>
+
+<Step number={3} title="Create Your First Project">
+
+Now create a project to use in your actual application.
+
+1. Click the **New project** button
+2. Enter project information:
+
+   **Name**: Project name (e.g., my-first-app)
+   - Only lowercase letters, numbers, and hyphens allowed
+   - Length: 3-63 characters
+
+   **Database Password**: Database password
+   - Click **Generate a password** button to create a strong password
+   - Save the generated password in a secure location (password manager recommended)
+
+   **Region**: Select project region
+   - Choose a region close to your users (Korea: Northeast Asia (Seoul))
+   - Region cannot be changed after creation
+
+   **Pricing Plan**: Select Free
+
+3. Click the **Create new project** button
+4. Project creation takes about 1-2 minutes to complete
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/supabase-account-setup/step3-project-en.png"
+  alt="Create Supabase project"
+  caption="Set project name, database password, and region"
+/>
+
+<Callout type="warning">
+**Make sure to save your database password!** This password is required for direct database connections and cannot be retrieved later. You'll need to reset it if you forget it.
+</Callout>
+
+<DevTip title="Region Selection Guide">
+**Available Major Regions:**
+- Northeast Asia (Seoul): For Korean users
+- Southeast Asia (Singapore): For Southeast Asian users
+- West US (North California): For western US users
+- East US (North Virginia): For eastern US users
+- Central EU (Frankfurt): For European users
+
+**Selection Criteria:**
+- Choose the region where your primary users are located
+- Region selection is more important for latency-sensitive applications
+- For global services, you can use Edge Functions for region-specific caching later
+</DevTip>
+
+<Checkpoint>
+- [ ] Project name entered
+- [ ] Database password generated and saved
+- [ ] Region selected
+- [ ] Project creation completed (green checkmark visible)
+</Checkpoint>
+
+</Step>
+
+<Step number={4} title="Explore the Dashboard">
+
+Once project creation is complete, the dashboard will be displayed.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/supabase-account-setup/step4-dashboard-en.png"
+  alt="Supabase project dashboard"
+  caption="Main menus and features of the Supabase project dashboard"
+/>
+
+### Explore the Main Menus
+
+You can access key features from the left sidebar:
+
+**Table Editor** 📊
+- Create and edit database tables with a GUI
+- Enter and modify data like a spreadsheet
+- Next guide: [Supabase Database Setup Guide](../supabase-database-setup)
+
+**SQL Editor** 💻
+- Write and execute SQL queries directly
+- Perform complex database operations
+- Manage saved queries
+
+**Authentication** 🔐
+- Configure and manage user authentication
+- Supports various authentication methods: email, OAuth, magic links, etc.
+- Next guide: [Supabase Auth Setup Guide](../supabase-auth-setup)
+
+**Storage** 📁
+- Upload and manage files
+- Store images, videos, documents, etc.
+- Next guide: [Supabase Storage Setup Guide](../supabase-storage-setup)
+
+**Functions** ⚡
+- Deploy serverless functions (Edge Functions)
+- Write backend logic in TypeScript
+
+**Database** 🗄️
+- View database connection information
+- Backup and restore
+- Manage extensions
+
+**API** 🔌
+- Auto-generated REST API documentation
+- View API keys and endpoints
+
+### Check API Keys in Project Settings
+
+1. Click **Project Settings** (gear icon) in the bottom left
+2. Select the **API** menu
+3. You can view the following information:
+
+   **Project URL**: Your project's API endpoint
+   ```
+   https://xxxxxxxxxxxxx.supabase.co
+   ```
+
+   **API Keys**:
+   - `anon public`: Public key used in clients (browser, mobile app)
+   - `service_role`: Secret key used only on servers (never expose to clients)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/supabase-account-setup/step4-api-keys-en.png"
+  alt="Check Supabase API keys"
+  caption="View project URL and API keys in Project Settings > API"
+/>
+
+<Callout type="warning">
+**Never include the service_role key in client code!** This key bypasses all RLS (Row Level Security) policies, so exposing it on GitHub or in browser-executed code creates security risks.
+</Callout>
+
+<DevTip title="API Key Usage Guide">
+**anon public key:**
+- Used in frontend code (React, Vue, Next.js, etc.)
+- Protected by RLS policies
+- Relatively safe to upload to public repositories (but environment variables recommended)
+
+**service_role key:**
+- Only use in backend code (API Routes, serverless functions)
+- Can access all data (admin privileges)
+- Must manage with environment variables (.env.local)
+- Never commit to Git
+
+**Environment Variable Example:**
+```bash
+NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGc...
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGc... # Server-side only
+```
+</DevTip>
+
+<Checkpoint>
+- [ ] Dashboard main menus reviewed
+- [ ] Project URL checked and saved
+- [ ] anon public key checked and saved
+- [ ] service_role key checked and saved (stored securely)
+</Checkpoint>
+
+</Step>
+
+## Next Steps
+
+Congratulations! You've completed the Supabase account and project setup. Now follow these guides to utilize Supabase's key features.
+
+### Recommended Guides
+
+1. **[Supabase Database Setup Guide](../supabase-database-setup)**
+   - Create and manage tables
+   - Execute SQL queries
+   - Configure Row Level Security
+   - Estimated time: 20 minutes
+
+2. **[Supabase Auth Setup Guide](../supabase-auth-setup)**
+   - Email/password authentication
+   - OAuth (Google, GitHub) integration
+   - Implement authentication in Next.js app
+   - Estimated time: 25 minutes
+
+3. **[Supabase Storage Setup Guide](../supabase-storage-setup)**
+   - Create file storage
+   - Upload and manage images
+   - Use CDN URLs
+   - Estimated time: 15 minutes
+
+## Troubleshooting
+
+### Project creation failed
+
+**Cause**: Temporary server issue or network error
+
+**Solution**:
+1. Refresh the page and try again
+2. Clear browser cache and retry
+3. Try a different browser
+4. Check service status at [Supabase Status](https://status.supabase.com/)
+
+### I forgot my database password
+
+**Solution**:
+1. Go to Project Settings > Database
+2. Click the **Reset database password** button
+3. Generate and save a new password
+4. Update the password in any connected applications
+
+### My project was paused
+
+**Cause**: Free tier projects are automatically paused after 1 week of inactivity.
+
+**Solution**:
+1. Click the **Restore** button in the project dashboard
+2. The project will resume within a few minutes
+3. All data is preserved
+
+<Callout type="tip">
+To prevent your project from being paused, periodically access the dashboard or set up a simple health check that calls the API.
+</Callout>
+
+### I reached free tier limits
+
+**Limitations**:
+- 2 projects per organization
+- 500MB database per project
+- 1GB file storage
+- 2GB bandwidth/month
+
+**Solutions**:
+1. Delete unused projects (Project Settings > General > Danger Zone)
+2. Consider upgrading to Pro plan ($25/month per project)
+3. Create multiple organizations (requires different email addresses)
+
+## Useful Resources
+
+- [Supabase Official Documentation](https://supabase.com/docs)
+- [Supabase YouTube Channel](https://www.youtube.com/@Supabase)
+- [Supabase GitHub](https://github.com/supabase/supabase)
+- [Supabase Discord Community](https://discord.supabase.com/)
+- [Supabase Example Code](https://github.com/supabase/supabase/tree/master/examples)

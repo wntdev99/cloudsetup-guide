@@ -1,0 +1,65 @@
+{
+  "slug": "cloudflare-account-setup",
+  "platform": "cloudflare",
+  "service": "Cloudflare Account",
+  "category": "cdn",
+  "difficulty": "beginner",
+  "estimatedMinutes": 10,
+  "totalSteps": 4,
+  "freeTier": {
+    "limit": "Unlimited sites, global CDN, DDoS protection",
+    "period": "forever",
+    "amount": 0,
+    "status": "available",
+    "conditions": [
+      "Unlimited bandwidth",
+      "Free SSL certificates",
+      "DDoS protection",
+      "CDN with 300+ locations"
+    ]
+  },
+  "prerequisites": [],
+  "nextGuides": [
+    "cloudflare-pages-deploy"
+  ],
+  "tags": [
+    "cloudflare",
+    "cdn",
+    "account",
+    "signup",
+    "dns",
+    "ddos-protection"
+  ],
+  "seo": {
+    "ko": {
+      "title": "Cloudflare 계정 생성 가이드 - 무료 CDN 및 DDoS 보호",
+      "description": "Cloudflare 계정을 생성하고 사이트를 추가하며, DNS 설정을 완료하는 방법을 배웁니다. 무료 CDN, SSL, DDoS 보호 기능 포함.",
+      "keywords": [
+        "Cloudflare",
+        "Cloudflare 계정",
+        "CDN",
+        "DDoS 보호",
+        "DNS 설정",
+        "네임서버",
+        "SSL 인증서"
+      ]
+    },
+    "en": {
+      "title": "Cloudflare Account Setup Guide - Free CDN & DDoS Protection",
+      "description": "Learn how to create a Cloudflare account, add your site, and complete DNS configuration. Includes free CDN, SSL, and DDoS protection features.",
+      "keywords": [
+        "Cloudflare",
+        "Cloudflare account",
+        "CDN",
+        "DDoS protection",
+        "DNS setup",
+        "nameserver",
+        "SSL certificate"
+      ]
+    }
+  },
+  "published": true,
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z"
+}

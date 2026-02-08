@@ -1,0 +1,68 @@
+{
+  "slug": "supabase-auth-setup",
+  "platform": "supabase",
+  "service": "Supabase Auth",
+  "category": "auth",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 25,
+  "totalSteps": 6,
+  "freeTier": {
+    "limit": "Unlimited users",
+    "period": "month",
+    "amount": 0,
+    "status": "available",
+    "conditions": [
+      "50,000 monthly active users (Pro plan: unlimited)",
+      "Email authentication included",
+      "OAuth providers: Google, GitHub, Discord, etc."
+    ]
+  },
+  "prerequisites": [
+    "supabase-account-setup",
+    "supabase-database-setup"
+  ],
+  "nextGuides": [
+    "supabase-storage-setup"
+  ],
+  "tags": [
+    "supabase",
+    "authentication",
+    "auth",
+    "oauth",
+    "email-auth",
+    "next-auth",
+    "row-level-security"
+  ],
+  "seo": {
+    "ko": {
+      "title": "Supabase 인증 설정 가이드 - 이메일/OAuth 연동",
+      "description": "Supabase에서 이메일 인증, OAuth(Google, GitHub), 매직 링크를 설정하고 Next.js 앱에 통합하는 방법을 배웁니다. Row Level Security와의 연동 포함.",
+      "keywords": [
+        "Supabase 인증",
+        "Supabase Auth",
+        "OAuth 설정",
+        "Google 로그인",
+        "GitHub 로그인",
+        "Next.js 인증",
+        "Row Level Security"
+      ]
+    },
+    "en": {
+      "title": "Supabase Auth Setup Guide - Email/OAuth Integration",
+      "description": "Learn how to configure email authentication, OAuth (Google, GitHub), magic links in Supabase and integrate with Next.js app. Includes Row Level Security integration.",
+      "keywords": [
+        "Supabase authentication",
+        "Supabase Auth",
+        "OAuth setup",
+        "Google login",
+        "GitHub login",
+        "Next.js authentication",
+        "Row Level Security"
+      ]
+    }
+  },
+  "published": true,
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z"
+}

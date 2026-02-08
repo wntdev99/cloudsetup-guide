@@ -1,0 +1,851 @@
+---
+title: "Supabase Storage Setup Guide - File Upload & CDN"
+description: "Learn how to create buckets, upload files, and configure Row Level Security policies in Supabase Storage."
+---
+
+# Supabase Storage Setup Guide
+
+Supabase Storage is an S3-compatible object storage service that allows you to store and manage all types of files including images, videos, and documents. It supports Row Level Security for fine-grained access control and includes built-in CDN and image transformation features.
+
+<FreeTierInfo
+  limit="1GB file storage, 2GB bandwidth"
+  period="month"
+  status="available"
+/>
+
+## Before You Begin
+
+Make sure you have the following ready.
+
+- [Supabase Account and Project Setup](../supabase-account-setup) completed
+- Sample files to upload (images, documents, etc.)
+- Basic JavaScript/TypeScript knowledge
+
+<Callout type="info">
+Supabase Storage provides S3-compatible APIs, making it easy to migrate from applications using AWS S3. It supports the TUS protocol for resumable uploads of large files.
+</Callout>
+
+<Step number={1} title="Create a Bucket">
+
+A bucket is the top-level container for storing files. You can create multiple buckets for different purposes.
+
+1. Click **Storage** in the Supabase dashboard
+2. Click the **New bucket** button
+3. Enter bucket information:
+
+   **Name**: `avatars` (bucket name, use lowercase and hyphens only)
+   - Examples: `avatars`, `product-images`, `user-documents`
+
+   **Public bucket**: Choose whether to check this option
+   - **Checked (Public)**: Anyone can access files via URL (profile pictures, product images, etc.)
+   - **Unchecked (Private)**: Access controlled by RLS policies (personal documents, sensitive files, etc.)
+
+4. Click the **Create bucket** button
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/supabase-storage-setup/step1-create-bucket-en.png"
+  alt="Create bucket"
+  caption="Create a new bucket in Supabase Storage"
+/>
+
+<DevTip title="Public vs Private Bucket Selection Guide">
+**Public Bucket:**
+- Use cases: Profile pictures, blog images, product photos, public documents
+- Pros: Direct access via URL without authentication
+- Cons: Anyone with the file URL can access it
+- URL example: `https://project.supabase.co/storage/v1/object/public/avatars/user1.jpg`
+
+**Private Bucket:**
+- Use cases: Personal documents, invoices, medical records, member-only content
+- Pros: Fine-grained access control with RLS policies
+- Cons: Requires signed URLs or authentication tokens for file access
+- URL example: `https://project.supabase.co/storage/v1/object/sign/documents/invoice.pdf?token=xxx`
+
+**Recommendation:**
+- Use Private buckets by default (security first)
+- Use Public buckets only when truly necessary
+- RLS policies can still be applied to Public buckets (to restrict upload/delete)
+</DevTip>
+
+### Create Additional Buckets (Optional)
+
+You can create multiple buckets for different purposes:
+
+- `avatars` (Public): Profile pictures
+- `documents` (Private): Personal documents
+- `product-images` (Public): Product images
+- `thumbnails` (Public): Thumbnail images
+
+<Checkpoint>
+- [ ] Accessed Storage menu
+- [ ] Entered bucket name
+- [ ] Selected Public/Private option
+- [ ] Created bucket successfully
+</Checkpoint>
+
+</Step>
+
+<Step number={2} title="Upload Files (GUI)">
+
+Let's upload files directly from the dashboard.
+
+1. Click the `avatars` bucket you created
+2. Click the **Upload file** button
+3. Select the file to upload
+   - Supported formats: All file types (images, videos, PDF, ZIP, etc.)
+   - Max size: 50MB (Free tier), 5GB (Pro tier)
+4. The file will appear in the list once uploaded
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/supabase-storage-setup/step2-upload-file-en.png"
+  alt="Upload file"
+  caption="Upload files from the Storage dashboard"
+/>
+
+### Create Folder Structure
+
+You can organize files by folders:
+
+1. Click the **Create folder** button
+2. Enter the folder name (e.g., `public`, `users`, `2024`)
+3. Click the folder to enter it, then upload files
+
+**Recommended folder structure:**
+```
+avatars/
+├── public/           # Public default avatars
+├── users/
+│   ├── user-123/     # Folders by user ID
+│   └── user-456/
+└── thumbnails/       # Thumbnail images
+```
+
+### Check Uploaded File URL
+
+1. Click the uploaded file
+2. Click the **Get URL** button
+3. The file URL is copied to clipboard
+
+**Public bucket URL format:**
+```
+https://your-project-ref.supabase.co/storage/v1/object/public/avatars/user1.jpg
+```
+
+**Private bucket URL format:**
+```
+https://your-project-ref.supabase.co/storage/v1/object/sign/documents/file.pdf?token=xxx&exp=1234567890
+```
+
+<DevTip title="File Path and Naming Conventions">
+**Recommended conventions:**
+- Use lowercase
+- Use hyphens or underscores instead of spaces
+- Include file extension
+- Ensure uniqueness with UUID or timestamp
+
+**Good examples:**
+```
+users/123e4567-e89b-12d3-a456-426614174000/profile.jpg
+products/smartphone-galaxy-s24.png
+documents/2024/01/invoice-2024-01-15.pdf
+```
+
+**Bad examples:**
+```
+User Profile.JPG                    # Spaces, uppercase
+file (1).pdf                        # Parentheses, spaces
+이미지.png                          # Non-ASCII characters (not recommended)
+```
+
+**Prevent filename collisions:**
+```javascript
+// Use UUID
+import { v4 as uuidv4 } from 'uuid'
+const fileName = `${uuidv4()}.jpg`  // "123e4567-e89b-12d3-a456-426614174000.jpg"
+
+// Use timestamp
+const fileName = `${Date.now()}-profile.jpg`  // "1706423456789-profile.jpg"
+
+// User ID + timestamp
+const fileName = `users/${userId}/${Date.now()}.jpg`
+```
+</DevTip>
+
+<Checkpoint>
+- [ ] Uploaded file to bucket
+- [ ] Created folders (optional)
+- [ ] Checked file URL
+</Checkpoint>
+
+</Step>
+
+<Step number={3} title="Configure Row Level Security (RLS) Policies">
+
+You can apply RLS policies to Storage to control file access.
+
+1. Select the `avatars` bucket in the **Storage** menu
+2. Click the **Policies** button in the top right
+3. Click the **New policy** button
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/supabase-storage-setup/step3-rls-policy-en.png"
+  alt="Storage RLS policy"
+  caption="Add RLS policies to the Storage bucket"
+/>
+
+### Policy 1: Allow all users to read files (Public Read)
+
+<CopyBlock language="sql">
+{`CREATE POLICY "Public Access"
+ON storage.objects FOR SELECT
+USING (bucket_id = 'avatars');`}
+</CopyBlock>
+
+Configure in dashboard:
+1. **Policy name**: "Public Access"
+2. **Allowed operation**: `SELECT`
+3. **USING expression**:
+   ```sql
+   bucket_id = 'avatars'
+   ```
+
+### Policy 2: Only authenticated users can upload
+
+<CopyBlock language="sql">
+{`CREATE POLICY "Authenticated users can upload"
+ON storage.objects FOR INSERT
+WITH CHECK (
+  bucket_id = 'avatars'
+  AND auth.role() = 'authenticated'
+);`}
+</CopyBlock>
+
+### Policy 3: Users can only modify/delete their own files
+
+<CopyBlock language="sql">
+{`CREATE POLICY "Users can update own files"
+ON storage.objects FOR UPDATE
+USING (
+  bucket_id = 'avatars'
+  AND auth.uid()::text = (storage.foldername(name))[1]
+);
+
+CREATE POLICY "Users can delete own files"
+ON storage.objects FOR DELETE
+USING (
+  bucket_id = 'avatars'
+  AND auth.uid()::text = (storage.foldername(name))[1]
+);`}
+</CopyBlock>
+
+This policy checks if the file path is in the format `users/{user_id}/...` and verifies that `{user_id}` matches the currently logged-in user's ID.
+
+<DevTip title="Storage RLS Policy Patterns">
+**1. Public Read, Authenticated Write:**
+```sql
+-- Read: Allow all
+CREATE POLICY "Public can read" ON storage.objects
+FOR SELECT USING (bucket_id = 'avatars');
+
+-- Write: Authenticated only
+CREATE POLICY "Authenticated can write" ON storage.objects
+FOR INSERT WITH CHECK (
+  bucket_id = 'avatars'
+  AND auth.role() = 'authenticated'
+);
+```
+
+**2. User folder isolation:**
+```sql
+-- File path: users/{user_id}/...
+CREATE POLICY "User folder access" ON storage.objects
+FOR ALL USING (
+  bucket_id = 'avatars'
+  AND (storage.foldername(name))[1] = auth.uid()::text
+);
+```
+
+**3. File size limit:**
+```sql
+CREATE POLICY "Limit file size" ON storage.objects
+FOR INSERT WITH CHECK (
+  bucket_id = 'avatars'
+  AND octet_length(decode(encode(name, 'escape'), 'base64')) < 10485760  -- 10MB
+);
+```
+
+**4. File type restriction (images only):**
+```sql
+CREATE POLICY "Images only" ON storage.objects
+FOR INSERT WITH CHECK (
+  bucket_id = 'avatars'
+  AND (
+    name LIKE '%.jpg'
+    OR name LIKE '%.jpeg'
+    OR name LIKE '%.png'
+    OR name LIKE '%.gif'
+    OR name LIKE '%.webp'
+  )
+);
+```
+
+**Useful Storage functions:**
+- `storage.foldername(name)`: Returns file path as array
+  - Example: `users/123/profile.jpg` → `['users', '123', 'profile.jpg']`
+- `storage.filename(name)`: Returns filename only
+  - Example: `users/123/profile.jpg` → `profile.jpg`
+- `storage.extension(name)`: Returns file extension
+  - Example: `profile.jpg` → `jpg`
+</DevTip>
+
+<Checkpoint>
+- [ ] Accessed Storage Policies
+- [ ] Created public read policy
+- [ ] Created authenticated upload policy
+- [ ] Created user-specific policy (optional)
+</Checkpoint>
+
+</Step>
+
+<Step number={4} title="Upload and Download Files with JavaScript">
+
+Let's learn how to use Supabase Storage in your application.
+
+### Upload Files
+
+<CopyBlock language="javascript">
+{`import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey)
+
+// File upload function
+async function uploadFile(file) {
+  const fileExt = file.name.split('.').pop()
+  const fileName = \`\${Date.now()}.\${fileExt}\`
+  const filePath = \`users/\${user.id}/\${fileName}\`
+
+  const { data, error } = await supabase.storage
+    .from('avatars')
+    .upload(filePath, file, {
+      cacheControl: '3600',
+      upsert: false  // Prevent overwriting existing files
+    })
+
+  if (error) {
+    console.error('Upload error:', error)
+    return null
+  }
+
+  console.log('Uploaded file:', data.path)
+  return data
+}`}
+</CopyBlock>
+
+### React Component Example (File Upload)
+
+<CopyBlock language="tsx">
+{`'use client'
+
+import { useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
+
+export default function FileUploader() {
+  const [uploading, setUploading] = useState(false)
+  const [fileUrl, setFileUrl] = useState<string | null>(null)
+  const supabase = createClient()
+
+  async function handleUpload(event: React.ChangeEvent<HTMLInputElement>) {
+    try {
+      setUploading(true)
+
+      const file = event.target.files?.[0]
+      if (!file) return
+
+      const fileExt = file.name.split('.').pop()
+      const fileName = \`\${Math.random()}\.\${fileExt}\`
+      const filePath = \`public/\${fileName}\`
+
+      // Upload file
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file)
+
+      if (uploadError) throw uploadError
+
+      // Get Public URL
+      const { data } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath)
+
+      setFileUrl(data.publicUrl)
+      alert('Upload successful!')
+    } catch (error) {
+      console.error('Error uploading file:', error)
+      alert('Upload failed')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  return (
+    <div>
+      <input
+        type="file"
+        onChange={handleUpload}
+        disabled={uploading}
+        accept="image/*"
+      />
+      {uploading && <p>Uploading...</p>}
+      {fileUrl && (
+        <div>
+          <p>Uploaded file:</p>
+          <img src={fileUrl} alt="Uploaded" style={{ maxWidth: '300px' }} />
+        </div>
+      )}
+    </div>
+  )
+}`}
+</CopyBlock>
+
+### Download Files
+
+<CopyBlock language="javascript">
+{`// Public bucket: Direct access with Public URL
+const { data } = supabase.storage
+  .from('avatars')
+  .getPublicUrl('public/image.jpg')
+
+console.log(data.publicUrl)
+// https://project.supabase.co/storage/v1/object/public/avatars/public/image.jpg
+
+// Private bucket: Generate Signed URL (with expiration)
+const { data, error } = await supabase.storage
+  .from('documents')
+  .createSignedUrl('private/document.pdf', 60)  // Valid for 60 seconds
+
+if (data) {
+  console.log(data.signedUrl)
+  // https://project.supabase.co/storage/v1/object/sign/documents/private/document.pdf?token=xxx
+}
+
+// Download file
+const { data, error } = await supabase.storage
+  .from('avatars')
+  .download('public/image.jpg')
+
+if (data) {
+  const url = URL.createObjectURL(data)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = 'image.jpg'
+  a.click()
+}`}
+</CopyBlock>
+
+### Delete Files
+
+<CopyBlock language="javascript">
+{`// Delete single file
+const { error } = await supabase.storage
+  .from('avatars')
+  .remove(['public/image.jpg'])
+
+// Delete multiple files
+const { error } = await supabase.storage
+  .from('avatars')
+  .remove([
+    'public/image1.jpg',
+    'public/image2.jpg',
+    'public/image3.jpg'
+  ])
+
+// Delete all files in folder
+const { data: files } = await supabase.storage
+  .from('avatars')
+  .list('users/123')
+
+const filesToRemove = files.map(file => \`users/123/\${file.name}\`)
+
+const { error } = await supabase.storage
+  .from('avatars')
+  .remove(filesToRemove)`}
+</CopyBlock>
+
+### List Files
+
+<CopyBlock language="javascript">
+{`// List all files in bucket
+const { data, error } = await supabase.storage
+  .from('avatars')
+  .list('public', {
+    limit: 100,
+    offset: 0,
+    sortBy: { column: 'name', order: 'asc' }
+  })
+
+// Search (filter by filename)
+const { data, error } = await supabase.storage
+  .from('avatars')
+  .list('public', {
+    search: 'profile'  // Only files containing 'profile'
+  })
+
+console.log(data)
+// [
+//   { name: 'profile1.jpg', id: '...', created_at: '...' },
+//   { name: 'profile2.jpg', id: '...', created_at: '...' }
+// ]`}
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/supabase-storage-setup/step4-javascript-upload-en.png"
+  alt="JavaScript file upload"
+  caption="Upload files to Supabase Storage from a React component"
+/>
+
+<DevTip title="File Upload Optimization Tips">
+**1. Client-side image resizing:**
+```javascript
+import imageCompression from 'browser-image-compression'
+
+async function compressImage(file) {
+  const options = {
+    maxSizeMB: 1,           // Max 1MB
+    maxWidthOrHeight: 1920, // Max 1920px
+    useWebWorker: true
+  }
+
+  const compressedFile = await imageCompression(file, options)
+  return compressedFile
+}
+
+// Usage
+const compressed = await compressImage(originalFile)
+await supabase.storage.from('avatars').upload(path, compressed)
+```
+
+**2. Show upload progress:**
+```javascript
+const { data, error } = await supabase.storage
+  .from('avatars')
+  .upload(filePath, file, {
+    onUploadProgress: (progress) => {
+      const percent = (progress.loaded / progress.total) * 100
+      console.log(\`Upload progress: \${percent}%\`)
+    }
+  })
+```
+
+**3. Multipart upload (large files):**
+```javascript
+// Use TUS protocol (resumable)
+const { data, error } = await supabase.storage
+  .from('videos')
+  .upload(filePath, largeFile, {
+    resumable: true  // Resumable on interruption
+  })
+```
+
+**4. File type validation:**
+```javascript
+const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
+
+if (!allowedTypes.includes(file.type)) {
+  alert('Only image files can be uploaded.')
+  return
+}
+```
+</DevTip>
+
+<Checkpoint>
+- [ ] Written file upload code
+- [ ] Retrieved Public URL
+- [ ] Written file download code
+- [ ] Written file delete code
+- [ ] Tested upload in React component
+</Checkpoint>
+
+</Step>
+
+<Step number={5} title="Image Transformations and CDN Usage">
+
+Supabase Storage provides built-in image transformation and CDN features.
+
+### Image Transformations (Resize, Format)
+
+You can dynamically transform images using URL parameters:
+
+<CopyBlock language="javascript">
+{`// Basic Public URL
+const publicUrl = supabase.storage
+  .from('avatars')
+  .getPublicUrl('profile.jpg')
+
+console.log(publicUrl.data.publicUrl)
+// https://project.supabase.co/storage/v1/object/public/avatars/profile.jpg
+
+// Transformed URL (resizing)
+const transformedUrl = supabase.storage
+  .from('avatars')
+  .getPublicUrl('profile.jpg', {
+    transform: {
+      width: 400,
+      height: 400,
+      resize: 'cover'  // cover, contain, fill
+    }
+  })
+
+console.log(transformedUrl.data.publicUrl)
+// https://project.supabase.co/storage/v1/render/image/public/avatars/profile.jpg?width=400&height=400`}
+</CopyBlock>
+
+### Available Transformation Options
+
+<CopyBlock language="javascript">
+{`const { data } = supabase.storage
+  .from('avatars')
+  .getPublicUrl('image.jpg', {
+    transform: {
+      width: 800,          // Width (px)
+      height: 600,         // Height (px)
+      resize: 'cover',     // cover, contain, fill
+      format: 'webp',      // webp, jpeg, png, avif
+      quality: 80          // 1-100 (default: 80)
+    }
+  })`}
+</CopyBlock>
+
+### Responsive Image Example
+
+<CopyBlock language="tsx">
+{`export function ResponsiveImage({ path }: { path: string }) {
+  const supabase = createClient()
+
+  // Generate image URLs for various sizes
+  const getSrcSet = () => {
+    const sizes = [400, 800, 1200]
+    return sizes
+      .map(size => {
+        const { data } = supabase.storage
+          .from('avatars')
+          .getPublicUrl(path, {
+            transform: { width: size, format: 'webp' }
+          })
+        return \`\${data.publicUrl} \${size}w\`
+      })
+      .join(', ')
+  }
+
+  const { data } = supabase.storage
+    .from('avatars')
+    .getPublicUrl(path, {
+      transform: { width: 800, format: 'webp' }
+    })
+
+  return (
+    <img
+      src={data.publicUrl}
+      srcSet={getSrcSet()}
+      sizes="(max-width: 600px) 400px, (max-width: 1200px) 800px, 1200px"
+      alt="Responsive image"
+      loading="lazy"
+    />
+  )
+}`}
+</CopyBlock>
+
+### Next.js Image Component Integration
+
+<CopyBlock language="tsx">
+{`import Image from 'next/image'
+import { createClient } from '@/lib/supabase/client'
+
+export function SupabaseImage({ path }: { path: string }) {
+  const supabase = createClient()
+
+  const { data } = supabase.storage
+    .from('avatars')
+    .getPublicUrl(path)
+
+  return (
+    <Image
+      src={data.publicUrl}
+      alt="Image"
+      width={800}
+      height={600}
+      quality={90}
+      priority={false}
+    />
+  )
+}`}
+</CopyBlock>
+
+### CDN Caching
+
+Supabase Storage automatically applies CDN caching:
+
+- **Public files**: Automatically cached by CDN
+- **Cache duration**: Default 1 hour (controlled by Cache-Control header)
+- **Cache invalidation**: Change file path or add query parameter
+
+<CopyBlock language="javascript">
+{`// Set cache on upload
+const { data, error } = await supabase.storage
+  .from('avatars')
+  .upload(filePath, file, {
+    cacheControl: '3600'  // 1 hour (in seconds)
+  })
+
+// Add query parameter for cache invalidation
+const url = \`\${publicUrl}?v=\${Date.now()}\`
+// Or include version in filename: image-v2.jpg`}
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/supabase-storage-setup/step5-image-transform-en.png"
+  alt="Image transformation"
+  caption="Generate various image sizes with Supabase Storage's image transformation"
+/>
+
+<DevTip title="Image Optimization Best Practices">
+**1. Use WebP format:**
+- WebP has 25-35% smaller file size than JPEG
+- Supported by all modern browsers
+- Use `<picture>` tag for fallback
+
+```tsx
+<picture>
+  <source srcSet={webpUrl} type="image/webp" />
+  <img src={jpegUrl} alt="Image" />
+</picture>
+```
+
+**2. Appropriate image sizes:**
+- Mobile: 400-800px
+- Tablet: 800-1200px
+- Desktop: 1200-1920px
+- Retina: 2x size (e.g., 1600px for 800px display)
+
+**3. Lazy Loading:**
+```tsx
+<img src={url} loading="lazy" />
+```
+
+**4. Blur placeholder:**
+```tsx
+// Load small blur image first
+const { data: blurData } = supabase.storage
+  .from('avatars')
+  .getPublicUrl(path, {
+    transform: { width: 20, quality: 20 }
+  })
+
+<Image
+  src={fullUrl}
+  placeholder="blur"
+  blurDataURL={blurData.publicUrl}
+/>
+```
+
+**5. Include hash in filename (cache busting):**
+```javascript
+const hash = await generateHash(file)
+const fileName = `${hash}-${originalName}`
+```
+</DevTip>
+
+<Checkpoint>
+- [ ] Generated image transformation URL
+- [ ] Implemented responsive images
+- [ ] Integrated with Next.js Image
+- [ ] Verified CDN caching settings
+</Checkpoint>
+
+</Step>
+
+## Next Steps
+
+You've completed file storage setup! Now try adding these features.
+
+### Recommended Guides
+
+1. **[Supabase Database Setup Guide](../supabase-database-setup)**
+   - Store file metadata in database
+   - Connect files with users
+   - Estimated time: 20 minutes
+
+2. **[Supabase Authentication Setup Guide](../supabase-auth-setup)**
+   - User-specific file access control
+   - Integrate RLS with authentication
+   - Estimated time: 25 minutes
+
+## Troubleshooting
+
+### File upload fails
+
+**Check:**
+1. Verify file size doesn't exceed limit (Free: 50MB, Pro: 5GB)
+2. Confirm RLS policy allows upload
+3. Verify bucket name and file path are correct
+4. Check authentication token is valid
+
+**Solution:**
+<CopyBlock language="javascript">
+{`// Check error log
+const { data, error } = await supabase.storage
+  .from('avatars')
+  .upload(filePath, file)
+
+if (error) {
+  console.error('Error code:', error.statusCode)
+  console.error('Error message:', error.message)
+  console.error('Error details:', error)
+}`}
+</CopyBlock>
+
+### Cannot access Public URL
+
+**Cause**: Files in Private buckets cannot be accessed with Public URLs
+
+**Solution:**
+1. Change bucket to Public, or
+2. Use Signed URL:
+<CopyBlock language="javascript">
+{`const { data, error } = await supabase.storage
+  .from('private-bucket')
+  .createSignedUrl('file.pdf', 3600)  // Valid for 1 hour
+
+console.log(data.signedUrl)  // Access with this URL`}
+</CopyBlock>
+
+### Image transformation not working
+
+**Check:**
+1. Verify file is an image format (JPEG, PNG, WebP, GIF, etc.)
+2. Confirm it's a Public bucket (Private buckets cannot be transformed)
+3. Check URL includes `/render/image/` path
+
+**Correct transformation URL:**
+```
+https://project.supabase.co/storage/v1/render/image/public/avatars/image.jpg?width=400
+```
+
+### Cannot delete files due to RLS policy
+
+**Solution:**
+1. Check DELETE policy in Storage Policies
+2. Add temporary allow-all policy (during development):
+<CopyBlock language="sql">
+{`CREATE POLICY "Temporary allow all" ON storage.objects
+FOR ALL USING (bucket_id = 'avatars');`}
+</CopyBlock>
+
+3. Replace with appropriate policy when done
+
+## Useful Resources
+
+- [Supabase Storage Official Documentation](https://supabase.com/docs/guides/storage)
+- [Storage RLS Guide](https://supabase.com/docs/guides/storage/security/access-control)
+- [Image Transformations Documentation](https://supabase.com/docs/guides/storage/serving/image-transformations)
+- [Supabase Storage API Reference](https://supabase.com/docs/reference/javascript/storage)
+- [TUS Protocol (Resumable Uploads)](https://tus.io/)

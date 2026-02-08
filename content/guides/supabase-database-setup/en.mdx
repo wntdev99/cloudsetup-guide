@@ -1,0 +1,809 @@
+---
+title: "Supabase Database Setup and Table Creation Guide"
+description: "Learn how to create PostgreSQL database tables in Supabase, execute SQL, and configure Row Level Security."
+---
+
+# Supabase Database Setup and Table Creation Guide
+
+Supabase is built on PostgreSQL and provides both a GUI table editor and SQL editor. This guide will teach you how to create tables, manage data, and configure Row Level Security (RLS) to use your database securely.
+
+<FreeTierInfo
+  limit="500MB database, unlimited tables and rows"
+  period="month"
+  status="available"
+/>
+
+## Before You Begin
+
+Make sure you have the following ready.
+
+- [Supabase account and project creation](../supabase-account-setup) completed
+- Understanding of basic database concepts (tables, columns, rows)
+- Understanding of basic SQL syntax (optional, can work with GUI)
+
+<Callout type="info">
+You can use all PostgreSQL features, including advanced capabilities like JSON, arrays, full-text search, and PostGIS.
+</Callout>
+
+<Step number={1} title="Create a Table (Table Editor)">
+
+Let's create your first table using the GUI. We'll create a `posts` table for managing blog posts as an example.
+
+1. Click **Table Editor** in the Supabase dashboard
+2. Click the **New table** button
+3. Enter table information:
+
+   **Name**: `posts` (table name, plural form recommended)
+
+   **Description**: "Blog posts table" (optional)
+
+   **Enable Row Level Security (RLS)**: Check (always recommended for security)
+
+4. Default columns are automatically created:
+   - `id`: bigint, Primary Key, auto-increment
+   - `created_at`: timestamptz, default: now()
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/supabase-database-setup/step1-create-table-en.png"
+  alt="Create Supabase table"
+  caption="Create a new table in Table Editor"
+/>
+
+<DevTip title="Table Naming Convention">
+**Recommended Rules:**
+- Use lowercase (users, posts)
+- Use plural form (users instead of user)
+- Separate words with underscores (blog_posts, user_profiles)
+- Avoid reserved words (table, user, order, etc.)
+
+**Reasons:**
+- PostgreSQL is case-insensitive (converts to lowercase)
+- Plural form clearly indicates a table contains multiple rows
+- Consistent naming improves code readability
+</DevTip>
+
+5. Click the **Save** button to create the table
+
+<Checkpoint>
+- [ ] Accessed Table Editor menu
+- [ ] Entered table name (posts)
+- [ ] Enabled RLS
+- [ ] Table created successfully
+</Checkpoint>
+
+</Step>
+
+<Step number={2} title="Add Columns and Constraints">
+
+Now let's add the columns needed for blog posts.
+
+1. Click the created `posts` table
+2. Click the **New Column** button
+3. Add the following columns one by one:
+
+### title Column (Title)
+- **Name**: `title`
+- **Type**: `text`
+- **Default Value**: (leave empty)
+- **Is Nullable**: Uncheck (required field)
+- **Is Unique**: Uncheck
+- Click **Save**
+
+### content Column (Body)
+- **Name**: `content`
+- **Type**: `text`
+- **Default Value**: (leave empty)
+- **Is Nullable**: Check (optional field, can save drafts)
+- Click **Save**
+
+### author_id Column (Author ID)
+- **Name**: `author_id`
+- **Type**: `uuid`
+- **Default Value**: (leave empty)
+- **Is Nullable**: Uncheck (required field)
+- Click **Save**
+
+### published Column (Published Status)
+- **Name**: `published`
+- **Type**: `boolean`
+- **Default Value**: `false`
+- **Is Nullable**: Uncheck
+- Click **Save**
+
+### published_at Column (Published Timestamp)
+- **Name**: `published_at`
+- **Type**: `timestamptz`
+- **Default Value**: (leave empty)
+- **Is Nullable**: Check (null before publishing)
+- Click **Save**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/supabase-database-setup/step2-add-columns-en.png"
+  alt="Add table columns"
+  caption="Add necessary columns to the posts table"
+/>
+
+<DevTip title="PostgreSQL Data Type Selection Guide">
+**Commonly Used Types:**
+
+**Text:**
+- `text`: Unlimited length text (titles, content, descriptions)
+- `varchar(n)`: Limited length text (email, username)
+- `char(n)`: Fixed length text (country code, postal code)
+
+**Numbers:**
+- `integer` / `int4`: Integer (-2,147,483,648 to 2,147,483,647)
+- `bigint` / `int8`: Large integer (IDs, counters)
+- `numeric(p,s)`: Exact decimal (amounts, precise calculations)
+- `real` / `float8`: Floating point (scientific calculations, coordinates)
+
+**Date/Time:**
+- `timestamptz`: Timestamp with timezone (recommended)
+- `timestamp`: Timestamp without timezone
+- `date`: Date only
+- `time`: Time only
+
+**Others:**
+- `boolean`: true/false
+- `uuid`: Unique identifier (user IDs, sessions)
+- `json` / `jsonb`: JSON data (jsonb recommended, indexable)
+- `array`: Array (tags, category lists)
+</DevTip>
+
+<Checkpoint>
+- [ ] Added title column
+- [ ] Added content column
+- [ ] Added author_id column
+- [ ] Added published column
+- [ ] Added published_at column
+</Checkpoint>
+
+</Step>
+
+<Step number={3} title="Insert Data (Insert Row)">
+
+Let's add sample data to the table.
+
+1. Click the **Insert row** button in the `posts` table view
+2. Enter data for the first post:
+   - **title**: "Getting Started with Supabase"
+   - **content**: "Supabase is an open-source Firebase alternative..."
+   - **author_id**: Use `gen_random_uuid()` function (generates temporary UUID)
+   - **published**: `true`
+   - **published_at**: Use `now()` function (current time)
+3. Click the **Save** button
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/supabase-database-setup/step3-insert-data-en.png"
+  alt="Insert data"
+  caption="Enter data directly in Table Editor"
+/>
+
+4. Add 2-3 more posts the same way
+
+<DevTip title="Using Default Value Functions">
+**Useful PostgreSQL Functions:**
+
+**UUID Generation:**
+```sql
+gen_random_uuid()  -- Generate random UUID
+```
+
+**Current Time:**
+```sql
+now()              -- Current time (with timezone)
+current_timestamp  -- Same
+current_date       -- Current date only
+```
+
+**String Manipulation:**
+```sql
+lower('TEXT')      -- Convert to lowercase
+upper('text')      -- Convert to uppercase
+concat('a', 'b')   -- Concatenate strings
+```
+
+**JSON Creation:**
+```sql
+'{"key": "value"}'::jsonb  -- Create JSON data
+```
+
+These functions can also be set as column Default Values.
+</DevTip>
+
+<Checkpoint>
+- [ ] Used Insert row feature
+- [ ] Entered first post data
+- [ ] Entered additional post data (2-3 posts)
+- [ ] Verified data in table view
+</Checkpoint>
+
+</Step>
+
+<Step number={4} title="Execute SQL Queries (SQL Editor)">
+
+You can perform more complex operations using the SQL Editor.
+
+1. Click **SQL Editor** in the left menu
+2. Click the **New query** button
+
+### Basic SELECT Query
+
+Query only published posts:
+
+<CopyBlock language="sql">
+{`SELECT
+  id,
+  title,
+  published_at,
+  published
+FROM posts
+WHERE published = true
+ORDER BY published_at DESC;`}
+</CopyBlock>
+
+3. Enter the query and click the **Run** button (or Ctrl/Cmd + Enter)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/supabase-database-setup/step4-sql-editor-en.png"
+  alt="Using SQL Editor"
+  caption="Write and execute queries in SQL Editor"
+/>
+
+### Update Query
+
+Publish a specific post:
+
+<CopyBlock language="sql">
+{`UPDATE posts
+SET
+  published = true,
+  published_at = now()
+WHERE id = 1;`}
+</CopyBlock>
+
+### Aggregation Query
+
+Query post statistics:
+
+<CopyBlock language="sql">
+{`SELECT
+  COUNT(*) as total_posts,
+  COUNT(*) FILTER (WHERE published = true) as published_posts,
+  COUNT(*) FILTER (WHERE published = false) as draft_posts
+FROM posts;`}
+</CopyBlock>
+
+### JOIN Query (when users table exists)
+
+Query posts with author information:
+
+<CopyBlock language="sql">
+{`SELECT
+  posts.id,
+  posts.title,
+  posts.published_at,
+  users.email as author_email,
+  users.name as author_name
+FROM posts
+INNER JOIN users ON posts.author_id = users.id
+WHERE posts.published = true
+ORDER BY posts.published_at DESC;`}
+</CopyBlock>
+
+<DevTip title="Save and Reuse SQL Queries">
+**Save Queries:**
+1. Write query in SQL Editor
+2. Click **Save** button at top
+3. Enter query name (e.g., "Get published posts")
+4. Access saved queries from **Snippets** tab
+
+**Favorite Queries:**
+- Register frequently used queries as favorites
+- Share queries with team members
+- Version control available
+
+**Useful Shortcuts:**
+- `Ctrl/Cmd + Enter`: Execute query
+- `Ctrl/Cmd + /`: Toggle comment
+- `Ctrl/Cmd + S`: Save query
+</DevTip>
+
+<Checkpoint>
+- [ ] Accessed SQL Editor menu
+- [ ] Executed SELECT query
+- [ ] Executed UPDATE query
+- [ ] Executed aggregation query
+- [ ] Verified query results
+</Checkpoint>
+
+</Step>
+
+<Step number={5} title="Configure Row Level Security (RLS)">
+
+RLS is PostgreSQL's powerful security feature for controlling data access at the database level.
+
+### Why RLS is Needed
+
+<Callout type="warning">
+Without RLS, clients can access all data! Even with the anon key, anyone can read or modify all table data.
+</Callout>
+
+### Create RLS Policies
+
+1. Select the `posts` table in **Table Editor**
+2. Verify the **RLS** toggle in the top right is enabled
+3. Click the **Add RLS policy** button
+
+#### Policy 1: All Users Can Read Published Posts
+
+1. **Policy name**: "Public posts are viewable by everyone"
+2. **Allowed operation**: `SELECT`
+3. **Policy definition**: `Custom`
+4. Enter in **USING expression**:
+
+<CopyBlock language="sql">
+{`published = true`}
+</CopyBlock>
+
+5. Click **Save policy**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/supabase-database-setup/step5-rls-policy-en.png"
+  alt="Create RLS policy"
+  caption="Create a policy that allows viewing only published posts"
+/>
+
+#### Policy 2: Authors Can Update Their Own Posts
+
+1. Click **Add RLS policy** again
+2. **Policy name**: "Users can update their own posts"
+3. **Allowed operation**: `UPDATE`
+4. **Policy definition**: `Custom`
+5. **USING expression**:
+
+<CopyBlock language="sql">
+{`auth.uid() = author_id`}
+</CopyBlock>
+
+6. **WITH CHECK expression**: (enter the same)
+
+<CopyBlock language="sql">
+{`auth.uid() = author_id`}
+</CopyBlock>
+
+7. Click **Save policy**
+
+#### Policy 3: Authenticated Users Can Create Posts
+
+1. Click **Add RLS policy**
+2. **Policy name**: "Authenticated users can insert posts"
+3. **Allowed operation**: `INSERT`
+4. **Policy definition**: `Custom`
+5. **WITH CHECK expression**:
+
+<CopyBlock language="sql">
+{`auth.uid() = author_id`}
+</CopyBlock>
+
+6. Click **Save policy**
+
+<DevTip title="Understanding RLS Policies">
+**USING vs WITH CHECK:**
+- **USING**: Condition for existing rows (SELECT, UPDATE, DELETE)
+- **WITH CHECK**: Condition for newly created/modified rows (INSERT, UPDATE)
+
+**auth.uid() Function:**
+- Returns UUID of currently logged-in user
+- Returns `NULL` for non-logged-in users
+- Automatically integrated with Supabase Auth
+
+**Common RLS Patterns:**
+
+**1. Public Read, Authenticated Write:**
+```sql
+-- SELECT: No restrictions
+true
+
+-- INSERT: Authenticated users only
+auth.uid() IS NOT NULL
+```
+
+**2. Owner-Only Access:**
+```sql
+-- All operations
+auth.uid() = user_id
+```
+
+**3. Role-Based Access:**
+```sql
+-- Admin only
+auth.jwt() ->> 'role' = 'admin'
+```
+
+**4. Organization/Team-Based Access:**
+```sql
+-- Same team members only
+EXISTS (
+  SELECT 1 FROM team_members
+  WHERE team_members.team_id = posts.team_id
+  AND team_members.user_id = auth.uid()
+)
+```
+</DevTip>
+
+### Test RLS Policies
+
+You can test policies in SQL Editor:
+
+<CopyBlock language="sql">
+{`-- Verify only published posts are returned
+SELECT * FROM posts;
+
+-- Test as if authenticated as specific user
+SET request.jwt.claim.sub = 'user-uuid-here';
+SELECT * FROM posts WHERE author_id = 'user-uuid-here';`}
+</CopyBlock>
+
+<Checkpoint>
+- [ ] Verified RLS enabled
+- [ ] Created read policy
+- [ ] Created update policy
+- [ ] Created insert policy
+- [ ] Tested policies
+</Checkpoint>
+
+</Step>
+
+<Step number={6} title="Access API with JavaScript Client">
+
+Now let's learn how to access the Supabase database from a frontend application.
+
+### Install Supabase JavaScript Client
+
+<CopyBlock language="bash">
+{`npm install @supabase/supabase-js`}
+</CopyBlock>
+
+### Initialize Client
+
+<CopyBlock language="javascript">
+{`import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey)`}
+</CopyBlock>
+
+### Query Data (SELECT)
+
+Query all published posts:
+
+<CopyBlock language="javascript">
+{`const { data, error } = await supabase
+  .from('posts')
+  .select('*')
+  .eq('published', true)
+  .order('published_at', { ascending: false })
+
+if (error) {
+  console.error('Error fetching posts:', error)
+} else {
+  console.log('Posts:', data)
+}`}
+</CopyBlock>
+
+Select specific columns only:
+
+<CopyBlock language="javascript">
+{`const { data, error } = await supabase
+  .from('posts')
+  .select('id, title, published_at')
+  .eq('published', true)`}
+</CopyBlock>
+
+Conditional queries:
+
+<CopyBlock language="javascript">
+{`// Posts with "Supabase" in title
+const { data, error } = await supabase
+  .from('posts')
+  .select('*')
+  .ilike('title', '%Supabase%')
+
+// Posts published in last 7 days
+const { data, error } = await supabase
+  .from('posts')
+  .select('*')
+  .gte('published_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
+
+// Pagination (10 per page)
+const { data, error } = await supabase
+  .from('posts')
+  .select('*')
+  .range(0, 9)  // 0-9th (first page)
+  .order('published_at', { ascending: false })`}
+</CopyBlock>
+
+### Insert Data (INSERT)
+
+<CopyBlock language="javascript">
+{`const { data, error } = await supabase
+  .from('posts')
+  .insert({
+    title: 'New Post',
+    content: 'Post content...',
+    author_id: user.id,  // Logged-in user ID
+    published: false
+  })
+  .select()  // Return inserted data
+
+if (error) {
+  console.error('Error inserting post:', error)
+} else {
+  console.log('Inserted post:', data)
+}`}
+</CopyBlock>
+
+Insert multiple rows:
+
+<CopyBlock language="javascript">
+{`const { data, error } = await supabase
+  .from('posts')
+  .insert([
+    { title: 'Post 1', content: 'Content 1', author_id: user.id },
+    { title: 'Post 2', content: 'Content 2', author_id: user.id },
+    { title: 'Post 3', content: 'Content 3', author_id: user.id }
+  ])
+  .select()`}
+</CopyBlock>
+
+### Update Data (UPDATE)
+
+<CopyBlock language="javascript">
+{`const { data, error } = await supabase
+  .from('posts')
+  .update({
+    published: true,
+    published_at: new Date().toISOString()
+  })
+  .eq('id', postId)
+  .select()
+
+if (error) {
+  console.error('Error updating post:', error)
+} else {
+  console.log('Updated post:', data)
+}`}
+</CopyBlock>
+
+### Delete Data (DELETE)
+
+<CopyBlock language="javascript">
+{`const { error } = await supabase
+  .from('posts')
+  .delete()
+  .eq('id', postId)
+
+if (error) {
+  console.error('Error deleting post:', error)
+} else {
+  console.log('Post deleted successfully')
+}`}
+</CopyBlock>
+
+### React Component Example
+
+<CopyBlock language="jsx">
+{`'use client'
+
+import { useState, useEffect } from 'react'
+import { supabase } from '@/lib/supabase'
+
+export default function PostsList() {
+  const [posts, setPosts] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchPosts()
+  }, [])
+
+  async function fetchPosts() {
+    try {
+      const { data, error } = await supabase
+        .from('posts')
+        .select('*')
+        .eq('published', true)
+        .order('published_at', { ascending: false })
+
+      if (error) throw error
+      setPosts(data)
+    } catch (error) {
+      console.error('Error fetching posts:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (loading) return <div>Loading...</div>
+
+  return (
+    <div>
+      <h1>Blog Posts</h1>
+      {posts.map(post => (
+        <article key={post.id}>
+          <h2>{post.title}</h2>
+          <p>{post.content}</p>
+          <time>{new Date(post.published_at).toLocaleDateString()}</time>
+        </article>
+      ))}
+    </div>
+  )
+}`}
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/supabase-database-setup/step6-javascript-client-en.png"
+  alt="Using JavaScript client"
+  caption="React component that queries data with Supabase JavaScript client"
+/>
+
+<DevTip title="Supabase Query Builder Tips">
+**Chaining Methods:**
+- `.select()`: Select columns to query
+- `.eq()`: Equals
+- `.neq()`: Not equals
+- `.gt()`, `.gte()`: Greater than, greater than or equal
+- `.lt()`, `.lte()`: Less than, less than or equal
+- `.like()`, `.ilike()`: Pattern matching (ilike is case-insensitive)
+- `.in()`: In array
+- `.is()`: NULL check
+- `.order()`: Sort
+- `.limit()`: Limit count
+- `.range()`: Specify range (pagination)
+
+**TypeScript Type Support:**
+```typescript
+type Post = {
+  id: number
+  title: string
+  content: string | null
+  author_id: string
+  published: boolean
+  published_at: string | null
+  created_at: string
+}
+
+const { data, error } = await supabase
+  .from('posts')
+  .select('*')
+  .returns<Post[]>()
+```
+
+**Auto-Generate Types:**
+```bash
+npx supabase gen types typescript --project-id your-project-id > types/supabase.ts
+```
+</DevTip>
+
+<Checkpoint>
+- [ ] Installed Supabase client
+- [ ] Executed SELECT query
+- [ ] Executed INSERT query
+- [ ] Executed UPDATE query
+- [ ] Successfully queried data in React component
+</Checkpoint>
+
+</Step>
+
+## Next Steps
+
+You've completed database setup! Now add these features.
+
+### Recommended Guides
+
+1. **[Supabase Auth Setup Guide](../supabase-auth-setup)**
+   - Email/password authentication
+   - OAuth (Google, GitHub)
+   - Integrate RLS with authentication
+   - Estimated time: 25 minutes
+
+2. **[Supabase Storage Setup Guide](../supabase-storage-setup)**
+   - Upload images
+   - Manage files
+   - Use CDN
+   - Estimated time: 15 minutes
+
+## Troubleshooting
+
+### Can't query data due to RLS policies
+
+**Cause**: RLS is enabled but no policies exist or conditions don't match
+
+**Solution**:
+1. Check RLS policies in Table Editor
+2. During development, temporarily add "allow all" policy:
+   ```sql
+   -- Temporary policy (do NOT use in production!)
+   CREATE POLICY "Allow all during development"
+   ON posts FOR ALL
+   USING (true)
+   WITH CHECK (true);
+   ```
+3. Replace with appropriate RLS policies when complete
+
+### Want to add foreign key constraints
+
+**Method**:
+Execute this query in SQL Editor:
+
+<CopyBlock language="sql">
+{`ALTER TABLE posts
+ADD CONSTRAINT posts_author_id_fkey
+FOREIGN KEY (author_id)
+REFERENCES auth.users(id)
+ON DELETE CASCADE;`}
+</CopyBlock>
+
+### Want to add JSON column
+
+**Method**:
+1. Click New Column in Table Editor
+2. Select `jsonb` as Type (better performance than json)
+3. Default value example: `'{}'` or `'[]'`
+
+**Usage Example:**
+<CopyBlock language="javascript">
+{`// Insert JSON data
+const { data, error } = await supabase
+  .from('posts')
+  .insert({
+    title: 'Post',
+    metadata: {
+      tags: ['tech', 'tutorial'],
+      views: 0,
+      featured: true
+    }
+  })
+
+// Query JSON field
+const { data } = await supabase
+  .from('posts')
+  .select('*')
+  .contains('metadata', { featured: true })`}
+</CopyBlock>
+
+### Want to implement full-text search
+
+**Method**:
+Add full-text search column in SQL Editor:
+
+<CopyBlock language="sql">
+{`-- Add tsvector column
+ALTER TABLE posts
+ADD COLUMN fts tsvector
+GENERATED ALWAYS AS (
+  to_tsvector('english', coalesce(title, '') || ' ' || coalesce(content, ''))
+) STORED;
+
+-- Create index
+CREATE INDEX posts_fts_idx ON posts USING GIN(fts);`}
+</CopyBlock>
+
+Search in JavaScript:
+
+<CopyBlock language="javascript">
+{`const { data } = await supabase
+  .from('posts')
+  .select('*')
+  .textSearch('fts', 'supabase & postgresql')`}
+</CopyBlock>
+
+## Useful Resources
+
+- [Supabase Database Official Documentation](https://supabase.com/docs/guides/database)
+- [PostgreSQL Official Documentation](https://www.postgresql.org/docs/)
+- [Row Level Security Guide](https://supabase.com/docs/guides/auth/row-level-security)
+- [Supabase JavaScript Client Documentation](https://supabase.com/docs/reference/javascript/introduction)
+- [SQL Query Learning Resources](https://www.postgresql.org/docs/current/tutorial.html)

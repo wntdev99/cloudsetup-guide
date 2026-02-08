@@ -1,0 +1,471 @@
+---
+title: "Supabase Auth Setup Guide - Email/OAuth Integration"
+description: "Learn how to configure email authentication, OAuth (Google, GitHub), magic links in Supabase and integrate with Next.js app."
+---
+
+# Supabase Auth Setup Guide
+
+Supabase Auth provides a complete user authentication system supporting email/password, OAuth, magic links, phone authentication, and more. This guide covers setting up major authentication methods and integrating them with a Next.js app.
+
+<FreeTierInfo
+  limit="Unlimited users"
+  period="month"
+  status="available"
+/>
+
+## Before You Begin
+
+Make sure you have the following ready.
+
+- [Supabase account and project creation](../supabase-account-setup) completed
+- [Supabase database setup](../supabase-database-setup) completed
+- Next.js project (or other frontend framework)
+- Google/GitHub account (for OAuth setup)
+
+<Callout type="info">
+Supabase Auth is JWT (JSON Web Token) based and fully integrated with Row Level Security. You can implement a secure authentication system without a separate backend server.
+</Callout>
+
+<Step number={1} title="Enable Auth Providers">
+
+Enable the authentication methods you want to use in the Supabase dashboard.
+
+1. Click **Authentication** in the Supabase dashboard
+2. Select the **Providers** tab
+3. Review available authentication methods
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/supabase-auth-setup/step1-providers-en.png"
+  alt="Auth provider list"
+  caption="Various authentication providers supported by Supabase"
+/>
+
+### Default Enabled Providers
+
+- **Email**: Email/password authentication (enabled by default)
+- **Phone**: Phone number authentication (SMS)
+
+### Available OAuth Providers
+
+- Google, GitHub, GitLab, Discord, Facebook, Apple, Twitter, Microsoft, and 20+ more providers
+
+<Checkpoint>
+- [ ] Accessed Authentication menu
+- [ ] Reviewed Providers tab
+- [ ] Verified Email provider is enabled
+</Checkpoint>
+
+</Step>
+
+<Step number={2} title="Configure Email Authentication">
+
+Set up email/password authentication and magic links.
+
+1. Click **Email** in the **Providers** tab
+2. Configure the following options:
+
+   **Enable Email provider**: Enabled (default)
+
+   **Confirm email**: Enabled (recommended)
+   - If enabled: Email confirmation required after signup
+   - If disabled: Immediate login (for testing)
+
+   **Enable Email Signup**: Enabled
+
+   **Enable Magic Link**: Enabled (optional)
+   - Login with email link only, no password
+
+3. Click **Save**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/supabase-auth-setup/step2-email-settings-en.png"
+  alt="Email auth settings"
+  caption="Configure email authentication options"
+/>
+
+### Customize Email Templates
+
+Click the **Email Templates** tab to modify:
+- Confirm signup, Magic Link, Change Email Address, Reset Password
+
+<Checkpoint>
+- [ ] Configured Email provider
+- [ ] Set Confirm email option
+- [ ] Reviewed email templates
+</Checkpoint>
+
+</Step>
+
+<Step number={3} title="Set Up OAuth Providers (Google, GitHub)">
+
+Configure Google and GitHub OAuth for social login.
+
+### Google OAuth Setup
+
+#### 1. Create OAuth Client in Google Cloud Console
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Navigate to **APIs & Services** > **Credentials**
+3. Click **Create Credentials** > **OAuth client ID**
+4. Select **Web application**
+5. Add to **Authorized redirect URIs**:
+   ```
+   https://your-project-ref.supabase.co/auth/v1/callback
+   ```
+6. Copy **Client ID** and **Client Secret**
+
+#### 2. Configure Google OAuth in Supabase
+
+1. Return to **Authentication** > **Providers**
+2. Click **Google**
+3. Enable **Google provider**
+4. Enter **Client ID** and **Client Secret**
+5. Click **Save**
+
+### GitHub OAuth Setup
+
+#### 1. Create OAuth App on GitHub
+
+1. Go to [GitHub Settings](https://github.com/settings/developers)
+2. Click **OAuth Apps** > **New OAuth App**
+3. Enter:
+   - **Authorization callback URL**:
+     ```
+     https://your-project-ref.supabase.co/auth/v1/callback
+     ```
+4. Copy **Client ID** and generate **Client Secret**
+
+#### 2. Configure GitHub OAuth in Supabase
+
+1. Return to **Authentication** > **Providers**
+2. Click **GitHub**
+3. Enable **GitHub provider**
+4. Enter **Client ID** and **Client Secret**
+5. Click **Save**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/supabase-auth-setup/step3-github-oauth-en.png"
+  alt="Create GitHub OAuth App"
+  caption="Create OAuth App on GitHub"
+/>
+
+<Checkpoint>
+- [ ] Created Google OAuth client
+- [ ] Configured Google OAuth in Supabase
+- [ ] Created GitHub OAuth App
+- [ ] Configured GitHub OAuth in Supabase
+</Checkpoint>
+
+</Step>
+
+<Step number={4} title="Configure Site URL and Redirect URLs">
+
+Set URLs for post-authentication redirection.
+
+1. Go to **Authentication** > **URL Configuration**
+2. Configure:
+
+### Site URL
+
+- **Development**: `http://localhost:3000`
+- **Production**: `https://your-domain.com`
+
+### Redirect URLs
+
+Add allowed redirect URLs (one per line):
+
+<CopyBlock language="text">
+{`http://localhost:3000/**
+https://your-domain.com/**`}
+</CopyBlock>
+
+3. Click **Save**
+
+<Checkpoint>
+- [ ] Configured Site URL
+- [ ] Added Redirect URLs
+- [ ] Added both dev and production URLs
+</Checkpoint>
+
+</Step>
+
+<Step number={5} title="Implement Authentication in Next.js App">
+
+Integrate Supabase Auth with Next.js App Router.
+
+### Install Supabase SSR Package
+
+<CopyBlock language="bash">
+{`npm install @supabase/ssr @supabase/supabase-js`}
+</CopyBlock>
+
+### Create Supabase Clients
+
+`lib/supabase/client.ts`:
+
+<CopyBlock language="typescript">
+{`import { createBrowserClient } from '@supabase/ssr'
+
+export function createClient() {
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+}`}
+</CopyBlock>
+
+### Create Signup Form
+
+`app/auth/signup/page.tsx`:
+
+<CopyBlock language="tsx">
+{`'use client'
+
+import { useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
+
+export default function SignUpPage() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const supabase = createClient()
+
+  async function handleSignUp(e: React.FormEvent) {
+    e.preventDefault()
+
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: \`\${location.origin}/auth/callback\`,
+      },
+    })
+
+    if (error) {
+      console.error(error)
+    } else {
+      alert('Check your email for confirmation link!')
+    }
+  }
+
+  return (
+    <form onSubmit={handleSignUp}>
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="Email"
+        required
+      />
+      <input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="Password"
+        required
+        minLength={6}
+      />
+      <button type="submit">Sign Up</button>
+    </form>
+  )
+}`}
+</CopyBlock>
+
+### Create Login Form with OAuth
+
+`app/auth/login/page.tsx`:
+
+<CopyBlock language="tsx">
+{`'use client'
+
+import { createClient } from '@/lib/supabase/client'
+
+export default function LoginPage() {
+  const supabase = createClient()
+
+  async function handleGoogleLogin() {
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: \`\${location.origin}/auth/callback\`,
+      },
+    })
+  }
+
+  async function handleGitHubLogin() {
+    await supabase.auth.signInWithOAuth({
+      provider: 'github',
+      options: {
+        redirectTo: \`\${location.origin}/auth/callback\`,
+      },
+    })
+  }
+
+  return (
+    <div>
+      <button onClick={handleGoogleLogin}>Login with Google</button>
+      <button onClick={handleGitHubLogin}>Login with GitHub</button>
+    </div>
+  )
+}`}
+</CopyBlock>
+
+### Create Auth Callback Route
+
+`app/auth/callback/route.ts`:
+
+<CopyBlock language="typescript">
+{`import { createClient } from '@/lib/supabase/server'
+import { NextResponse } from 'next/server'
+
+export async function GET(request: Request) {
+  const { searchParams, origin } = new URL(request.url)
+  const code = searchParams.get('code')
+  const next = searchParams.get('next') ?? '/'
+
+  if (code) {
+    const supabase = await createClient()
+    await supabase.auth.exchangeCodeForSession(code)
+    return NextResponse.redirect(\`\${origin}\${next}\`)
+  }
+
+  return NextResponse.redirect(\`\${origin}/auth/auth-code-error\`)
+}`}
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/supabase-auth-setup/step5-nextjs-auth-en.png"
+  alt="Next.js auth implementation"
+  caption="Login page using Supabase Auth in Next.js"
+/>
+
+<Checkpoint>
+- [ ] Installed Supabase SSR package
+- [ ] Created client/server helpers
+- [ ] Implemented signup form
+- [ ] Implemented login form (email + OAuth)
+- [ ] Created auth callback route
+</Checkpoint>
+
+</Step>
+
+<Step number={6} title="Protect Routes and Integrate with RLS">
+
+Protect authenticated pages and integrate with RLS.
+
+### Check Authentication with Middleware
+
+Create `middleware.ts`:
+
+<CopyBlock language="typescript">
+{`import { createServerClient } from '@supabase/ssr'
+import { NextResponse, type NextRequest } from 'next/server'
+
+export async function middleware(request: NextRequest) {
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return request.cookies.get(name)?.value
+        },
+      },
+    }
+  )
+
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (request.nextUrl.pathname.startsWith('/dashboard') && !user) {
+    return NextResponse.redirect(new URL('/auth/login', request.url))
+  }
+
+  return NextResponse.next()
+}`}
+</CopyBlock>
+
+### Create Protected Page
+
+`app/dashboard/page.tsx`:
+
+<CopyBlock language="tsx">
+{`import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
+
+export default async function DashboardPage() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    redirect('/auth/login')
+  }
+
+  return (
+    <div>
+      <h1>Dashboard</h1>
+      <p>Welcome, {user.email}!</p>
+    </div>
+  )
+}`}
+</CopyBlock>
+
+### RLS Integration
+
+RLS policies automatically work with authenticated users:
+
+<CopyBlock language="javascript">
+{`// auth.uid() returns current user ID automatically
+// RLS policies filter data based on user
+const { data } = await supabase
+  .from('posts')
+  .select('*')  // Only returns posts matching RLS policies`}
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/supabase-auth-setup/step6-protected-routes-en.png"
+  alt="Protected routes"
+  caption="Dashboard page accessible only to authenticated users"
+/>
+
+<Checkpoint>
+- [ ] Configured middleware
+- [ ] Created protected page
+- [ ] Verified RLS integration
+- [ ] Implemented logout
+</Checkpoint>
+
+</Step>
+
+## Next Steps
+
+You've built an authentication system! Now add these features.
+
+### Recommended Guides
+
+1. **[Supabase Storage Setup Guide](../supabase-storage-setup)**
+   - Upload profile images
+   - Manage files
+   - Estimated time: 15 minutes
+
+## Troubleshooting
+
+### OAuth login not working
+
+**Check:**
+1. Verify OAuth app Redirect URI matches Supabase callback URL
+2. Verify Client ID and Client Secret are correct
+3. Added app URL to Supabase Redirect URLs
+4. Browser cookies enabled
+
+### Email confirmation not arriving
+
+**Solutions:**
+1. Check spam folder
+2. Verify "Confirm email" option in Authentication > Settings
+3. Temporarily disable "Confirm email" during development
+4. Check Email Templates
+
+## Useful Resources
+
+- [Supabase Auth Documentation](https://supabase.com/docs/guides/auth)
+- [Next.js with Supabase Guide](https://supabase.com/docs/guides/getting-started/quickstarts/nextjs)
+- [Row Level Security Guide](https://supabase.com/docs/guides/auth/row-level-security)

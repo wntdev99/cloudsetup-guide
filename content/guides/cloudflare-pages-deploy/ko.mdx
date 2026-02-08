@@ -1,0 +1,759 @@
+---
+title: "Cloudflare Pages 배포 가이드 - Git 연동 무료 호스팅"
+description: "Cloudflare Pages에 정적 사이트를 배포하는 방법을 배웁니다. GitHub/GitLab 연동, 자동 빌드, 커스텀 도메인 설정 포함."
+---
+
+# Cloudflare Pages 배포 가이드
+
+Cloudflare Pages는 정적 사이트를 무료로 호스팅할 수 있는 서비스입니다. Git 저장소와 연동하여 자동 빌드 및 배포를 지원하며, 무제한 요청과 대역폭을 제공합니다. Next.js, React, Vue, Svelte 등 모든 주요 프레임워크를 지원하고, Cloudflare Functions를 통해 서버리스 백엔드도 추가할 수 있습니다.
+
+<FreeTierInfo
+  limit="Unlimited requests, 500 builds/month"
+  period="month"
+  status="available"
+/>
+
+## 시작하기 전에
+
+다음 항목들이 준비되어 있는지 확인하세요.
+
+- [Cloudflare 계정 생성](../cloudflare-account-setup) 완료
+- GitHub 또는 GitLab 계정
+- 배포할 프로젝트 (정적 사이트 또는 프레임워크 프로젝트)
+- Git 기본 사용법 이해
+
+<Callout type="info">
+Cloudflare Pages는 Vercel, Netlify와 유사한 서비스이지만, Cloudflare의 글로벌 네트워크를 활용하여 더 빠른 속도와 무제한 대역폭을 제공합니다. SSR이 필요한 경우 Cloudflare Workers와 통합하여 사용할 수 있습니다.
+</Callout>
+
+<Step number={1} title="Git 저장소 연동하기">
+
+Cloudflare Pages와 GitHub 또는 GitLab 저장소를 연결합니다.
+
+1. Cloudflare 대시보드에서 **Pages**를 클릭합니다
+2. **Create a project** 버튼을 클릭합니다
+3. **Connect to Git** 섹션에서 Git 공급자를 선택합니다:
+   - **GitHub** 또는 **GitLab** 선택
+4. 권한 승인 화면이 나타나면 **Authorize Cloudflare Pages** 클릭
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/cloudflare-pages-deploy/step1-connect-git-ko.png"
+  alt="Git 연동"
+  caption="GitHub 또는 GitLab 계정을 Cloudflare Pages와 연결합니다"
+/>
+
+### 저장소 선택
+
+1. 연동 완료 후 본인의 저장소 목록이 표시됩니다
+2. 배포할 저장소를 선택합니다
+   - 검색창을 사용하여 저장소를 빠르게 찾을 수 있습니다
+3. **Begin setup** 버튼을 클릭합니다
+
+<Callout type="warning">
+저장소가 보이지 않는다면 **Configure GitHub/GitLab permissions**를 클릭하여 추가 권한을 부여하세요. Private 저장소를 배포하려면 해당 저장소에 대한 접근 권한이 필요합니다.
+</Callout>
+
+<DevTip title="Git 연동 방식 선택">
+**GitHub 연동:**
+- 장점: 가장 많이 사용, GitHub Actions와 병행 가능
+- 권한: 저장소별 또는 전체 저장소 선택 가능
+- Pull Request 미리보기 자동 생성
+
+**GitLab 연동:**
+- 장점: Self-hosted GitLab도 지원
+- 권한: 프로젝트별 권한 설정
+- Merge Request 미리보기 자동 생성
+
+**직접 업로드 (Wrangler CLI):**
+- Git 없이 로컬에서 직접 배포
+- CI/CD 파이프라인 직접 구성
+- `wrangler pages publish` 명령어 사용
+
+대부분의 경우 GitHub 연동을 권장합니다.
+</DevTip>
+
+<Checkpoint>
+- [ ] Cloudflare Pages 접속 완료
+- [ ] Git 공급자 연결 완료 (GitHub/GitLab)
+- [ ] 저장소 선택 완료
+</Checkpoint>
+
+</Step>
+
+<Step number={2} title="빌드 설정 구성하기">
+
+프로젝트의 빌드 명령어와 출력 디렉토리를 설정합니다.
+
+### 프로젝트 정보 입력
+
+1. **Project name**: 프로젝트 이름을 입력합니다
+   - 예: `my-blog`, `company-website`
+   - URL이 `project-name.pages.dev`가 됩니다
+2. **Production branch**: 배포할 기본 브랜치 선택
+   - 예: `main`, `master`, `production`
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/cloudflare-pages-deploy/step2-build-settings-ko.png"
+  alt="빌드 설정"
+  caption="프레임워크를 선택하고 빌드 명령어를 구성합니다"
+/>
+
+### 빌드 설정
+
+1. **Framework preset**: 프레임워크를 선택합니다
+   - Cloudflare가 자동으로 감지하여 추천합니다
+   - 수동 선택 가능
+
+2. **Build command**: 빌드 명령어를 입력합니다
+3. **Build output directory**: 빌드 결과물이 생성되는 디렉토리
+
+### 주요 프레임워크별 설정
+
+**Next.js (Static Export):**
+```
+Framework preset: Next.js (Static HTML Export)
+Build command: npm run build
+Build output directory: out
+```
+
+**React (Create React App):**
+```
+Framework preset: Create React App
+Build command: npm run build
+Build output directory: build
+```
+
+**Vue.js:**
+```
+Framework preset: Vue
+Build command: npm run build
+Build output directory: dist
+```
+
+**Vite:**
+```
+Framework preset: Vite
+Build command: npm run build
+Build output directory: dist
+```
+
+**Svelte / SvelteKit (Adapter Static):**
+```
+Framework preset: SvelteKit
+Build command: npm run build
+Build output directory: build
+```
+
+**Gatsby:**
+```
+Framework preset: Gatsby
+Build command: npm run build
+Build output directory: public
+```
+
+**Hugo:**
+```
+Framework preset: Hugo
+Build command: hugo
+Build output directory: public
+```
+
+**정적 HTML (빌드 없음):**
+```
+Framework preset: None
+Build command: (비워두기)
+Build output directory: / (또는 public)
+```
+
+<DevTip title="빌드 설정 팁">
+**Node.js 버전 지정:**
+환경 변수에서 Node.js 버전을 지정할 수 있습니다:
+- 변수명: `NODE_VERSION`
+- 값: `18`, `20` 등
+
+**Package manager 선택:**
+- `npm`, `yarn`, `pnpm` 모두 지원
+- `package-lock.json` → npm
+- `yarn.lock` → yarn
+- `pnpm-lock.yaml` → pnpm
+- 자동 감지됨
+
+**Root directory 설정:**
+모노레포인 경우 Root directory를 지정:
+- 예: `apps/web`, `packages/landing`
+
+**빌드 캐싱:**
+- Cloudflare가 자동으로 `node_modules` 캐싱
+- 빌드 속도 향상
+- 캐시 삭제: 배포 설정에서 "Clear build cache" 선택
+</DevTip>
+
+<Checkpoint>
+- [ ] 프로젝트 이름 입력 완료
+- [ ] Production 브랜치 선택 완료
+- [ ] 프레임워크 선택 완료
+- [ ] 빌드 명령어 및 출력 디렉토리 설정 완료
+</Checkpoint>
+
+</Step>
+
+<Step number={3} title="환경 변수 설정 및 배포하기">
+
+환경 변수를 추가하고 첫 배포를 시작합니다.
+
+### 환경 변수 추가 (선택사항)
+
+빌드 시 필요한 환경 변수가 있다면 추가합니다:
+
+1. **Environment variables** 섹션에서 **Add variable** 클릭
+2. 변수명과 값을 입력합니다
+   - 예: `NEXT_PUBLIC_API_URL` = `https://api.example.com`
+   - 예: `VITE_APP_TITLE` = `My App`
+3. 여러 개의 환경 변수를 추가할 수 있습니다
+
+**주의:** 민감한 정보 (API 키, 비밀번호)는 클라이언트에 노출되지 않도록 주의하세요.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/cloudflare-pages-deploy/step3-deploy-ko.png"
+  alt="첫 배포"
+  caption="환경 변수를 설정하고 첫 배포를 시작합니다"
+/>
+
+### 첫 배포 시작
+
+1. 모든 설정을 확인합니다
+2. **Save and Deploy** 버튼을 클릭합니다
+3. 빌드 프로세스가 시작됩니다
+
+### 배포 로그 확인
+
+빌드 진행 상황을 실시간으로 확인할 수 있습니다:
+
+1. **Initializing build environment**: 빌드 환경 준비
+2. **Cloning repository**: Git 저장소 복제
+3. **Installing dependencies**: 의존성 설치 (`npm install`)
+4. **Building application**: 애플리케이션 빌드
+5. **Deploying to Cloudflare's network**: 전 세계 배포
+6. **Success**: 배포 완료!
+
+**배포 시간:** 보통 1-3분 소요 (프로젝트 크기에 따라 다름)
+
+<Callout type="info">
+첫 배포는 캐시가 없어서 조금 더 오래 걸릴 수 있습니다. 이후 배포는 캐시를 활용하여 더 빠릅니다.
+</Callout>
+
+<DevTip title="환경 변수 관리 팁">
+**Production vs Preview 환경:**
+- Production: `main` 브랜치 배포 시 사용
+- Preview: Pull Request 및 다른 브랜치 배포 시 사용
+- 각각 다른 환경 변수 설정 가능
+
+**Next.js 환경 변수 규칙:**
+- `NEXT_PUBLIC_*`: 클라이언트에 노출됨 (브라우저에서 접근 가능)
+- `NEXT_PUBLIC_` 없이: 서버 사이드에서만 접근 (Static Export 시 빌드 타임에만 사용)
+
+**Vite 환경 변수 규칙:**
+- `VITE_*`: 클라이언트에 노출됨
+- 그 외: 빌드 스크립트에서만 사용
+
+**환경 변수 암호화:**
+Cloudflare는 환경 변수를 암호화하여 저장하지만, 민감한 정보는:
+- API Routes/Functions에서만 사용
+- `.env.local`을 Git에 커밋하지 않기
+- Cloudflare Workers Secrets 사용 고려
+</DevTip>
+
+<Checkpoint>
+- [ ] 환경 변수 추가 완료 (필요시)
+- [ ] 첫 배포 시작 완료
+- [ ] 배포 로그 확인 완료
+- [ ] 배포 성공 확인
+</Checkpoint>
+
+</Step>
+
+<Step number={4} title="커스텀 도메인 연결하기">
+
+본인의 도메인을 Cloudflare Pages에 연결해봅시다.
+
+### 커스텀 도메인 추가
+
+1. 배포 완료 후 **Custom domains** 탭을 클릭합니다
+2. **Set up a custom domain** 버튼을 클릭합니다
+3. 본인의 도메인을 입력합니다
+   - 예: `www.example.com` 또는 `example.com`
+4. **Continue** 클릭
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/cloudflare-pages-deploy/step4-custom-domain-ko.png"
+  alt="커스텀 도메인"
+  caption="본인의 도메인을 Cloudflare Pages 프로젝트에 연결합니다"
+/>
+
+### DNS 레코드 추가
+
+Cloudflare가 자동으로 DNS 레코드를 추가합니다:
+
+**케이스 1: 도메인이 이미 Cloudflare에 있는 경우**
+1. DNS 레코드가 자동으로 추가됩니다
+2. 즉시 활성화됩니다 (몇 분 소요)
+
+**케이스 2: 도메인이 다른 등록기관에 있는 경우**
+1. CNAME 레코드를 수동으로 추가해야 합니다
+2. 표시된 CNAME 값을 복사합니다
+   - 예: `www` → `your-project.pages.dev`
+3. 도메인 등록기관의 DNS 설정에서 CNAME 레코드 추가
+4. 전파 완료까지 최대 24시간 대기
+
+### 루트 도메인 (`example.com`) 연결
+
+루트 도메인은 CNAME을 사용할 수 없으므로 다음 방법 중 하나를 사용합니다:
+
+**방법 1: Cloudflare에서 도메인 관리 (권장)**
+1. 도메인 네임서버를 Cloudflare로 변경
+2. 자동으로 A 레코드가 추가됨
+
+**방법 2: CNAME Flattening 지원 등록기관**
+- Cloudflare, Cloudflare Registrar 등
+- CNAME을 루트 도메인에서도 사용 가능
+
+**방법 3: A 레코드 사용**
+- Cloudflare Pages IP 주소로 A 레코드 추가
+- Cloudflare 대시보드에 표시된 IP 사용
+
+<DevTip title="도메인 설정 베스트 프랙티스">
+**도메인 구조 권장:**
+1. `example.com` (루트) → Cloudflare Pages
+2. `www.example.com` → `example.com`으로 리다이렉트
+3. 또는 반대: `www`를 메인으로 사용
+
+**리다이렉트 설정 (Bulk Redirects):**
+Cloudflare Bulk Redirects를 사용하여 리다이렉트:
+1. Cloudflare 대시보드 → Bulk Redirects
+2. `example.com` → `www.example.com` (또는 반대)
+3. Status code: 301 (영구 리다이렉트)
+
+**SSL/TLS 설정:**
+- Cloudflare Pages는 자동으로 SSL 인증서 발급
+- 커스텀 도메인 추가 후 몇 분 내에 HTTPS 활성화
+- SSL/TLS 모드: Full (strict) 권장
+
+**서브도메인 활용:**
+- `blog.example.com` → Cloudflare Pages (블로그)
+- `app.example.com` → Cloudflare Pages (앱)
+- `api.example.com` → Cloudflare Workers (API)
+
+각 서브도메인마다 별도의 Cloudflare Pages 프로젝트 연결 가능.
+</DevTip>
+
+<Checkpoint>
+- [ ] 커스텀 도메인 추가 완료
+- [ ] DNS 레코드 설정 완료
+- [ ] SSL 인증서 발급 확인
+- [ ] 도메인으로 접속 테스트 완료
+</Checkpoint>
+
+</Step>
+
+<Step number={5} title="Preview 배포 및 자동 배포 설정">
+
+Git 브랜치별 자동 배포와 Pull Request 미리보기를 활용해봅시다.
+
+### 자동 배포 흐름
+
+Cloudflare Pages는 Git과 완벽하게 통합됩니다:
+
+**Production 배포:**
+1. `main` 브랜치에 코드를 푸시합니다
+2. Cloudflare가 자동으로 빌드 및 배포를 시작합니다
+3. 성공하면 Production URL이 업데이트됩니다
+   - `https://your-project.pages.dev`
+   - 커스텀 도메인 (설정한 경우)
+
+**Preview 배포:**
+1. 새 브랜치를 만들고 코드를 푸시합니다
+   - 예: `feature/new-landing-page`
+2. Pull Request를 생성합니다
+3. Cloudflare가 자동으로 Preview 배포를 생성합니다
+4. 고유한 미리보기 URL이 생성됩니다
+   - 예: `https://abc123.your-project.pages.dev`
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/cloudflare-pages-deploy/step5-preview-deploy-ko.png"
+  alt="Preview 배포"
+  caption="Pull Request마다 자동으로 Preview 배포가 생성됩니다"
+/>
+
+### Pull Request 댓글 확인
+
+GitHub/GitLab Pull Request에 Cloudflare Pages 봇이 댓글을 남깁니다:
+
+```
+✅ Deploy Preview ready!
+
+🔨 Latest commit: a1b2c3d
+🔍 Preview URL: https://abc123.your-project.pages.dev
+📝 Build logs: https://dash.cloudflare.com/...
+```
+
+팀원들은 이 URL을 클릭하여 변경 사항을 미리 확인할 수 있습니다.
+
+### Preview 배포 관리
+
+Cloudflare Pages 대시보드에서 모든 배포 이력을 확인할 수 있습니다:
+
+1. **View all deployments** 클릭
+2. 배포 목록이 표시됩니다:
+   - **Production**: Production 배포 (main 브랜치)
+   - **Preview**: Preview 배포 (다른 브랜치, PR)
+3. 각 배포를 클릭하여 세부 정보 확인:
+   - 빌드 로그
+   - 배포 URL
+   - 커밋 정보
+   - 빌드 시간
+
+### Rollback (이전 버전 복원)
+
+배포에 문제가 있으면 이전 버전으로 쉽게 롤백할 수 있습니다:
+
+1. **Deployments** 탭에서 이전 성공한 배포를 찾습니다
+2. 해당 배포의 **⋯** 메뉴를 클릭합니다
+3. **Rollback to this deployment** 선택
+4. 즉시 이전 버전으로 복원됩니다
+
+<DevTip title="CI/CD 워크플로우 최적화">
+**브랜치 전략:**
+```
+main (production)      → Production 배포
+  ├── develop          → Preview 배포 (개발 환경)
+  ├── feature/xyz      → Preview 배포 (기능 개발)
+  └── hotfix/abc       → Preview 배포 (긴급 수정)
+```
+
+**환경별 설정:**
+- Production: 최적화된 빌드, 실제 API 사용
+- Preview: 개발 모드, Staging API 사용
+
+**배포 알림 설정:**
+1. Cloudflare Pages → Settings → Notifications
+2. Email, Slack, Discord 웹훅 설정 가능
+3. 배포 성공/실패 시 알림 받기
+
+**빌드 스킵하기:**
+커밋 메시지에 `[ci skip]` 또는 `[skip ci]` 포함:
+```bash
+git commit -m "docs: update README [ci skip]"
+```
+
+**병렬 빌드:**
+- 무료 플랜: 동시 1개 빌드
+- Pro 플랜: 동시 5개 빌드
+- 여러 PR이 있어도 순차적으로 처리됨
+
+**Build Watch Paths (선택적 배포):**
+특정 파일/폴더 변경 시에만 배포:
+- Settings → Builds & deployments → Build watch paths
+- 예: `apps/web/**`, `packages/ui/**`
+</DevTip>
+
+<Checkpoint>
+- [ ] Production 자동 배포 테스트 완료
+- [ ] Preview 배포 생성 확인
+- [ ] PR 댓글에서 Preview URL 확인
+- [ ] 배포 이력 확인 완료
+</Checkpoint>
+
+</Step>
+
+<Step number={6} title="Cloudflare Functions 사용하기">
+
+Cloudflare Pages에서 서버리스 함수를 추가하여 동적 기능을 구현해봅시다.
+
+### Cloudflare Functions란?
+
+Cloudflare Functions는 Cloudflare Workers를 기반으로 하는 서버리스 함수입니다:
+
+- **위치**: `/functions` 디렉토리에 `.js` 또는 `.ts` 파일 생성
+- **실행**: Cloudflare Edge에서 실행 (전 세계 300개 위치)
+- **성능**: 콜드 스타트 없이 즉시 실행
+- **가격**: 무료 플랜에서 10만 요청/일
+
+### Functions 파일 생성
+
+프로젝트 루트에 `/functions` 디렉토리를 만들고 함수를 추가합니다:
+
+**예시 1: 간단한 API (GET 요청)**
+
+`/functions/api/hello.js`:
+<CopyBlock language="javascript">
+{`// GET /api/hello
+export async function onRequestGet(context) {
+  return new Response(
+    JSON.stringify({ message: 'Hello from Cloudflare Functions!' }),
+    {
+      headers: { 'Content-Type': 'application/json' }
+    }
+  )
+}`}
+</CopyBlock>
+
+**예시 2: 동적 라우트**
+
+`/functions/api/user/[id].js`:
+<CopyBlock language="javascript">
+{`// GET /api/user/:id
+export async function onRequestGet(context) {
+  const userId = context.params.id
+
+  return new Response(
+    JSON.stringify({ userId, name: \`User \${userId}\` }),
+    {
+      headers: { 'Content-Type': 'application/json' }
+    }
+  )
+}`}
+</CopyBlock>
+
+**예시 3: POST 요청 처리**
+
+`/functions/api/contact.js`:
+<CopyBlock language="javascript">
+{`// POST /api/contact
+export async function onRequestPost(context) {
+  const formData = await context.request.json()
+
+  // 이메일 전송, 데이터베이스 저장 등
+  console.log('Contact form:', formData)
+
+  return new Response(
+    JSON.stringify({ success: true, message: 'Thank you for contacting us!' }),
+    {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    }
+  )
+}`}
+</CopyBlock>
+
+### 프론트엔드에서 Functions 호출
+
+<CopyBlock language="javascript">
+{`// React 예시
+async function fetchHello() {
+  const response = await fetch('/api/hello')
+  const data = await response.json()
+  console.log(data.message)
+}
+
+// POST 요청
+async function submitContact(formData) {
+  const response = await fetch('/api/contact', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(formData)
+  })
+
+  const result = await response.json()
+  return result
+}`}
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/cloudflare-pages-deploy/step6-functions-ko.png"
+  alt="Cloudflare Functions"
+  caption="Cloudflare Functions로 서버리스 API를 추가합니다"
+/>
+
+### 환경 변수 사용 (Functions)
+
+Functions에서 환경 변수를 사용하려면:
+
+<CopyBlock language="javascript">
+{`// /functions/api/data.js
+export async function onRequestGet(context) {
+  // context.env에서 환경 변수 접근
+  const apiKey = context.env.API_KEY
+  const apiUrl = context.env.API_URL
+
+  const response = await fetch(\`\${apiUrl}/data\`, {
+    headers: { 'Authorization': \`Bearer \${apiKey}\` }
+  })
+
+  const data = await response.json()
+  return Response.json(data)
+}`}
+</CopyBlock>
+
+환경 변수는 Cloudflare Pages 대시보드에서 설정:
+1. Settings → Environment variables
+2. Production 및 Preview 환경별로 설정 가능
+
+### Functions 고급 기능
+
+**미들웨어 (_middleware.js):**
+<CopyBlock language="javascript">
+{`// /functions/_middleware.js
+// 모든 요청에 대해 실행되는 미들웨어
+export async function onRequest(context) {
+  // CORS 헤더 추가
+  const response = await context.next()
+
+  response.headers.set('Access-Control-Allow-Origin', '*')
+  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+
+  return response
+}`}
+</CopyBlock>
+
+**데이터베이스 연결 (Cloudflare D1):**
+<CopyBlock language="javascript">
+{`// D1 데이터베이스 사용
+export async function onRequestGet(context) {
+  const { results } = await context.env.DB.prepare(
+    'SELECT * FROM users LIMIT 10'
+  ).all()
+
+  return Response.json(results)
+}`}
+</CopyBlock>
+
+**KV Storage 사용:**
+<CopyBlock language="javascript">
+{`// Cloudflare KV에서 데이터 읽기
+export async function onRequestGet(context) {
+  const value = await context.env.MY_KV.get('key')
+  return new Response(value)
+}`}
+</CopyBlock>
+
+<DevTip title="Cloudflare Functions 활용 팁">
+**적합한 사용 사례:**
+- ✅ 폼 제출 처리
+- ✅ 외부 API 호출 (API 키 숨기기)
+- ✅ 인증 및 권한 확인
+- ✅ 이미지 리사이징 및 최적화
+- ✅ A/B 테스트 및 개인화
+- ✅ 서버사이드 분석 및 로깅
+
+**제한 사항:**
+- CPU 시간: 50ms (무료), 30초 (Workers Paid)
+- 메모리: 128MB
+- 파일 크기: 1MB (번들 후)
+- 외부 모듈: `import` 문 제한적 (Web APIs 사용)
+
+**성능 최적화:**
+- 캐싱 활용: `cache.match()`, `cache.put()`
+- KV 사용: 빠른 key-value 스토리지
+- Durable Objects: 상태 관리 및 WebSocket
+
+**대안:**
+- SSR 필요 시: Cloudflare Workers + Hono/itty-router
+- 복잡한 백엔드: Cloudflare Workers + D1/R2/KV
+- Full-stack: SvelteKit, Remix (Cloudflare adapter)
+
+**디버깅:**
+- `wrangler dev`로 로컬 테스트
+- `console.log()`는 Cloudflare 대시보드의 Real-time Logs에서 확인
+- Preview 배포로 테스트 후 Production 배포
+</DevTip>
+
+<Checkpoint>
+- [ ] `/functions` 디렉토리 생성 완료
+- [ ] 샘플 함수 추가 완료
+- [ ] 프론트엔드에서 함수 호출 테스트
+- [ ] 배포 후 Functions 작동 확인
+</Checkpoint>
+
+</Step>
+
+## 다음 단계
+
+Cloudflare Pages 배포를 완료했습니다! 이제 추가 기능을 활용해보세요.
+
+### 추천 리소스
+
+- **Cloudflare Workers**: 더 강력한 서버리스 함수
+- **Cloudflare D1**: 서버리스 SQL 데이터베이스
+- **Cloudflare R2**: S3 호환 객체 스토리지
+- **Cloudflare Images**: 이미지 최적화 및 CDN
+
+## 문제 해결
+
+### 빌드가 실패해요
+
+**확인 사항:**
+1. 빌드 명령어가 올바른지 확인 (`npm run build`)
+2. Node.js 버전이 호환되는지 확인
+3. 빌드 로그에서 에러 메시지 확인
+4. 환경 변수가 제대로 설정되었는지 확인
+
+**해결 방법:**
+<CopyBlock language="bash">
+{`# 로컬에서 빌드 테스트
+npm install
+npm run build
+
+# 빌드 성공하면 output 디렉토리 확인
+ls -la dist/  # 또는 out/, build/, public/`}
+</CopyBlock>
+
+### 배포 후 404 에러가 발생해요
+
+**원인:**
+- Build output directory가 잘못 설정됨
+- SPA 라우팅 설정 누락
+
+**해결 방법:**
+1. Build output directory 확인 및 수정
+2. SPA의 경우 `_redirects` 파일 추가:
+
+`/public/_redirects`:
+```
+/* /index.html 200
+```
+
+또는 Functions 사용:
+`/functions/[[path]].js`:
+<CopyBlock language="javascript">
+{`export async function onRequest(context) {
+  const url = new URL(context.request.url)
+
+  // 파일이 없으면 index.html 반환 (SPA)
+  return context.env.ASSETS.fetch(new Request(\`\${url.origin}/index.html\`, context.request))
+}`}
+</CopyBlock>
+
+### Functions가 작동하지 않아요
+
+**확인 사항:**
+1. `/functions` 디렉토리가 프로젝트 루트에 있는지 확인
+2. 파일 이름이 올바른지 확인 (`api/hello.js` → `/api/hello` 경로)
+3. `export async function onRequestGet` 등 올바른 export 사용
+4. 빌드 로그에서 Functions 감지 확인
+
+**해결 방법:**
+로컬에서 Wrangler로 테스트:
+<CopyBlock language="bash">
+{`npm install -g wrangler
+wrangler pages dev ./dist --compatibility-date=2024-01-01`}
+</CopyBlock>
+
+### 커스텀 도메인 SSL 인증서 오류
+
+**원인:**
+- DNS 전파 미완료
+- CAA 레코드 차단
+
+**해결 방법:**
+1. DNS 전파 대기 (최대 24시간)
+2. CAA 레코드 확인:
+   - Cloudflare 발급을 허용하는 CAA 레코드 추가
+   - 또는 CAA 레코드 삭제
+
+## 유용한 리소스
+
+- [Cloudflare Pages 공식 문서](https://developers.cloudflare.com/pages)
+- [Cloudflare Functions 가이드](https://developers.cloudflare.com/pages/functions)
+- [Cloudflare Workers 문서](https://developers.cloudflare.com/workers)
+- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler) - 로컬 개발 도구
+- [Cloudflare Developer Discord](https://discord.gg/cloudflaredev)

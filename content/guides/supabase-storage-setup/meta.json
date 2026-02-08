@@ -1,0 +1,67 @@
+{
+  "slug": "supabase-storage-setup",
+  "platform": "supabase",
+  "service": "Supabase Storage",
+  "category": "storage",
+  "difficulty": "beginner",
+  "estimatedMinutes": 15,
+  "totalSteps": 5,
+  "freeTier": {
+    "limit": "1GB file storage, 2GB bandwidth",
+    "period": "month",
+    "amount": 0,
+    "status": "available",
+    "conditions": [
+      "Unlimited buckets",
+      "Image transformations included",
+      "CDN included"
+    ]
+  },
+  "prerequisites": [
+    "supabase-account-setup"
+  ],
+  "nextGuides": [
+    "supabase-database-setup",
+    "supabase-auth-setup"
+  ],
+  "tags": [
+    "supabase",
+    "storage",
+    "file-upload",
+    "cdn",
+    "image-transformation",
+    "bucket"
+  ],
+  "seo": {
+    "ko": {
+      "title": "Supabase 스토리지 설정 가이드 - 파일 업로드 및 CDN",
+      "description": "Supabase Storage에서 버킷을 생성하고 파일을 업로드하며, Row Level Security 정책을 설정하는 방법을 배웁니다. 이미지 변환 및 CDN URL 활용 포함.",
+      "keywords": [
+        "Supabase 스토리지",
+        "Supabase Storage",
+        "파일 업로드",
+        "이미지 업로드",
+        "CDN",
+        "버킷 생성",
+        "Row Level Security"
+      ]
+    },
+    "en": {
+      "title": "Supabase Storage Setup Guide - File Upload & CDN",
+      "description": "Learn how to create buckets, upload files, and configure Row Level Security policies in Supabase Storage. Includes image transformations and CDN URL usage.",
+      "keywords": [
+        "Supabase storage",
+        "Supabase Storage",
+        "file upload",
+        "image upload",
+        "CDN",
+        "create bucket",
+        "Row Level Security"
+      ]
+    }
+  },
+  "published": true,
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z"
+}

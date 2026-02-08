@@ -1,0 +1,65 @@
+{
+  "slug": "supabase-database-setup",
+  "platform": "supabase",
+  "service": "Supabase Database",
+  "category": "database",
+  "difficulty": "beginner",
+  "estimatedMinutes": 20,
+  "totalSteps": 6,
+  "freeTier": {
+    "limit": "500MB database, unlimited tables and rows",
+    "period": "month",
+    "amount": 0,
+    "status": "available",
+    "conditions": [
+      "PostgreSQL 15",
+      "Automatic daily backups (7 days retention)",
+      "Full PostgreSQL features and extensions"
+    ]
+  },
+  "prerequisites": [
+    "supabase-account-setup"
+  ],
+  "nextGuides": [
+    "supabase-auth-setup",
+    "supabase-storage-setup"
+  ],
+  "tags": [
+    "supabase",
+    "database",
+    "postgresql",
+    "sql",
+    "table-editor",
+    "row-level-security"
+  ],
+  "seo": {
+    "ko": {
+      "title": "Supabase 데이터베이스 설정 및 테이블 생성 가이드",
+      "description": "Supabase에서 PostgreSQL 데이터베이스 테이블을 만들고, SQL을 실행하며, Row Level Security를 설정하는 방법을 배웁니다. JavaScript 클라이언트 사용법도 포함됩니다.",
+      "keywords": [
+        "Supabase 데이터베이스",
+        "Supabase 테이블 생성",
+        "PostgreSQL 설정",
+        "Row Level Security",
+        "Supabase SQL",
+        "Supabase JavaScript"
+      ]
+    },
+    "en": {
+      "title": "Supabase Database Setup and Table Creation Guide",
+      "description": "Learn how to create PostgreSQL database tables in Supabase, execute SQL, and configure Row Level Security. Includes JavaScript client usage.",
+      "keywords": [
+        "Supabase database",
+        "Supabase create table",
+        "PostgreSQL setup",
+        "Row Level Security",
+        "Supabase SQL",
+        "Supabase JavaScript"
+      ]
+    }
+  },
+  "published": true,
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z"
+}

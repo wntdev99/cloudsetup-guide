@@ -1,0 +1,324 @@
+---
+title: "Supabase 계정 생성 및 프로젝트 설정 가이드"
+description: "Supabase 계정을 만들고 첫 번째 프로젝트를 설정하는 방법을 단계별로 알아봅니다."
+---
+
+# Supabase 계정 생성 및 프로젝트 설정 가이드
+
+Supabase는 오픈소스 Firebase 대체제로, PostgreSQL 데이터베이스, 인증, 스토리지, 실시간 기능을 제공하는 백엔드 플랫폼입니다. 이 가이드에서는 Supabase 계정을 만들고 첫 번째 프로젝트를 설정하는 방법을 알아봅니다.
+
+<FreeTierInfo
+  limit="500MB database, 1GB file storage, 2GB bandwidth"
+  period="month"
+  status="available"
+/>
+
+## 시작하기 전에
+
+다음 항목들이 준비되어 있는지 확인하세요.
+
+- 유효한 이메일 주소
+- GitHub 계정 (선택사항, OAuth 로그인용)
+- 안정적인 인터넷 연결
+
+<Callout type="info">
+Supabase는 무료 티어로 조직당 2개의 프로젝트를 제공합니다. 1주일간 활동이 없으면 프로젝트가 일시 중지되지만, 언제든지 재개할 수 있습니다.
+</Callout>
+
+<Step number={1} title="Supabase 계정 가입하기">
+
+Supabase 웹사이트에 접속하여 계정을 생성합니다.
+
+1. 브라우저에서 [https://supabase.com](https://supabase.com)에 접속합니다
+2. 우측 상단의 **Start your project** 버튼을 클릭합니다
+3. 다음 중 하나의 방법으로 가입합니다:
+   - **GitHub 계정으로 가입** (권장): GitHub 계정과 연동하여 간편하게 가입
+   - **이메일로 가입**: 이메일과 비밀번호를 입력하여 가입
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/supabase-account-setup/step1-signup-ko.png"
+  alt="Supabase 회원가입 페이지"
+  caption="Supabase 회원가입 페이지에서 GitHub 또는 이메일로 가입할 수 있습니다"
+/>
+
+<Callout type="tip">
+GitHub 계정으로 가입하면 GitHub Actions와의 연동이 더 쉬워집니다. CI/CD 파이프라인을 구축할 계획이라면 GitHub 가입을 권장합니다.
+</Callout>
+
+이메일로 가입한 경우, 이메일 인증 링크를 클릭하여 계정을 활성화합니다.
+
+<Checkpoint>
+- [ ] Supabase 계정 생성 완료
+- [ ] 이메일 인증 완료 (이메일 가입 시)
+- [ ] 대시보드에 로그인 완료
+</Checkpoint>
+
+</Step>
+
+<Step number={2} title="조직(Organization) 생성하기">
+
+Supabase에서는 조직 단위로 프로젝트를 관리합니다.
+
+1. 로그인 후 자동으로 조직 생성 페이지로 이동합니다
+2. **Organization name**에 조직 이름을 입력합니다
+   - 개인 프로젝트: 본인 이름 또는 개인 아이디
+   - 팀 프로젝트: 팀 또는 회사 이름
+3. **Plan** 선택 화면에서 **Free**를 선택합니다
+4. **Create organization** 버튼을 클릭합니다
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/supabase-account-setup/step2-organization-ko.png"
+  alt="Supabase 조직 생성"
+  caption="조직 이름을 입력하고 무료 플랜을 선택합니다"
+/>
+
+<DevTip title="조직과 프로젝트의 관계">
+- **조직(Organization)**: 여러 프로젝트를 관리하는 최상위 단위
+- **프로젝트(Project)**: 실제 애플리케이션의 백엔드 인스턴스
+- 하나의 조직에서 여러 프로젝트를 생성할 수 있습니다
+- 무료 티어에서는 조직당 2개의 프로젝트까지 생성 가능
+</DevTip>
+
+<Checkpoint>
+- [ ] 조직 이름 입력 완료
+- [ ] Free 플랜 선택 완료
+- [ ] 조직 생성 완료
+</Checkpoint>
+
+</Step>
+
+<Step number={3} title="첫 번째 프로젝트 생성하기">
+
+이제 실제 애플리케이션에서 사용할 프로젝트를 생성합니다.
+
+1. **New project** 버튼을 클릭합니다
+2. 프로젝트 정보를 입력합니다:
+
+   **Name**: 프로젝트 이름 (예: my-first-app)
+   - 소문자, 숫자, 하이픈만 사용 가능
+   - 3-63자 길이로 입력
+
+   **Database Password**: 데이터베이스 비밀번호
+   - **Generate a password** 버튼을 클릭하여 강력한 비밀번호 생성
+   - 생성된 비밀번호를 안전한 곳에 저장하세요 (비밀번호 관리자 권장)
+
+   **Region**: 프로젝트 리전 선택
+   - 사용자와 가까운 지역 선택 (한국: Northeast Asia (Seoul))
+   - 리전은 생성 후 변경할 수 없습니다
+
+   **Pricing Plan**: Free 선택
+
+3. **Create new project** 버튼을 클릭합니다
+4. 프로젝트 생성 완료까지 1-2분 정도 소요됩니다
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/supabase-account-setup/step3-project-ko.png"
+  alt="Supabase 프로젝트 생성"
+  caption="프로젝트 이름, 데이터베이스 비밀번호, 리전을 설정합니다"
+/>
+
+<Callout type="warning">
+**데이터베이스 비밀번호는 반드시 저장하세요!** 이 비밀번호는 직접 데이터베이스에 접속할 때 필요하며, 나중에 확인할 수 없습니다. 비밀번호를 잊어버린 경우 재설정해야 합니다.
+</Callout>
+
+<DevTip title="리전 선택 가이드">
+**사용 가능한 주요 리전:**
+- Northeast Asia (Seoul): 한국 사용자 대상
+- Southeast Asia (Singapore): 동남아시아 사용자 대상
+- West US (North California): 미국 서부 사용자 대상
+- East US (North Virginia): 미국 동부 사용자 대상
+- Central EU (Frankfurt): 유럽 사용자 대상
+
+**선택 기준:**
+- 주요 사용자층이 위치한 지역 선택
+- 레이턴시가 중요한 애플리케이션일수록 리전 선택이 중요
+- 글로벌 서비스라면 향후 Edge Functions를 활용하여 리전별 캐싱 가능
+</DevTip>
+
+<Checkpoint>
+- [ ] 프로젝트 이름 입력 완료
+- [ ] 데이터베이스 비밀번호 생성 및 저장 완료
+- [ ] 리전 선택 완료
+- [ ] 프로젝트 생성 완료 (녹색 체크 표시 확인)
+</Checkpoint>
+
+</Step>
+
+<Step number={4} title="대시보드 둘러보기">
+
+프로젝트 생성이 완료되면 대시보드가 표시됩니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/supabase-account-setup/step4-dashboard-ko.png"
+  alt="Supabase 프로젝트 대시보드"
+  caption="Supabase 프로젝트 대시보드의 주요 메뉴와 기능"
+/>
+
+### 주요 메뉴 살펴보기
+
+왼쪽 사이드바에서 주요 기능에 접근할 수 있습니다:
+
+**Table Editor** 📊
+- 데이터베이스 테이블을 GUI로 생성하고 편집
+- 스프레드시트처럼 데이터를 직접 입력하고 수정
+- 다음 가이드: [Supabase 데이터베이스 설정 가이드](../supabase-database-setup)
+
+**SQL Editor** 💻
+- SQL 쿼리를 직접 작성하고 실행
+- 복잡한 데이터베이스 작업 수행
+- 저장된 쿼리 관리
+
+**Authentication** 🔐
+- 사용자 인증 설정 및 관리
+- 이메일, OAuth, 매직 링크 등 다양한 인증 방식 지원
+- 다음 가이드: [Supabase 인증 설정 가이드](../supabase-auth-setup)
+
+**Storage** 📁
+- 파일 업로드 및 관리
+- 이미지, 동영상, 문서 등 저장
+- 다음 가이드: [Supabase 스토리지 설정 가이드](../supabase-storage-setup)
+
+**Functions** ⚡
+- 서버리스 함수 (Edge Functions) 배포
+- TypeScript로 백엔드 로직 작성
+
+**Database** 🗄️
+- 데이터베이스 연결 정보 확인
+- 백업 및 복원
+- Extensions 관리
+
+**API** 🔌
+- 자동 생성된 REST API 문서
+- API 키 및 엔드포인트 확인
+
+### Project Settings에서 API 키 확인하기
+
+1. 좌측 하단의 **Project Settings**(톱니바퀴 아이콘)를 클릭합니다
+2. **API** 메뉴를 선택합니다
+3. 다음 정보를 확인할 수 있습니다:
+
+   **Project URL**: 프로젝트의 API 엔드포인트
+   ```
+   https://xxxxxxxxxxxxx.supabase.co
+   ```
+
+   **API Keys**:
+   - `anon public`: 클라이언트(브라우저, 모바일 앱)에서 사용하는 공개 키
+   - `service_role`: 서버에서만 사용하는 비밀 키 (절대 클라이언트에 노출하지 말 것)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/supabase-account-setup/step4-api-keys-ko.png"
+  alt="Supabase API 키 확인"
+  caption="Project Settings > API에서 프로젝트 URL과 API 키를 확인합니다"
+/>
+
+<Callout type="warning">
+**service_role 키는 절대 클라이언트 코드에 포함하지 마세요!** 이 키는 모든 RLS(Row Level Security) 정책을 우회하므로, GitHub에 올리거나 브라우저에서 실행되는 코드에 포함하면 보안 위험이 발생합니다.
+</Callout>
+
+<DevTip title="API 키 사용 가이드">
+**anon public 키:**
+- 프론트엔드 코드에서 사용 (React, Vue, Next.js 등)
+- RLS 정책에 의해 보호됨
+- 공개 저장소에 올려도 상대적으로 안전 (단, 환경 변수 사용 권장)
+
+**service_role 키:**
+- 백엔드 코드에서만 사용 (API Routes, 서버리스 함수)
+- 모든 데이터에 접근 가능 (관리자 권한)
+- 반드시 환경 변수(.env.local)로 관리
+- 절대 Git에 커밋하지 말 것
+
+**환경 변수 예시:**
+```bash
+NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGc...
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGc... # 서버에서만 사용
+```
+</DevTip>
+
+<Checkpoint>
+- [ ] 대시보드 주요 메뉴 확인 완료
+- [ ] Project URL 확인 및 저장
+- [ ] anon public 키 확인 및 저장
+- [ ] service_role 키 확인 및 저장 (안전한 곳에 보관)
+</Checkpoint>
+
+</Step>
+
+## 다음 단계
+
+축하합니다! Supabase 계정과 프로젝트 설정을 완료했습니다. 이제 다음 가이드를 따라 Supabase의 주요 기능들을 활용해보세요.
+
+### 추천 가이드
+
+1. **[Supabase 데이터베이스 설정 가이드](../supabase-database-setup)**
+   - 테이블 생성 및 관리
+   - SQL 쿼리 실행
+   - Row Level Security 설정
+   - 예상 소요 시간: 20분
+
+2. **[Supabase 인증 설정 가이드](../supabase-auth-setup)**
+   - 이메일/비밀번호 인증
+   - OAuth (Google, GitHub) 연동
+   - Next.js 앱에 인증 구현
+   - 예상 소요 시간: 25분
+
+3. **[Supabase 스토리지 설정 가이드](../supabase-storage-setup)**
+   - 파일 저장소 생성
+   - 이미지 업로드 및 관리
+   - CDN URL 활용
+   - 예상 소요 시간: 15분
+
+## 문제 해결
+
+### 프로젝트 생성이 실패했어요
+
+**원인**: 일시적인 서버 문제 또는 네트워크 오류
+
+**해결 방법**:
+1. 페이지를 새로고침하고 다시 시도
+2. 브라우저 캐시를 삭제하고 재시도
+3. 다른 브라우저로 시도
+4. [Supabase Status](https://status.supabase.com/)에서 서비스 상태 확인
+
+### 데이터베이스 비밀번호를 잊어버렸어요
+
+**해결 방법**:
+1. Project Settings > Database로 이동
+2. **Reset database password** 버튼 클릭
+3. 새 비밀번호 생성 및 저장
+4. 기존에 연결된 애플리케이션의 비밀번호도 업데이트 필요
+
+### 프로젝트가 일시 중지되었어요
+
+**원인**: 1주일간 활동이 없을 때 무료 티어 프로젝트는 자동으로 일시 중지됩니다.
+
+**해결 방법**:
+1. 프로젝트 대시보드에서 **Restore** 버튼 클릭
+2. 몇 분 내에 프로젝트가 재개됩니다
+3. 데이터는 모두 보존됩니다
+
+<Callout type="tip">
+프로젝트가 일시 중지되지 않도록 하려면 주기적으로 대시보드에 접속하거나, API를 호출하는 간단한 헬스체크를 설정하세요.
+</Callout>
+
+### 무료 티어 제한에 도달했어요
+
+**제한 사항**:
+- 조직당 2개 프로젝트
+- 프로젝트당 500MB 데이터베이스
+- 1GB 파일 스토리지
+- 2GB 대역폭/월
+
+**해결 방법**:
+1. 사용하지 않는 프로젝트 삭제 (프로젝트 설정 > General > Danger Zone)
+2. Pro 플랜 업그레이드 고려 ($25/월, 프로젝트당)
+3. 여러 조직 생성 (다른 이메일 주소 필요)
+
+## 유용한 리소스
+
+- [Supabase 공식 문서](https://supabase.com/docs)
+- [Supabase 유튜브 채널](https://www.youtube.com/@Supabase)
+- [Supabase GitHub](https://github.com/supabase/supabase)
+- [Supabase 디스코드 커뮤니티](https://discord.supabase.com/)
+- [Supabase 예제 코드](https://github.com/supabase/supabase/tree/master/examples)

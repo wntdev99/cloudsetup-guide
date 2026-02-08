@@ -1,0 +1,759 @@
+---
+title: "Cloudflare Pages Deploy Guide - Free Git-Integrated Hosting"
+description: "Learn how to deploy static sites on Cloudflare Pages. GitHub/GitLab integration, automatic builds, custom domains included."
+---
+
+# Cloudflare Pages Deploy Guide
+
+Cloudflare Pages is a service for hosting static sites for free. It supports automatic builds and deployments through Git integration, providing unlimited requests and bandwidth. It supports all major frameworks like Next.js, React, Vue, Svelte, and you can add serverless backends through Cloudflare Functions.
+
+<FreeTierInfo
+  limit="Unlimited requests, 500 builds/month"
+  period="month"
+  status="available"
+/>
+
+## Before You Begin
+
+Make sure you have the following ready.
+
+- [Cloudflare Account Setup](../cloudflare-account-setup) completed
+- GitHub or GitLab account
+- Project to deploy (static site or framework project)
+- Basic understanding of Git
+
+<Callout type="info">
+Cloudflare Pages is similar to Vercel and Netlify, but leverages Cloudflare's global network for faster speeds and unlimited bandwidth. For SSR needs, you can integrate with Cloudflare Workers.
+</Callout>
+
+<Step number={1} title="Connect Git Repository">
+
+Connect your GitHub or GitLab repository to Cloudflare Pages.
+
+1. Click **Pages** in the Cloudflare dashboard
+2. Click the **Create a project** button
+3. In the **Connect to Git** section, select your Git provider:
+   - Choose **GitHub** or **GitLab**
+4. When the authorization screen appears, click **Authorize Cloudflare Pages**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/cloudflare-pages-deploy/step1-connect-git-en.png"
+  alt="Connect Git"
+  caption="Connect your GitHub or GitLab account to Cloudflare Pages"
+/>
+
+### Select Repository
+
+1. After connection, your repository list will be displayed
+2. Select the repository to deploy
+   - Use the search bar to quickly find repositories
+3. Click the **Begin setup** button
+
+<Callout type="warning">
+If you don't see your repository, click **Configure GitHub/GitLab permissions** to grant additional permissions. To deploy private repositories, you need access permissions for those repositories.
+</Callout>
+
+<DevTip title="Choosing Git Integration Method">
+**GitHub Integration:**
+- Pros: Most widely used, can run alongside GitHub Actions
+- Permissions: Choose per-repository or all repositories
+- Automatic Pull Request preview creation
+
+**GitLab Integration:**
+- Pros: Supports self-hosted GitLab too
+- Permissions: Per-project permission settings
+- Automatic Merge Request preview creation
+
+**Direct Upload (Wrangler CLI):**
+- Deploy directly from local without Git
+- Build your own CI/CD pipeline
+- Use `wrangler pages publish` command
+
+GitHub integration is recommended for most cases.
+</DevTip>
+
+<Checkpoint>
+- [ ] Accessed Cloudflare Pages
+- [ ] Connected Git provider (GitHub/GitLab)
+- [ ] Selected repository
+</Checkpoint>
+
+</Step>
+
+<Step number={2} title="Configure Build Settings">
+
+Set up your project's build command and output directory.
+
+### Enter Project Information
+
+1. **Project name**: Enter project name
+   - Example: `my-blog`, `company-website`
+   - URL will be `project-name.pages.dev`
+2. **Production branch**: Select default branch to deploy
+   - Example: `main`, `master`, `production`
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/cloudflare-pages-deploy/step2-build-settings-en.png"
+  alt="Build settings"
+  caption="Select framework and configure build commands"
+/>
+
+### Build Settings
+
+1. **Framework preset**: Select your framework
+   - Cloudflare auto-detects and recommends
+   - Manual selection available
+
+2. **Build command**: Enter build command
+3. **Build output directory**: Directory where build artifacts are generated
+
+### Settings by Major Framework
+
+**Next.js (Static Export):**
+```
+Framework preset: Next.js (Static HTML Export)
+Build command: npm run build
+Build output directory: out
+```
+
+**React (Create React App):**
+```
+Framework preset: Create React App
+Build command: npm run build
+Build output directory: build
+```
+
+**Vue.js:**
+```
+Framework preset: Vue
+Build command: npm run build
+Build output directory: dist
+```
+
+**Vite:**
+```
+Framework preset: Vite
+Build command: npm run build
+Build output directory: dist
+```
+
+**Svelte / SvelteKit (Adapter Static):**
+```
+Framework preset: SvelteKit
+Build command: npm run build
+Build output directory: build
+```
+
+**Gatsby:**
+```
+Framework preset: Gatsby
+Build command: npm run build
+Build output directory: public
+```
+
+**Hugo:**
+```
+Framework preset: Hugo
+Build command: hugo
+Build output directory: public
+```
+
+**Static HTML (no build):**
+```
+Framework preset: None
+Build command: (leave empty)
+Build output directory: / (or public)
+```
+
+<DevTip title="Build Configuration Tips">
+**Specify Node.js version:**
+You can specify Node.js version in environment variables:
+- Variable name: `NODE_VERSION`
+- Value: `18`, `20`, etc.
+
+**Package manager selection:**
+- Supports `npm`, `yarn`, `pnpm`
+- `package-lock.json` → npm
+- `yarn.lock` → yarn
+- `pnpm-lock.yaml` → pnpm
+- Auto-detected
+
+**Root directory setting:**
+For monorepos, specify Root directory:
+- Example: `apps/web`, `packages/landing`
+
+**Build caching:**
+- Cloudflare automatically caches `node_modules`
+- Improves build speed
+- Clear cache: Select "Clear build cache" in deployment settings
+</DevTip>
+
+<Checkpoint>
+- [ ] Entered project name
+- [ ] Selected Production branch
+- [ ] Selected framework
+- [ ] Configured build command and output directory
+</Checkpoint>
+
+</Step>
+
+<Step number={3} title="Set Environment Variables and Deploy">
+
+Add environment variables and start your first deployment.
+
+### Add Environment Variables (Optional)
+
+If you need environment variables during build, add them:
+
+1. In **Environment variables** section, click **Add variable**
+2. Enter variable name and value
+   - Example: `NEXT_PUBLIC_API_URL` = `https://api.example.com`
+   - Example: `VITE_APP_TITLE` = `My App`
+3. You can add multiple environment variables
+
+**Caution:** Be careful not to expose sensitive information (API keys, passwords) to the client.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/cloudflare-pages-deploy/step3-deploy-en.png"
+  alt="First deployment"
+  caption="Set environment variables and start first deployment"
+/>
+
+### Start First Deployment
+
+1. Verify all settings
+2. Click the **Save and Deploy** button
+3. Build process starts
+
+### Check Deployment Logs
+
+You can monitor build progress in real-time:
+
+1. **Initializing build environment**: Preparing build environment
+2. **Cloning repository**: Cloning Git repository
+3. **Installing dependencies**: Installing dependencies (`npm install`)
+4. **Building application**: Building application
+5. **Deploying to Cloudflare's network**: Deploying globally
+6. **Success**: Deployment complete!
+
+**Deployment time:** Usually takes 1-3 minutes (depends on project size)
+
+<Callout type="info">
+First deployment may take longer as there's no cache. Subsequent deployments are faster using cache.
+</Callout>
+
+<DevTip title="Environment Variable Management Tips">
+**Production vs Preview environments:**
+- Production: Used when deploying `main` branch
+- Preview: Used for Pull Requests and other branch deployments
+- Different environment variables can be set for each
+
+**Next.js environment variable rules:**
+- `NEXT_PUBLIC_*`: Exposed to client (accessible in browser)
+- Without `NEXT_PUBLIC_`: Server-side only (build-time only for Static Export)
+
+**Vite environment variable rules:**
+- `VITE_*`: Exposed to client
+- Others: Build scripts only
+
+**Environment variable encryption:**
+Cloudflare encrypts environment variables, but for sensitive info:
+- Use only in API Routes/Functions
+- Don't commit `.env.local` to Git
+- Consider using Cloudflare Workers Secrets
+</DevTip>
+
+<Checkpoint>
+- [ ] Added environment variables (if needed)
+- [ ] Started first deployment
+- [ ] Checked deployment logs
+- [ ] Verified deployment success
+</Checkpoint>
+
+</Step>
+
+<Step number={4} title="Connect Custom Domain">
+
+Let's connect your own domain to Cloudflare Pages.
+
+### Add Custom Domain
+
+1. After deployment completes, click the **Custom domains** tab
+2. Click the **Set up a custom domain** button
+3. Enter your domain
+   - Example: `www.example.com` or `example.com`
+4. Click **Continue**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/cloudflare-pages-deploy/step4-custom-domain-en.png"
+  alt="Custom domain"
+  caption="Connect your own domain to Cloudflare Pages project"
+/>
+
+### Add DNS Record
+
+Cloudflare automatically adds DNS records:
+
+**Case 1: Domain already on Cloudflare**
+1. DNS record is automatically added
+2. Activated immediately (takes a few minutes)
+
+**Case 2: Domain with different registrar**
+1. Must manually add CNAME record
+2. Copy the displayed CNAME value
+   - Example: `www` → `your-project.pages.dev`
+3. Add CNAME record in domain registrar's DNS settings
+4. Wait up to 24 hours for propagation
+
+### Connecting Root Domain (`example.com`)
+
+Root domain cannot use CNAME, so use one of these methods:
+
+**Method 1: Manage domain on Cloudflare (recommended)**
+1. Change domain nameservers to Cloudflare
+2. A record automatically added
+
+**Method 2: Registrar with CNAME Flattening support**
+- Cloudflare, Cloudflare Registrar, etc.
+- Can use CNAME on root domain
+
+**Method 3: Use A record**
+- Add A record with Cloudflare Pages IP address
+- Use IP shown in Cloudflare dashboard
+
+<DevTip title="Domain Configuration Best Practices">
+**Recommended domain structure:**
+1. `example.com` (root) → Cloudflare Pages
+2. `www.example.com` → Redirect to `example.com`
+3. Or reverse: Use `www` as main
+
+**Redirect setup (Bulk Redirects):**
+Set up redirects using Cloudflare Bulk Redirects:
+1. Cloudflare dashboard → Bulk Redirects
+2. `example.com` → `www.example.com` (or reverse)
+3. Status code: 301 (permanent redirect)
+
+**SSL/TLS configuration:**
+- Cloudflare Pages automatically issues SSL certificates
+- HTTPS activated within minutes after adding custom domain
+- SSL/TLS mode: Full (strict) recommended
+
+**Subdomain usage:**
+- `blog.example.com` → Cloudflare Pages (blog)
+- `app.example.com` → Cloudflare Pages (app)
+- `api.example.com` → Cloudflare Workers (API)
+
+You can connect separate Cloudflare Pages projects to each subdomain.
+</DevTip>
+
+<Checkpoint>
+- [ ] Added custom domain
+- [ ] Configured DNS records
+- [ ] Verified SSL certificate issuance
+- [ ] Tested access via domain
+</Checkpoint>
+
+</Step>
+
+<Step number={5} title="Preview Deployments and Auto-Deploy">
+
+Let's utilize automatic deployments per Git branch and Pull Request previews.
+
+### Automatic Deployment Flow
+
+Cloudflare Pages integrates perfectly with Git:
+
+**Production deployment:**
+1. Push code to `main` branch
+2. Cloudflare automatically starts build and deployment
+3. Upon success, Production URL is updated
+   - `https://your-project.pages.dev`
+   - Custom domain (if configured)
+
+**Preview deployment:**
+1. Create new branch and push code
+   - Example: `feature/new-landing-page`
+2. Create Pull Request
+3. Cloudflare automatically creates Preview deployment
+4. Unique preview URL is generated
+   - Example: `https://abc123.your-project.pages.dev`
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/cloudflare-pages-deploy/step5-preview-deploy-en.png"
+  alt="Preview deployment"
+  caption="Preview deployments are automatically created for each Pull Request"
+/>
+
+### Check Pull Request Comments
+
+Cloudflare Pages bot comments on GitHub/GitLab Pull Requests:
+
+```
+✅ Deploy Preview ready!
+
+🔨 Latest commit: a1b2c3d
+🔍 Preview URL: https://abc123.your-project.pages.dev
+📝 Build logs: https://dash.cloudflare.com/...
+```
+
+Team members can click this URL to preview changes.
+
+### Manage Preview Deployments
+
+You can see all deployment history in Cloudflare Pages dashboard:
+
+1. Click **View all deployments**
+2. Deployment list is displayed:
+   - **Production**: Production deployment (main branch)
+   - **Preview**: Preview deployments (other branches, PRs)
+3. Click each deployment to see details:
+   - Build logs
+   - Deployment URL
+   - Commit information
+   - Build time
+
+### Rollback (Restore Previous Version)
+
+If there's an issue with deployment, you can easily rollback to a previous version:
+
+1. In **Deployments** tab, find a previous successful deployment
+2. Click the **⋯** menu for that deployment
+3. Select **Rollback to this deployment**
+4. Immediately restored to previous version
+
+<DevTip title="CI/CD Workflow Optimization">
+**Branch strategy:**
+```
+main (production)      → Production deployment
+  ├── develop          → Preview deployment (dev environment)
+  ├── feature/xyz      → Preview deployment (feature dev)
+  └── hotfix/abc       → Preview deployment (hotfix)
+```
+
+**Environment-specific configuration:**
+- Production: Optimized build, use real APIs
+- Preview: Development mode, use staging APIs
+
+**Deployment notifications:**
+1. Cloudflare Pages → Settings → Notifications
+2. Can configure Email, Slack, Discord webhooks
+3. Get notified on deployment success/failure
+
+**Skip builds:**
+Include `[ci skip]` or `[skip ci]` in commit message:
+```bash
+git commit -m "docs: update README [ci skip]"
+```
+
+**Concurrent builds:**
+- Free plan: 1 concurrent build
+- Pro plan: 5 concurrent builds
+- Multiple PRs processed sequentially
+
+**Build Watch Paths (selective deployment):**
+Deploy only when specific files/folders change:
+- Settings → Builds & deployments → Build watch paths
+- Example: `apps/web/**`, `packages/ui/**`
+</DevTip>
+
+<Checkpoint>
+- [ ] Tested Production auto-deployment
+- [ ] Verified Preview deployment creation
+- [ ] Checked Preview URL in PR comment
+- [ ] Verified deployment history
+</Checkpoint>
+
+</Step>
+
+<Step number={6} title="Using Cloudflare Functions">
+
+Let's add serverless functions to Cloudflare Pages to implement dynamic features.
+
+### What are Cloudflare Functions?
+
+Cloudflare Functions are serverless functions based on Cloudflare Workers:
+
+- **Location**: Create `.js` or `.ts` files in `/functions` directory
+- **Execution**: Run on Cloudflare Edge (300 locations worldwide)
+- **Performance**: Instant execution with no cold starts
+- **Pricing**: 100,000 requests/day on free plan
+
+### Create Functions Files
+
+Create a `/functions` directory at project root and add functions:
+
+**Example 1: Simple API (GET request)**
+
+`/functions/api/hello.js`:
+<CopyBlock language="javascript">
+{`// GET /api/hello
+export async function onRequestGet(context) {
+  return new Response(
+    JSON.stringify({ message: 'Hello from Cloudflare Functions!' }),
+    {
+      headers: { 'Content-Type': 'application/json' }
+    }
+  )
+}`}
+</CopyBlock>
+
+**Example 2: Dynamic routes**
+
+`/functions/api/user/[id].js`:
+<CopyBlock language="javascript">
+{`// GET /api/user/:id
+export async function onRequestGet(context) {
+  const userId = context.params.id
+
+  return new Response(
+    JSON.stringify({ userId, name: \`User \${userId}\` }),
+    {
+      headers: { 'Content-Type': 'application/json' }
+    }
+  )
+}`}
+</CopyBlock>
+
+**Example 3: Handle POST requests**
+
+`/functions/api/contact.js`:
+<CopyBlock language="javascript">
+{`// POST /api/contact
+export async function onRequestPost(context) {
+  const formData = await context.request.json()
+
+  // Send email, save to database, etc.
+  console.log('Contact form:', formData)
+
+  return new Response(
+    JSON.stringify({ success: true, message: 'Thank you for contacting us!' }),
+    {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    }
+  )
+}`}
+</CopyBlock>
+
+### Call Functions from Frontend
+
+<CopyBlock language="javascript">
+{`// React example
+async function fetchHello() {
+  const response = await fetch('/api/hello')
+  const data = await response.json()
+  console.log(data.message)
+}
+
+// POST request
+async function submitContact(formData) {
+  const response = await fetch('/api/contact', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(formData)
+  })
+
+  const result = await response.json()
+  return result
+}`}
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/cloudflare-pages-deploy/step6-functions-en.png"
+  alt="Cloudflare Functions"
+  caption="Add serverless API with Cloudflare Functions"
+/>
+
+### Using Environment Variables (Functions)
+
+To use environment variables in Functions:
+
+<CopyBlock language="javascript">
+{`// /functions/api/data.js
+export async function onRequestGet(context) {
+  // Access environment variables from context.env
+  const apiKey = context.env.API_KEY
+  const apiUrl = context.env.API_URL
+
+  const response = await fetch(\`\${apiUrl}/data\`, {
+    headers: { 'Authorization': \`Bearer \${apiKey}\` }
+  })
+
+  const data = await response.json()
+  return Response.json(data)
+}`}
+</CopyBlock>
+
+Set environment variables in Cloudflare Pages dashboard:
+1. Settings → Environment variables
+2. Can configure separately for Production and Preview environments
+
+### Advanced Functions Features
+
+**Middleware (_middleware.js):**
+<CopyBlock language="javascript">
+{`// /functions/_middleware.js
+// Middleware that runs for all requests
+export async function onRequest(context) {
+  // Add CORS headers
+  const response = await context.next()
+
+  response.headers.set('Access-Control-Allow-Origin', '*')
+  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+
+  return response
+}`}
+</CopyBlock>
+
+**Database connection (Cloudflare D1):**
+<CopyBlock language="javascript">
+{`// Use D1 database
+export async function onRequestGet(context) {
+  const { results } = await context.env.DB.prepare(
+    'SELECT * FROM users LIMIT 10'
+  ).all()
+
+  return Response.json(results)
+}`}
+</CopyBlock>
+
+**Using KV Storage:**
+<CopyBlock language="javascript">
+{`// Read data from Cloudflare KV
+export async function onRequestGet(context) {
+  const value = await context.env.MY_KV.get('key')
+  return new Response(value)
+}`}
+</CopyBlock>
+
+<DevTip title="Cloudflare Functions Usage Tips">
+**Suitable use cases:**
+- ✅ Form submission handling
+- ✅ External API calls (hide API keys)
+- ✅ Authentication and authorization
+- ✅ Image resizing and optimization
+- ✅ A/B testing and personalization
+- ✅ Server-side analytics and logging
+
+**Limitations:**
+- CPU time: 50ms (free), 30s (Workers Paid)
+- Memory: 128MB
+- File size: 1MB (after bundling)
+- External modules: `import` statements limited (use Web APIs)
+
+**Performance optimization:**
+- Use caching: `cache.match()`, `cache.put()`
+- Use KV: Fast key-value storage
+- Durable Objects: State management and WebSockets
+
+**Alternatives:**
+- For SSR: Cloudflare Workers + Hono/itty-router
+- Complex backend: Cloudflare Workers + D1/R2/KV
+- Full-stack: SvelteKit, Remix (Cloudflare adapter)
+
+**Debugging:**
+- Test locally with `wrangler dev`
+- `console.log()` visible in Cloudflare dashboard Real-time Logs
+- Test with Preview deployment before Production
+</DevTip>
+
+<Checkpoint>
+- [ ] Created `/functions` directory
+- [ ] Added sample function
+- [ ] Tested function call from frontend
+- [ ] Verified Functions working after deployment
+</Checkpoint>
+
+</Step>
+
+## Next Steps
+
+You've completed Cloudflare Pages deployment! Now explore additional features.
+
+### Recommended Resources
+
+- **Cloudflare Workers**: More powerful serverless functions
+- **Cloudflare D1**: Serverless SQL database
+- **Cloudflare R2**: S3-compatible object storage
+- **Cloudflare Images**: Image optimization and CDN
+
+## Troubleshooting
+
+### Build fails
+
+**Check:**
+1. Verify build command is correct (`npm run build`)
+2. Check Node.js version compatibility
+3. Review error messages in build logs
+4. Verify environment variables are properly set
+
+**Solution:**
+<CopyBlock language="bash">
+{`# Test build locally
+npm install
+npm run build
+
+# If build succeeds, check output directory
+ls -la dist/  # or out/, build/, public/`}
+</CopyBlock>
+
+### 404 error after deployment
+
+**Cause:**
+- Build output directory incorrectly configured
+- SPA routing configuration missing
+
+**Solution:**
+1. Check and correct Build output directory
+2. For SPAs, add `_redirects` file:
+
+`/public/_redirects`:
+```
+/* /index.html 200
+```
+
+Or use Functions:
+`/functions/[[path]].js`:
+<CopyBlock language="javascript">
+{`export async function onRequest(context) {
+  const url = new URL(context.request.url)
+
+  // Return index.html if file not found (SPA)
+  return context.env.ASSETS.fetch(new Request(\`\${url.origin}/index.html\`, context.request))
+}`}
+</CopyBlock>
+
+### Functions not working
+
+**Check:**
+1. Verify `/functions` directory is at project root
+2. Check filename is correct (`api/hello.js` → `/api/hello` route)
+3. Use correct exports like `export async function onRequestGet`
+4. Check build logs for Functions detection
+
+**Solution:**
+Test locally with Wrangler:
+<CopyBlock language="bash">
+{`npm install -g wrangler
+wrangler pages dev ./dist --compatibility-date=2024-01-01`}
+</CopyBlock>
+
+### Custom domain SSL certificate error
+
+**Cause:**
+- DNS propagation incomplete
+- CAA record blocking
+
+**Solution:**
+1. Wait for DNS propagation (up to 24 hours)
+2. Check CAA records:
+   - Add CAA record allowing Cloudflare issuance
+   - Or delete CAA records
+
+## Useful Resources
+
+- [Cloudflare Pages Official Documentation](https://developers.cloudflare.com/pages)
+- [Cloudflare Functions Guide](https://developers.cloudflare.com/pages/functions)
+- [Cloudflare Workers Documentation](https://developers.cloudflare.com/workers)
+- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler) - Local development tool
+- [Cloudflare Developer Discord](https://discord.gg/cloudflaredev)

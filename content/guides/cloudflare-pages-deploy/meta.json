@@ -1,0 +1,66 @@
+{
+  "slug": "cloudflare-pages-deploy",
+  "platform": "cloudflare",
+  "service": "Cloudflare Pages",
+  "category": "cdn",
+  "difficulty": "beginner",
+  "estimatedMinutes": 15,
+  "totalSteps": 6,
+  "freeTier": {
+    "limit": "Unlimited requests, 500 builds/month",
+    "period": "month",
+    "amount": 0,
+    "status": "available",
+    "conditions": [
+      "Unlimited bandwidth",
+      "Unlimited static requests",
+      "500 builds per month",
+      "100 custom domains per project"
+    ]
+  },
+  "prerequisites": [
+    "cloudflare-account-setup"
+  ],
+  "nextGuides": [],
+  "tags": [
+    "cloudflare",
+    "pages",
+    "deploy",
+    "static-site",
+    "git",
+    "ci-cd",
+    "serverless"
+  ],
+  "seo": {
+    "ko": {
+      "title": "Cloudflare Pages 배포 가이드 - Git 연동 무료 호스팅",
+      "description": "Cloudflare Pages에 정적 사이트를 배포하는 방법을 배웁니다. GitHub/GitLab 연동, 자동 빌드, 커스텀 도메인, Preview 배포, Cloudflare Functions 활용 포함.",
+      "keywords": [
+        "Cloudflare Pages",
+        "정적 사이트 배포",
+        "Git 연동",
+        "무료 호스팅",
+        "CI/CD",
+        "자동 배포",
+        "Cloudflare Functions"
+      ]
+    },
+    "en": {
+      "title": "Cloudflare Pages Deploy Guide - Free Git-Integrated Hosting",
+      "description": "Learn how to deploy static sites on Cloudflare Pages. Includes GitHub/GitLab integration, automatic builds, custom domains, preview deployments, and Cloudflare Functions usage.",
+      "keywords": [
+        "Cloudflare Pages",
+        "static site deployment",
+        "Git integration",
+        "free hosting",
+        "CI/CD",
+        "automatic deployment",
+        "Cloudflare Functions"
+      ]
+    }
+  },
+  "published": true,
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z"
+}

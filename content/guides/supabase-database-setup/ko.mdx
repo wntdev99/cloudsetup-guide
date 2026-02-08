@@ -1,0 +1,809 @@
+---
+title: "Supabase 데이터베이스 설정 및 테이블 생성 가이드"
+description: "Supabase에서 PostgreSQL 데이터베이스 테이블을 만들고, SQL을 실행하며, Row Level Security를 설정하는 방법을 배웁니다."
+---
+
+# Supabase 데이터베이스 설정 및 테이블 생성 가이드
+
+Supabase는 PostgreSQL 데이터베이스를 기반으로 하며, GUI 테이블 에디터와 SQL 에디터를 모두 제공합니다. 이 가이드에서는 테이블을 생성하고, 데이터를 관리하며, Row Level Security(RLS)를 설정하여 안전하게 데이터베이스를 사용하는 방법을 알아봅니다.
+
+<FreeTierInfo
+  limit="500MB database, unlimited tables and rows"
+  period="month"
+  status="available"
+/>
+
+## 시작하기 전에
+
+다음 항목들이 준비되어 있는지 확인하세요.
+
+- [Supabase 계정 및 프로젝트 생성](../supabase-account-setup) 완료
+- 기본적인 데이터베이스 개념 이해 (테이블, 컬럼, 행)
+- SQL 기본 문법 이해 (선택사항, GUI로도 작업 가능)
+
+<Callout type="info">
+PostgreSQL의 모든 기능을 사용할 수 있으며, JSON, 배열, 전문 검색(Full-text search), PostGIS 등 고급 기능도 지원합니다.
+</Callout>
+
+<Step number={1} title="테이블 생성하기 (Table Editor)">
+
+GUI를 사용하여 첫 번째 테이블을 생성해봅시다. 예제로 블로그 포스트를 관리하는 `posts` 테이블을 만들겠습니다.
+
+1. Supabase 대시보드에서 **Table Editor**를 클릭합니다
+2. **New table** 버튼을 클릭합니다
+3. 테이블 정보를 입력합니다:
+
+   **Name**: `posts` (테이블 이름, 복수형 권장)
+
+   **Description**: "Blog posts table" (선택사항)
+
+   **Enable Row Level Security (RLS)**: 체크 (보안을 위해 항상 활성화 권장)
+
+4. 기본 컬럼이 자동으로 생성됩니다:
+   - `id`: bigint, Primary Key, auto-increment
+   - `created_at`: timestamptz, 기본값: now()
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/supabase-database-setup/step1-create-table-ko.png"
+  alt="Supabase 테이블 생성"
+  caption="Table Editor에서 새 테이블을 생성합니다"
+/>
+
+<DevTip title="테이블 이름 컨벤션">
+**권장 규칙:**
+- 소문자 사용 (users, posts)
+- 복수형 사용 (user 대신 users)
+- 언더스코어로 단어 구분 (blog_posts, user_profiles)
+- 예약어 피하기 (table, user, order 등)
+
+**이유:**
+- PostgreSQL은 대소문자를 구분하지 않음 (소문자로 변환)
+- 복수형은 여러 행을 담는 테이블의 의미를 명확히 함
+- 일관된 명명 규칙으로 코드 가독성 향상
+</DevTip>
+
+5. **Save** 버튼을 클릭하여 테이블을 생성합니다
+
+<Checkpoint>
+- [ ] Table Editor 메뉴 접근 완료
+- [ ] 테이블 이름 입력 완료 (posts)
+- [ ] RLS 활성화 완료
+- [ ] 테이블 생성 완료
+</Checkpoint>
+
+</Step>
+
+<Step number={2} title="컬럼 추가 및 제약조건 설정하기">
+
+이제 블로그 포스트에 필요한 컬럼들을 추가해봅시다.
+
+1. 생성된 `posts` 테이블을 클릭합니다
+2. **New Column** 버튼을 클릭합니다
+3. 다음 컬럼들을 하나씩 추가합니다:
+
+### title 컬럼 (제목)
+- **Name**: `title`
+- **Type**: `text`
+- **Default Value**: (비워둠)
+- **Is Nullable**: 체크 해제 (필수 필드)
+- **Is Unique**: 체크 해제
+- **Save** 클릭
+
+### content 컬럼 (본문)
+- **Name**: `content`
+- **Type**: `text`
+- **Default Value**: (비워둠)
+- **Is Nullable**: 체크 (선택 필드, 초안 저장 가능)
+- **Save** 클릭
+
+### author_id 컬럼 (작성자 ID)
+- **Name**: `author_id`
+- **Type**: `uuid`
+- **Default Value**: (비워둠)
+- **Is Nullable**: 체크 해제 (필수 필드)
+- **Save** 클릭
+
+### published 컬럼 (게시 여부)
+- **Name**: `published`
+- **Type**: `boolean`
+- **Default Value**: `false`
+- **Is Nullable**: 체크 해제
+- **Save** 클릭
+
+### published_at 컬럼 (게시 일시)
+- **Name**: `published_at`
+- **Type**: `timestamptz`
+- **Default Value**: (비워둠)
+- **Is Nullable**: 체크 (게시 전에는 null)
+- **Save** 클릭
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/supabase-database-setup/step2-add-columns-ko.png"
+  alt="테이블 컬럼 추가"
+  caption="posts 테이블에 필요한 컬럼들을 추가합니다"
+/>
+
+<DevTip title="PostgreSQL 데이터 타입 선택 가이드">
+**자주 사용하는 타입:**
+
+**텍스트:**
+- `text`: 길이 제한 없는 텍스트 (제목, 본문, 설명 등)
+- `varchar(n)`: 길이 제한 있는 텍스트 (이메일, 사용자명 등)
+- `char(n)`: 고정 길이 텍스트 (국가 코드, 우편번호 등)
+
+**숫자:**
+- `integer` / `int4`: 정수 (-2,147,483,648 ~ 2,147,483,647)
+- `bigint` / `int8`: 큰 정수 (ID, 카운터 등)
+- `numeric(p,s)`: 정확한 소수 (금액, 정밀 계산)
+- `real` / `float8`: 부동소수점 (과학 계산, 좌표)
+
+**날짜/시간:**
+- `timestamptz`: 타임존 포함 타임스탬프 (권장)
+- `timestamp`: 타임존 없는 타임스탬프
+- `date`: 날짜만
+- `time`: 시간만
+
+**기타:**
+- `boolean`: true/false
+- `uuid`: 고유 식별자 (사용자 ID, 세션 등)
+- `json` / `jsonb`: JSON 데이터 (jsonb 권장, 인덱싱 가능)
+- `array`: 배열 (태그, 카테고리 목록 등)
+</DevTip>
+
+<Checkpoint>
+- [ ] title 컬럼 추가 완료
+- [ ] content 컬럼 추가 완료
+- [ ] author_id 컬럼 추가 완료
+- [ ] published 컬럼 추가 완료
+- [ ] published_at 컬럼 추가 완료
+</Checkpoint>
+
+</Step>
+
+<Step number={3} title="데이터 삽입하기 (Insert Row)">
+
+테이블에 샘플 데이터를 추가해봅시다.
+
+1. `posts` 테이블 뷰에서 **Insert row** 버튼을 클릭합니다
+2. 첫 번째 포스트 데이터를 입력합니다:
+   - **title**: "Supabase 시작하기"
+   - **content**: "Supabase는 오픈소스 Firebase 대체제입니다..."
+   - **author_id**: `gen_random_uuid()` 함수 사용 (임시 UUID 생성)
+   - **published**: `true`
+   - **published_at**: `now()` 함수 사용 (현재 시간)
+3. **Save** 버튼을 클릭합니다
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/supabase-database-setup/step3-insert-data-ko.png"
+  alt="데이터 삽입"
+  caption="Table Editor에서 직접 데이터를 입력합니다"
+/>
+
+4. 같은 방식으로 2-3개의 추가 포스트를 더 입력합니다
+
+<DevTip title="기본값 함수 활용">
+**유용한 PostgreSQL 함수:**
+
+**UUID 생성:**
+```sql
+gen_random_uuid()  -- 랜덤 UUID 생성
+```
+
+**현재 시간:**
+```sql
+now()              -- 현재 시간 (타임존 포함)
+current_timestamp  -- 동일
+current_date       -- 현재 날짜만
+```
+
+**문자열 조작:**
+```sql
+lower('TEXT')      -- 소문자 변환
+upper('text')      -- 대문자 변환
+concat('a', 'b')   -- 문자열 연결
+```
+
+**JSON 생성:**
+```sql
+'{"key": "value"}'::jsonb  -- JSON 데이터 생성
+```
+
+이러한 함수들은 컬럼의 기본값(Default Value)으로도 설정할 수 있습니다.
+</DevTip>
+
+<Checkpoint>
+- [ ] Insert row 기능 사용 완료
+- [ ] 첫 번째 포스트 데이터 입력 완료
+- [ ] 추가 포스트 데이터 입력 완료 (2-3개)
+- [ ] 테이블 뷰에서 데이터 확인 완료
+</Checkpoint>
+
+</Step>
+
+<Step number={4} title="SQL 쿼리 실행하기 (SQL Editor)">
+
+SQL Editor를 사용하여 더 복잡한 작업을 수행할 수 있습니다.
+
+1. 좌측 메뉴에서 **SQL Editor**를 클릭합니다
+2. **New query** 버튼을 클릭합니다
+
+### 기본 SELECT 쿼리
+
+게시된 포스트만 조회하기:
+
+<CopyBlock language="sql">
+{`SELECT
+  id,
+  title,
+  published_at,
+  published
+FROM posts
+WHERE published = true
+ORDER BY published_at DESC;`}
+</CopyBlock>
+
+3. 쿼리를 입력하고 **Run** 버튼을 클릭합니다 (또는 Ctrl/Cmd + Enter)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/supabase-database-setup/step4-sql-editor-ko.png"
+  alt="SQL Editor 사용"
+  caption="SQL Editor에서 쿼리를 작성하고 실행합니다"
+/>
+
+### 데이터 업데이트 쿼리
+
+특정 포스트를 게시하기:
+
+<CopyBlock language="sql">
+{`UPDATE posts
+SET
+  published = true,
+  published_at = now()
+WHERE id = 1;`}
+</CopyBlock>
+
+### 집계(Aggregation) 쿼리
+
+포스트 통계 조회:
+
+<CopyBlock language="sql">
+{`SELECT
+  COUNT(*) as total_posts,
+  COUNT(*) FILTER (WHERE published = true) as published_posts,
+  COUNT(*) FILTER (WHERE published = false) as draft_posts
+FROM posts;`}
+</CopyBlock>
+
+### JOIN 쿼리 (users 테이블이 있을 때)
+
+작성자 정보와 함께 포스트 조회:
+
+<CopyBlock language="sql">
+{`SELECT
+  posts.id,
+  posts.title,
+  posts.published_at,
+  users.email as author_email,
+  users.name as author_name
+FROM posts
+INNER JOIN users ON posts.author_id = users.id
+WHERE posts.published = true
+ORDER BY posts.published_at DESC;`}
+</CopyBlock>
+
+<DevTip title="SQL 쿼리 저장 및 재사용">
+**쿼리 저장하기:**
+1. SQL Editor에서 쿼리 작성
+2. 상단의 **Save** 버튼 클릭
+3. 쿼리 이름 입력 (예: "Get published posts")
+4. **Snippets** 탭에서 저장된 쿼리 접근 가능
+
+**쿼리 즐겨찾기:**
+- 자주 사용하는 쿼리는 즐겨찾기로 등록
+- 팀원과 쿼리 공유 가능
+- 버전 관리 가능
+
+**유용한 단축키:**
+- `Ctrl/Cmd + Enter`: 쿼리 실행
+- `Ctrl/Cmd + /`: 주석 토글
+- `Ctrl/Cmd + S`: 쿼리 저장
+</DevTip>
+
+<Checkpoint>
+- [ ] SQL Editor 메뉴 접근 완료
+- [ ] SELECT 쿼리 실행 완료
+- [ ] UPDATE 쿼리 실행 완료
+- [ ] 집계 쿼리 실행 완료
+- [ ] 쿼리 결과 확인 완료
+</Checkpoint>
+
+</Step>
+
+<Step number={5} title="Row Level Security (RLS) 설정하기">
+
+RLS는 데이터베이스 레벨에서 데이터 접근을 제어하는 PostgreSQL의 강력한 보안 기능입니다.
+
+### RLS가 필요한 이유
+
+<Callout type="warning">
+RLS 없이는 클라이언트에서 모든 데이터에 접근할 수 있습니다! anon 키를 사용하더라도 누구나 테이블의 모든 데이터를 읽거나 수정할 수 있습니다.
+</Callout>
+
+### RLS 정책 생성하기
+
+1. **Table Editor**에서 `posts` 테이블을 선택합니다
+2. 우측 상단의 **RLS** 토글이 활성화되어 있는지 확인합니다
+3. **Add RLS policy** 버튼을 클릭합니다
+
+#### 정책 1: 모든 사용자가 게시된 포스트 읽기 가능
+
+1. **Policy name**: "Public posts are viewable by everyone"
+2. **Allowed operation**: `SELECT`
+3. **Policy definition**: `Custom`
+4. **USING expression**에 다음 입력:
+
+<CopyBlock language="sql">
+{`published = true`}
+</CopyBlock>
+
+5. **Save policy** 클릭
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/supabase-database-setup/step5-rls-policy-ko.png"
+  alt="RLS 정책 생성"
+  caption="게시된 포스트만 조회할 수 있는 정책을 생성합니다"
+/>
+
+#### 정책 2: 작성자만 자신의 포스트 수정 가능
+
+1. **Add RLS policy** 다시 클릭
+2. **Policy name**: "Users can update their own posts"
+3. **Allowed operation**: `UPDATE`
+4. **Policy definition**: `Custom`
+5. **USING expression**:
+
+<CopyBlock language="sql">
+{`auth.uid() = author_id`}
+</CopyBlock>
+
+6. **WITH CHECK expression**: (동일하게 입력)
+
+<CopyBlock language="sql">
+{`auth.uid() = author_id`}
+</CopyBlock>
+
+7. **Save policy** 클릭
+
+#### 정책 3: 인증된 사용자만 포스트 생성 가능
+
+1. **Add RLS policy** 클릭
+2. **Policy name**: "Authenticated users can insert posts"
+3. **Allowed operation**: `INSERT`
+4. **Policy definition**: `Custom`
+5. **WITH CHECK expression**:
+
+<CopyBlock language="sql">
+{`auth.uid() = author_id`}
+</CopyBlock>
+
+6. **Save policy** 클릭
+
+<DevTip title="RLS 정책 이해하기">
+**USING vs WITH CHECK:**
+- **USING**: 기존 행에 대한 조건 (SELECT, UPDATE, DELETE)
+- **WITH CHECK**: 새로 생성/수정되는 행에 대한 조건 (INSERT, UPDATE)
+
+**auth.uid() 함수:**
+- 현재 로그인한 사용자의 UUID 반환
+- 비로그인 사용자는 `NULL` 반환
+- Supabase Auth와 자동 연동
+
+**일반적인 RLS 패턴:**
+
+**1. 공개 읽기, 인증 쓰기:**
+```sql
+-- SELECT: 제한 없음
+true
+
+-- INSERT: 인증된 사용자만
+auth.uid() IS NOT NULL
+```
+
+**2. 소유자만 접근:**
+```sql
+-- 모든 작업
+auth.uid() = user_id
+```
+
+**3. 역할 기반 접근:**
+```sql
+-- 관리자만 접근
+auth.jwt() ->> 'role' = 'admin'
+```
+
+**4. 조직/팀 기반 접근:**
+```sql
+-- 같은 팀 멤버만 접근
+EXISTS (
+  SELECT 1 FROM team_members
+  WHERE team_members.team_id = posts.team_id
+  AND team_members.user_id = auth.uid()
+)
+```
+</DevTip>
+
+### RLS 정책 테스트하기
+
+SQL Editor에서 정책을 테스트할 수 있습니다:
+
+<CopyBlock language="sql">
+{`-- 게시된 포스트만 조회되는지 확인
+SELECT * FROM posts;
+
+-- 특정 사용자로 인증된 것처럼 테스트
+SET request.jwt.claim.sub = 'user-uuid-here';
+SELECT * FROM posts WHERE author_id = 'user-uuid-here';`}
+</CopyBlock>
+
+<Checkpoint>
+- [ ] RLS 활성화 확인 완료
+- [ ] 읽기 정책 생성 완료
+- [ ] 수정 정책 생성 완료
+- [ ] 삽입 정책 생성 완료
+- [ ] 정책 테스트 완료
+</Checkpoint>
+
+</Step>
+
+<Step number={6} title="JavaScript 클라이언트로 API 접근하기">
+
+이제 프론트엔드 애플리케이션에서 Supabase 데이터베이스에 접근하는 방법을 알아봅시다.
+
+### Supabase JavaScript 클라이언트 설치
+
+<CopyBlock language="bash">
+{`npm install @supabase/supabase-js`}
+</CopyBlock>
+
+### 클라이언트 초기화
+
+<CopyBlock language="javascript">
+{`import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey)`}
+</CopyBlock>
+
+### 데이터 조회하기 (SELECT)
+
+게시된 포스트 전체 조회:
+
+<CopyBlock language="javascript">
+{`const { data, error } = await supabase
+  .from('posts')
+  .select('*')
+  .eq('published', true)
+  .order('published_at', { ascending: false })
+
+if (error) {
+  console.error('Error fetching posts:', error)
+} else {
+  console.log('Posts:', data)
+}`}
+</CopyBlock>
+
+특정 컬럼만 선택:
+
+<CopyBlock language="javascript">
+{`const { data, error } = await supabase
+  .from('posts')
+  .select('id, title, published_at')
+  .eq('published', true)`}
+</CopyBlock>
+
+조건부 조회:
+
+<CopyBlock language="javascript">
+{`// 제목에 "Supabase"가 포함된 포스트
+const { data, error } = await supabase
+  .from('posts')
+  .select('*')
+  .ilike('title', '%Supabase%')
+
+// 최근 7일 내 게시된 포스트
+const { data, error } = await supabase
+  .from('posts')
+  .select('*')
+  .gte('published_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
+
+// 페이지네이션 (10개씩)
+const { data, error } = await supabase
+  .from('posts')
+  .select('*')
+  .range(0, 9)  // 0-9번째 (첫 페이지)
+  .order('published_at', { ascending: false })`}
+</CopyBlock>
+
+### 데이터 삽입하기 (INSERT)
+
+<CopyBlock language="javascript">
+{`const { data, error } = await supabase
+  .from('posts')
+  .insert({
+    title: '새로운 포스트',
+    content: '포스트 내용입니다...',
+    author_id: user.id,  // 로그인한 사용자 ID
+    published: false
+  })
+  .select()  // 삽입된 데이터 반환
+
+if (error) {
+  console.error('Error inserting post:', error)
+} else {
+  console.log('Inserted post:', data)
+}`}
+</CopyBlock>
+
+여러 행 삽입:
+
+<CopyBlock language="javascript">
+{`const { data, error } = await supabase
+  .from('posts')
+  .insert([
+    { title: '포스트 1', content: '내용 1', author_id: user.id },
+    { title: '포스트 2', content: '내용 2', author_id: user.id },
+    { title: '포스트 3', content: '내용 3', author_id: user.id }
+  ])
+  .select()`}
+</CopyBlock>
+
+### 데이터 수정하기 (UPDATE)
+
+<CopyBlock language="javascript">
+{`const { data, error } = await supabase
+  .from('posts')
+  .update({
+    published: true,
+    published_at: new Date().toISOString()
+  })
+  .eq('id', postId)
+  .select()
+
+if (error) {
+  console.error('Error updating post:', error)
+} else {
+  console.log('Updated post:', data)
+}`}
+</CopyBlock>
+
+### 데이터 삭제하기 (DELETE)
+
+<CopyBlock language="javascript">
+{`const { error } = await supabase
+  .from('posts')
+  .delete()
+  .eq('id', postId)
+
+if (error) {
+  console.error('Error deleting post:', error)
+} else {
+  console.log('Post deleted successfully')
+}`}
+</CopyBlock>
+
+### React 컴포넌트 예시
+
+<CopyBlock language="jsx">
+{`'use client'
+
+import { useState, useEffect } from 'react'
+import { supabase } from '@/lib/supabase'
+
+export default function PostsList() {
+  const [posts, setPosts] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchPosts()
+  }, [])
+
+  async function fetchPosts() {
+    try {
+      const { data, error } = await supabase
+        .from('posts')
+        .select('*')
+        .eq('published', true)
+        .order('published_at', { ascending: false })
+
+      if (error) throw error
+      setPosts(data)
+    } catch (error) {
+      console.error('Error fetching posts:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (loading) return <div>로딩 중...</div>
+
+  return (
+    <div>
+      <h1>블로그 포스트</h1>
+      {posts.map(post => (
+        <article key={post.id}>
+          <h2>{post.title}</h2>
+          <p>{post.content}</p>
+          <time>{new Date(post.published_at).toLocaleDateString()}</time>
+        </article>
+      ))}
+    </div>
+  )
+}`}
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1234567890/guides/supabase-database-setup/step6-javascript-client-ko.png"
+  alt="JavaScript 클라이언트 사용"
+  caption="Supabase JavaScript 클라이언트로 데이터를 조회하는 React 컴포넌트"
+/>
+
+<DevTip title="Supabase 쿼리 빌더 팁">
+**체이닝 메서드:**
+- `.select()`: 조회할 컬럼 선택
+- `.eq()`: 같음 (equals)
+- `.neq()`: 같지 않음 (not equals)
+- `.gt()`, `.gte()`: 크다, 크거나 같다
+- `.lt()`, `.lte()`: 작다, 작거나 같다
+- `.like()`, `.ilike()`: 패턴 매칭 (ilike는 대소문자 무시)
+- `.in()`: 배열에 포함
+- `.is()`: NULL 체크
+- `.order()`: 정렬
+- `.limit()`: 개수 제한
+- `.range()`: 범위 지정 (페이지네이션)
+
+**TypeScript 타입 지원:**
+```typescript
+type Post = {
+  id: number
+  title: string
+  content: string | null
+  author_id: string
+  published: boolean
+  published_at: string | null
+  created_at: string
+}
+
+const { data, error } = await supabase
+  .from('posts')
+  .select('*')
+  .returns<Post[]>()
+```
+
+**자동 타입 생성:**
+```bash
+npx supabase gen types typescript --project-id your-project-id > types/supabase.ts
+```
+</DevTip>
+
+<Checkpoint>
+- [ ] Supabase 클라이언트 설치 완료
+- [ ] SELECT 쿼리 실행 완료
+- [ ] INSERT 쿼리 실행 완료
+- [ ] UPDATE 쿼리 실행 완료
+- [ ] React 컴포넌트에서 데이터 조회 성공
+</Checkpoint>
+
+</Step>
+
+## 다음 단계
+
+데이터베이스 설정을 완료했습니다! 이제 다음 기능들을 추가해보세요.
+
+### 추천 가이드
+
+1. **[Supabase 인증 설정 가이드](../supabase-auth-setup)**
+   - 이메일/비밀번호 인증
+   - OAuth (Google, GitHub)
+   - RLS와 인증 연동
+   - 예상 소요 시간: 25분
+
+2. **[Supabase 스토리지 설정 가이드](../supabase-storage-setup)**
+   - 이미지 업로드
+   - 파일 관리
+   - CDN 활용
+   - 예상 소요 시간: 15분
+
+## 문제 해결
+
+### RLS 정책 때문에 데이터를 조회할 수 없어요
+
+**원인**: RLS가 활성화되어 있지만 정책이 없거나 조건에 맞지 않음
+
+**해결 방법**:
+1. Table Editor에서 RLS 정책 확인
+2. 개발 중에는 임시로 "모든 작업 허용" 정책 추가:
+   ```sql
+   -- 임시 정책 (프로덕션에서는 사용 금지!)
+   CREATE POLICY "Allow all during development"
+   ON posts FOR ALL
+   USING (true)
+   WITH CHECK (true);
+   ```
+3. 완성 후 적절한 RLS 정책으로 교체
+
+### 외래 키(Foreign Key) 제약조건을 추가하고 싶어요
+
+**방법**:
+SQL Editor에서 다음 쿼리 실행:
+
+<CopyBlock language="sql">
+{`ALTER TABLE posts
+ADD CONSTRAINT posts_author_id_fkey
+FOREIGN KEY (author_id)
+REFERENCES auth.users(id)
+ON DELETE CASCADE;`}
+</CopyBlock>
+
+### JSON 컬럼을 추가하고 싶어요
+
+**방법**:
+1. Table Editor에서 New Column 클릭
+2. Type을 `jsonb` 선택 (json보다 성능이 좋음)
+3. 기본값 예시: `'{}'` 또는 `'[]'`
+
+**사용 예시**:
+<CopyBlock language="javascript">
+{`// JSON 데이터 삽입
+const { data, error } = await supabase
+  .from('posts')
+  .insert({
+    title: '포스트',
+    metadata: {
+      tags: ['tech', 'tutorial'],
+      views: 0,
+      featured: true
+    }
+  })
+
+// JSON 필드 쿼리
+const { data } = await supabase
+  .from('posts')
+  .select('*')
+  .contains('metadata', { featured: true })`}
+</CopyBlock>
+
+### 전문 검색(Full-text Search)을 구현하고 싶어요
+
+**방법**:
+SQL Editor에서 전문 검색 컬럼 추가:
+
+<CopyBlock language="sql">
+{`-- tsvector 컬럼 추가
+ALTER TABLE posts
+ADD COLUMN fts tsvector
+GENERATED ALWAYS AS (
+  to_tsvector('english', coalesce(title, '') || ' ' || coalesce(content, ''))
+) STORED;
+
+-- 인덱스 생성
+CREATE INDEX posts_fts_idx ON posts USING GIN(fts);`}
+</CopyBlock>
+
+JavaScript에서 검색:
+
+<CopyBlock language="javascript">
+{`const { data } = await supabase
+  .from('posts')
+  .select('*')
+  .textSearch('fts', 'supabase & postgresql')`}
+</CopyBlock>
+
+## 유용한 리소스
+
+- [Supabase Database 공식 문서](https://supabase.com/docs/guides/database)
+- [PostgreSQL 공식 문서](https://www.postgresql.org/docs/)
+- [Row Level Security 가이드](https://supabase.com/docs/guides/auth/row-level-security)
+- [Supabase JavaScript 클라이언트 문서](https://supabase.com/docs/reference/javascript/introduction)
+- [SQL 쿼리 학습 리소스](https://www.postgresql.org/docs/current/tutorial.html)
