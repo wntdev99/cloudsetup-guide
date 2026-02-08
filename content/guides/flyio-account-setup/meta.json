@@ -1,0 +1,57 @@
+{
+  "slug": "flyio-account-setup",
+  "platform": "flyio",
+  "service": "Fly.io Platform",
+  "category": "deployment",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 20,
+  "totalSteps": 4,
+  "freeTier": {
+    "service": "Fly.io",
+    "limit": "3개 공유 CPU VM, 월 3GB 저장소",
+    "period": "forever",
+    "amount": "무료",
+    "status": "generous",
+    "conditions": [
+      "3개 공유 CPU-1x 256MB VM 무료",
+      "월 3GB 저장소 포함",
+      "전역 배포 (Edge 포함)",
+      "자동 SSL",
+      "프로덕션 사용 가능"
+    ]
+  },
+  "prerequisites": [],
+  "nextGuides": [
+    "flyio-app-deployment"
+  ],
+  "tags": ["flyio", "deployment", "docker", "cli", "serverless"],
+  "seo": {
+    "ko": {
+      "title": "Fly.io 계정 만들기 및 CLI 설치 가이드 | CloudSetup.guide",
+      "description": "Fly.io 무료 계정을 만들고 flyctl CLI를 설치하는 방법을 배우세요. 클라우드 애플리케이션 배포 준비를 15분 안에 완료합니다.",
+      "keywords": [
+        "Fly.io 계정",
+        "flyctl 설치",
+        "Docker 배포",
+        "클라우드 배포",
+        "Fly.io CLI",
+        "애플리케이션 배포",
+        "서버리스"
+      ]
+    },
+    "en": {
+      "title": "Create Fly.io Account and Install CLI - Setup Guide | CloudSetup.guide",
+      "description": "Learn how to create a free Fly.io account and install the flyctl CLI. Complete cloud application deployment setup in 15 minutes.",
+      "keywords": [
+        "Fly.io account",
+        "flyctl installation",
+        "Docker deployment",
+        "cloud deployment",
+        "Fly.io CLI",
+        "app deployment",
+        "serverless"
+      ]
+    }
+  },
+  "lastVerified": "2025-02-08"
+}

@@ -1,0 +1,411 @@
+# SendGrid Email Integration - Send Emails from Your Application
+
+Now that your SendGrid account is ready, it's time to **actually send emails from your application**. You can implement email verification, password resets, newsletters, and more using Node.js, Python, or SMTP. Complete the integration in just 30 minutes.
+
+<FreeTierInfo
+  service="SendGrid Email API"
+  limit="100 emails per month free"
+  period="forever"
+  status="generous"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "SendGrid account and API key", required: true },
+  { text: "Sender email verified", required: true },
+  { text: "Node.js, Python, or SMTP client", required: true }
+]} />
+
+<Callout type="info">
+🚀 **Goal of this guide**: Learn how to send emails from your application using SendGrid API. We provide examples in multiple languages and frameworks.
+</Callout>
+
+---
+
+<Step number={1} title="Set Up SendGrid in Node.js">
+
+**Install NPM Package:**
+
+First, install the SendGrid Node.js library:
+
+<CopyBlock
+  code="npm install @sendgrid/mail"
+  language="bash"
+/>
+
+**Create .env File:**
+
+<CopyBlock
+  code="SENDGRID_API_KEY=SG.YOUR_API_KEY_HERE
+SENDGRID_FROM_EMAIL=noreply@example.com"
+  language="bash"
+/>
+
+**Send Basic Email:**
+
+<CopyBlock
+  code="const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+const msg = {
+  to: 'recipient@example.com',
+  from: process.env.SENDGRID_FROM_EMAIL,
+  subject: 'Hello!',
+  text: 'This is a SendGrid test email.',
+  html: 'This is a SendGrid test email.'
+};
+
+sgMail
+  .send(msg)
+  .then(() => console.log('Email sent!'))
+  .catch(error => console.error(error));"
+  language="javascript"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/sendgrid/step1-nodejs-setup-en.png"
+  alt="Node.js SendGrid Setup"
+  caption="Basic SendGrid setup in Node.js"
+  priority={true}
+/>
+
+<Callout type="tip">
+💡 **Tip**: Test and check for errors using console.log.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Set Up SendGrid in Python">
+
+**Install pip Package:**
+
+<CopyBlock
+  code="pip install sendgrid"
+  language="bash"
+/>
+
+**Create .env File:**
+
+<CopyBlock
+  code="SENDGRID_API_KEY=SG.YOUR_API_KEY_HERE
+SENDGRID_FROM_EMAIL=noreply@example.com"
+  language="bash"
+/>
+
+**Send Basic Email:**
+
+<CopyBlock
+  code="import os
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
+
+message = Mail(
+    from_email=os.getenv('SENDGRID_FROM_EMAIL'),
+    to_emails='recipient@example.com',
+    subject='Hello!',
+    plain_text_content='This is a SendGrid test email.',
+    html_content='This is a SendGrid test email.'
+)
+
+try:
+    sg = SendGridAPIClient(os.getenv('SENDGRID_API_KEY'))
+    response = sg.send(message)
+    print('Email sent!')
+except Exception as e:
+    print(f'Error: {e}')"
+  language="python"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/sendgrid/step2-python-setup-en.png"
+  alt="Python SendGrid Setup"
+  caption="Basic SendGrid setup in Python"
+/>
+
+<Callout type="tip">
+💡 **Tip**: When using in Flask or Django, handle errors with try-except.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="Send Emails Using SMTP">
+
+SMTP allows you to use SendGrid with any email client.
+
+**SMTP Configuration:**
+
+- **Host**: smtp.sendgrid.net
+- **Port**: 587 (TLS) or 465 (SSL)
+- **Username**: apikey
+- **Password**: YOUR_API_KEY
+
+**Node.js Nodemailer Example:**
+
+First, install:
+
+<CopyBlock
+  code="npm install nodemailer"
+  language="bash"
+/>
+
+Code:
+
+<CopyBlock
+  code="const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport({
+  host: 'smtp.sendgrid.net',
+  port: 587,
+  auth: {
+    user: 'apikey',
+    pass: process.env.SENDGRID_API_KEY
+  }
+});
+
+const mailOptions = {
+  from: process.env.SENDGRID_FROM_EMAIL,
+  to: 'recipient@example.com',
+  subject: 'Hello!',
+  html: 'This is a test email.'
+};
+
+transporter.sendMail(mailOptions, (error, info) => {
+  if (error) console.error(error);
+  else console.log('Email sent:', info.response);
+});"
+  language="javascript"
+/>
+
+**Python Example:**
+
+<CopyBlock
+  code="import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import os
+
+sender = os.getenv('SENDGRID_FROM_EMAIL')
+recipient = 'recipient@example.com'
+subject = 'Hello!'
+
+message = MIMEMultipart('alternative')
+message['Subject'] = subject
+message['From'] = sender
+message['To'] = recipient
+
+text = 'This is a test email.'
+html = 'This is a test email.'
+
+part1 = MIMEText(text, 'plain')
+part2 = MIMEText(html, 'html')
+message.attach(part1)
+message.attach(part2)
+
+try:
+    server = smtplib.SMTP('smtp.sendgrid.net', 587)
+    server.starttls()
+    server.login('apikey', os.getenv('SENDGRID_API_KEY'))
+    server.sendmail(sender, recipient, message.as_string())
+    server.quit()
+    print('Email sent!')
+except Exception as e:
+    print(f'Error: {e}')"
+  language="python"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/sendgrid/step3-smtp-setup-en.png"
+  alt="Send Email Using SMTP"
+  caption="SendGrid email sending via SMTP configuration"
+/>
+
+</Step>
+
+---
+
+<Step number={4} title="Real-World Example: Email Verification">
+
+Example of sending a verification email after user signup.
+
+**Node.js Express Example:**
+
+<CopyBlock
+  code="const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+app.post('/signup', async (req, res) => {
+  const { email, name } = req.body;
+
+  const confirmationUrl = 'https://yoursite.com/confirm?token=abc123';
+
+  const msg = {
+    to: email,
+    from: process.env.SENDGRID_FROM_EMAIL,
+    subject: 'Verify Your Email - YourApp',
+    html: 'Click here to verify: ' + confirmationUrl
+  };
+
+  try {
+    await sgMail.send(msg);
+    res.json({ success: true, message: 'Verification email sent!' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});"
+  language="javascript"
+/>
+
+**HTML Email Template:**
+
+<CopyBlock
+  code="const htmlTemplate = 'html: `Dear ' + name + ',\\n\\nPlease verify your email by clicking the link below:\\n\\nhttps://yoursite.com/confirm?token=abc123\\n\\nBest regards,\\nYourApp Team`;"
+  language="javascript"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/sendgrid/step4-verification-email-en.png"
+  alt="User Verification Email"
+  caption="Send verification email after user signup"
+/>
+
+<Callout type="info">
+ℹ️ **Tip**: Include tokens in verification links and store them in your database. Set an expiration time.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={5} title="Email Tracking and Monitoring">
+
+Monitor your email sending from the SendGrid dashboard.
+
+**Check Dashboard:**
+
+1. Log in to your SendGrid dashboard.
+2. Go to **Mail Send** menu.
+3. Click **Activity** tab.
+4. View your sent emails:
+   - Status (Delivered, Bounced, Opened, Clicked, etc.)
+   - Recipients
+   - Time
+
+**Set Up WebHook (Optional):**
+
+To receive real-time email events (delivery, opens, clicks):
+
+1. Go to **Settings** menu.
+2. Click **Event Webhook**.
+3. Enter your **HTTP POST URL** (e.g., https://yoursite.com/webhook).
+4. Enable **Select Events**:
+   - Delivered
+   - Opened
+   - Clicked
+
+5. Click **Save**.
+
+<Checkpoint
+  title="Verify Your Setup"
+  items={[
+    "Is your API key saved in environment variables?",
+    "Did you successfully send an email?",
+    "Can you see send history in the dashboard?",
+    "Did you use HTML templates?",
+    "Did you integrate into your real application?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **Complete!** Your SendGrid email integration is ready. You can now reliably send emails from your application.
+</Callout>
+
+</Step>
+
+---
+
+## Next Steps
+
+After completing your SendGrid email integration:
+
+1. **[Create Dynamic Templates](https://docs.sendgrid.com/ui/sending-email/how-to-send-an-email-with-dynamic-templates)** - More complex email templates
+2. **[Send Bulk Emails](https://docs.sendgrid.com/ui/sending-email/index-table-of-contents)** - Bulk sending features
+3. **[Track Email Events](https://docs.sendgrid.com/for-developers/tracking/getting-started-event-webhook)** - Email tracking and analytics
+
+---
+
+## Developer Tips
+
+<DevTip>
+**Email Sending Limits:**
+
+SendGrid free accounts are limited to 100 emails per month. To save costs:
+
+1. Send only necessary emails
+2. Process in batches
+3. Manage unsubscribes
+
+Check SendGrid's paid plans for higher limits.
+</DevTip>
+
+---
+
+## Frequently Asked Questions
+
+<Callout type="info">
+**Q. Emails aren't being sent**
+
+A. Check the following:
+- Is your API key correct?
+- Is your sender email verified?
+- Is the recipient email address valid?
+- Have you exceeded 100 emails per month?
+</Callout>
+
+<Callout type="info">
+**Q. Can I send HTML emails?**
+
+A. Yes! Include HTML content in the 'html' field. SendGrid will format it automatically.
+</Callout>
+
+<Callout type="info">
+**Q. Can I send attachments?**
+
+A. Yes! Use SendGrid's attachments option to include files. Check the documentation.
+</Callout>
+
+<Callout type="info">
+**Q. What's the best way to send bulk emails?**
+
+A. Use SendGrid's dynamic templates and personalizations feature. This lets you send customized emails to each recipient.
+</Callout>
+
+---
+
+## Troubleshooting
+
+### "Invalid email from address" error
+
+- Verify your sender email is authenticated
+- Check the sender list in SendGrid dashboard
+- Try authenticating again
+
+### Emails marked as spam
+
+- Check SPF, DKIM, and DMARC records
+- Complete domain authentication
+- Remove spam trigger words
+
+### API key errors
+
+- Verify your environment variables
+- Create a new API key
+- Check permissions
+
+---
+
+**Congratulations!** You can now reliably send emails from your application. Use SendGrid's powerful features to enhance user experience! 🚀

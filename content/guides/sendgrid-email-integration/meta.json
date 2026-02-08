@@ -1,0 +1,57 @@
+{
+  "slug": "sendgrid-email-integration",
+  "platform": "sendgrid",
+  "service": "SendGrid Email Integration",
+  "category": "communication",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 30,
+  "totalSteps": 5,
+  "freeTier": {
+    "service": "SendGrid API",
+    "limit": "월 100 이메일 무료",
+    "period": "forever",
+    "amount": "무료",
+    "status": "generous",
+    "conditions": [
+      "월 100개 이메일 무료",
+      "모든 기능 포함",
+      "개발 및 프로덕션 사용 가능",
+      "API, SMTP 모두 지원",
+      "템플릿 및 추적 가능"
+    ]
+  },
+  "prerequisites": [
+    "sendgrid-account-setup"
+  ],
+  "nextGuides": [],
+  "tags": ["sendgrid", "email", "api", "integration", "nodejs", "python", "smtp"],
+  "seo": {
+    "ko": {
+      "title": "SendGrid 이메일 통합 - 애플리케이션에서 이메일 보내기 | CloudSetup.guide",
+      "description": "Node.js, Python, SMTP를 사용하여 애플리케이션에서 SendGrid를 통해 이메일을 보내는 방법을 배우세요. 회원 확인, 비밀번호 재설정, 뉴스레터 등을 구현하세요.",
+      "keywords": [
+        "SendGrid 통합",
+        "이메일 보내기",
+        "Node.js 이메일",
+        "Python 이메일",
+        "SMTP 설정",
+        "이메일 API",
+        "회원 확인 이메일"
+      ]
+    },
+    "en": {
+      "title": "SendGrid Email Integration - Send Emails from Your Application | CloudSetup.guide",
+      "description": "Learn how to send emails through SendGrid from your application using Node.js, Python, or SMTP. Implement email verification, password resets, newsletters, and more.",
+      "keywords": [
+        "SendGrid integration",
+        "send emails",
+        "Node.js email",
+        "Python email",
+        "SMTP setup",
+        "email API",
+        "email verification"
+      ]
+    }
+  },
+  "lastVerified": "2025-02-08"
+}

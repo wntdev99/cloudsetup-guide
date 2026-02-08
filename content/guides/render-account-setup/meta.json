@@ -1,0 +1,54 @@
+{
+  "slug": "render-account-setup",
+  "platform": "render",
+  "service": "Render Platform",
+  "category": "deployment",
+  "difficulty": "beginner",
+  "estimatedMinutes": 15,
+  "totalSteps": 4,
+  "freeTier": {
+    "service": "Render",
+    "limit": "90일 무료 트라이얼",
+    "period": "trial",
+    "status": "generous",
+    "conditions": [
+      "90일 무료 트라이얼 제공",
+      "월 $7.99 이상 환불",
+      "무제한 배포",
+      "자동 HTTPS",
+      "Git 자동 배포"
+    ]
+  },
+  "prerequisites": [],
+  "nextGuides": [
+    "render-app-deployment"
+  ],
+  "tags": ["render", "deployment", "paas", "git", "nodejs", "python"],
+  "seo": {
+    "ko": {
+      "title": "Render 계정 만들기 및 설정 가이드 | CloudSetup.guide",
+      "description": "Render 무료 계정을 만들고 Git을 연결하는 방법을 배우세요. 90일 무료 트라이얼로 애플리케이션 배포를 시작하세요.",
+      "keywords": [
+        "Render 계정",
+        "Render 가입",
+        "웹 서비스",
+        "배포 플랫폼",
+        "Git 연동",
+        "클라우드 배포"
+      ]
+    },
+    "en": {
+      "title": "Create Render Account and Setup Guide | CloudSetup.guide",
+      "description": "Learn how to create a free Render account and connect Git. Get started with a 90-day free trial.",
+      "keywords": [
+        "Render account",
+        "Render signup",
+        "web service",
+        "deployment platform",
+        "Git integration",
+        "cloud deployment"
+      ]
+    }
+  },
+  "lastVerified": "2025-02-08"
+}

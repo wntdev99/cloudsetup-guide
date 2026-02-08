@@ -1,0 +1,249 @@
+# Twilio SMS Integration - Send SMS from Your App
+
+Now that your Twilio account is ready, it's time to **actually send SMS from your application**. Implement member authentication, OTP validation, alerts, and more in Node.js and Python. Complete integration in just 25 minutes.
+
+<FreeTierInfo
+  service="Twilio SMS API"
+  limit="Free trial $15 credit"
+  period="trial"
+  status="generous"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Twilio account and API key", required: true },
+  { text: "Twilio phone number", required: true },
+  { text: "Node.js or Python", required: true }
+]} />
+
+<Callout type="info">
+📱 **Goal of this guide**: Use Twilio API to send SMS from your application.
+</Callout>
+
+---
+
+<Step number={1} title="Set Up Twilio SMS in Node.js">
+
+**Install NPM package:**
+
+<CopyBlock
+  code="npm install twilio"
+  language="bash"
+/>
+
+**Send basic SMS:**
+
+<CopyBlock
+  code="const twilio = require('twilio');
+
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const client = twilio(accountSid, authToken);
+
+client.messages
+  .create({
+    body: 'Hello! This is a message from Twilio.',
+    from: process.env.TWILIO_PHONE_NUMBER,
+    to: '+1234567890'
+  })
+  .then(message => console.log('SMS sent:', message.sid))
+  .catch(error => console.error(error));"
+  language="javascript"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/twilio/step1-nodejs-sms-en.png"
+  alt="Node.js Twilio SMS"
+  caption="Send SMS with Twilio in Node.js"
+  priority={true}
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="Set Up Twilio SMS in Python">
+
+**Install pip package:**
+
+<CopyBlock
+  code="pip install twilio"
+  language="bash"
+/>
+
+**Send basic SMS:**
+
+<CopyBlock
+  code="from twilio.rest import Client
+import os
+
+account_sid = os.getenv('TWILIO_ACCOUNT_SID')
+auth_token = os.getenv('TWILIO_AUTH_TOKEN')
+client = Client(account_sid, auth_token)
+
+message = client.messages.create(
+    body='Hello! This is a message from Twilio.',
+    from_=os.getenv('TWILIO_PHONE_NUMBER'),
+    to='+1234567890'
+)
+
+print('SMS sent:', message.sid)"
+  language="python"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/twilio/step2-python-sms-en.png"
+  alt="Python Twilio SMS"
+  caption="Send SMS with Twilio in Python"
+/>
+
+</Step>
+
+---
+
+<Step number={3} title="Real-World Example: OTP Authentication">
+
+Example of sending an OTP to users.
+
+**Node.js Express example:**
+
+<CopyBlock
+  code="const express = require('express');
+const twilio = require('twilio');
+const app = express();
+
+const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+
+app.post('/send-otp', (req, res) => {
+  const { phone } = req.body;
+  const otp = Math.floor(100000 + Math.random() * 900000);
+
+  client.messages.create({
+    body: 'Your OTP is: ' + otp,
+    from: process.env.TWILIO_PHONE_NUMBER,
+    to: phone
+  })
+  .then(message => {
+    res.json({ success: true, message_id: message.sid });
+  })
+  .catch(error => {
+    res.status(500).json({ error: error.message });
+  });
+});"
+  language="javascript"
+/>
+
+**Python Flask example:**
+
+<CopyBlock
+  code="from flask import Flask, request, jsonify
+from twilio.rest import Client
+import os
+import random
+
+app = Flask(__name__)
+client = Client(os.getenv('TWILIO_ACCOUNT_SID'), os.getenv('TWILIO_AUTH_TOKEN'))
+
+@app.route('/send-otp', methods=['POST'])
+def send_otp():
+  data = request.json
+  phone = data['phone']
+  otp = random.randint(100000, 999999)
+
+  message = client.messages.create(
+    body='Your OTP is: ' + str(otp),
+    from_=os.getenv('TWILIO_PHONE_NUMBER'),
+    to=phone
+  )
+
+  return jsonify({ 'success': True, 'message_id': message.sid })"
+  language="python"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/twilio/step3-otp-integration-en.png"
+  alt="OTP Integration"
+  caption="Send OTP to users"
+/>
+
+</Step>
+
+---
+
+<Step number={4} title="SMS Callbacks and Receiving Messages">
+
+Set up webhooks to receive user responses.
+
+**Set up Incoming Webhook:**
+
+1. Go to **Messaging > Settings > Webhooks** in Twilio dashboard.
+2. Set **Incoming Message Webhook** (e.g., https://yoursite.com/sms).
+3. Select HTTP POST.
+
+**Node.js Webhook handler:**
+
+<CopyBlock
+  code="app.post('/sms', express.urlencoded({ extended: false }), (req, res) => {
+  const fromNumber = req.body.From;
+  const messageBody = req.body.Body;
+
+  console.log('Received:', fromNumber, messageBody);
+
+  const twiml = new twilio.twiml.MessagingResponse();
+  twiml.message('Message received: ' + messageBody);
+
+  res.type('text/xml').send(twiml.toString());
+});"
+  language="javascript"
+/>
+
+<Checkpoint
+  title="Verify Setup"
+  items={[
+    "Did you install Twilio package?",
+    "Did you set environment variables?",
+    "Did you successfully send SMS?",
+    "Did you check SMS history in dashboard?",
+    "Did you set up webhook (optional)?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **Complete!** Twilio SMS integration is done. You can reliably send SMS from your application.
+</Callout>
+
+</Step>
+
+---
+
+## Next Steps
+
+After completing:
+
+1. **[Twilio Voice API](https://www.twilio.com/docs/voice)** - Add voice calls
+2. **[SMS Templates](https://www.twilio.com/docs/messaging)** - More complex messages
+3. **[Twilio Analytics](https://www.twilio.com/docs/monitoring)** - Track messages
+
+---
+
+## Frequently Asked Questions
+
+<Callout type="info">
+**Q. SMS isn't sending**
+
+A. Check:
+- Is recipient verified? (trial)
+- Do you have credits?
+- Are Account SID and Auth Token correct?
+</Callout>
+
+<Callout type="info">
+**Q. Can I send many SMS at once?**
+
+A. Yes, but trial is limited to 20 verified numbers. Upgrade to paid for unlimited.
+</Callout>
+
+---
+
+**Congratulations!** Your Twilio SMS integration is complete! 🚀

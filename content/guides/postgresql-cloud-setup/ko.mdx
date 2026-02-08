@@ -1,0 +1,310 @@
+# PostgreSQL 클라우드 데이터베이스 설정
+
+로컬 개발이 완료되었다면 이제 **프로덕션을 위한 클라우드 데이터베이스**를 설정할 차례입니다. Supabase, Railway, AWS RDS 등 다양한 클라우드 플랫폼에서 PostgreSQL을 호스팅할 수 있습니다. 25분 안에 프로덕션 데이터베이스를 설정할 수 있습니다.
+
+<FreeTierInfo
+  service="PostgreSQL 클라우드 (Supabase 기준)"
+  limit="500MB 저장소, 무제한 API"
+  period="무료 티어"
+  status="generous"
+/>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "PostgreSQL 로컬 설치 완료", required: true },
+  { text: "클라우드 계정 (Supabase 또는 다른 제공자)", required: true },
+  { text: "로컬 데이터베이스 데이터 (있는 경우)", required: false }
+]} />
+
+<Callout type="info">
+☁️ **클라우드 PostgreSQL이란?** 클라우드 기반 PostgreSQL은 로컬 머신 대신 클라우드 서버에서 호스팅되는 데이터베이스입니다. 스케일링, 자동 백업, 높은 가용성을 제공하며 프로덕션 애플리케이션에 완벽합니다.
+</Callout>
+
+---
+
+<Step number={1} title="Supabase에서 PostgreSQL 데이터베이스 생성">
+
+**Supabase는 최고의 무료 PostgreSQL 호스팅 옵션입니다.**
+
+1. [Supabase.com](https://supabase.com)을 방문합니다.
+2. **새로운 프로젝트 시작** 버튼을 클릭합니다.
+3. 로그인하거나 가입합니다 (GitHub, Google, 또는 이메일).
+4. **프로젝트 이름**을 입력합니다 (예: my-app-db).
+5. **데이터베이스 암호**를 설정하고 저장합니다.
+6. **지역**을 선택합니다 (사용자와 가장 가까운 지역).
+7. **프로젝트 생성**을 클릭합니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/postgresql/step1-supabase-create-ko.png"
+  alt="Supabase 프로젝트 생성"
+  caption="Supabase 대시보드에서 새 프로젝트 생성"
+  priority={true}
+/>
+
+<Callout type="tip">
+💡 **팁**: Supabase는 웹 기반 UI 제공자들 중 가장 초보자 친화적입니다.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="데이터베이스 연결 정보 가져오기">
+
+프로젝트가 생성되면 연결 정보를 찾을 수 있습니다.
+
+1. 왼쪽 사이드바에서 **설정** 메뉴로 이동합니다.
+2. **데이터베이스** 섹션을 클릭합니다.
+3. **연결 풀링 정보** 또는 **직접 연결** 정보를 찾습니다.
+4. **연결 문자열**을 복사합니다:
+
+연결 문자열은 다음과 같은 형식입니다:
+
+```
+postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
+```
+
+또는 연결 풀링의 경우:
+
+```
+postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:6543/postgres
+```
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/postgresql/step2-connection-info-ko.png"
+  alt="Supabase 연결 정보"
+  caption="데이터베이스 연결 정보를 찾습니다"
+/>
+
+<Callout type="warning">
+⚠️ **보안**: 연결 문자열에는 암호가 포함되어 있습니다. 절대 공개하지 마세요. 환경 변수에 저장하세요.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="로컬 데이터베이스를 클라우드로 마이그레이션 (선택사항)">
+
+기존 로컬 데이터베이스가 있다면 클라우드로 마이그레이션할 수 있습니다.
+
+**1단계: 로컬 데이터베이스 내보내기**
+
+로컬 컴퓨터에서:
+
+<CopyBlock
+  code="pg_dump -U postgres myapp > myapp_backup.sql"
+  language="bash"
+/>
+
+비밀번호를 입력하라는 메시지가 나타나면 슈퍼유저 암호를 입력합니다.
+
+**2단계: Supabase로 복원**
+
+<CopyBlock
+  code="psql -h db.[PROJECT-REF].supabase.co -U postgres -d postgres -f myapp_backup.sql"
+  language="bash"
+/>
+
+Supabase 데이터베이스 암호를 입력합니다.
+
+또는 Supabase SQL 에디터를 사용할 수도 있습니다:
+
+1. Supabase 대시보드의 **SQL 에디터**로 이동합니다.
+2. **새 쿼리**를 클릭합니다.
+3. 백업 파일의 내용을 복사하여 붙여넣습니다.
+4. **실행**을 클릭합니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/postgresql/step3-migration-ko.png"
+  alt="PostgreSQL 데이터 마이그레이션"
+  caption="pg_dump를 사용하여 데이터베이스 마이그레이션"
+/>
+
+<Callout type="info">
+ℹ️ **참고**: 데이터가 없다면 이 단계를 건너뛸 수 있습니다.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="애플리케이션에서 연결 설정">
+
+이제 애플리케이션을 클라우드 데이터베이스에 연결합니다.
+
+**.env 파일에 연결 문자열 저장:**
+
+<CopyBlock
+  code="DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@db.YOUR_REF.supabase.co:5432/postgres"
+  language="bash"
+/>
+
+**Node.js/Express 예제:**
+
+<CopyBlock
+  code="const Pool = require('pg').Pool;
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
+});
+
+pool.query('SELECT NOW()', (err, res) => {
+  if (err) console.error('연결 실패:', err);
+  else console.log('연결 성공!', res.rows);
+});"
+  language="javascript"
+/>
+
+**Python/Flask 예제:**
+
+<CopyBlock
+  code="import psycopg2
+import os
+
+conn = psycopg2.connect(os.getenv('DATABASE_URL'), sslmode='require')
+cursor = conn.cursor()
+cursor.execute('SELECT NOW()')
+print('연결 성공!', cursor.fetchone())
+cursor.close()
+conn.close()"
+  language="python"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/postgresql/step4-app-connection-ko.png"
+  alt="애플리케이션 데이터베이스 연결"
+  caption="애플리케이션에서 클라우드 데이터베이스에 연결"
+/>
+
+<Callout type="tip">
+💡 **팁**: 항상 SSL 연결을 사용하여 클라우드 데이터베이스를 보호합니다.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={5} title="다른 클라우드 플랫폼 옵션 탐색">
+
+Supabase 외에도 다양한 옵션이 있습니다:
+
+**Railway.app**
+- 무료 $5/월 크레딧
+- 간단한 배포
+- 연결 문자열 자동 제공
+- 웹사이트: [railway.app](https://railway.app)
+
+**AWS RDS PostgreSQL**
+- 12개월 무료 750시간
+- 가장 강력한 옵션
+- 복잡한 설정
+- 웹사이트: [aws.amazon.com/rds](https://aws.amazon.com/rds)
+
+**Render**
+- 90일 무료 트라이얼
+- 자동 백업
+- 간단한 UI
+- 웹사이트: [render.com](https://render.com)
+
+**DigitalOcean 데이터베이스**
+- $15/월부터 시작
+- SSD 스토리지
+- 자동 백업
+- 웹사이트: [digitalocean.com](https://www.digitalocean.com/products/managed-databases)
+
+<Checkpoint
+  title="설정 확인"
+  items={[
+    "클라우드 PostgreSQL 프로젝트가 생성되었나요?",
+    "연결 문자열을 찾았나요?",
+    "환경 변수에 연결 문자열을 저장했나요?",
+    "애플리케이션에서 데이터베이스에 연결할 수 있나요?",
+    "쿼리를 실행할 수 있나요?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **완료!** 프로덕션 준비가 완료된 클라우드 PostgreSQL 데이터베이스가 설정되었습니다. 이제 애플리케이션을 배포하고 데이터를 저장할 수 있습니다.
+</Callout>
+
+</Step>
+
+---
+
+## 다음 단계
+
+PostgreSQL 클라우드 설정을 완료했으니:
+
+1. **[데이터베이스 백업 및 복원](https://supabase.com/docs/guides/database/backups)** - 정기적인 백업 설정
+2. **[성능 모니터링](https://supabase.com/docs/guides/database/monitoring)** - 데이터베이스 상태 확인
+3. **[보안 설정](https://supabase.com/docs/guides/auth/row-level-security)** - Row-Level Security 활성화
+
+---
+
+## 개발자 팁
+
+<DevTip>
+**연결 풀링 vs 직접 연결:**
+
+- **직접 연결** (포트 5432): 장기 실행 애플리케이션에 최적
+- **연결 풀링** (포트 6543): 서버리스, AWS Lambda 등에 최적
+
+Supabase는 PgBouncer를 사용하여 연결 풀링을 제공합니다. 서버리스 함수에서는 풀링 포트를 사용하세요.
+</DevTip>
+
+---
+
+## 자주 묻는 질문
+
+<Callout type="info">
+**Q. 클라우드 데이터베이스를 로컬에서 테스트할 수 있나요?**
+
+A. 예! 로컬 애플리케이션에서 환경 변수를 사용하여 클라우드 데이터베이스에 연결하고 테스트할 수 있습니다. 다만 개발 중에는 네트워크 지연을 고려하세요.
+</Callout>
+
+<Callout type="info">
+**Q. Supabase 무료 티어에서 얼마나 많은 데이터를 저장할 수 있나요?**
+
+A. Supabase 무료 티어는 1GB 저장소를 제공합니다. 초과하면 추가 요금이 발생합니다. 프로덕션 애플리케이션의 경우 유료 플랜으로 업그레이드하는 것이 좋습니다.
+</Callout>
+
+<Callout type="info">
+**Q. 데이터 마이그레이션 중 오류가 발생합니다**
+
+A. pg_dump가 일부 사용자 정의 확장이나 함수를 지원하지 않을 수 있습니다. Supabase SQL 에디터에서 각 부분을 개별적으로 실행해보세요. 또는 테이블 데이터를 CSV로 내보내 수동으로 마이그레이션합니다.
+</Callout>
+
+<Callout type="info">
+**Q. 연결 문자열이 보안 위험한가요?**
+
+A. 연결 문자열은 암호를 포함하므로 매우 민감합니다. 항상 환경 변수에 저장하고 버전 관리 시스템에 커밋하지 마세요. .gitignore에 .env 파일을 추가하세요.
+</Callout>
+
+---
+
+## 문제 해결
+
+### "연결할 수 없습니다" 오류
+
+- 연결 문자열이 정확한지 확인합니다
+- Supabase 대시보드에서 프로젝트가 활성 상태인지 확인합니다
+- 방화벽 또는 네트워크 제약을 확인합니다
+- SSL 모드를 확인합니다 (sslmode=require)
+
+### 마이그레이션 후 데이터가 보이지 않습니다
+
+- Supabase SQL 에디터에서 SELECT 쿼리를 실행합니다
+- 연결한 데이터베이스를 확인합니다 (기본값: postgres)
+- 테이블이 정확히 복사되었는지 확인합니다
+
+### 느린 쿼리 성능
+
+- 인덱스를 추가합니다
+- 쿼리를 최적화합니다
+- Supabase 모니터링 도구를 사용하여 느린 쿼리를 찾습니다
+
+---
+
+**축하합니다!** 프로덕션 준비가 된 PostgreSQL 클라우드 데이터베이스가 완전히 설정되었습니다. 이제 안심하고 애플리케이션을 배포할 수 있습니다! 🚀

@@ -1,0 +1,56 @@
+{
+  "slug": "render-app-deployment",
+  "platform": "render",
+  "service": "Render Web App Deployment",
+  "category": "deployment",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 25,
+  "totalSteps": 4,
+  "freeTier": {
+    "service": "Render Deployment",
+    "limit": "90일 무료 트라이얼",
+    "period": "trial",
+    "status": "generous",
+    "conditions": [
+      "90일 무료 사용",
+      "500MB RAM, 0.5 CPU",
+      "자동 배포",
+      "무제한 빌드",
+      "SSL 포함"
+    ]
+  },
+  "prerequisites": [
+    "render-account-setup"
+  ],
+  "nextGuides": [],
+  "tags": ["render", "deployment", "nodejs", "python", "docker", "github"],
+  "seo": {
+    "ko": {
+      "title": "Render에 웹앱 배포하기 - 배포 가이드 | CloudSetup.guide",
+      "description": "Render에 Node.js, Python, Go 등의 웹 애플리케이션을 배포하는 방법을 배우세요. GitHub에서 자동 배포 설정까지 완료합니다.",
+      "keywords": [
+        "Render 배포",
+        "웹앱 배포",
+        "GitHub 자동 배포",
+        "Node.js 배포",
+        "Python 배포",
+        "클라우드 배포",
+        "웹 서비스"
+      ]
+    },
+    "en": {
+      "title": "Deploy Web Apps to Render - Deployment Guide | CloudSetup.guide",
+      "description": "Learn how to deploy Node.js, Python, and Go web apps to Render. Complete GitHub auto-deploy setup.",
+      "keywords": [
+        "Render deployment",
+        "web app deployment",
+        "GitHub auto-deploy",
+        "Node.js deployment",
+        "Python deployment",
+        "cloud deployment",
+        "web service"
+      ]
+    }
+  },
+  "lastVerified": "2025-02-08"
+}

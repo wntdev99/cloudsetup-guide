@@ -1,0 +1,57 @@
+{
+  "slug": "twilio-sms-integration",
+  "platform": "twilio",
+  "service": "Twilio SMS Integration",
+  "category": "communication",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 25,
+  "totalSteps": 4,
+  "freeTier": {
+    "service": "Twilio SMS API",
+    "limit": "무료 평가판 $15 크레딧",
+    "period": "trial",
+    "amount": "$15",
+    "status": "generous",
+    "conditions": [
+      "$15 무료 크레딧",
+      "SMS, 음성, 비디오 모두 포함",
+      "최대 20개 검증된 번호",
+      "완전한 API 기능",
+      "프로덕션 테스트 가능"
+    ]
+  },
+  "prerequisites": [
+    "twilio-account-setup"
+  ],
+  "nextGuides": [],
+  "tags": ["twilio", "sms", "api", "nodejs", "python", "integration"],
+  "seo": {
+    "ko": {
+      "title": "Twilio SMS 통합 - 애플리케이션에서 SMS 보내기 | CloudSetup.guide",
+      "description": "Node.js, Python에서 Twilio를 사용하여 SMS를 보내는 방법을 배우세요. 회원 인증, OTP 검증, 알림 등을 구현합니다.",
+      "keywords": [
+        "Twilio SMS",
+        "SMS API",
+        "문자 메시지",
+        "Node.js SMS",
+        "Python SMS",
+        "OTP 검증",
+        "문자 알림"
+      ]
+    },
+    "en": {
+      "title": "Twilio SMS Integration - Send SMS from Your App | CloudSetup.guide",
+      "description": "Learn how to send SMS using Twilio in Node.js and Python. Implement email verification, OTP validation, SMS alerts, and more.",
+      "keywords": [
+        "Twilio SMS",
+        "SMS API",
+        "text messages",
+        "Node.js SMS",
+        "Python SMS",
+        "OTP validation",
+        "SMS alerts"
+      ]
+    }
+  },
+  "lastVerified": "2025-02-08"
+}

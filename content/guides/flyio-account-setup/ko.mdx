@@ -1,0 +1,292 @@
+# Fly.io 계정 만들기 및 CLI 설치
+
+Fly.io는 **Docker 컨테이너를 전 세계에 배포할 수 있는 현대적인 클라우드 플랫폼**입니다. 무료로 시작하여 프로덕션급 애플리케이션을 배포할 수 있습니다. 20분 안에 계정을 설정하고 배포 준비를 완료할 수 있습니다.
+
+<FreeTierInfo
+  service="Fly.io"
+  limit="3개 공유 CPU VM, 월 3GB 저장소"
+  period="영구"
+  status="generous"
+/>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "이메일 주소", required: true },
+  { text: "Docker 설치 (선택사항)", required: false },
+  { text: "Node.js, Python, Go, Ruby 등의 애플리케이션", required: false }
+]} />
+
+<Callout type="info">
+🚀 **Fly.io란?** Fly.io는 컨테이너 기반 애플리케이션 배포 플랫폼입니다. 전세계 여러 지역에 앱을 배포하여 사용자에게 빠른 응답 속도를 제공합니다. 자동 스케일링과 SSL을 지원합니다.
+</Callout>
+
+---
+
+<Step number={1} title="Fly.io 계정 생성">
+
+1. [Fly.io](https://fly.io)를 방문합니다.
+2. **Get Started** 또는 **Sign Up** 버튼을 클릭합니다.
+3. 로그인 방법을 선택합니다:
+   - GitHub 계정
+   - Google 계정
+   - 이메일과 비밀번호
+
+4. 계정 정보를 입력합니다.
+5. **계정 생성** 또는 **Create Account**를 클릭합니다.
+6. 이메일 확인 (필요한 경우).
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/flyio/step1-signup-ko.png"
+  alt="Fly.io 가입"
+  caption="Fly.io 계정을 만드세요 - GitHub, Google 또는 이메일로 가입"
+  priority={true}
+/>
+
+<Callout type="tip">
+💡 **팁**: GitHub 계정으로 가입하면 더 빠릅니다.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="CLI 설치 (macOS/Linux)">
+
+Fly.io 배포를 위해 flyctl CLI를 설치해야 합니다.
+
+**macOS (Homebrew 권장):**
+
+<CopyBlock
+  code="brew install flyctl"
+  language="bash"
+/>
+
+**또는 curl 사용:**
+
+<CopyBlock
+  code="curl -L https://fly.io/install.sh | sh"
+  language="bash"
+/>
+
+**Linux (Ubuntu/Debian):**
+
+<CopyBlock
+  code="curl -L https://fly.io/install.sh | sh"
+  language="bash"
+/>
+
+PATH에 추가:
+
+<CopyBlock
+  code="export PATH=$PATH:~/.fly/bin"
+  language="bash"
+/>
+
+.bashrc 또는 .zshrc에 추가하여 영구 설정:
+
+<CopyBlock
+  code="echo 'export PATH=$PATH:~/.fly/bin' >> ~/.bashrc"
+  language="bash"
+/>
+
+**설치 확인:**
+
+<CopyBlock
+  code="flyctl version"
+  language="bash"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/flyio/step2-cli-install-ko.png"
+  alt="Fly.io CLI 설치"
+  caption="flyctl CLI 설치 및 확인"
+/>
+
+<Callout type="tip">
+💡 **팁**: 버전 번호가 출력되면 설치가 성공한 것입니다.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="CLI 설치 (Windows)">
+
+**Windows 사용자:**
+
+**방법 1: Chocolatey 사용 (권장)**
+
+<CopyBlock
+  code="choco install flyctl"
+  language="bash"
+/>
+
+**방법 2: PowerShell 사용**
+
+PowerShell을 **관리자 권한**으로 실행한 후:
+
+<CopyBlock
+  code="iwr https://fly.io/install.ps1 -useb | iex"
+  language="bash"
+/>
+
+**방법 3: 수동 설치**
+
+1. [GitHub 릴리스 페이지](https://github.com/superfly/flyctl/releases)에서 flyctl을 다운로드합니다.
+2. 압축을 풀고 PATH에 추가합니다.
+
+**설치 확인:**
+
+PowerShell에서:
+
+<CopyBlock
+  code="flyctl version"
+  language="bash"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/flyio/step3-windows-cli-ko.png"
+  alt="Windows Fly.io CLI 설치"
+  caption="Windows에 flyctl 설치"
+/>
+
+<Callout type="info">
+ℹ️ **참고**: Windows 환경 변수를 업데이트한 후 PowerShell을 재시작하세요.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="Fly.io 계정과 CLI 연결">
+
+이제 flyctl을 Fly.io 계정과 연결합니다.
+
+<CopyBlock
+  code="flyctl auth login"
+  language="bash"
+/>
+
+명령을 실행하면:
+
+1. **인증 URL**이 표시됩니다.
+2. 브라우저에서 URL을 열거나 **"Press Enter to open browser"**를 누릅니다.
+3. Fly.io 계정으로 로그인합니다.
+4. **Authorize** 또는 **승인**을 클릭합니다.
+5. 터미널로 돌아가면 인증이 완료됩니다.
+
+**인증 확인:**
+
+<CopyBlock
+  code="flyctl auth whoami"
+  language="bash"
+/>
+
+이메일 주소가 출력되면 성공입니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/flyio/step4-auth-login-ko.png"
+  alt="Fly.io CLI 인증"
+  caption="flyctl 로그인 및 계정 연결"
+/>
+
+<Checkpoint
+  title="설정 확인"
+  items={[
+    "Fly.io 계정이 생성되었나요?",
+    "flyctl이 설치되었나요?",
+    "flyctl version을 실행했나요?",
+    "flyctl auth login을 완료했나요?",
+    "flyctl auth whoami로 확인했나요?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **완료!** Fly.io 계정이 준비되고 CLI가 설정되었습니다. 이제 [Fly.io 애플리케이션 배포](../flyio-app-deployment) 가이드를 따라 첫 애플리케이션을 배포할 수 있습니다.
+</Callout>
+
+</Step>
+
+---
+
+## 다음 단계
+
+Fly.io 계정 설정을 완료했으니:
+
+1. **[Fly.io 애플리케이션 배포](../flyio-app-deployment)** - 첫 애플리케이션 배포하기
+2. **[Fly.io 대시보드](https://fly.io/dashboard)** - 배포된 앱 관리
+3. **[Fly.io 문서](https://fly.io/docs)** - 상세한 가이드 읽기
+
+---
+
+## 개발자 팁
+
+<DevTip>
+**flyctl 주요 명령어:**
+
+```
+flyctl apps list          # 배포된 앱 목록
+flyctl deploy             # 앱 배포
+flyctl logs               # 로그 보기
+flyctl ssh console        # SSH 접속
+flyctl scale              # 스케일 조정
+flyctl secrets set KEY=VALUE  # 환경 변수 설정
+```
+
+이 명령어들을 자주 사용하게 됩니다.
+</DevTip>
+
+---
+
+## 자주 묻는 질문
+
+<Callout type="info">
+**Q. Fly.io 무료 티어에서 얼마나 할 수 있나요?**
+
+A. 3개의 공유 CPU VM과 월 3GB 저장소를 무료로 사용할 수 있습니다. 소규모 프로젝트와 개발에 충분합니다.
+</Callout>
+
+<Callout type="info">
+**Q. Docker가 필요한가요?**
+
+A. Fly.io는 Docker를 사용하지만, flyctl이 자동으로 Dockerfile을 생성해주므로 직접 작성할 필요가 없습니다.
+</Callout>
+
+<Callout type="info">
+**Q. 도메인을 연결할 수 있나요?**
+
+A. 예! Fly.io에서 도메인을 등록하거나 기존 도메인을 연결할 수 있습니다. CNAME 또는 DNS 설정을 통해 연결합니다.
+</Callout>
+
+<Callout type="info">
+**Q. 데이터베이스를 어디에 두나요?**
+
+A. PostgreSQL은 Fly.io의 Postgres 서비스를 사용하거나, Supabase, Railway 등의 외부 데이터베이스를 연결할 수 있습니다.
+</Callout>
+
+---
+
+## 문제 해결
+
+### "command not found: flyctl" 오류
+
+- flyctl이 PATH에 추가되었는지 확인합니다
+- 터미널을 재시작합니다
+- 수동으로 PATH를 설정합니다
+
+### 인증 실패
+
+- 로그아웃 후 다시 로그인합니다: `flyctl auth logout && flyctl auth login`
+- 인터넷 연결을 확인합니다
+- Fly.io 상태를 확인합니다
+
+### flyctl version이 작동하지 않습니다
+
+- 설치가 완료되었는지 확인합니다
+- 시스템 재부팅을 시도합니다
+- 다시 설치합니다
+
+---
+
+**축하합니다!** Fly.io 계정과 CLI가 완전히 설정되었습니다. 다음 단계로 첫 애플리케이션을 배포해보세요! 🚀

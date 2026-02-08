@@ -1,0 +1,251 @@
+# Create SendGrid Account and Verify Sender
+
+SendGrid is a **powerful cloud-based email sending service** that makes it easy for developers to send large volumes of emails. You can send 100 emails per month completely free. Set up your account and prepare to send your first email in just 15 minutes.
+
+<FreeTierInfo
+  service="SendGrid"
+  limit="100 emails per month free"
+  period="forever"
+  status="generous"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Email address", required: true },
+  { text: "Domain (for sender verification)", required: false },
+  { text: "DNS configuration access", required: false }
+]} />
+
+<Callout type="info">
+📧 **What is SendGrid?** SendGrid is a service for reliably sending large volumes of emails via SMTP server or email API. Use it in web applications for email verification, password resets, newsletters, and more.
+</Callout>
+
+---
+
+<Step number={1} title="Create SendGrid Account">
+
+1. Visit [SendGrid.com](https://sendgrid.com).
+2. Click the **Sign up** button.
+3. Enter your **email address**.
+4. Set a **password** (strong password recommended).
+5. Enter your **first name** and **last name**.
+6. Optionally enter **company name**.
+7. Agree to **terms** and click **Create Account**.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/sendgrid/step1-signup-en.png"
+  alt="SendGrid Signup Page"
+  caption="Create your SendGrid account - sign up with email"
+  priority={true}
+/>
+
+<Callout type="tip">
+💡 **Tip**: You'll need to verify your email after signup. Check your inbox.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Verify Your Email Address">
+
+1. After signup, SendGrid sends a **verification email**.
+2. Find the SendGrid email in your inbox.
+3. Click the **Verify Email** link.
+4. Once verified, you'll be redirected to the dashboard.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/sendgrid/step2-verify-email-en.png"
+  alt="SendGrid Email Verification"
+  caption="Click the verification link to confirm your email"
+/>
+
+<Callout type="warning">
+⚠️ **Important**: You cannot use the API until you verify your email.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="Generate API Key">
+
+You need an API key to send emails from SendGrid.
+
+1. In the dashboard, go to the **Settings** section in the left menu.
+2. Click **API Keys** or **API Keys**.
+3. Click the **Create API Key** button.
+4. Enter an **API Key name** (e.g., "My App API Key").
+5. Select the **permission level**:
+   - **Restricted**: Grant specific permissions (recommended)
+   - **Full Access**: Grant all permissions
+
+6. **Required permissions**:
+   - Mail Send
+   - Contacts Import
+   - Bounce (optional)
+
+7. Click **Create & View** button.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/sendgrid/step3-api-key-en.png"
+  alt="SendGrid API Key Creation"
+  caption="Generate a new API key - save it securely"
+/>
+
+**Copy and save the API key in a safe place:**
+
+Your API key is displayed **only once**. If you lose it, you'll need to create a new one.
+
+<Callout type="warning">
+⚠️ **Security**: Never share your API key or commit it to version control. Store it in environment variables.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="Set Up Sender Verification">
+
+You must verify the sender to send emails from SendGrid.
+
+**Simple Verification (Recommended - Fast):**
+
+1. In the dashboard, go to **Settings** menu.
+2. Click **Sender Authentication** or **Sender Authentication**.
+3. Choose **Single Sender Verification**.
+4. Enter your **sender email address** (e.g., noreply@example.com).
+5. Enter your **sender name** (e.g., My App).
+6. Optionally enter a **reply-to email**.
+7. Click **Create**.
+8. SendGrid sends a **verification email**.
+9. Click the **verification link** in the email.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/sendgrid/step4-sender-verification-en.png"
+  alt="SendGrid Sender Verification"
+  caption="Verify your sender email address"
+/>
+
+**Domain Authentication (For Production - Recommended):**
+
+Authenticating your domain provides higher deliverability.
+
+1. On the **Sender Authentication** page, choose **Domain Authentication**.
+2. Enter your **domain** (e.g., example.com).
+3. Select **Default to Domain** (recommended).
+4. **DNS records** will be displayed:
+   - **CNAME** records (3)
+   - Or **MX** records
+
+5. Log in to your **DNS hosting provider**:
+   - GoDaddy, Namecheap, Route 53, etc.
+6. Add the records to your **DNS settings**.
+7. Click the **Verify** button in SendGrid.
+8. Once DNS records are verified, you're done.
+
+<Checkpoint
+  title="Verify Your Setup"
+  items={[
+    "Is your SendGrid account created?",
+    "Is your email address verified?",
+    "Did you generate and save your API key?",
+    "Is your sender email verified?",
+    "Did you start domain authentication (optional)?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **Complete!** Your SendGrid account is ready. Now follow the [SendGrid Email Integration](../sendgrid-email-integration) guide to send emails from your application.
+</Callout>
+
+</Step>
+
+---
+
+## Next Steps
+
+After completing your SendGrid account setup:
+
+1. **[SendGrid Email Integration](../sendgrid-email-integration)** - Send emails from your application
+2. **[Set Up WebHooks](https://docs.sendgrid.com/for-developers/tracking/getting-started-event-webhook)** - Track email events
+3. **[Create Templates](https://docs.sendgrid.com/ui/sending-email/how-to-send-an-email-with-dynamic-templates)** - Use email templates
+
+---
+
+## Developer Tips
+
+<DevTip>
+**Set API Key Environment Variables:**
+
+Save in your .env file:
+
+```
+SENDGRID_API_KEY=SG.xxxxxxxxxxxxxxxxxxxx
+SENDGRID_FROM_EMAIL=noreply@example.com
+SENDGRID_FROM_NAME=My App
+```
+
+Access in Node.js:
+
+```javascript
+const apiKey = process.env.SENDGRID_API_KEY;
+const fromEmail = process.env.SENDGRID_FROM_EMAIL;
+```
+</DevTip>
+
+---
+
+## Frequently Asked Questions
+
+<Callout type="info">
+**Q. What happens if I exceed 100 emails per month?**
+
+A. Your emails won't be sent. To send more, upgrade to a paid SendGrid plan.
+</Callout>
+
+<Callout type="info">
+**Q. I lost my API key. What should I do?**
+
+A. Just create a new API key. Click the "Create API Key" button on the API Keys page in your dashboard.
+</Callout>
+
+<Callout type="info">
+**Q. What's the difference between sender verification and domain authentication?**
+
+A. Sender verification confirms a specific email address and is quick. Domain authentication confirms your entire domain and provides higher deliverability.
+</Callout>
+
+<Callout type="info">
+**Q. How can I prevent my emails from being marked as spam?**
+
+A. Add SPF, DKIM, and DMARC records to your DNS. SendGrid automatically provides these records when you authenticate your domain.
+</Callout>
+
+---
+
+## Troubleshooting
+
+### Verification email doesn't arrive
+
+- Check your spam folder
+- Verify you used the correct email address
+- Request verification email again
+- Contact SendGrid support
+
+### API key doesn't work
+
+- Verify the API key was copied correctly
+- Check that the API key has "Mail Send" permission
+- Generate a new API key
+
+### Sender verification failed
+
+- Verify you used a valid email address
+- Try domain authentication
+- Contact SendGrid support
+
+---
+
+**Congratulations!** Your SendGrid account is fully set up. Next, add email functionality to your application! 🚀

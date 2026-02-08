@@ -1,0 +1,344 @@
+# PostgreSQL Local Installation and Database Creation
+
+PostgreSQL is a **powerful and reliable open-source relational database** that you can install on your local machine completely free. You can create and run your first database in just 20 minutes.
+
+<FreeTierInfo
+  service="PostgreSQL"
+  limit="Unlimited usage"
+  period="completely free"
+  status="free"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Windows, Mac, or Linux computer", required: true },
+  { text: "Administrator privileges (for installation)", required: true },
+  { text: "Internet connection", required: true }
+]} />
+
+<Callout type="info">
+📊 **What is PostgreSQL?** PostgreSQL is a powerful database that supports complex queries, transactions, and extensible data types. It is widely used by developers, startups, and large enterprises worldwide.
+</Callout>
+
+---
+
+<Step number={1} title="Download and Install PostgreSQL (Windows)">
+
+**For Windows users:**
+
+1. Visit the [PostgreSQL official website](https://www.postgresql.org/download/windows/).
+2. Click on the **latest stable version** (currently 15.x or 16.x).
+3. Download the **Windows installer**.
+4. Run the downloaded file (e.g., postgresql-16-x64-setup.exe).
+5. The installation wizard will start:
+   - Choose installation directory (default C:/Program Files/PostgreSQL)
+   - Set a **superuser password** (remember it!)
+   - Keep port as default 5432
+   - Select locale (default [C])
+
+6. Click **Finish** to complete installation.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/postgresql/step1-windows-install-en.png"
+  alt="Windows PostgreSQL Setup Wizard"
+  caption="PostgreSQL installation wizard - remember your superuser password"
+  priority={true}
+/>
+
+<Callout type="warning">
+⚠️ **Important**: Write down your superuser (postgres) password in a safe place. You'll need it for database management.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Install PostgreSQL on Mac">
+
+**For Mac users:**
+
+You can install PostgreSQL on Mac in three ways:
+
+**Method 1: Using Homebrew (Recommended)**
+
+1. Make sure [Homebrew](https://brew.sh) is installed.
+2. Open Terminal and run:
+
+<CopyBlock
+  code="brew install postgresql@16"
+  language="bash"
+/>
+
+3. After installation completes:
+
+<CopyBlock
+  code="brew services start postgresql@16"
+  language="bash"
+/>
+
+4. PostgreSQL will start automatically.
+
+**Method 2: Using PostgreSQL.app**
+
+1. Visit [PostgreSQL.app](https://postgresapp.com/).
+2. Download the latest version and drag it to the Applications folder.
+3. Double-click PostgreSQL.app in Finder.
+4. When the elephant icon appears in the menu bar, it's running.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/postgresql/step2-mac-install-en.png"
+  alt="Mac PostgreSQL.app Installation"
+  caption="PostgreSQL.app - the simplest installation method for Mac"
+/>
+
+<Callout type="tip">
+💡 **Tip**: PostgreSQL.app is simpler to set up than Homebrew.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="Install PostgreSQL on Linux">
+
+**For Linux users (Ubuntu/Debian):**
+
+1. Open Terminal and run:
+
+<CopyBlock
+  code="sudo apt update && sudo apt install -y postgresql postgresql-contrib"
+  language="bash"
+/>
+
+2. PostgreSQL starts automatically. Check status:
+
+<CopyBlock
+  code="sudo systemctl status postgresql"
+  language="bash"
+/>
+
+3. Switch to postgres user:
+
+<CopyBlock
+  code="sudo -i -u postgres"
+  language="bash"
+/>
+
+4. Connect to PostgreSQL client:
+
+<CopyBlock
+  code="psql"
+  language="bash"
+/>
+
+5. If successful, the prompt changes to postgres=# .
+
+**For Fedora/RHEL:**
+
+<CopyBlock
+  code="sudo dnf install -y postgresql-server postgresql-contrib"
+  language="bash"
+/>
+
+<CopyBlock
+  code="sudo postgresql-setup initdb"
+  language="bash"
+/>
+
+<CopyBlock
+  code="sudo systemctl start postgresql"
+  language="bash"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/postgresql/step3-linux-install-en.png"
+  alt="Linux PostgreSQL Installation"
+  caption="PostgreSQL installation on Ubuntu/Debian"
+/>
+
+<Callout type="info">
+ℹ️ **Note**: On Linux, the postgres user is created automatically.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="Create and Connect to Your First Database">
+
+Now create your first database.
+
+**Run psql on Windows / Mac:**
+
+1. Open Command Prompt or Terminal and run:
+
+<CopyBlock
+  code="psql -U postgres"
+  language="bash"
+/>
+
+2. Enter the superuser password you set during installation (on Windows, the password you entered).
+
+3. The prompt changes to postgres=# .
+
+**Create a Database:**
+
+<CopyBlock
+  code="CREATE DATABASE myapp;"
+  language="sql"
+/>
+
+<CopyBlock
+  code="CREATE USER appuser WITH PASSWORD 'secure_password_here';"
+  language="sql"
+/>
+
+<CopyBlock
+  code="ALTER ROLE appuser SET client_encoding TO 'utf8';"
+  language="sql"
+/>
+
+<CopyBlock
+  code="ALTER ROLE appuser SET timezone TO 'UTC';"
+  language="sql"
+/>
+
+<CopyBlock
+  code="GRANT ALL PRIVILEGES ON DATABASE myapp TO appuser;"
+  language="sql"
+/>
+
+**Verify the Database:**
+
+<CopyBlock
+  code="\\l"
+  language="sql"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/postgresql/step4-create-database-en.png"
+  alt="PostgreSQL Database Creation"
+  caption="Creating a new database and user in psql"
+/>
+
+**Exit psql:**
+
+<CopyBlock
+  code="\\q"
+  language="sql"
+/>
+
+<Checkpoint
+  title="Verify Your Setup"
+  items={[
+    "Is PostgreSQL installed?",
+    "Was database 'myapp' created?",
+    "Was user 'appuser' created?",
+    "Did you successfully connect to psql?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **Complete!** PostgreSQL is installed on your local machine and your first database is created. You're ready to use it in your applications.
+</Callout>
+
+</Step>
+
+---
+
+## Next Steps
+
+After completing your local PostgreSQL setup:
+
+1. **[PostgreSQL Cloud Setup](../postgresql-cloud-setup)** - Migrate to a cloud database for production
+2. **[Manage with pgAdmin](https://www.pgadmin.org/)** - GUI-based database management
+3. **[Backup and Restore](https://www.postgresql.org/docs/current/backup.html)** - Learn how to protect your data
+
+---
+
+## Developer Tips
+
+<DevTip>
+**Connection String Examples:**
+
+For local development, your connection string is:
+
+```
+postgresql://appuser:secure_password_here@localhost:5432/myapp
+```
+
+Or:
+
+```
+postgres://appuser:secure_password_here@127.0.0.1:5432/myapp
+```
+
+Save it in an environment variable (.env file):
+
+```
+DATABASE_URL=postgresql://appuser:password@localhost:5432/myapp
+```
+</DevTip>
+
+---
+
+## Frequently Asked Questions
+
+<Callout type="info">
+**Q. I get a "psql: command not found" error on Windows**
+
+A. You need to add the PostgreSQL bin folder to your PATH environment variable. Add 'C:\Program Files\PostgreSQL\16\bin' to your system environment variables.
+</Callout>
+
+<Callout type="info">
+**Q. I forgot my superuser password**
+
+A. On Windows, reinstall PostgreSQL or modify the pg_hba.conf file to reset the password. On Mac/Linux, you can connect as the postgres user with sudo privileges without a password.
+</Callout>
+
+<Callout type="info">
+**Q. Port 5432 is already in use**
+
+A. Another PostgreSQL instance may be running. To resolve the conflict, choose a different port (e.g., 5433) during installation, or stop the existing instance.
+</Callout>
+
+<Callout type="info">
+**Q. How do I move my local database to production?**
+
+A. Use pg_dump to export your local database and then restore it to your cloud database. See the [postgresql-cloud-setup](../postgresql-cloud-setup) guide for details.
+</Callout>
+
+---
+
+## Troubleshooting
+
+### PostgreSQL service won't start
+
+**Windows:**
+- Check Windows Services: services.msc
+- Find "postgresql-x64-16" service and start it
+- Open Command Prompt as Administrator and try reinstalling
+
+**Mac:**
+- Run `brew services restart postgresql@16` in Terminal
+- Or restart PostgreSQL.app
+
+**Linux:**
+- Run `sudo systemctl restart postgresql`
+- Check logs: `sudo journalctl -xe`
+
+### "role postgres does not exist" error in psql
+
+- On Mac/Linux, run `sudo -i -u postgres` then `psql`
+- On Windows, run with `-U postgres` option or check permissions
+
+### Database queries don't work
+
+- First verify tables with `\dt` command
+- Check you're connected to the right database: `\c myapp`
+- Review SQL syntax and ensure semicolons are included
+
+---
+
+**Congratulations!** PostgreSQL is fully set up locally on your machine. You're ready to start application development. 🚀

@@ -1,0 +1,57 @@
+{
+  "slug": "twilio-account-setup",
+  "platform": "twilio",
+  "service": "Twilio Communication Platform",
+  "category": "communication",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 20,
+  "totalSteps": 4,
+  "freeTier": {
+    "service": "Twilio",
+    "limit": "무료 평가판 $15 크레딧",
+    "period": "trial",
+    "amount": "$15",
+    "status": "generous",
+    "conditions": [
+      "$15 무료 평가판 크레딧",
+      "SMS, 음성, 비디오 테스트 가능",
+      "최대 20개 검증된 전화번호",
+      "프로덕션 전 충분한 테스트",
+      "무제한 API 호출 (크레딧 범위 내)"
+    ]
+  },
+  "prerequisites": [],
+  "nextGuides": [
+    "twilio-sms-integration"
+  ],
+  "tags": ["twilio", "sms", "communication", "voice", "api"],
+  "seo": {
+    "ko": {
+      "title": "Twilio 계정 만들기 및 전화번호 설정 가이드 | CloudSetup.guide",
+      "description": "Twilio 계정을 만들고 무료 평가판 크레딧으로 SMS 및 음성 서비스를 테스트합니다. 전화번호 확보 및 설정 방법을 배우세요.",
+      "keywords": [
+        "Twilio 계정",
+        "Twilio 가입",
+        "SMS API",
+        "음성 API",
+        "전화번호 설정",
+        "Twilio CLI",
+        "통신 API"
+      ]
+    },
+    "en": {
+      "title": "Create Twilio Account and Setup Phone Numbers - Guide | CloudSetup.guide",
+      "description": "Create a Twilio account and test SMS and voice services with free trial credits. Learn how to acquire and configure phone numbers.",
+      "keywords": [
+        "Twilio account",
+        "Twilio signup",
+        "SMS API",
+        "voice API",
+        "phone number setup",
+        "Twilio CLI",
+        "communication API"
+      ]
+    }
+  },
+  "lastVerified": "2025-02-08"
+}

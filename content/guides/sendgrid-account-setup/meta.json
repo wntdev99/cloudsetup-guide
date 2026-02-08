@@ -1,0 +1,57 @@
+{
+  "slug": "sendgrid-account-setup",
+  "platform": "sendgrid",
+  "service": "SendGrid Email Service",
+  "category": "communication",
+  "difficulty": "beginner",
+  "estimatedMinutes": 15,
+  "totalSteps": 4,
+  "freeTier": {
+    "service": "SendGrid",
+    "limit": "월 100 이메일 무료",
+    "period": "forever",
+    "amount": "무료",
+    "status": "generous",
+    "conditions": [
+      "월 100개 이메일 완전 무료",
+      "횟수 제한 없음",
+      "사인업 필요",
+      "모든 API 기능 포함",
+      "프로덕션 사용 가능"
+    ]
+  },
+  "prerequisites": [],
+  "nextGuides": [
+    "sendgrid-email-integration"
+  ],
+  "tags": ["sendgrid", "email", "communication", "api", "smtp"],
+  "seo": {
+    "ko": {
+      "title": "SendGrid 계정 만들기 및 인증 설정 가이드 | CloudSetup.guide",
+      "description": "SendGrid 무료 계정을 만들고 발신자 인증을 설정하는 방법을 배우세요. 월 100개 이메일 무료로 보낼 수 있습니다.",
+      "keywords": [
+        "SendGrid 계정",
+        "SendGrid 가입",
+        "이메일 인증",
+        "DKIM 설정",
+        "SPF 레코드",
+        "이메일 API",
+        "메일 서비스"
+      ]
+    },
+    "en": {
+      "title": "Create SendGrid Account and Verify Sender - Setup Guide | CloudSetup.guide",
+      "description": "Learn how to create a free SendGrid account and set up sender verification. Send 100 emails per month for free.",
+      "keywords": [
+        "SendGrid account",
+        "SendGrid signup",
+        "email verification",
+        "DKIM setup",
+        "SPF record",
+        "email API",
+        "mail service"
+      ]
+    }
+  },
+  "lastVerified": "2025-02-08"
+}

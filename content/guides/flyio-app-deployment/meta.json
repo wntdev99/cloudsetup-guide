@@ -1,0 +1,57 @@
+{
+  "slug": "flyio-app-deployment",
+  "platform": "flyio",
+  "service": "Fly.io App Deployment",
+  "category": "deployment",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 30,
+  "totalSteps": 5,
+  "freeTier": {
+    "service": "Fly.io Deployment",
+    "limit": "3개 공유 CPU VM, 월 3GB 저장소",
+    "period": "forever",
+    "amount": "무료",
+    "status": "generous",
+    "conditions": [
+      "3개 공유 CPU-1x VM 무료",
+      "월 3GB 저장소",
+      "전역 배포",
+      "자동 스케일링",
+      "무료 SSL 인증서"
+    ]
+  },
+  "prerequisites": [
+    "flyio-account-setup"
+  ],
+  "nextGuides": [],
+  "tags": ["flyio", "deployment", "docker", "nodejs", "python", "deployment"],
+  "seo": {
+    "ko": {
+      "title": "Fly.io에 애플리케이션 배포하기 - 배포 가이드 | CloudSetup.guide",
+      "description": "Fly.io에 Node.js, Python, Go, Ruby 애플리케이션을 배포하는 방법을 배우세요. 30분 안에 애플리케이션을 전 세계에 배포하세요.",
+      "keywords": [
+        "Fly.io 배포",
+        "애플리케이션 배포",
+        "Docker 배포",
+        "Node.js 배포",
+        "Python 배포",
+        "flyctl deploy",
+        "클라우드 배포"
+      ]
+    },
+    "en": {
+      "title": "Deploy Applications to Fly.io - Deployment Guide | CloudSetup.guide",
+      "description": "Learn how to deploy Node.js, Python, Go, and Ruby applications to Fly.io. Deploy to the world in 30 minutes.",
+      "keywords": [
+        "Fly.io deployment",
+        "app deployment",
+        "Docker deployment",
+        "Node.js deployment",
+        "Python deployment",
+        "flyctl deploy",
+        "cloud deployment"
+      ]
+    }
+  },
+  "lastVerified": "2025-02-08"
+}

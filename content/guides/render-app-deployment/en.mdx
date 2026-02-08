@@ -1,0 +1,281 @@
+# Deploy Web Apps to Render
+
+Now that your Render account is ready, it's time to **deploy a real web application**. Deploy Node.js, Python, Go, Ruby, and more. Complete deployment in 25 minutes.
+
+<FreeTierInfo
+  service="Render Web App Deployment"
+  limit="90-day free trial"
+  period="trial"
+  status="generous"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Render account and setup complete", required: true },
+  { text: "Web application (GitHub repository)", required: true },
+  { text: "Node.js, Python, Go app with proper config", required: true }
+]} />
+
+<Callout type="info">
+🚀 **Goal**: Deploy your web app to Render and serve users worldwide.
+</Callout>
+
+---
+
+<Step number={1} title="Prepare GitHub Repository">
+
+Prepare your repository before deployment.
+
+**Required files:**
+
+- **package.json** (Node.js) or **requirements.txt** (Python) or **go.mod** (Go)
+- **Procfile** (optional - Render config)
+
+**Procfile example (Node.js):**
+
+<CopyBlock
+  code="web: npm start"
+  language="bash"
+/>
+
+**Procfile example (Python):**
+
+<CopyBlock
+  code="web: gunicorn app:app"
+  language="bash"
+/>
+
+**Check package.json start script (Node.js):**
+
+<CopyBlock
+  code="\"scripts\": {
+  \"start\": \"node server.js\"
+}"
+  language="json"
+/>
+
+**Port configuration (critical):**
+
+Render uses PORT environment variable. Your app must listen on it:
+
+<CopyBlock
+  code="const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log('Server is running on port ' + port);
+});"
+  language="javascript"
+/>
+
+Or Python:
+
+<CopyBlock
+  code="import os
+port = int(os.environ.get('PORT', 5000))
+app.run(host='0.0.0.0', port=port)"
+  language="python"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/render/step1-repo-prepare-en.png"
+  alt="Prepare GitHub Repository"
+  caption="Prepare repo before deployment"
+  priority={true}
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="Create and Deploy Web Service in Render">
+
+In Render dashboard:
+
+1. Click **New +** button.
+2. Select **Web Service**.
+3. Select your GitHub repository.
+4. Verify settings:
+   - **Name**: App name
+   - **Runtime**: Node, Python, Go, etc.
+   - **Build Command**: npm install, pip install, etc.
+   - **Start Command**: npm start, python app.py, etc.
+
+5. Select **Free** instance (90-day free).
+6. Click **Deploy**.
+
+Watch deployment progress in logs.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/render/step2-deploy-en.png"
+  alt="Render Deployment"
+  caption="Deploy web service to Render"
+/>
+
+<Callout type="tip">
+💡 **Tip**: First deployment can take 5-10 minutes.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="Set Environment Variables">
+
+Configure database URLs, API keys, etc. as environment variables.
+
+**Add environment variables in Render:**
+
+1. Click your deployed app in dashboard.
+2. Go to **Environment** tab.
+3. Click **Add Environment Variable**.
+4. Enter **Key** (e.g., DATABASE_URL).
+5. Enter **Value** (database connection string).
+6. Click **Save**.
+
+**Add multiple variables:**
+
+<CopyBlock
+  code="DATABASE_URL=postgresql://...
+API_KEY=sk_test_...
+REDIS_URL=redis://..."
+  language="bash"
+/>
+
+**Redeploy after changes:**
+
+Auto-redeploy or click **Manual Deploy** button.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/render/step3-env-vars-en.png"
+  alt="Environment Variables"
+  caption="Manage environment variables in Render"
+/>
+
+</Step>
+
+---
+
+<Step number={4} title="Deployment Complete and Monitoring">
+
+When deployment finishes:
+
+1. Check **URL** (e.g., https://my-app.onrender.com).
+2. Visit URL in browser.
+3. Verify app works correctly.
+
+**Check logs:**
+
+1. Go to **Logs** tab for real-time logs.
+2. Find errors in logs if issues occur.
+
+**GitHub auto-deploy:**
+
+1. Enable **Auto-Deploy** toggle (default).
+2. Select **main branch**.
+3. GitHub push triggers auto-deploy.
+
+**Connect domain:**
+
+1. Go to **Settings** tab.
+2. Add **Custom Domain**.
+3. Configure DNS records.
+
+**Restart/delete app:**
+
+1. **Settings > Restart Service** - Restart app.
+2. **Settings > Delete Service** - Delete app.
+
+<Checkpoint
+  title="Verify Deployment Complete"
+  items={[
+    "Is web service created on Render?",
+    "Did deployment succeed?",
+    "Can you visit the deployed URL?",
+    "Did you set environment variables?",
+    "Are there no errors in logs?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **Complete!** Your web app is deployed to Render. GitHub pushes now auto-deploy.
+</Callout>
+
+</Step>
+
+---
+
+## Next Steps
+
+After completing Render deployment:
+
+1. **[Add Database](https://render.com/docs/databases)** - Connect PostgreSQL database
+2. **[Connect Domain](https://render.com/docs/custom-domains)** - Set up custom domain
+3. **[Manage Environments](https://render.com/docs/environment-variables)** - Separate dev/production
+
+---
+
+## Developer Tips
+
+<DevTip>
+**Auto-deploy troubleshooting:**
+
+If GitHub push doesn't auto-deploy:
+
+1. Check GitHub Webhook settings
+2. Use **Manual Deploy** button
+3. Check logs for errors
+
+Use render.yaml to include config in code.
+</DevTip>
+
+---
+
+## Frequently Asked Questions
+
+<Callout type="info">
+**Q. I get 502 error after deployment**
+
+A. Check:
+- Are you using PORT environment variable?
+- Is start command correct?
+- Did dependencies install?
+- Check logs for errors
+</Callout>
+
+<Callout type="info">
+**Q. Web service auto-stops**
+
+A. 90-day trial ended or free instance auto-paused (cost savings). Upgrade to paid or manually restart.
+</Callout>
+
+<Callout type="info">
+**Q. I have a domain. Can I connect it?**
+
+A. Yes! In **Custom Domain** settings, point DNS record as CNAME.
+</Callout>
+
+---
+
+## Troubleshooting
+
+### Deployment fails
+
+- Check build logs: **Logs** tab
+- Verify buildCommand and startCommand
+- Check dependency files (package.json, requirements.txt)
+
+### App won't run
+
+- Check logs
+- Verify PORT environment variable
+- Check port binds to 0.0.0.0
+
+### Auto-deploy not working
+
+- Verify **Auto-Deploy** is enabled in dashboard
+- Check GitHub Webhook
+- Test with manual deploy
+
+---
+
+**Congratulations!** Your web app is successfully deployed to Render. Auto-deploy happens on every GitHub push! 🚀

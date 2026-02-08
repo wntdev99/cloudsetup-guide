@@ -1,0 +1,352 @@
+# Deploy Applications to Fly.io
+
+Now that your Fly.io CLI is set up, it's time to **deploy a real application**. You can deploy apps written in Node.js, Python, Go, Ruby, and more. Get your application live worldwide in just 30 minutes.
+
+<FreeTierInfo
+  service="Fly.io App Deployment"
+  limit="3 shared CPU VMs, 3GB storage/month"
+  period="forever"
+  status="generous"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Fly.io account and CLI setup complete", required: true },
+  { text: "Application to deploy (Node.js, Python, Go, Ruby, etc.)", required: true },
+  { text: "Git installed (optional)", required: false }
+]} />
+
+<Callout type="info">
+🚀 **Goal**: Deploy your application to Fly.io and serve it to users worldwide. Fly.io automatically builds and deploys Docker images.
+</Callout>
+
+---
+
+<Step number={1} title="Prepare Application and Create fly.toml">
+
+**Create app directory:**
+
+<CopyBlock
+  code="mkdir my-app && cd my-app"
+  language="bash"
+/>
+
+**Initialize Fly.io app:**
+
+<CopyBlock
+  code="flyctl launch"
+  language="bash"
+/>
+
+At the prompts:
+
+1. Enter **app name** (e.g., my-awesome-app).
+2. Choose **region** (default: SFO).
+3. Add **database?** - select if needed.
+4. Enter **Y** or as desired.
+
+This command creates a **fly.toml** file - your deployment config.
+
+**fly.toml file contents:**
+
+<CopyBlock
+  code="app = 'my-awesome-app'
+primary_region = 'sfo'
+
+[build]
+image = 'my-awesome-app:latest'
+
+[[services]]
+internal_port = 3000
+protocol = 'tcp'
+auto_stop_machines = true
+auto_start_machines = true"
+  language="toml"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/flyio/step1-launch-en.png"
+  alt="Fly.io App Launch"
+  caption="Initialize your Fly.io app with flyctl launch"
+  priority={true}
+/>
+
+<Callout type="tip">
+💡 **Tip**: Change the port number to match your app's port (Node.js usually 3000, Python 5000).
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Test Application Locally">
+
+Test your app locally before deploying.
+
+**Node.js example:**
+
+<CopyBlock
+  code="npm install && npm start"
+  language="bash"
+/>
+
+**Python example:**
+
+<CopyBlock
+  code="pip install -r requirements.txt && python app.py"
+  language="bash"
+/>
+
+**Go example:**
+
+<CopyBlock
+  code="go run main.go"
+  language="bash"
+/>
+
+Verify your app runs at http://localhost:3000 (or your port).
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/flyio/step2-local-test-en.png"
+  alt="Local Application Test"
+  caption="Test your application on localhost"
+/>
+
+<Callout type="warning">
+⚠️ **Important**: If it doesn't work locally, it won't work after deployment.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="Deploy Application to Fly.io">
+
+Now deploy your application.
+
+<CopyBlock
+  code="flyctl deploy"
+  language="bash"
+/>
+
+Deployment process:
+
+1. **Create Dockerfile** - flyctl generates one automatically (optional).
+2. **Build image** - Build Docker image.
+3. **Push to registry** - Upload to Fly.io registry.
+4. **Create machines** - Create VM instances.
+5. **Deploy** - Start application.
+
+When deployment completes:
+
+<CopyBlock
+  code="Visit your newly deployed app at https://my-awesome-app.fly.dev"
+  language="bash"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/flyio/step3-deploy-en.png"
+  alt="Application Deployment"
+  caption="Deploy your app with flyctl deploy"
+/>
+
+<Callout type="success">
+✅ **Congratulations!** Your app is deployed!
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="Manage and Monitor Deployed App">
+
+Manage your app after deployment.
+
+**View logs:**
+
+<CopyBlock
+  code="flyctl logs"
+  language="bash"
+/>
+
+**Check app status:**
+
+<CopyBlock
+  code="flyctl status"
+  language="bash"
+/>
+
+**Set environment variables:**
+
+<CopyBlock
+  code="flyctl secrets set DATABASE_URL=postgresql://..."
+  language="bash"
+/>
+
+Or multiple variables at once:
+
+<CopyBlock
+  code="flyctl secrets set API_KEY=xyz DATABASE_URL=postgresql://..."
+  language="bash"
+/>
+
+**Scale your app:**
+
+<CopyBlock
+  code="flyctl scale vm shared-cpu-1x 3"
+  language="bash"
+/>
+
+This scales to 3 VM instances (max 3 total on free tier).
+
+**Connect a domain:**
+
+<CopyBlock
+  code="flyctl certs add example.com"
+  language="bash"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/flyio/step4-manage-en.png"
+  alt="Manage Deployed App"
+  caption="Manage your deployed app with flyctl"
+/>
+
+<Callout type="tip">
+💡 **Tip**: Use `flyctl status` to check real-time status.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={5} title="Updates and Redeployment">
+
+Redeploy after code changes.
+
+**Modify code:**
+
+Update your app code.
+
+**Redeploy:**
+
+<CopyBlock
+  code="flyctl deploy"
+  language="bash"
+/>
+
+Or use a specific Dockerfile:
+
+<CopyBlock
+  code="flyctl deploy --dockerfile ./Dockerfile"
+  language="bash"
+/>
+
+**View deployment history:**
+
+<CopyBlock
+  code="flyctl releases"
+  language="bash"
+/>
+
+**Rollback to previous version:**
+
+<CopyBlock
+  code="flyctl releases rollback"
+  language="bash"
+/>
+
+<Checkpoint
+  title="Verify Deployment Complete"
+  items={[
+    "Did you run flyctl launch?",
+    "Did you test locally?",
+    "Did you deploy with flyctl deploy?",
+    "Did you visit the deployed URL?",
+    "Did you check the logs?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **Complete!** Your app is deployed to Fly.io and accessible worldwide.
+</Callout>
+
+</Step>
+
+---
+
+## Next Steps
+
+After completing Fly.io deployment:
+
+1. **[Set Up Custom Domain](https://fly.io/docs/networking/custom-domain/)** - Connect custom domain
+2. **[Automate Deployment](https://fly.io/docs/reference/github-actions/)** - Auto-deploy with GitHub Actions
+3. **[Add Database](https://fly.io/docs/postgres/)** - Add PostgreSQL
+
+---
+
+## Developer Tips
+
+<DevTip>
+**Key flyctl Deployment Commands:**
+
+```
+flyctl deploy               # Deploy
+flyctl deploy --strategy=rolling  # Rolling deployment
+flyctl deploy --detach              # Background deployment
+flyctl deploy --build-only          # Build only
+```
+
+--strategy=rolling enables zero-downtime deployments.
+</DevTip>
+
+---
+
+## Frequently Asked Questions
+
+<Callout type="info">
+**Q. Deployment fails**
+
+A. Check logs: `flyctl logs`. Common causes:
+- Port configuration error
+- Missing environment variables
+- Missing dependencies
+</Callout>
+
+<Callout type="info">
+**Q. App won't run after deployment**
+
+A. Check status with `flyctl status` and find errors with `flyctl logs`.
+</Callout>
+
+<Callout type="info">
+**Q. How do I set environment variables?**
+
+A. Use `flyctl secrets set KEY=VALUE`. Redeploy after changes.
+</Callout>
+
+---
+
+## Troubleshooting
+
+### "Failed to connect to builder" error
+
+- Check internet connection
+- Check Fly.io status page
+- Try again: `flyctl deploy --force`
+
+### 502 error after deployment
+
+- Check `flyctl logs`
+- Verify port in fly.toml
+- Verify environment variables
+
+### Out of memory error
+
+- Upgrade machine: `flyctl scale vm shared-cpu-2x`
+- Or check for memory leaks
+
+---
+
+**Congratulations!** Your application is successfully deployed to Fly.io. Users worldwide can now access your app! 🚀

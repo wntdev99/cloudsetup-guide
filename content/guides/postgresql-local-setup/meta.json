@@ -1,0 +1,56 @@
+{
+  "slug": "postgresql-local-setup",
+  "platform": "postgresql",
+  "service": "PostgreSQL Local Installation",
+  "category": "database",
+  "difficulty": "beginner",
+  "estimatedMinutes": 20,
+  "totalSteps": 4,
+  "freeTier": {
+    "service": "PostgreSQL",
+    "limit": "무제한",
+    "period": "forever",
+    "status": "free",
+    "conditions": [
+      "오픈 소스 완전 무료",
+      "무제한 데이터베이스 생성 가능",
+      "로컬 개발에 최적",
+      "프로덕션 사용 가능",
+      "커뮤니티 지원"
+    ]
+  },
+  "prerequisites": [],
+  "nextGuides": [
+    "postgresql-cloud-setup"
+  ],
+  "tags": ["database", "postgresql", "sql", "local", "development"],
+  "seo": {
+    "ko": {
+      "title": "PostgreSQL 로컬 설치 및 데이터베이스 생성 가이드 | CloudSetup.guide",
+      "description": "Windows, Mac, Linux에 PostgreSQL을 설치하고 로컬 데이터베이스를 생성하는 방법을 단계별로 배우세요. 개발 환경 설정 완료 가이드입니다.",
+      "keywords": [
+        "PostgreSQL 설치",
+        "PostgreSQL 로컬",
+        "데이터베이스 생성",
+        "PostgreSQL 가이드",
+        "pgAdmin",
+        "SQL 데이터베이스",
+        "개발 환경"
+      ]
+    },
+    "en": {
+      "title": "PostgreSQL Local Installation and Database Creation Guide | CloudSetup.guide",
+      "description": "Learn step-by-step how to install PostgreSQL on Windows, Mac, and Linux and create local databases. Complete guide for setting up your development environment.",
+      "keywords": [
+        "PostgreSQL installation",
+        "PostgreSQL local",
+        "database creation",
+        "PostgreSQL tutorial",
+        "pgAdmin",
+        "SQL database",
+        "development environment"
+      ]
+    }
+  },
+  "lastVerified": "2025-02-08"
+}

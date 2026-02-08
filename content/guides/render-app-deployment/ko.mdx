@@ -1,0 +1,281 @@
+# Render에 웹앱 배포하기
+
+Render 계정이 준비되었으니 이제 **실제 웹 애플리케이션을 배포**할 차례입니다. Node.js, Python, Go, Ruby 등 어떤 언어의 앱도 배포할 수 있습니다. 25분 안에 배포를 완료할 수 있습니다.
+
+<FreeTierInfo
+  service="Render 웹앱 배포"
+  limit="90일 무료 트라이얼"
+  period="trial"
+  status="generous"
+/>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "Render 계정 및 설정 완료", required: true },
+  { text: "배포할 웹 애플리케이션 (GitHub 리포지토리)", required: true },
+  { text: "Node.js, Python, Go 등의 애플리케이션", required: true }
+]} />
+
+<Callout type="info">
+🚀 **목표**: 웹 애플리케이션을 Render에 배포하고 전 세계 사용자에게 서빙합니다.
+</Callout>
+
+---
+
+<Step number={1} title="GitHub 리포지토리 준비">
+
+배포 전에 리포지토리를 준비합니다.
+
+**필수 파일:**
+
+- **package.json** (Node.js) 또는 **requirements.txt** (Python) 또는 **go.mod** (Go)
+- **Procfile** (선택사항 - Render 설정)
+
+**Procfile 예제 (Node.js):**
+
+<CopyBlock
+  code="web: npm start"
+  language="bash"
+/>
+
+**Procfile 예제 (Python):**
+
+<CopyBlock
+  code="web: gunicorn app:app"
+  language="bash"
+/>
+
+**package.json start 스크립트 확인 (Node.js):**
+
+<CopyBlock
+  code="\"scripts\": {
+  \"start\": \"node server.js\"
+}"
+  language="json"
+/>
+
+**포트 설정 (중요):**
+
+Render는 PORT 환경 변수를 사용합니다. 앱이 다음과 같이 설정해야 합니다:
+
+<CopyBlock
+  code="const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log('Server is running on port ' + port);
+});"
+  language="javascript"
+/>
+
+또는 Python:
+
+<CopyBlock
+  code="import os
+port = int(os.environ.get('PORT', 5000))
+app.run(host='0.0.0.0', port=port)"
+  language="python"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/render/step1-repo-prepare-ko.png"
+  alt="GitHub 리포지토리 준비"
+  caption="배포 전 리포지토리 준비"
+  priority={true}
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="Render에 웹 서비스 생성 및 배포">
+
+Render 대시보드에서:
+
+1. **New +** 버튼 클릭.
+2. **Web Service** 선택.
+3. GitHub 리포지토리 선택.
+4. 다음 설정 확인:
+   - **Name**: 앱 이름
+   - **Runtime**: Node, Python, Go 등
+   - **Build Command**: npm install, pip install 등
+   - **Start Command**: npm start, python app.py 등
+
+5. **Free** 인스턴스 선택 (90일 무료).
+6. **Deploy** 클릭.
+
+배포 진행 상황을 로그로 확인할 수 있습니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/render/step2-deploy-ko.png"
+  alt="Render 배포"
+  caption="Render에 웹 서비스 배포"
+/>
+
+<Callout type="tip">
+💡 **팁**: 첫 배포는 5~10분 걸릴 수 있습니다.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="환경 변수 설정 및 관리">
+
+데이터베이스 URL, API 키 등을 환경 변수로 설정합니다.
+
+**Render에서 환경 변수 추가:**
+
+1. 대시보드에서 배포된 앱을 클릭.
+2. **Environment** 탭으로 이동.
+3. **Add Environment Variable** 클릭.
+4. **Key** 입력 (예: DATABASE_URL).
+5. **Value** 입력 (데이터베이스 연결 문자열).
+6. **Save** 클릭.
+
+**여러 환경 변수 추가:**
+
+<CopyBlock
+  code="DATABASE_URL=postgresql://...
+API_KEY=sk_test_...
+REDIS_URL=redis://..."
+  language="bash"
+/>
+
+**앱 재배포:**
+
+환경 변수 변경 후 자동으로 재배포되거나, **Manual Deploy** 버튼을 클릭하여 수동으로 배포합니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/render/step3-env-vars-ko.png"
+  alt="환경 변수 설정"
+  caption="Render에서 환경 변수 관리"
+/>
+
+</Step>
+
+---
+
+<Step number={4} title="배포 완료 및 모니터링">
+
+배포가 완료되면:
+
+1. **URL** 확인 (예: https://my-app.onrender.com).
+2. 브라우저에서 URL 방문.
+3. 앱이 정상 작동하는지 확인.
+
+**로그 확인:**
+
+1. **Logs** 탭에서 실시간 로그 확인.
+2. 오류가 있으면 로그에서 원인 찾기.
+
+**GitHub 자동 배포:**
+
+1. **Auto-Deploy** 토글 활성화 (기본값).
+2. **메인 브랜치** 선택.
+3. GitHub에 푸시하면 자동 배포.
+
+**도메인 연결:**
+
+1. **Settings** 탭으로 이동.
+2. **Custom Domain** 추가.
+3. DNS 레코드 설정.
+
+**앱 재시작/삭제:**
+
+1. **Settings > Restart Service** - 앱 재시작.
+2. **Settings > Delete Service** - 앱 삭제.
+
+<Checkpoint
+  title="배포 완료 확인"
+  items={[
+    "Render에 웹 서비스가 생성되었나요?",
+    "배포가 성공했나요?",
+    "배포된 URL에 접속할 수 있나요?",
+    "환경 변수를 설정했나요?",
+    "로그에서 오류가 없나요?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **완료!** 웹 애플리케이션이 Render에 배포되었습니다. 이제 GitHub에 푸시하면 자동으로 배포됩니다.
+</Callout>
+
+</Step>
+
+---
+
+## 다음 단계
+
+Render 배포를 완료했으니:
+
+1. **[데이터베이스 추가](https://render.com/docs/databases)** - PostgreSQL 데이터베이스 연결
+2. **[도메인 연결](https://render.com/docs/custom-domains)** - 커스텀 도메인 설정
+3. **[환경 관리](https://render.com/docs/environment-variables)** - 개발/프로덕션 환경 분리
+
+---
+
+## 개발자 팁
+
+<DevTip>
+**자동 배포 문제 해결:**
+
+만약 GitHub 푸시 후 배포가 안 되면:
+
+1. GitHub Webhook 설정 확인
+2. **Manual Deploy** 버튼으로 수동 배포
+3. 로그에서 오류 확인
+
+render.yaml 파일로 설정을 코드에 포함시킬 수도 있습니다.
+</DevTip>
+
+---
+
+## 자주 묻는 질문
+
+<Callout type="info">
+**Q. 배포 후 502 오류가 발생합니다**
+
+A. 다음을 확인하세요:
+- PORT 환경 변수 사용했나?
+- Start command가 올바른가?
+- 의존성이 설치되었나?
+- 로그에서 오류를 찾으세요
+</Callout>
+
+<Callout type="info">
+**Q. 웹 서비스가 자동으로 멈춥니다**
+
+A. 90일 무료 트라이얼이 끝났거나, 무료 인스턴스가 자동 멈춤됨 (비용 절감). 유료로 업그레이드하거나 수동으로 재시작합니다.
+</Callout>
+
+<Callout type="info">
+**Q. 도메인을 이미 가지고 있습니다. 연결할 수 있나요?**
+
+A. 예! **Custom Domain** 설정에서 DNS 레코드를 CNAME으로 가리키면 됩니다.
+</Callout>
+
+---
+
+## 문제 해결
+
+### 배포가 실패합니다
+
+- 빌드 로그 확인: **Logs** 탭
+- buildCommand와 startCommand 확인
+- 의존성 파일 확인 (package.json, requirements.txt)
+
+### 앱이 실행되지 않습니다
+
+- 로그 확인
+- PORT 환경 변수 설정 확인
+- 포트가 0.0.0.0에 바인드되어 있는지 확인
+
+### 자동 배포가 작동하지 않습니다
+
+- 대시보드에서 **Auto-Deploy** 활성화 확인
+- GitHub Webhook 확인
+- 수동 배포로 테스트
+
+---
+
+**축하합니다!** 웹 애플리케이션이 Render에 성공적으로 배포되었습니다. 이제 GitHub에 푸시할 때마다 자동으로 배포됩니다! 🚀

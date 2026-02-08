@@ -1,0 +1,232 @@
+# Create Twilio Account and Setup Phone Numbers
+
+Twilio is a **powerful platform for adding SMS, voice calls, and video to your applications**. Start free and communicate with users worldwide. Set up your account and prepare to send your first SMS in just 20 minutes.
+
+<FreeTierInfo
+  service="Twilio"
+  limit="Free trial $15 credit"
+  period="trial"
+  status="generous"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Email address", required: true },
+  { text: "Phone number (for verification)", required: true },
+  { text: "Credit card (optional)", required: false }
+]} />
+
+<Callout type="info">
+📞 **What is Twilio?** Twilio is an API platform that lets developers programmatically send SMS, voice calls, and video calls. Use it for membership verification, OTP validation, notifications, and more.
+</Callout>
+
+---
+
+<Step number={1} title="Create Twilio Account">
+
+1. Visit [Twilio.com](https://www.twilio.com).
+2. Click **Sign Up** button.
+3. Enter **email**, **password**, and **name**.
+4. Agree to **terms** and click **Create Account**.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/twilio/step1-signup-en.png"
+  alt="Twilio Signup"
+  caption="Create your Twilio account"
+  priority={true}
+/>
+
+<Callout type="tip">
+💡 **Tip**: You can also sign up with GitHub, Google, or Microsoft accounts.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Enter Account Info and Verify Phone">
+
+1. Select your **use case** (e.g., Send SMS, make calls).
+2. Enter **name**, **company**, **country**.
+3. Enter and verify **phone number**:
+   - Receive SMS code, or
+   - Phone call verification
+
+4. Enter the verification code.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/twilio/step2-phone-verification-en.png"
+  alt="Twilio Phone Verification"
+  caption="Verify phone number to activate account"
+/>
+
+<Callout type="warning">
+⚠️ **Important**: Twilio requires phone verification for account security.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="Check Free Trial Credits and Create API Keys">
+
+1. Go to dashboard.
+2. In **Account Settings**, verify your free trial $15 credit.
+3. Go to **API Keys & Tokens** section:
+   - Copy your **Account SID**
+   - Copy your **Auth Token** (never share!)
+
+4. Or create a new API key:
+   - Click **Create API Key** button
+   - Enter **Friendly Name** (e.g., My App API Key)
+   - Select **SID Type** (Standard)
+   - Click **Create**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/twilio/step3-api-keys-en.png"
+  alt="Twilio API Keys"
+  caption="Get your Account SID and Auth Token"
+/>
+
+<Callout type="warning">
+⚠️ **Security**: Never share your Auth Token. Store in environment variables, not hardcoded.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="Acquire Twilio Phone Number">
+
+You need a Twilio phone number to send SMS or make calls.
+
+**Get trial phone number:**
+
+1. Click **Phone Numbers** in dashboard.
+2. Click **Get Started**.
+3. Select **Buy a Number**.
+4. Choose your **country** (e.g., US +1).
+5. Enter **Area Code** (optional).
+6. Select your desired **phone number**.
+7. Click **Buy**.
+
+**Set environment variables:**
+
+Save in your .env file:
+
+<CopyBlock
+  code="TWILIO_ACCOUNT_SID=AC...
+TWILIO_AUTH_TOKEN=your_auth_token_here
+TWILIO_PHONE_NUMBER=+1234567890"
+  language="bash"
+/>
+
+**Add verified caller IDs (trial mode):**
+
+In trial mode, you can only SMS 20 verified phone numbers.
+
+1. Go to **Verified Caller IDs**.
+2. Click **Add a Verified Caller ID**.
+3. Enter the recipient phone number.
+4. Confirm with SMS code.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/twilio/step4-phone-number-en.png"
+  alt="Twilio Phone Number Setup"
+  caption="Buy Twilio phone number and add verified senders"
+/>
+
+<Checkpoint
+  title="Verify Your Setup"
+  items={[
+    "Is your Twilio account created?",
+    "Did you verify with phone number?",
+    "Do you have Account SID and Auth Token?",
+    "Did you buy a Twilio phone number?",
+    "Did you add verified senders?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **Complete!** Your Twilio account is ready. Follow the [Twilio SMS Integration](../twilio-sms-integration) guide to send SMS from your application.
+</Callout>
+
+</Step>
+
+---
+
+## Next Steps
+
+After completing your Twilio account setup:
+
+1. **[Twilio SMS Integration](../twilio-sms-integration)** - Send SMS from your app
+2. **[Twilio Voice API](https://www.twilio.com/docs/voice)** - Add voice calls
+3. **[Twilio Video](https://www.twilio.com/docs/video)** - Add video calls
+
+---
+
+## Developer Tips
+
+<DevTip>
+**Trial Mode Limitations:**
+
+- Limited to $15 credit
+- SMS only to 20 verified numbers
+- Unlimited API calls (within credit limits)
+
+Upgrade to paid account for production use.
+</DevTip>
+
+---
+
+## Frequently Asked Questions
+
+<Callout type="info">
+**Q. How much does a Twilio phone number cost per month?**
+
+A. Varies by country, usually $1-$2/month. Your $15 trial credit covers multiple months.
+</Callout>
+
+<Callout type="info">
+**Q. What happens when trial credits run out?**
+
+A. Add a credit card and convert to paid account for additional services. Set spending limits to control costs.
+</Callout>
+
+<Callout type="info">
+**Q. I lost my Auth Token**
+
+A. Generate a new one in your dashboard. The old one is automatically revoked.
+</Callout>
+
+<Callout type="info">
+**Q. What countries does Twilio support?**
+
+A. Almost all countries. Check the [Twilio supported countries list](https://www.twilio.com/docs/phone-numbers/phone-number-capabilities).
+</Callout>
+
+---
+
+## Troubleshooting
+
+### Limited to trial account
+
+- Check status: `Account > General Settings > Account Type`
+- Add credit card
+- Request upgrade from Twilio
+
+### SMS sending fails
+
+- Verify recipient number (trial mode)
+- Check Account SID and Auth Token
+- Verify you have credits remaining
+
+### Can't buy phone number
+
+- Verify you added payment info
+- Check if Twilio supports your country
+
+---
+
+**Congratulations!** Your Twilio account is fully set up. Next, add SMS functionality to your application! 🚀

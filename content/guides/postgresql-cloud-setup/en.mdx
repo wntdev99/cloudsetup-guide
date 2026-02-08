@@ -1,0 +1,310 @@
+# PostgreSQL Cloud Database Setup
+
+After finishing local development, it's time to set up a **cloud database for production**. You can host PostgreSQL on various cloud platforms including Supabase, Railway, and AWS RDS. Get your production database running in just 25 minutes.
+
+<FreeTierInfo
+  service="PostgreSQL Cloud (Supabase)"
+  limit="500MB storage, unlimited API"
+  period="free tier"
+  status="generous"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "PostgreSQL local installation completed", required: true },
+  { text: "Cloud account (Supabase or other provider)", required: true },
+  { text: "Local database data (if applicable)", required: false }
+]} />
+
+<Callout type="info">
+☁️ **What is Cloud PostgreSQL?** Cloud-hosted PostgreSQL is a database that runs on cloud servers instead of your local machine. It provides scaling, automatic backups, high availability, and is perfect for production applications.
+</Callout>
+
+---
+
+<Step number={1} title="Create PostgreSQL Database on Supabase">
+
+**Supabase is the best free PostgreSQL hosting option.**
+
+1. Visit [Supabase.com](https://supabase.com).
+2. Click **Start your project** button.
+3. Sign up or log in (GitHub, Google, or email).
+4. Enter your **project name** (e.g., my-app-db).
+5. Set your **database password** and save it.
+6. Choose your **region** (closest to your users).
+7. Click **Create project**.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/postgresql/step1-supabase-create-en.png"
+  alt="Supabase Project Creation"
+  caption="Create a new project on Supabase dashboard"
+  priority={true}
+/>
+
+<Callout type="tip">
+💡 **Tip**: Supabase is the most beginner-friendly cloud PostgreSQL provider.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Get Database Connection Information">
+
+Once your project is created, find the connection details.
+
+1. Go to **Settings** in the left sidebar.
+2. Click **Database** section.
+3. Find **Connection Pooling** or **Direct Connection** information.
+4. Copy your **Connection String**:
+
+The connection string looks like this:
+
+```
+postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
+```
+
+Or with connection pooling:
+
+```
+postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:6543/postgres
+```
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/postgresql/step2-connection-info-en.png"
+  alt="Supabase Connection Information"
+  caption="Find your database connection information"
+/>
+
+<Callout type="warning">
+⚠️ **Security**: Your connection string contains a password. Never share it. Store it in environment variables.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="Migrate Local Database to Cloud (Optional)">
+
+If you have an existing local database, you can migrate it to the cloud.
+
+**Step 1: Export Local Database**
+
+On your local computer:
+
+<CopyBlock
+  code="pg_dump -U postgres myapp > myapp_backup.sql"
+  language="bash"
+/>
+
+Enter your superuser password when prompted.
+
+**Step 2: Restore to Supabase**
+
+<CopyBlock
+  code="psql -h db.[PROJECT-REF].supabase.co -U postgres -d postgres -f myapp_backup.sql"
+  language="bash"
+/>
+
+Enter your Supabase database password.
+
+Or use the Supabase SQL Editor:
+
+1. Go to **SQL Editor** in Supabase dashboard.
+2. Click **New query**.
+3. Copy and paste the contents of your backup file.
+4. Click **Run**.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/postgresql/step3-migration-en.png"
+  alt="PostgreSQL Data Migration"
+  caption="Migrate database using pg_dump"
+/>
+
+<Callout type="info">
+ℹ️ **Note**: You can skip this step if you don't have existing data.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="Connect Your Application">
+
+Now connect your application to the cloud database.
+
+**Save Connection String in .env:**
+
+<CopyBlock
+  code="DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@db.YOUR_REF.supabase.co:5432/postgres"
+  language="bash"
+/>
+
+**Node.js/Express Example:**
+
+<CopyBlock
+  code="const Pool = require('pg').Pool;
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
+});
+
+pool.query('SELECT NOW()', (err, res) => {
+  if (err) console.error('Connection failed:', err);
+  else console.log('Connected!', res.rows);
+});"
+  language="javascript"
+/>
+
+**Python/Flask Example:**
+
+<CopyBlock
+  code="import psycopg2
+import os
+
+conn = psycopg2.connect(os.getenv('DATABASE_URL'), sslmode='require')
+cursor = conn.cursor()
+cursor.execute('SELECT NOW()')
+print('Connected!', cursor.fetchone())
+cursor.close()
+conn.close()"
+  language="python"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/postgresql/step4-app-connection-en.png"
+  alt="Application Database Connection"
+  caption="Connect your app to cloud database"
+/>
+
+<Callout type="tip">
+💡 **Tip**: Always use SSL connections to protect your cloud database.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={5} title="Explore Other Cloud Platform Options">
+
+Beyond Supabase, here are other options:
+
+**Railway.app**
+- Free $5/month credits
+- Simple deployment
+- Auto-generated connection strings
+- Website: [railway.app](https://railway.app)
+
+**AWS RDS PostgreSQL**
+- Free 750 hours for 12 months
+- Most powerful option
+- Complex setup
+- Website: [aws.amazon.com/rds](https://aws.amazon.com/rds)
+
+**Render**
+- 90-day free trial
+- Automatic backups
+- Simple UI
+- Website: [render.com](https://render.com)
+
+**DigitalOcean Database**
+- Starts at $15/month
+- SSD storage included
+- Automatic backups
+- Website: [digitalocean.com](https://www.digitalocean.com/products/managed-databases)
+
+<Checkpoint
+  title="Verify Your Setup"
+  items={[
+    "Is your cloud PostgreSQL project created?",
+    "Did you find your connection string?",
+    "Is the connection string saved in environment variables?",
+    "Can your app connect to the database?",
+    "Can you execute queries successfully?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **Complete!** Your production-ready cloud PostgreSQL database is set up. You're ready to deploy your application and store data with confidence.
+</Callout>
+
+</Step>
+
+---
+
+## Next Steps
+
+After completing your cloud PostgreSQL setup:
+
+1. **[Database Backups and Restore](https://supabase.com/docs/guides/database/backups)** - Set up regular backups
+2. **[Performance Monitoring](https://supabase.com/docs/guides/database/monitoring)** - Track database health
+3. **[Security Setup](https://supabase.com/docs/guides/auth/row-level-security)** - Enable Row-Level Security
+
+---
+
+## Developer Tips
+
+<DevTip>
+**Connection Pooling vs Direct Connection:**
+
+- **Direct Connection** (port 5432): Best for long-running applications
+- **Connection Pooling** (port 6543): Best for serverless, AWS Lambda, etc.
+
+Supabase provides connection pooling with PgBouncer. Use the pooling port for serverless functions.
+</DevTip>
+
+---
+
+## Frequently Asked Questions
+
+<Callout type="info">
+**Q. Can I test my cloud database from local development?**
+
+A. Yes! You can connect your local application to the cloud database using environment variables and test it. Just remember to account for network latency during development.
+</Callout>
+
+<Callout type="info">
+**Q. How much data can I store on Supabase free tier?**
+
+A. Supabase free tier provides 1GB storage. Exceeding that incurs additional charges. For production apps, upgrading to a paid plan is recommended.
+</Callout>
+
+<Callout type="info">
+**Q. I get errors during data migration**
+
+A. pg_dump may not support certain custom extensions or functions. Try executing each part individually in Supabase SQL Editor. Alternatively, export your data as CSV and migrate manually.
+</Callout>
+
+<Callout type="info">
+**Q. Is my connection string a security risk?**
+
+A. Yes, connection strings contain passwords and are very sensitive. Always store them in environment variables and never commit .env files to version control. Add .env to your .gitignore.
+</Callout>
+
+---
+
+## Troubleshooting
+
+### "Cannot connect" error
+
+- Verify your connection string is correct
+- Check that your project is active in Supabase dashboard
+- Check firewall or network restrictions
+- Verify SSL mode (sslmode=require)
+
+### Data not visible after migration
+
+- Run a SELECT query in Supabase SQL Editor
+- Verify you're connected to the correct database (default: postgres)
+- Check that tables were copied correctly
+
+### Slow query performance
+
+- Add indexes to frequently queried columns
+- Optimize your queries
+- Use Supabase monitoring tools to find slow queries
+
+---
+
+**Congratulations!** Your production-ready cloud PostgreSQL database is fully set up. You're ready to deploy with confidence! 🚀

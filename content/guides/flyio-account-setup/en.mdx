@@ -1,0 +1,292 @@
+# Create Fly.io Account and Install CLI
+
+Fly.io is a **modern cloud platform for deploying Docker containers globally**. Start free and deploy production-grade applications. Complete account setup and deployment preparation in just 20 minutes.
+
+<FreeTierInfo
+  service="Fly.io"
+  limit="3 shared CPU VMs, 3GB storage/month"
+  period="forever"
+  status="generous"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Email address", required: true },
+  { text: "Docker installed (optional)", required: false },
+  { text: "Node.js, Python, Go, Ruby app (optional)", required: false }
+]} />
+
+<Callout type="info">
+🚀 **What is Fly.io?** Fly.io is a container-based application deployment platform. Deploy your apps across multiple regions worldwide to provide fast responses to users. Supports auto-scaling and automatic SSL.
+</Callout>
+
+---
+
+<Step number={1} title="Create Fly.io Account">
+
+1. Visit [Fly.io](https://fly.io).
+2. Click **Get Started** or **Sign Up** button.
+3. Choose your sign-in method:
+   - GitHub account
+   - Google account
+   - Email and password
+
+4. Enter your account information.
+5. Click **Create Account**.
+6. Verify email if needed.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/flyio/step1-signup-en.png"
+  alt="Fly.io Signup"
+  caption="Create your Fly.io account - sign up with GitHub, Google, or email"
+  priority={true}
+/>
+
+<Callout type="tip">
+💡 **Tip**: Signing up with GitHub is faster.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Install CLI (macOS/Linux)">
+
+You need to install the flyctl CLI for Fly.io deployment.
+
+**macOS (Homebrew recommended):**
+
+<CopyBlock
+  code="brew install flyctl"
+  language="bash"
+/>
+
+**Or using curl:**
+
+<CopyBlock
+  code="curl -L https://fly.io/install.sh | sh"
+  language="bash"
+/>
+
+**Linux (Ubuntu/Debian):**
+
+<CopyBlock
+  code="curl -L https://fly.io/install.sh | sh"
+  language="bash"
+/>
+
+Add to PATH:
+
+<CopyBlock
+  code="export PATH=$PATH:~/.fly/bin"
+  language="bash"
+/>
+
+Add to .bashrc or .zshrc for permanent setup:
+
+<CopyBlock
+  code="echo 'export PATH=$PATH:~/.fly/bin' >> ~/.bashrc"
+  language="bash"
+/>
+
+**Verify installation:**
+
+<CopyBlock
+  code="flyctl version"
+  language="bash"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/flyio/step2-cli-install-en.png"
+  alt="Fly.io CLI Installation"
+  caption="Install and verify flyctl CLI"
+/>
+
+<Callout type="tip">
+💡 **Tip**: If a version number appears, installation is successful.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="Install CLI (Windows)">
+
+**For Windows users:**
+
+**Method 1: Using Chocolatey (Recommended)**
+
+<CopyBlock
+  code="choco install flyctl"
+  language="bash"
+/>
+
+**Method 2: Using PowerShell**
+
+Run PowerShell as **Administrator**, then:
+
+<CopyBlock
+  code="iwr https://fly.io/install.ps1 -useb | iex"
+  language="bash"
+/>
+
+**Method 3: Manual Installation**
+
+1. Download flyctl from [GitHub Releases](https://github.com/superfly/flyctl/releases).
+2. Extract and add to PATH.
+
+**Verify installation:**
+
+In PowerShell:
+
+<CopyBlock
+  code="flyctl version"
+  language="bash"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/flyio/step3-windows-cli-en.png"
+  alt="Windows Fly.io CLI Installation"
+  caption="Install flyctl on Windows"
+/>
+
+<Callout type="info">
+ℹ️ **Note**: Restart PowerShell after updating Windows environment variables.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="Connect CLI to Fly.io Account">
+
+Now connect flyctl to your Fly.io account.
+
+<CopyBlock
+  code="flyctl auth login"
+  language="bash"
+/>
+
+When you run the command:
+
+1. An **authentication URL** is displayed.
+2. Open the URL in your browser or press **"Press Enter to open browser"**.
+3. Log in with your Fly.io account.
+4. Click **Authorize**.
+5. Return to the terminal and authentication is complete.
+
+**Verify authentication:**
+
+<CopyBlock
+  code="flyctl auth whoami"
+  language="bash"
+/>
+
+Success if your email address is printed.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/flyio/step4-auth-login-en.png"
+  alt="Fly.io CLI Authentication"
+  caption="Login and connect your account with flyctl"
+/>
+
+<Checkpoint
+  title="Verify Your Setup"
+  items={[
+    "Is your Fly.io account created?",
+    "Is flyctl installed?",
+    "Did you run flyctl version?",
+    "Did you complete flyctl auth login?",
+    "Did you verify with flyctl auth whoami?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **Complete!** Your Fly.io account is ready and CLI is set up. Now follow the [Fly.io App Deployment](../flyio-app-deployment) guide to deploy your first application.
+</Callout>
+
+</Step>
+
+---
+
+## Next Steps
+
+After completing your Fly.io account setup:
+
+1. **[Fly.io App Deployment](../flyio-app-deployment)** - Deploy your first application
+2. **[Fly.io Dashboard](https://fly.io/dashboard)** - Manage deployed apps
+3. **[Fly.io Documentation](https://fly.io/docs)** - Read detailed guides
+
+---
+
+## Developer Tips
+
+<DevTip>
+**Key flyctl Commands:**
+
+```
+flyctl apps list          # List deployed apps
+flyctl deploy             # Deploy app
+flyctl logs               # View logs
+flyctl ssh console        # SSH access
+flyctl scale              # Scale apps
+flyctl secrets set KEY=VALUE  # Set environment variables
+```
+
+You'll use these commands frequently.
+</DevTip>
+
+---
+
+## Frequently Asked Questions
+
+<Callout type="info">
+**Q. What can I do with Fly.io's free tier?**
+
+A. You get 3 shared CPU VMs and 3GB monthly storage for free. Enough for small projects and development.
+</Callout>
+
+<Callout type="info">
+**Q. Do I need Docker?**
+
+A. Fly.io uses Docker, but flyctl automatically generates Dockerfile for you, so you don't need to write one.
+</Callout>
+
+<Callout type="info">
+**Q. Can I connect a domain?**
+
+A. Yes! Register a domain with Fly.io or connect an existing domain via CNAME or DNS settings.
+</Callout>
+
+<Callout type="info">
+**Q. Where should I put my database?**
+
+A. Use Fly.io's Postgres service or connect external databases like Supabase or Railway.
+</Callout>
+
+---
+
+## Troubleshooting
+
+### "command not found: flyctl" error
+
+- Verify flyctl is added to PATH
+- Restart your terminal
+- Set PATH manually
+
+### Authentication fails
+
+- Log out and try again: `flyctl auth logout && flyctl auth login`
+- Check internet connection
+- Check Fly.io status page
+
+### flyctl version doesn't work
+
+- Verify installation is complete
+- Try restarting your system
+- Reinstall flyctl
+
+---
+
+**Congratulations!** Your Fly.io account and CLI are fully set up. Next, deploy your first application! 🚀

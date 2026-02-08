@@ -1,0 +1,56 @@
+{
+  "slug": "postgresql-cloud-setup",
+  "platform": "postgresql",
+  "service": "PostgreSQL Cloud Database",
+  "category": "database",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 25,
+  "totalSteps": 5,
+  "freeTier": {
+    "service": "PostgreSQL Cloud Databases",
+    "limit": "다양함 (플랫폼별)",
+    "period": "varies",
+    "status": "available",
+    "conditions": [
+      "Supabase: 500MB 저장소, 무제한 API 요청",
+      "Railway: $5/월 크레딧",
+      "Render: 90일 무료 트라이얼",
+      "AWS RDS: 12개월 750시간 프리 티어",
+      "프로덕션 사용 가능"
+    ]
+  },
+  "prerequisites": [
+    "postgresql-local-setup"
+  ],
+  "nextGuides": [],
+  "tags": ["database", "postgresql", "cloud", "supabase", "railway", "aws", "production"],
+  "seo": {
+    "ko": {
+      "title": "PostgreSQL 클라우드 데이터베이스 설정 가이드 - Supabase, Railway, AWS | CloudSetup.guide",
+      "description": "Supabase, Railway, AWS RDS, Render 등의 클라우드 플랫폼에 PostgreSQL 데이터베이스를 설정하고 연결하는 방법을 배우세요. 프로덕션 배포 가이드입니다.",
+      "keywords": [
+        "PostgreSQL 클라우드",
+        "Supabase PostgreSQL",
+        "Railway 데이터베이스",
+        "AWS RDS PostgreSQL",
+        "클라우드 데이터베이스",
+        "프로덕션 데이터베이스",
+        "데이터베이스 마이그레이션"
+      ]
+    },
+    "en": {
+      "title": "PostgreSQL Cloud Database Setup Guide - Supabase, Railway, AWS | CloudSetup.guide",
+      "description": "Learn how to set up and connect PostgreSQL databases on cloud platforms including Supabase, Railway, AWS RDS, and Render. Complete production deployment guide.",
+      "keywords": [
+        "PostgreSQL cloud",
+        "Supabase PostgreSQL",
+        "Railway database",
+        "AWS RDS PostgreSQL",
+        "cloud database",
+        "production database",
+        "database migration"
+      ]
+    }
+  },
+  "lastVerified": "2025-02-08"
+}

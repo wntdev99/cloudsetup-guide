@@ -1,0 +1,411 @@
+# SendGrid 이메일 통합 - 애플리케이션에서 이메일 보내기
+
+SendGrid 계정이 준비되었다면 이제 **애플리케이션에서 실제로 이메일을 보낼**차례입니다. Node.js, Python, 또는 SMTP를 사용하여 회원 확인, 비밀번호 재설정, 뉴스레터 등을 구현할 수 있습니다. 30분 안에 통합을 완료할 수 있습니다.
+
+<FreeTierInfo
+  service="SendGrid 이메일 API"
+  limit="월 100 이메일 무료"
+  period="영구"
+  status="generous"
+/>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "SendGrid 계정 및 API 키", required: true },
+  { text: "발신자 이메일 인증 완료", required: true },
+  { text: "Node.js, Python 또는 SMTP 클라이언트", required: true }
+]} />
+
+<Callout type="info">
+🚀 **이 가이드의 목표**: 애플리케이션에서 SendGrid API를 사용하여 이메일을 보내는 방법을 배웁니다. 다양한 언어와 프레임워크 예제를 제공합니다.
+</Callout>
+
+---
+
+<Step number={1} title="Node.js에서 SendGrid 설정">
+
+**NPM 패키지 설치:**
+
+먼저 SendGrid Node.js 라이브러리를 설치합니다:
+
+<CopyBlock
+  code="npm install @sendgrid/mail"
+  language="bash"
+/>
+
+**.env 파일 생성:**
+
+<CopyBlock
+  code="SENDGRID_API_KEY=SG.YOUR_API_KEY_HERE
+SENDGRID_FROM_EMAIL=noreply@example.com"
+  language="bash"
+/>
+
+**기본 이메일 보내기:**
+
+<CopyBlock
+  code="const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+const msg = {
+  to: 'recipient@example.com',
+  from: process.env.SENDGRID_FROM_EMAIL,
+  subject: '안녕하세요!',
+  text: '이것은 SendGrid 테스트 이메일입니다.',
+  html: 'This is a SendGrid test email.'
+};
+
+sgMail
+  .send(msg)
+  .then(() => console.log('이메일이 전송되었습니다!'))
+  .catch(error => console.error(error));"
+  language="javascript"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/sendgrid/step1-nodejs-setup-ko.png"
+  alt="Node.js SendGrid 설정"
+  caption="Node.js에서 SendGrid 기본 설정"
+  priority={true}
+/>
+
+<Callout type="tip">
+💡 **팁**: console.log로 오류를 확인하며 테스트하세요.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Python에서 SendGrid 설정">
+
+**pip 패키지 설치:**
+
+<CopyBlock
+  code="pip install sendgrid"
+  language="bash"
+/>
+
+**.env 파일 생성:**
+
+<CopyBlock
+  code="SENDGRID_API_KEY=SG.YOUR_API_KEY_HERE
+SENDGRID_FROM_EMAIL=noreply@example.com"
+  language="bash"
+/>
+
+**기본 이메일 보내기:**
+
+<CopyBlock
+  code="import os
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
+
+message = Mail(
+    from_email=os.getenv('SENDGRID_FROM_EMAIL'),
+    to_emails='recipient@example.com',
+    subject='안녕하세요!',
+    plain_text_content='이것은 SendGrid 테스트 이메일입니다.',
+    html_content='This is a SendGrid test email.'
+)
+
+try:
+    sg = SendGridAPIClient(os.getenv('SENDGRID_API_KEY'))
+    response = sg.send(message)
+    print('이메일이 전송되었습니다!')
+except Exception as e:
+    print(f'오류: {e}')"
+  language="python"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/sendgrid/step2-python-setup-ko.png"
+  alt="Python SendGrid 설정"
+  caption="Python에서 SendGrid 기본 설정"
+/>
+
+<Callout type="tip">
+💡 **팁**: Flask나 Django 애플리케이션에서 사용할 때 try-except로 오류를 처리하세요.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="SMTP를 사용한 이메일 전송">
+
+SMTP를 사용하면 모든 이메일 클라이언트에서 SendGrid를 사용할 수 있습니다.
+
+**SMTP 설정 정보:**
+
+- **호스트**: smtp.sendgrid.net
+- **포트**: 587 (TLS) 또는 465 (SSL)
+- **사용자명**: apikey
+- **암호**: YOUR_API_KEY
+
+**Node.js Nodemailer 예제:**
+
+먼저 설치:
+
+<CopyBlock
+  code="npm install nodemailer"
+  language="bash"
+/>
+
+코드:
+
+<CopyBlock
+  code="const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport({
+  host: 'smtp.sendgrid.net',
+  port: 587,
+  auth: {
+    user: 'apikey',
+    pass: process.env.SENDGRID_API_KEY
+  }
+});
+
+const mailOptions = {
+  from: process.env.SENDGRID_FROM_EMAIL,
+  to: 'recipient@example.com',
+  subject: '안녕하세요!',
+  html: 'This is a test email.'
+};
+
+transporter.sendMail(mailOptions, (error, info) => {
+  if (error) console.error(error);
+  else console.log('이메일 전송됨:', info.response);
+});"
+  language="javascript"
+/>
+
+**Python 예제:**
+
+<CopyBlock
+  code="import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import os
+
+sender = os.getenv('SENDGRID_FROM_EMAIL')
+recipient = 'recipient@example.com'
+subject = '안녕하세요!'
+
+message = MIMEMultipart('alternative')
+message['Subject'] = subject
+message['From'] = sender
+message['To'] = recipient
+
+text = 'This is a test email.'
+html = 'This is a test email.'
+
+part1 = MIMEText(text, 'plain')
+part2 = MIMEText(html, 'html')
+message.attach(part1)
+message.attach(part2)
+
+try:
+    server = smtplib.SMTP('smtp.sendgrid.net', 587)
+    server.starttls()
+    server.login('apikey', os.getenv('SENDGRID_API_KEY'))
+    server.sendmail(sender, recipient, message.as_string())
+    server.quit()
+    print('이메일이 전송되었습니다!')
+except Exception as e:
+    print(f'오류: {e}')"
+  language="python"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/sendgrid/step3-smtp-setup-ko.png"
+  alt="SMTP를 사용한 이메일 전송"
+  caption="SMTP 설정을 통한 SendGrid 이메일 전송"
+/>
+
+</Step>
+
+---
+
+<Step number={4} title="실제 사용 사례: 회원 확인 이메일">
+
+회원 가입 후 확인 이메일을 보내는 예제입니다.
+
+**Node.js Express 예제:**
+
+<CopyBlock
+  code="const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+app.post('/signup', async (req, res) => {
+  const { email, name } = req.body;
+
+  const confirmationUrl = 'https://yoursite.com/confirm?token=abc123';
+
+  const msg = {
+    to: email,
+    from: process.env.SENDGRID_FROM_EMAIL,
+    subject: '이메일 확인 - YourApp',
+    html: 'Click here to verify: ' + confirmationUrl
+  };
+
+  try {
+    await sgMail.send(msg);
+    res.json({ success: true, message: '확인 이메일이 전송되었습니다!' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});"
+  language="javascript"
+/>
+
+**HTML 이메일 템플릿:**
+
+<CopyBlock
+  code="const htmlTemplate = 'html: `Dear ' + name + ',\\n\\nPlease verify your email by clicking the link below:\\n\\nhttps://yoursite.com/confirm?token=abc123\\n\\nBest regards,\\nYourApp Team`;"
+  language="javascript"
+/>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/sendgrid/step4-verification-email-ko.png"
+  alt="회원 확인 이메일"
+  caption="회원 가입 후 확인 이메일 보내기"
+/>
+
+<Callout type="info">
+ℹ️ **팁**: 확인 링크에 토큰을 포함시키고 데이터베이스에 저장하세요. 만료 시간을 설정하는 것이 좋습니다.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={5} title="이메일 추적 및 모니터링">
+
+SendGrid 대시보드에서 이메일 전송을 모니터링할 수 있습니다.
+
+**대시보드 확인:**
+
+1. SendGrid 대시보드에 로그인합니다.
+2. **메일 전송** 또는 **Mail Send** 메뉴로 이동합니다.
+3. **활동** (Activity) 탭을 클릭합니다.
+4. 전송된 이메일 목록을 볼 수 있습니다:
+   - 상태 (Delivered, Bounced, Opened, Clicked 등)
+   - 수신자
+   - 시간
+
+**WebHook 설정 (선택사항):**
+
+이메일 이벤트 (배달, 열음, 클릭)를 실시간으로 받으려면:
+
+1. **설정** 메뉴로 이동합니다.
+2. **Event Webhook**을 클릭합니다.
+3. **HTTP POST URL**을 입력합니다 (예: https://yoursite.com/webhook).
+4. **선택 이벤트**를 활성화합니다:
+   - Delivered
+   - Opened
+   - Clicked
+
+5. **저장**을 클릭합니다.
+
+<Checkpoint
+  title="설정 확인"
+  items={[
+    "API 키가 환경 변수에 저장되었나요?",
+    "이메일을 성공적으로 보냈나요?",
+    "대시보드에서 전송 기록을 볼 수 있나요?",
+    "HTML 템플릿을 사용했나요?",
+    "실제 애플리케이션에 통합했나요?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **완료!** SendGrid 이메일 통합이 완료되었습니다. 이제 애플리케이션에서 안정적으로 이메일을 보낼 수 있습니다.
+</Callout>
+
+</Step>
+
+---
+
+## 다음 단계
+
+SendGrid 이메일 통합을 완료했으니:
+
+1. **[동적 템플릿 생성](https://docs.sendgrid.com/ui/sending-email/how-to-send-an-email-with-dynamic-templates)** - 더 복잡한 이메일 템플릿
+2. **[대량 이메일 전송](https://docs.sendgrid.com/ui/sending-email/index-table-of-contents)** - 대량 발송 기능
+3. **[이벤트 추적](https://docs.sendgrid.com/for-developers/tracking/getting-started-event-webhook)** - 이메일 추적 및 분석
+
+---
+
+## 개발자 팁
+
+<DevTip>
+**이메일 전송 제한:**
+
+SendGrid 무료 계정은 월 100개 이메일로 제한됩니다. 비용 절감을 위해:
+
+1. 필요한 이메일만 보내기
+2. 배치 전송으로 처리
+3. 수신 거부 관리
+
+더 많이 필요하면 SendGrid 유료 계획 확인하기.
+</DevTip>
+
+---
+
+## 자주 묻는 질문
+
+<Callout type="info">
+**Q. 이메일이 전송되지 않습니다**
+
+A. 다음을 확인하세요:
+- API 키가 정확한가?
+- 발신자 이메일이 인증되었는가?
+- 대상 이메일 주소가 유효한가?
+- 월 100개 이메일을 초과하지 않았는가?
+</Callout>
+
+<Callout type="info">
+**Q. HTML 이메일을 보낼 수 있나요?**
+
+A. 예! 'html' 필드에 HTML 콘텐츠를 포함시키세요. SendGrid는 자동으로 포맷합니다.
+</Callout>
+
+<Callout type="info">
+**Q. 첨부 파일을 보낼 수 있나요?**
+
+A. 예! SendGrid의 attachments 옵션을 사용하여 파일을 첨부할 수 있습니다. 문서를 참조하세요.
+</Callout>
+
+<Callout type="info">
+**Q. 대량 이메일을 보내는 가장 좋은 방법은?**
+
+A. SendGrid의 동적 템플릿과 personalizations 기능을 사용하세요. 이를 통해 각 수신자에게 맞춤 이메일을 보낼 수 있습니다.
+</Callout>
+
+---
+
+## 문제 해결
+
+### "Invalid email from address" 오류
+
+- 발신자 이메일이 인증되었는지 확인합니다
+- SendGrid 대시보드에서 발신자 목록을 확인합니다
+- 다시 인증해봅니다
+
+### 이메일이 스팸으로 표시됩니다
+
+- SPF, DKIM, DMARC 레코드를 확인합니다
+- 도메인 인증을 완료하세요
+- 스팸 트리거 단어를 제거하세요
+
+### API 키 오류
+
+- 환경 변수가 올바른지 확인합니다
+- 새 API 키를 생성해봅니다
+- 권한을 확인합니다
+
+---
+
+**축하합니다!** 이제 애플리케이션에서 안정적으로 이메일을 보낼 수 있습니다. SendGrid의 강력한 기능들을 활용하여 사용자 경험을 높이세요! 🚀
