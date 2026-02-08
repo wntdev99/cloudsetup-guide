@@ -1,0 +1,578 @@
+# GCP Maps API 설정 - Google 지도를 웹사이트에 추가하기
+
+Google Maps Platform은 **지도 표시**, **경로 탐색**, **장소 검색** 등 강력한 지도 서비스를 제공합니다. 이 가이드를 따라 Maps API를 활성화하고 첫 번째 지도를 15분 안에 웹사이트에 표시해보세요!
+
+<FreeTierInfo
+  service="Google Maps Platform"
+  limit="월 $200 크레딧"
+  period="월간"
+  status="generous"
+/>
+
+## Google Maps Platform으로 무엇을 할 수 있나요?
+
+<Callout type="info">
+🗺️ **주요 Google Maps Platform 기능**
+
+- **Maps JavaScript API**: 웹사이트에 인터랙티브 지도 표시
+- **Geocoding API**: 주소를 좌표로 변환 (또는 반대)
+- **Places API**: 주변 장소 검색, 자동완성
+- **Directions API**: 경로 탐색 및 길찾기
+- **Distance Matrix API**: 여러 지점 간 거리/시간 계산
+- **Street View API**: 거리뷰 이미지 표시
+
+**사용 사례**:
+- 매장 위치 지도
+- 배달 경로 최적화
+- 주소 검색 자동완성
+- 부동산 지도 앱
+</Callout>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "GCP 계정 및 프로젝트 생성 완료", required: true },
+  { text: "결제 계정 연결 완료 (필수!)", required: true },
+  { text: "기본 HTML/JavaScript 지식", required: false }
+]} />
+
+<Callout type="warning">
+⚠️ **Maps API는 결제 계정 필수**
+
+Maps API는 무료 체험 크레딧이 있더라도 **반드시 결제 계정을 연결**해야 사용할 수 있습니다. 매월 $200 크레딧이 자동으로 적용됩니다.
+</Callout>
+
+---
+
+<Step number={1} title="Maps API 활성화">
+
+1. [Google Cloud Console](https://console.cloud.google.com)에 로그인합니다.
+2. 올바른 프로젝트가 선택되었는지 확인하세요.
+3. 상단 검색창에 **"Maps JavaScript API"**를 입력합니다.
+4. 검색 결과에서 **Maps JavaScript API**를 클릭합니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-maps-api-step1-ko.png"
+  alt="Maps JavaScript API 검색"
+  caption="Maps JavaScript API를 검색하세요"
+/>
+
+5. **사용 설정(ENABLE)** 버튼을 클릭합니다.
+6. API 활성화에 몇 초 정도 소요됩니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-maps-api-step1b-ko.png"
+  alt="Maps JavaScript API 활성화"
+  caption="사용 설정 버튼을 클릭하여 API를 활성화하세요"
+/>
+
+<DevTip>
+**추가로 활성화할 API들**:
+- **Geocoding API**: 주소 ↔ 좌표 변환
+- **Places API**: 장소 검색
+- **Directions API**: 경로 탐색
+
+나중에 필요할 때 동일한 방법으로 활성화하세요.
+</DevTip>
+
+<Checkpoint
+  title="API 활성화 확인"
+  items={[
+    "Maps JavaScript API가 활성화되었나요?",
+    "결제 계정이 연결되어 있나요?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="API 키 생성 및 제한">
+
+Maps API는 API 키가 **반드시** 필요합니다.
+
+### 2-1. API 키 생성
+
+1. 왼쪽 메뉴에서 **사용자 인증 정보(Credentials)** 클릭
+2. 상단 **+ 사용자 인증 정보 만들기** 버튼 클릭
+3. 드롭다운에서 **API 키** 선택
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-maps-api-step2-ko.png"
+  alt="API 키 생성"
+  caption="Maps API용 API 키를 생성하세요"
+/>
+
+4. 생성된 API 키를 **복사**하여 안전하게 보관합니다.
+
+### 2-2. API 키 제한 (중요!)
+
+Maps API 키는 웹사이트에 노출되므로 **반드시** 제한을 설정해야 합니다:
+
+1. **키 제한** 버튼 클릭
+2. **애플리케이션 제한사항** 섹션:
+   - **HTTP 리퍼러(웹사이트)** 선택
+   - **항목 추가** 클릭
+   - 허용할 도메인 입력:
+     - 개발: `localhost`, `127.0.0.1/*`
+     - 프로덕션: `yourdomain.com/*`, `*.yourdomain.com/*`
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-maps-api-step2b-ko.png"
+  alt="HTTP 리퍼러 제한"
+  caption="허용할 도메인을 설정하세요"
+/>
+
+3. **API 제한사항** 섹션:
+   - **키 제한** 선택
+   - **Maps JavaScript API** 체크
+   - (필요시) **Geocoding API**, **Places API** 등 추가
+
+4. **저장** 클릭
+
+<Callout type="warning">
+⚠️ **Maps API 키 보안**
+
+Maps API 키는 클라이언트(브라우저)에 노출되므로:
+- HTTP 리퍼러 제한은 **필수**
+- API 제한사항 설정 **필수**
+- 정기적으로 사용량 모니터링
+- 의심스러운 활동 발견 시 즉시 키 재생성
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="첫 번째 지도 표시하기">
+
+간단한 HTML 파일로 지도를 테스트해봅시다.
+
+### 3-1. HTML 파일 생성
+
+다음 코드로 `map.html` 파일을 생성하세요:
+
+<CopyBlock
+  code='<!DOCTYPE html>
+<html>
+<head>
+  <title>My First Google Map</title>
+  <style>
+    #map {
+      height: 400px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <h1>Google Maps API 테스트</h1>
+  <div id="map"></div>
+
+  <script>
+    function initMap() {
+      // 서울 시청 좌표
+      const seoul = { lat: 37.5665, lng: 126.9780 };
+
+      // 지도 생성
+      const map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 13,
+        center: seoul,
+      });
+
+      // 마커 추가
+      const marker = new google.maps.Marker({
+        position: seoul,
+        map: map,
+        title: "서울특별시청"
+      });
+    }
+  </script>
+
+  <!-- Maps JavaScript API 로드 -->
+  <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap">
+  </script>
+</body>
+</html>'
+  language="html"
+/>
+
+**주의**: `YOUR_API_KEY`를 Step 2에서 받은 실제 API 키로 바꾸세요!
+
+### 3-2. 지도 테스트
+
+1. `map.html` 파일을 웹 브라우저로 엽니다.
+2. 서울 시청을 중심으로 지도가 표시되어야 합니다.
+3. 마커를 클릭하면 "서울특별시청" 제목이 표시됩니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-maps-api-step3-ko.png"
+  alt="첫 번째 Google 지도"
+  caption="지도가 성공적으로 표시되었습니다!"
+/>
+
+<Callout type="success">
+✅ **성공!** 첫 번째 Google 지도를 웹사이트에 표시했습니다!
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="다양한 지도 기능 사용하기">
+
+Maps API의 다양한 기능을 시험해봅시다.
+
+### 4-1. 인포윈도우 (정보 창)
+
+마커 클릭 시 정보 창 표시:
+
+<CopyBlock
+  code='function initMap() {
+  const seoul = { lat: 37.5665, lng: 126.9780 };
+
+  const map = new google.maps.Map(document.getElementById("map"), {
+    zoom: 13,
+    center: seoul,
+  });
+
+  const marker = new google.maps.Marker({
+    position: seoul,
+    map: map,
+  });
+
+  // 인포윈도우 생성
+  const infoWindow = new google.maps.InfoWindow({
+    content: "<h3>서울특별시청</h3><p>대한민국의 수도</p>"
+  });
+
+  // 마커 클릭 이벤트
+  marker.addListener("click", () => {
+    infoWindow.open(map, marker);
+  });
+}'
+  language="javascript"
+/>
+
+### 4-2. 여러 마커 추가
+
+배열을 사용하여 여러 위치에 마커 추가:
+
+<CopyBlock
+  code='const locations = [
+  { lat: 37.5665, lng: 126.9780, title: "서울시청" },
+  { lat: 37.5796, lng: 126.9770, title: "경복궁" },
+  { lat: 37.5511, lng: 126.9882, title: "남산타워" },
+  { lat: 37.5172, lng: 127.0473, title: "코엑스" }
+];
+
+locations.forEach(location => {
+  new google.maps.Marker({
+    position: { lat: location.lat, lng: location.lng },
+    map: map,
+    title: location.title
+  });
+});'
+  language="javascript"
+/>
+
+### 4-3. 지도 타입 변경
+
+지형도, 위성 이미지 등으로 변경:
+
+<CopyBlock
+  code='const map = new google.maps.Map(document.getElementById("map"), {
+  zoom: 13,
+  center: seoul,
+  mapTypeId: "satellite"  // roadmap, satellite, hybrid, terrain
+});'
+  language="javascript"
+/>
+
+### 4-4. 사용자 위치 표시
+
+현재 위치 가져오기:
+
+<CopyBlock
+  code='function initMap() {
+  const map = new google.maps.Map(document.getElementById("map"), {
+    zoom: 15,
+    center: { lat: 37.5665, lng: 126.9780 }
+  });
+
+  // 브라우저에서 현재 위치 가져오기
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const pos = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        };
+
+        map.setCenter(pos);
+
+        new google.maps.Marker({
+          position: pos,
+          map: map,
+          title: "현재 위치",
+          icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+        });
+      },
+      () => {
+        alert("위치 정보를 가져올 수 없습니다.");
+      }
+    );
+  }
+}'
+  language="javascript"
+/>
+
+<Checkpoint
+  title="지도 기능 테스트 확인"
+  items={[
+    "인포윈도우가 정상적으로 표시되나요?",
+    "여러 마커가 지도에 표시되나요?",
+    "현재 위치가 제대로 표시되나요?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={5} title="Geocoding API 사용하기">
+
+주소를 좌표로 변환하거나 반대로 변환할 수 있습니다.
+
+### 5-1. Geocoding API 활성화
+
+1. GCP Console에서 **Geocoding API** 검색
+2. **사용 설정** 클릭
+3. Step 2의 API 키에 **Geocoding API** 추가
+
+### 5-2. 주소 → 좌표 변환
+
+<CopyBlock
+  code='const address = "서울특별시 중구 세종대로 110";
+const geocoder = new google.maps.Geocoding();
+
+geocoder.geocode({ address: address }, (results, status) => {
+  if (status === "OK") {
+    const location = results[0].geometry.location;
+    console.log("위도:", location.lat());
+    console.log("경도:", location.lng());
+
+    map.setCenter(location);
+    new google.maps.Marker({
+      map: map,
+      position: location
+    });
+  } else {
+    alert("Geocoding 실패: " + status);
+  }
+});'
+  language="javascript"
+/>
+
+### 5-3. 좌표 → 주소 변환 (Reverse Geocoding)
+
+<CopyBlock
+  code='const latlng = { lat: 37.5665, lng: 126.9780 };
+const geocoder = new google.maps.Geocoder();
+
+geocoder.geocode({ location: latlng }, (results, status) => {
+  if (status === "OK") {
+    if (results[0]) {
+      console.log("주소:", results[0].formatted_address);
+      // "대한민국 서울특별시 중구 세종대로 110"
+    }
+  }
+});'
+  language="javascript"
+/>
+
+</Step>
+
+---
+
+<Step number={6} title="실제 프로젝트에 통합하기">
+
+실전에서 사용할 수 있는 예제입니다.
+
+### 6-1. React 예제
+
+<CopyBlock
+  code='import React, { useEffect, useRef } from "react";
+
+function GoogleMap() {
+  const mapRef = useRef(null);
+
+  useEffect(() => {
+    const initMap = () => {
+      const map = new google.maps.Map(mapRef.current, {
+        center: { lat: 37.5665, lng: 126.9780 },
+        zoom: 13,
+      });
+
+      new google.maps.Marker({
+        position: { lat: 37.5665, lng: 126.9780 },
+        map: map,
+        title: "서울시청"
+      });
+    };
+
+    if (!window.google) {
+      const script = document.createElement("script");
+      script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY`;
+      script.async = true;
+      script.defer = true;
+      script.onload = initMap;
+      document.head.appendChild(script);
+    } else {
+      initMap();
+    }
+  }, []);
+
+  return <div ref={mapRef} style={{ height: "400px", width: "100%" }} />;
+}
+
+export default GoogleMap;'
+  language="javascript"
+/>
+
+### 6-2. Next.js 예제
+
+<CopyBlock
+  code='// components/Map.js
+import { useEffect, useRef } from "react";
+import { Loader } from "@googlemaps/js-api-loader";
+
+export default function Map() {
+  const mapRef = useRef(null);
+
+  useEffect(() => {
+    const loader = new Loader({
+      apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
+      version: "weekly",
+    });
+
+    loader.load().then(() => {
+      const map = new google.maps.Map(mapRef.current, {
+        center: { lat: 37.5665, lng: 126.9780 },
+        zoom: 13,
+      });
+
+      new google.maps.Marker({
+        position: { lat: 37.5665, lng: 126.9780 },
+        map: map,
+      });
+    });
+  }, []);
+
+  return <div ref={mapRef} style={{ height: "400px" }} />;
+}'
+  language="javascript"
+/>
+
+`.env.local` 파일에 API 키 추가:
+```
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_api_key_here
+```
+
+<Callout type="success">
+🎉 **완료!** Google Maps Platform을 활성화하고 성공적으로 지도를 표시했습니다!
+</Callout>
+
+</Step>
+
+---
+
+## 비용 관리
+
+<Callout type="info">
+💰 **Google Maps Platform 가격 정책**
+
+- **무료 크레딧**: 매월 $200 자동 적용
+- **Maps JavaScript API**:
+  - Dynamic Maps: 1,000회 로드당 $7
+  - Static Maps: 1,000회당 $2
+- **Geocoding API**: 1,000회당 $5
+- **Places API**: 요청당 $0.017~$0.032
+
+**무료 크레딧으로 가능한 양**:
+- 약 28,500회 지도 로드
+- 약 40,000회 Geocoding 요청
+- 대부분의 소규모 프로젝트는 무료!
+</Callout>
+
+---
+
+## 다음 단계
+
+Maps API를 마스터했으니, 다른 GCP 서비스도 사용해보세요:
+
+1. **[Cloud Storage 설정](../gcp-cloud-storage-setup)** - 파일 저장소
+2. **[Firestore 설정](../gcp-firestore-setup)** - NoSQL 데이터베이스
+3. **[Cloud Functions 설정](../gcp-cloud-functions-setup)** - 서버리스 함수
+
+---
+
+## 자주 묻는 질문
+
+<Callout type="info">
+**Q. Maps API 키가 노출되면 위험한가요?**
+
+A. Maps API 키는 클라이언트에 노출되도록 설계되었습니다:
+- HTTP 리퍼러 제한으로 허용된 도메인에서만 사용 가능
+- API 제한사항으로 특정 API만 사용 가능
+- 정기적으로 사용량 모니터링 필수
+- 의심스러운 활동 발견 시 키 즉시 재생성
+
+다만, 서버 전용 API 키(Places API 서버 요청 등)는 노출하면 안 됩니다.
+</Callout>
+
+<Callout type="info">
+**Q. 무료 크레딧을 초과하면 어떻게 되나요?**
+
+A. 자동으로 과금됩니다:
+- 결제 계정에 연결된 카드로 청구
+- 예산 알림을 설정하여 초과 방지 권장
+- GCP Console에서 실시간 사용량 모니터링 가능
+</Callout>
+
+<Callout type="info">
+**Q. 지도 로딩 속도를 개선하려면?**
+
+A. 다음을 시도해보세요:
+- `async defer` 속성으로 스크립트 비동기 로드
+- 필요한 라이브러리만 로드 (`libraries=places,geometry`)
+- 초기 줌 레벨 최적화
+- 마커가 많으면 Marker Clustering 사용
+- 정적 지도(Static Maps API) 고려
+</Callout>
+
+---
+
+## 문제 해결
+
+### "RefererNotAllowedMapError" 오류
+
+- HTTP 리퍼러 설정 확인
+- 현재 도메인이 허용 목록에 있는지 확인
+- localhost 테스트 시 `localhost`, `127.0.0.1/*` 추가
+
+### 지도가 회색으로 표시됨
+
+- API 키 확인
+- Maps JavaScript API가 활성화되었는지 확인
+- 결제 계정이 연결되었는지 확인
+- 브라우저 콘솔에서 오류 메시지 확인
+
+### "This API project is not authorized to use this API"
+
+- API 제한사항에서 Maps JavaScript API가 체크되었는지 확인
+- API 키 저장 후 몇 분 대기 (전파 시간)
+
+---
+
+**Google Maps Platform 설정 완료!** 🎊 이제 자유롭게 지도 서비스를 활용하세요!

@@ -1,0 +1,62 @@
+{
+  "slug": "gcp-maps-api-setup",
+  "platform": "gcp",
+  "service": "Google Maps Platform",
+  "category": "maps",
+  "difficulty": "beginner",
+  "estimatedMinutes": 15,
+  "totalSteps": 6,
+  "freeTier": {
+    "service": "Google Maps Platform",
+    "limit": "월 $200 크레딧",
+    "period": "month",
+    "amount": "$200",
+    "status": "generous",
+    "conditions": [
+      "매월 $200 무료 크레딧",
+      "Maps, Routes, Places API 모두 포함",
+      "약 28,000회 동적 지도 로드 무료"
+    ]
+  },
+  "prerequisites": [
+    "gcp-account-setup",
+    "gcp-project-create",
+    "gcp-billing-setup"
+  ],
+  "nextGuides": [
+    "gcp-cloud-storage-setup",
+    "gcp-firestore-setup"
+  ],
+  "seo": {
+    "ko": {
+      "title": "GCP Maps API 설정 - Google 지도를 웹사이트에 추가 | CloudSetup.guide",
+      "description": "Google Maps Platform API를 활성화하고 첫 번째 지도를 웹사이트에 표시하는 방법을 6단계로 배워보세요. API 키 생성부터 실제 테스트까지 완벽 가이드.",
+      "keywords": [
+        "Google Maps API",
+        "GCP Maps API",
+        "구글 지도 API",
+        "지도 API 설정",
+        "Maps Platform",
+        "GCP API 키",
+        "웹사이트 지도 추가"
+      ]
+    },
+    "en": {
+      "title": "Setup GCP Maps API - Add Google Maps to Website | CloudSetup.guide",
+      "description": "Learn how to enable Google Maps Platform API and display your first map on a website in 6 easy steps. Complete guide from API key creation to testing.",
+      "keywords": [
+        "Google Maps API",
+        "GCP Maps API",
+        "maps API setup",
+        "Maps Platform",
+        "GCP API key",
+        "add maps to website",
+        "embed Google Maps"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T05:00:00.000Z",
+  "updatedAt": "2026-02-08T05:00:00.000Z",
+  "lastVerified": "2026-02-08T05:00:00.000Z",
+  "published": true
+}

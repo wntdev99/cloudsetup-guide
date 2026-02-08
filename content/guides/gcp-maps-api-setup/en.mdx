@@ -1,0 +1,578 @@
+# Setup GCP Maps API - Add Google Maps to Your Website
+
+Google Maps Platform provides powerful mapping services including **map display**, **route navigation**, and **place search**. Follow this guide to enable Maps API and display your first map on a website in just 15 minutes!
+
+<FreeTierInfo
+  service="Google Maps Platform"
+  limit="$200 credit/month"
+  period="Monthly"
+  status="generous"
+/>
+
+## What Can Google Maps Platform Do?
+
+<Callout type="info">
+🗺️ **Key Google Maps Platform Features**
+
+- **Maps JavaScript API**: Display interactive maps on websites
+- **Geocoding API**: Convert addresses to coordinates (or vice versa)
+- **Places API**: Search nearby places, autocomplete
+- **Directions API**: Route navigation and directions
+- **Distance Matrix API**: Calculate distance/time between multiple points
+- **Street View API**: Display Street View images
+
+**Use Cases**:
+- Store location maps
+- Delivery route optimization
+- Address search autocomplete
+- Real estate map apps
+</Callout>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "GCP account and project created", required: true },
+  { text: "Billing account linked (REQUIRED!)", required: true },
+  { text: "Basic HTML/JavaScript knowledge", required: false }
+]} />
+
+<Callout type="warning">
+⚠️ **Maps API Requires Billing Account**
+
+Maps API **requires a billing account** even with free trial credits. $200 monthly credit is automatically applied.
+</Callout>
+
+---
+
+<Step number={1} title="Enable Maps API">
+
+1. Log in to [Google Cloud Console](https://console.cloud.google.com).
+2. Verify the correct project is selected.
+3. Type **"Maps JavaScript API"** in the top search bar.
+4. Click **Maps JavaScript API** from the results.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-maps-api-step1-en.png"
+  alt="Search for Maps JavaScript API"
+  caption="Search for Maps JavaScript API"
+/>
+
+5. Click the **ENABLE** button.
+6. API activation takes a few seconds.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-maps-api-step1b-en.png"
+  alt="Enable Maps JavaScript API"
+  caption="Click ENABLE to activate the API"
+/>
+
+<DevTip>
+**Additional APIs to enable**:
+- **Geocoding API**: Address ↔ coordinate conversion
+- **Places API**: Place search
+- **Directions API**: Route navigation
+
+Enable them later when needed using the same method.
+</DevTip>
+
+<Checkpoint
+  title="Verify API Enabled"
+  items={[
+    "Is Maps JavaScript API enabled?",
+    "Is billing account linked?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="Create and Restrict API Key">
+
+Maps API **requires** an API key.
+
+### 2-1. Create API Key
+
+1. Click **Credentials** in the left menu
+2. Click **+ CREATE CREDENTIALS** button at the top
+3. Select **API key** from the dropdown
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-maps-api-step2-en.png"
+  alt="Create API key"
+  caption="Create an API key for Maps API"
+/>
+
+4. **Copy** the generated API key and save it securely.
+
+### 2-2. Restrict API Key (Important!)
+
+Maps API keys are exposed on websites, so restrictions are **mandatory**:
+
+1. Click **Restrict Key** button
+2. **Application restrictions** section:
+   - Select **HTTP referrers (web sites)**
+   - Click **Add an item**
+   - Enter allowed domains:
+     - Development: `localhost`, `127.0.0.1/*`
+     - Production: `yourdomain.com/*`, `*.yourdomain.com/*`
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-maps-api-step2b-en.png"
+  alt="HTTP referrer restrictions"
+  caption="Set allowed domains"
+/>
+
+3. **API restrictions** section:
+   - Select **Restrict key**
+   - Check **Maps JavaScript API**
+   - (If needed) Add **Geocoding API**, **Places API**, etc.
+
+4. Click **Save**
+
+<Callout type="warning">
+⚠️ **Maps API Key Security**
+
+Maps API keys are exposed to clients (browsers):
+- HTTP referrer restrictions are **mandatory**
+- API restrictions are **mandatory**
+- Monitor usage regularly
+- Regenerate key immediately if suspicious activity detected
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="Display Your First Map">
+
+Test the map with a simple HTML file.
+
+### 3-1. Create HTML File
+
+Create a `map.html` file with this code:
+
+<CopyBlock
+  code='<!DOCTYPE html>
+<html>
+<head>
+  <title>My First Google Map</title>
+  <style>
+    #map {
+      height: 400px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <h1>Google Maps API Test</h1>
+  <div id="map"></div>
+
+  <script>
+    function initMap() {
+      // New York City coordinates
+      const nyc = { lat: 40.7128, lng: -74.0060 };
+
+      // Create map
+      const map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 13,
+        center: nyc,
+      });
+
+      // Add marker
+      const marker = new google.maps.Marker({
+        position: nyc,
+        map: map,
+        title: "New York City"
+      });
+    }
+  </script>
+
+  <!-- Load Maps JavaScript API -->
+  <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap">
+  </script>
+</body>
+</html>'
+  language="html"
+/>
+
+**Note**: Replace `YOUR_API_KEY` with your actual API key from Step 2!
+
+### 3-2. Test the Map
+
+1. Open `map.html` in a web browser.
+2. The map should display centered on New York City.
+3. Click the marker to see the "New York City" title.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-maps-api-step3-en.png"
+  alt="First Google Map"
+  caption="Map successfully displayed!"
+/>
+
+<Callout type="success">
+✅ **Success!** You've displayed your first Google Map on a website!
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="Use Various Map Features">
+
+Try different Maps API features!
+
+### 4-1. Info Window
+
+Display info window on marker click:
+
+<CopyBlock
+  code='function initMap() {
+  const nyc = { lat: 40.7128, lng: -74.0060 };
+
+  const map = new google.maps.Map(document.getElementById("map"), {
+    zoom: 13,
+    center: nyc,
+  });
+
+  const marker = new google.maps.Marker({
+    position: nyc,
+    map: map,
+  });
+
+  // Create info window
+  const infoWindow = new google.maps.InfoWindow({
+    content: "<h3>New York City</h3><p>The Big Apple</p>"
+  });
+
+  // Marker click event
+  marker.addListener("click", () => {
+    infoWindow.open(map, marker);
+  });
+}'
+  language="javascript"
+/>
+
+### 4-2. Multiple Markers
+
+Add markers at multiple locations using an array:
+
+<CopyBlock
+  code='const locations = [
+  { lat: 40.7128, lng: -74.0060, title: "NYC" },
+  { lat: 40.7589, lng: -73.9851, title: "Times Square" },
+  { lat: 40.7484, lng: -73.9857, title: "Empire State" },
+  { lat: 40.6892, lng: -74.0445, title: "Statue of Liberty" }
+];
+
+locations.forEach(location => {
+  new google.maps.Marker({
+    position: { lat: location.lat, lng: location.lng },
+    map: map,
+    title: location.title
+  });
+});'
+  language="javascript"
+/>
+
+### 4-3. Change Map Type
+
+Switch to terrain, satellite, etc.:
+
+<CopyBlock
+  code='const map = new google.maps.Map(document.getElementById("map"), {
+  zoom: 13,
+  center: nyc,
+  mapTypeId: "satellite"  // roadmap, satellite, hybrid, terrain
+});'
+  language="javascript"
+/>
+
+### 4-4. Display User Location
+
+Get current location:
+
+<CopyBlock
+  code='function initMap() {
+  const map = new google.maps.Map(document.getElementById("map"), {
+    zoom: 15,
+    center: { lat: 40.7128, lng: -74.0060 }
+  });
+
+  // Get current location from browser
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const pos = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        };
+
+        map.setCenter(pos);
+
+        new google.maps.Marker({
+          position: pos,
+          map: map,
+          title: "Your Location",
+          icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+        });
+      },
+      () => {
+        alert("Unable to retrieve your location.");
+      }
+    );
+  }
+}'
+  language="javascript"
+/>
+
+<Checkpoint
+  title="Verify Map Features"
+  items={[
+    "Does the info window display correctly?",
+    "Are multiple markers visible on the map?",
+    "Does current location display properly?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={5} title="Use Geocoding API">
+
+Convert addresses to coordinates or vice versa.
+
+### 5-1. Enable Geocoding API
+
+1. Search for **Geocoding API** in GCP Console
+2. Click **ENABLE**
+3. Add **Geocoding API** to your API key from Step 2
+
+### 5-2. Address → Coordinates
+
+<CopyBlock
+  code='const address = "1600 Amphitheatre Parkway, Mountain View, CA";
+const geocoder = new google.maps.Geocoder();
+
+geocoder.geocode({ address: address }, (results, status) => {
+  if (status === "OK") {
+    const location = results[0].geometry.location;
+    console.log("Latitude:", location.lat());
+    console.log("Longitude:", location.lng());
+
+    map.setCenter(location);
+    new google.maps.Marker({
+      map: map,
+      position: location
+    });
+  } else {
+    alert("Geocoding failed: " + status);
+  }
+});'
+  language="javascript"
+/>
+
+### 5-3. Coordinates → Address (Reverse Geocoding)
+
+<CopyBlock
+  code='const latlng = { lat: 40.7128, lng: -74.0060 };
+const geocoder = new google.maps.Geocoder();
+
+geocoder.geocode({ location: latlng }, (results, status) => {
+  if (status === "OK") {
+    if (results[0]) {
+      console.log("Address:", results[0].formatted_address);
+      // "New York, NY 10007, USA"
+    }
+  }
+});'
+  language="javascript"
+/>
+
+</Step>
+
+---
+
+<Step number={6} title="Integrate with Real Projects">
+
+Examples for real-world use.
+
+### 6-1. React Example
+
+<CopyBlock
+  code='import React, { useEffect, useRef } from "react";
+
+function GoogleMap() {
+  const mapRef = useRef(null);
+
+  useEffect(() => {
+    const initMap = () => {
+      const map = new google.maps.Map(mapRef.current, {
+        center: { lat: 40.7128, lng: -74.0060 },
+        zoom: 13,
+      });
+
+      new google.maps.Marker({
+        position: { lat: 40.7128, lng: -74.0060 },
+        map: map,
+        title: "New York City"
+      });
+    };
+
+    if (!window.google) {
+      const script = document.createElement("script");
+      script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY`;
+      script.async = true;
+      script.defer = true;
+      script.onload = initMap;
+      document.head.appendChild(script);
+    } else {
+      initMap();
+    }
+  }, []);
+
+  return <div ref={mapRef} style={{ height: "400px", width: "100%" }} />;
+}
+
+export default GoogleMap;'
+  language="javascript"
+/>
+
+### 6-2. Next.js Example
+
+<CopyBlock
+  code='// components/Map.js
+import { useEffect, useRef } from "react";
+import { Loader } from "@googlemaps/js-api-loader";
+
+export default function Map() {
+  const mapRef = useRef(null);
+
+  useEffect(() => {
+    const loader = new Loader({
+      apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
+      version: "weekly",
+    });
+
+    loader.load().then(() => {
+      const map = new google.maps.Map(mapRef.current, {
+        center: { lat: 40.7128, lng: -74.0060 },
+        zoom: 13,
+      });
+
+      new google.maps.Marker({
+        position: { lat: 40.7128, lng: -74.0060 },
+        map: map,
+      });
+    });
+  }, []);
+
+  return <div ref={mapRef} style={{ height: "400px" }} />;
+}'
+  language="javascript"
+/>
+
+Add API key to `.env.local`:
+```
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_api_key_here
+```
+
+<Callout type="success">
+🎉 **Complete!** You've enabled Google Maps Platform and successfully displayed maps!
+</Callout>
+
+</Step>
+
+---
+
+## Cost Management
+
+<Callout type="info">
+💰 **Google Maps Platform Pricing**
+
+- **Free credit**: $200 monthly automatically applied
+- **Maps JavaScript API**:
+  - Dynamic Maps: $7 per 1,000 loads
+  - Static Maps: $2 per 1,000 loads
+- **Geocoding API**: $5 per 1,000 requests
+- **Places API**: $0.017~$0.032 per request
+
+**What free credit covers**:
+- ~28,500 map loads
+- ~40,000 Geocoding requests
+- Most small projects stay free!
+</Callout>
+
+---
+
+## Next Steps
+
+Now that you've mastered Maps API, try other GCP services:
+
+1. **[Cloud Storage Setup](../gcp-cloud-storage-setup)** - File storage
+2. **[Firestore Setup](../gcp-firestore-setup)** - NoSQL database
+3. **[Cloud Functions Setup](../gcp-cloud-functions-setup)** - Serverless functions
+
+---
+
+## Frequently Asked Questions
+
+<Callout type="info">
+**Q. Is it risky if Maps API key is exposed?**
+
+A. Maps API keys are designed to be exposed to clients:
+- HTTP referrer restrictions allow usage only from authorized domains
+- API restrictions limit to specific APIs
+- Regular usage monitoring is essential
+- Regenerate key immediately if suspicious activity detected
+
+However, server-only API keys (e.g., Places API server requests) must NOT be exposed.
+</Callout>
+
+<Callout type="info">
+**Q. What happens if I exceed the free credit?**
+
+A. You'll be automatically charged:
+- Billed to the card linked to your billing account
+- Recommended to set budget alerts to prevent overage
+- Monitor real-time usage in GCP Console
+</Callout>
+
+<Callout type="info">
+**Q. How to improve map loading speed?**
+
+A. Try the following:
+- Use `async defer` attributes for asynchronous script loading
+- Load only needed libraries (`libraries=places,geometry`)
+- Optimize initial zoom level
+- Use Marker Clustering for many markers
+- Consider Static Maps API for static images
+</Callout>
+
+---
+
+## Troubleshooting
+
+### "RefererNotAllowedMapError" error
+
+- Check HTTP referrer settings
+- Verify current domain is in the allowed list
+- For localhost testing, add `localhost`, `127.0.0.1/*`
+
+### Map displays as gray
+
+- Verify API key
+- Check Maps JavaScript API is enabled
+- Verify billing account is linked
+- Check browser console for error messages
+
+### "This API project is not authorized to use this API"
+
+- Verify Maps JavaScript API is checked in API restrictions
+- Wait a few minutes after saving API key (propagation time)
+
+---
+
+**Google Maps Platform Setup Complete!** 🎊 Now freely use mapping services!
