@@ -1,0 +1,378 @@
+# Weaviate 벡터 데이터베이스 설치 및 실행하기
+
+**Weaviate**는 벡터 임베딩을 저장하고 검색할 수 있는 오픈소스 벡터 데이터베이스입니다. 머신러닝 모델로부터 생성된 벡터를 저장하고 시맨틱 검색을 수행할 수 있습니다. 이 가이드를 따라 Docker를 사용하여 Weaviate를 설치하고 실행하세요.
+
+<FreeTierInfo
+  service="Weaviate"
+  limit="오픈소스, 무료 자체 호스팅"
+  period="one-time"
+  status="free"
+/>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "Docker 설치", required: true },
+  { text: "Docker Compose (선택사항)", required: false },
+  { text: "터미널 또는 명령 프롬프트", required: true },
+  { text: "최소 4GB RAM", required: true }
+]} />
+
+<Callout type="info">
+🔍 **벡터 데이터베이스란?** 벡터 데이터베이스는 숫자 벡터로 표현된 데이터를 저장하고 검색합니다. 텍스트, 이미지, 음성 등을 임베딩으로 변환하여 저장하고 시맨틱 유사성에 따라 검색할 수 있습니다.
+</Callout>
+
+---
+
+<Step number={1} title="Docker 설치 확인">
+
+### Docker 확인
+
+먼저 Docker가 설치되어 있는지 확인합니다.
+
+<CopyBlock language="bash" title="Docker 버전 확인">
+docker --version
+</CopyBlock>
+
+### Docker 설치
+
+Docker가 설치되지 않았다면 [Docker 공식 사이트](https://www.docker.com)에서 설치합니다.
+
+macOS/Linux:
+<CopyBlock language="bash" title="Docker 설치 (macOS Homebrew)">
+brew install docker
+</CopyBlock>
+
+Windows:
+[Docker Desktop 다운로드](https://www.docker.com/products/docker-desktop)
+
+### Docker 데몬 실행
+
+Docker가 실행 중인지 확인합니다. Docker Desktop을 열거나:
+
+<CopyBlock language="bash" title="Docker 데몬 상태 확인">
+docker ps
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/weaviate/step1-docker-check-ko.png"
+  alt="Docker 설치 확인"
+  caption="터미널에서 docker --version 실행"
+  priority={true}
+/>
+
+<Callout type="warning">
+⚠️ **주의**: 위 명령이 작동하지 않으면 Docker가 실행 중이 아닙니다. Docker Desktop 또는 Docker 데몬을 시작하세요.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Weaviate Docker 이미지 실행">
+
+### 간단한 Docker 실행
+
+가장 간단한 방법으로 Weaviate를 실행합니다.
+
+<CopyBlock language="bash" title="Weaviate 컨테이너 시작">
+docker run -d \
+  -p 8080:8080 \
+  -p 50051:50051 \
+  --name weaviate \
+  semitechnologies/weaviate:latest
+</CopyBlock>
+
+### Docker Compose 사용 (권장)
+
+더 쉬운 관리를 위해 docker-compose.yml 파일을 생성합니다.
+
+<CopyBlock language="bash" title="docker-compose.yml 파일 생성">
+cat > docker-compose.yml << EOF
+version: '3.4'
+services:
+  weaviate:
+    image: semitechnologies/weaviate:latest
+    ports:
+      - "8080:8080"
+      - "50051:50051"
+    environment:
+      QUERY_DEFAULTS_LIMIT: 25
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
+      PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
+    volumes:
+      - weaviate_data:/var/lib/weaviate
+
+volumes:
+  weaviate_data:
+EOF
+</CopyBlock>
+
+### Docker Compose로 시작
+
+<CopyBlock language="bash" title="Docker Compose 실행">
+docker-compose up -d
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/weaviate/step2-docker-run-ko.png"
+  alt="Docker 실행"
+  caption="docker-compose up -d를 실행하여 Weaviate를 시작합니다"
+/>
+
+<Callout type="success">
+✅ **완료!** Weaviate가 백그라운드에서 실행 중입니다.
+</Callout>
+
+<Checkpoint>
+Weaviate 컨테이너가 실행되고 있나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={3} title="Weaviate 실행 확인">
+
+### 헬스 체크
+
+Weaviate가 올바르게 실행되고 있는지 확인합니다.
+
+<CopyBlock language="bash" title="헬스 체크 요청">
+curl http://localhost:8080/v1/.well-known/ready
+</CopyBlock>
+
+### 웹 인터페이스 확인
+
+브라우저에서 다음 URL을 방문합니다:
+- [http://localhost:8080/v1/objects](http://localhost:8080/v1/objects)
+
+성공적으로 응답이 반환되면 Weaviate가 정상 실행 중입니다.
+
+### Docker 컨테이너 상태 확인
+
+<CopyBlock language="bash" title="실행 중인 컨테이너 확인">
+docker ps | grep weaviate
+</CopyBlock>
+
+또는:
+
+<CopyBlock language="bash" title="Docker Compose 상태 확인">
+docker-compose ps
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/weaviate/step3-health-check-ko.png"
+  alt="헬스 체크"
+  caption="curl을 사용하여 Weaviate 헬스 체크"
+/>
+
+<Callout type="tip">
+💡 **팁**: 포트 8080이 이미 사용 중이면 docker-compose.yml에서 포트를 변경할 수 있습니다.
+</Callout>
+
+<Checkpoint>
+헬스 체크가 성공했나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={4} title="Python 클라이언트 설치 및 연결">
+
+### Python 클라이언트 라이브러리 설치
+
+<CopyBlock language="bash" title="Weaviate 클라이언트 설치">
+pip install weaviate-client
+</CopyBlock>
+
+### Python에서 연결
+
+<CopyBlock language="python" title="Python 연결 스크립트">
+import weaviate
+
+client = weaviate.Client('http://localhost:8080')
+
+print(client.is_ready())
+</CopyBlock>
+
+### Node.js 클라이언트 설치
+
+<CopyBlock language="bash" title="Node.js 클라이언트 설치">
+npm install weaviate-client
+</CopyBlock>
+
+### Node.js에서 연결
+
+<CopyBlock language="javascript" title="Node.js 연결 스크립트">
+const weaviate = require('weaviate-client');
+
+const client = weaviate.client({
+  scheme: 'http',
+  host: 'localhost:8080',
+});
+
+client.misc.readyChecker()
+  .then(ready => console.log(ready ? 'Ready!' : 'Not ready'))
+  .catch(err => console.error('Error:', err));
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/weaviate/step4-client-install-ko.png"
+  alt="클라이언트 설치"
+  caption="pip install weaviate-client 실행"
+/>
+
+<Callout type="success">
+✅ **완료!** 클라이언트가 설치되고 Weaviate에 연결되었습니다.
+</Callout>
+
+<Checkpoint>
+클라이언트 연결에 성공했나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={5} title="컨테이너 관리">
+
+### 컨테이너 중지
+
+실행을 중지하려면:
+
+<CopyBlock language="bash" title="Docker 컨테이너 중지">
+docker stop weaviate
+</CopyBlock>
+
+또는 Docker Compose:
+
+<CopyBlock language="bash" title="Docker Compose 중지">
+docker-compose down
+</CopyBlock>
+
+### 컨테이너 재시작
+
+<CopyBlock language="bash" title="Docker 컨테이너 재시작">
+docker restart weaviate
+</CopyBlock>
+
+또는:
+
+<CopyBlock language="bash" title="Docker Compose 재시작">
+docker-compose restart
+</CopyBlock>
+
+### 로그 확인
+
+<CopyBlock language="bash" title="Docker 로그 보기">
+docker logs -f weaviate
+</CopyBlock>
+
+또는:
+
+<CopyBlock language="bash" title="Docker Compose 로그">
+docker-compose logs -f
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/weaviate/step5-management-ko.png"
+  alt="컨테이너 관리"
+  caption="Docker 명령으로 Weaviate 컨테이너를 관리합니다"
+/>
+
+<DevTip>
+🔧 **개발팁**: 개발 중에는 `docker-compose up`으로 실행하면 로그가 터미널에 표시되므로 디버깅이 쉽습니다. 프로덕션에서는 `-d` 플래그로 백그라운드 실행하세요.
+</DevTip>
+
+</Step>
+
+---
+
+## 다음 단계
+
+- [Weaviate 벡터 검색하기](/guides/weaviate-vector-search) - 벡터를 저장하고 검색
+- [Weaviate 공식 문서](https://weaviate.io/developers/weaviate)
+- [Python 클라이언트 문서](https://python-client-v3.readthedocs.io/)
+
+## Weaviate 기본 개념
+
+### 벡터 임베딩
+
+벡터 임베딩은 텍스트, 이미지 등을 숫자 배열로 변환한 것입니다:
+
+<CopyBlock language="text" title="임베딩 예시">
+텍스트: "dog" -> [0.234, 0.546, 0.123, ...]
+텍스트: "puppy" -> [0.245, 0.567, 0.134, ...]
+</CopyBlock>
+
+유사한 의미의 텍스트는 유사한 벡터를 가집니다.
+
+### 스키마
+
+Weaviate에서는 먼저 데이터 구조(스키마)를 정의합니다:
+
+<CopyBlock language="python" title="스키마 정의">
+class_obj = {
+  'class': 'Article',
+  'description': 'A blog post article',
+  'properties': [
+    {
+      'name': 'title',
+      'dataType': ['text']
+    },
+    {
+      'name': 'content',
+      'dataType': ['text']
+    }
+  ]
+}
+</CopyBlock>
+
+## 포트 설명
+
+- **8080**: REST API 포트
+- **50051**: gRPC 포트 (더 빠른 통신)
+
+## 시스템 요구사항
+
+| 요구사항 | 최소값 | 권장값 |
+|---------|--------|-------|
+| RAM | 2GB | 8GB+ |
+| 디스크 | 5GB | 50GB+ |
+| CPU | 2 cores | 4+ cores |
+
+---
+
+## 문제 해결
+
+### 포트 충돌
+
+포트 8080이 이미 사용 중이면:
+
+<CopyBlock language="bash" title="다른 포트 사용">
+docker run -d -p 9000:8080 --name weaviate semitechnologies/weaviate:latest
+</CopyBlock>
+
+그 다음 `http://localhost:9000`으로 접속합니다.
+
+### 메모리 부족 오류
+
+Docker의 메모리 할당을 증가시키세요:
+
+Docker Desktop Settings > Resources에서 메모리를 4GB 이상으로 설정합니다.
+
+### 컨테이너가 시작되지 않음
+
+로그를 확인하세요:
+
+<CopyBlock language="bash" title="로그 확인">
+docker logs weaviate
+</CopyBlock>
+
+### 클라이언트 연결 실패
+
+1. Weaviate가 실행 중인지 확인
+2. URL이 올바른지 확인
+3. 방화벽/네트워크 설정 확인

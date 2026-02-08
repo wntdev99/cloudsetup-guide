@@ -1,0 +1,338 @@
+# RabbitMQ 메시지 큐 - 메시지 발행 및 처리
+
+RabbitMQ에서 메시지를 발행하고 처리합니다. 큐를 생성하고 발행자(Publisher)와 소비자(Consumer)를 구현하여 비동기 메시지 처리를 수행합니다.
+
+<FreeTierInfo
+  service="RabbitMQ"
+  limit="오픈소스, 무료 자체 호스팅"
+  period="one-time"
+  status="free"
+/>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "RabbitMQ 설치됨", required: true },
+  { text: "pika 또는 amqplib", required: true },
+  { text: "Python 또는 Node.js", required: true },
+  { text: "터미널", required: true }
+]} />
+
+<Callout type="info">
+📬 **메시지 큐의 장점** 발행자와 소비자가 독립적으로 작동할 수 있습니다. 소비자가 다운되면 메시지는 큐에 저장되고, 소비자가 복구되면 메시지를 처리합니다.
+</Callout>
+
+---
+
+<Step number={1} title="Python 발행자 작성">
+
+### 기본 메시지 발행
+
+Python에서 메시지를 RabbitMQ에 발행합니다.
+
+<CopyBlock language="python" title="Python 발행자">
+import pika
+import json
+
+connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+channel = connection.channel()
+
+channel.queue_declare(queue='hello', durable=True)
+
+message = {'text': 'Hello RabbitMQ!', 'id': 1}
+
+channel.basic_publish(
+  exchange='',
+  routing_key='hello',
+  body=json.dumps(message),
+  properties=pika.BasicProperties(
+    delivery_mode=pika.DeliveryMode.Persistent
+  )
+)
+
+print(f'Message sent: {message}')
+connection.close()
+</CopyBlock>
+
+### 여러 메시지 발행
+
+<CopyBlock language="python" title="배치 발행">
+for i in range(10):
+  message = {'id': i, 'data': f'Message {i}'}
+  channel.basic_publish(
+    exchange='',
+    routing_key='hello',
+    body=json.dumps(message)
+  )
+  print(f'Sent message {i}')
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/rabbitmq/step1-publisher-ko.png"
+  alt="발행자"
+  caption="Python 발행자를 작성하여 메시지를 보냅니다"
+  priority={true}
+/>
+
+<Callout type="success">
+✅ **완료!** 메시지가 큐에 저장되었습니다.
+</Callout>
+
+<Checkpoint>
+메시지가 성공적으로 발행되었나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={2} title="Python 소비자 작성">
+
+### 기본 메시지 처리
+
+<CopyBlock language="python" title="Python 소비자">
+import pika
+import json
+
+connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+channel = connection.channel()
+
+channel.queue_declare(queue='hello', durable=True)
+
+def callback(ch, method, properties, body):
+  message = json.loads(body)
+  print(f'Received: {message}')
+  ch.basic_ack(delivery_tag=method.delivery_tag)
+
+channel.basic_consume(queue='hello', on_message_callback=callback)
+
+print('Waiting for messages...')
+try:
+  channel.start_consuming()
+except KeyboardInterrupt:
+  channel.stop_consuming()
+  connection.close()
+</CopyBlock>
+
+### 여러 소비자 처리
+
+<CopyBlock language="python" title="공정한 분배">
+channel.basic_qos(prefetch_count=1)
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/rabbitmq/step2-consumer-ko.png"
+  alt="소비자"
+  caption="Python 소비자를 작성하여 메시지를 처리합니다"
+/>
+
+<Callout type="tip">
+💡 **팁**: `basic_ack`는 메시지 처리 완료를 RabbitMQ에 알립니다. 이를 호출하지 않으면 메시지가 다시 큐로 돌아갑니다.
+</Callout>
+
+<Checkpoint>
+소비자가 메시지를 수신했나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={3} title="Node.js 발행자">
+
+### Node.js에서 메시지 발행
+
+<CopyBlock language="javascript" title="Node.js 발행자">
+const amqp = require('amqplib');
+
+async function publishMessage() {
+  const connection = await amqp.connect('amqp://localhost');
+  const channel = await connection.createChannel();
+
+  const queue = 'hello';
+  const message = JSON.stringify({
+    text: 'Hello RabbitMQ!',
+    id: 1,
+    timestamp: new Date()
+  });
+
+  await channel.assertQueue(queue, { durable: true });
+  channel.sendToQueue(queue, Buffer.from(message), { persistent: true });
+
+  console.log('Message sent:', message);
+
+  setTimeout(() => {
+    channel.close();
+    connection.close();
+  }, 500);
+}
+
+publishMessage().catch(console.error);
+</CopyBlock>
+
+<DevTip>
+🔧 **개발팁**: `persistent: true`는 메시지를 디스크에 저장하여 RabbitMQ 재시작 후에도 보존됩니다.
+</DevTip>
+
+<Checkpoint>
+Node.js 발행자가 작동했나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={4} title="Node.js 소비자">
+
+### Node.js에서 메시지 처리
+
+<CopyBlock language="javascript" title="Node.js 소비자">
+const amqp = require('amqplib');
+
+async function consumeMessage() {
+  const connection = await amqp.connect('amqp://localhost');
+  const channel = await connection.createChannel();
+
+  const queue = 'hello';
+  await channel.assertQueue(queue, { durable: true });
+
+  console.log('Waiting for messages...');
+
+  channel.consume(queue, (message) => {
+    if (message) {
+      console.log('Received:', message.content.toString());
+      channel.ack(message);
+    }
+  });
+}
+
+consumeMessage().catch(console.error);
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/rabbitmq/step4-nodejs-consumer-ko.png"
+  alt="Node.js 소비자"
+  caption="Node.js 소비자를 작성합니다"
+/>
+
+<Callout type="success">
+✅ **완료!** Node.js 소비자가 메시지를 처리합니다.
+</Callout>
+
+<Checkpoint>
+Node.js 소비자가 메시지를 받았나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={5} title="고급 패턴">
+
+### Exchange와 Binding
+
+<CopyBlock language="python" title="Fanout Exchange">
+channel.exchange_declare(exchange='logs', exchange_type='fanout')
+
+channel.queue_declare(queue='logs_queue1')
+channel.queue_declare(queue='logs_queue2')
+
+channel.queue_bind(exchange='logs', queue='logs_queue1')
+channel.queue_bind(exchange='logs', queue='logs_queue2')
+
+channel.basic_publish(exchange='logs', routing_key='', body=b'Log message')
+</CopyBlock>
+
+### Topic Exchange
+
+<CopyBlock language="python" title="Topic Exchange">
+channel.exchange_declare(exchange='events', exchange_type='topic')
+
+channel.queue_declare(queue='user_events')
+channel.queue_declare(queue='order_events')
+
+channel.queue_bind(exchange='events', queue='user_events', routing_key='user.*')
+channel.queue_bind(exchange='events', queue='order_events', routing_key='order.*')
+
+channel.basic_publish(exchange='events', routing_key='user.created', body=b'New user')
+channel.basic_publish(exchange='events', routing_key='order.placed', body=b'Order placed')
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/rabbitmq/step5-advanced-ko.png"
+  alt="고급 패턴"
+  caption="Exchange와 Binding을 사용한 메시지 라우팅"
+/>
+
+<DevTip>
+🔧 **개발팁**: Topic exchange는 와일드카드(`*` 한 단어, `#` 여러 단어)를 지원합니다.
+</DevTip>
+
+</Step>
+
+---
+
+## 다음 단계
+
+- [RabbitMQ 공식 문서](https://www.rabbitmq.com/documentation.html)
+- [RPC 패턴](https://www.rabbitmq.com/tutorials/tutorial-six-python.html)
+- [성능 최적화](https://www.rabbitmq.com/blog/2021/07/07/high-performance-publishing/)
+
+## Exchange 타입
+
+### Direct
+
+라우팅 키가 정확히 일치하는 큐에만 전달합니다.
+
+<CopyBlock language="text" title="Direct 예시">
+channel.queue_bind(exchange='tasks', routing_key='task.urgent')
+</CopyBlock>
+
+### Topic
+
+와일드카드 패턴으로 라우팅합니다.
+
+<CopyBlock language="text" title="Topic 예시">
+routing_key='logs.error.*'
+routing_key='*.critical'
+</CopyBlock>
+
+### Fanout
+
+모든 바인딩된 큐로 메시지를 브로드캐스트합니다.
+
+<CopyBlock language="text" title="Fanout 예시">
+channel.basic_publish(exchange='broadcast', routing_key='')
+</CopyBlock>
+
+## 모니터링
+
+### 관리 콘솔에서 확인
+
+RabbitMQ 관리 콘솔(http://localhost:15672)에서:
+
+1. **Queues** 탭에서 큐 상태 확인
+2. **Connections** 탭에서 활성 연결 확인
+3. **Channels** 탭에서 채널 정보 확인
+
+---
+
+## 문제 해결
+
+### 메시지를 받지 못함
+
+1. 큐가 존재하는지 확인
+2. 소비자가 연결되어 있는지 확인
+3. 관리 콘솔에서 큐의 메시지 개수 확인
+
+### 메시지 손실
+
+1. `durable=True`로 큐 설정
+2. `persistent=True`로 메시지 설정
+3. `basic_ack`로 확인응답 처리
+
+### 성능 저하
+
+1. `prefetch_count` 조정
+2. 소비자 수 증가
+3. 메시지 배치 처리

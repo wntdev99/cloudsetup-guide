@@ -1,0 +1,60 @@
+{
+  "slug": "weaviate-installation-setup",
+  "platform": "weaviate",
+  "service": "Weaviate Vector Database",
+  "category": "database",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 20,
+  "totalSteps": 5,
+  "freeTier": {
+    "service": "Weaviate",
+    "limit": "Open source, free to self-host",
+    "period": "one-time",
+    "amount": "Free with Docker",
+    "status": "free",
+    "conditions": [
+      "Open source license",
+      "Free with Docker installation",
+      "No usage fees",
+      "Community support available",
+      "Self-hosted deployment required",
+      "Cloud version available with paid tier"
+    ]
+  },
+  "prerequisites": [],
+  "nextGuides": [
+    "weaviate-vector-search"
+  ],
+  "seo": {
+    "ko": {
+      "title": "Weaviate 벡터 데이터베이스 설치 및 실행 | CloudSetup.guide",
+      "description": "Docker를 사용하여 Weaviate 벡터 데이터베이스를 설치하고 실행하는 방법을 배웁니다.",
+      "keywords": [
+        "Weaviate",
+        "벡터 데이터베이스",
+        "벡터 검색",
+        "Docker",
+        "머신러닝",
+        "임베딩",
+        "시맨틱 검색"
+      ]
+    },
+    "en": {
+      "title": "Install and Run Weaviate Vector Database | CloudSetup.guide",
+      "description": "Learn how to install and run Weaviate vector database using Docker. Get started in minutes.",
+      "keywords": [
+        "Weaviate",
+        "vector database",
+        "vector search",
+        "Docker",
+        "machine learning",
+        "embeddings",
+        "semantic search"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z",
+  "published": false
+}

@@ -1,0 +1,359 @@
+# Deploy and Run Replicate Models
+
+Replicate makes it easy to run pre-trained AI models. In this guide, learn how to deploy and run actual models including image generation, text processing, and more.
+
+<FreeTierInfo
+  service="Replicate"
+  limit="Free credits for new users"
+  period="monthly"
+  status="free"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Replicate account", required: true },
+  { text: "API key", required: true },
+  { text: "Python or Node.js environment", required: true },
+  { text: "Terminal or command prompt", required: true }
+]} />
+
+<Callout type="info">
+🚀 **Getting Started**: Replicate lets you use AI models with just API calls, no training or deployment needed. Get started immediately without complex setup.
+</Callout>
+
+---
+
+<Step number={1} title="Install Python Client Library">
+
+### Install using pip
+
+First, install the Replicate library in your Python environment.
+
+<CopyBlock language="bash" title="Install library">
+pip install replicate
+</CopyBlock>
+
+### Verify Installation
+
+<CopyBlock language="bash" title="Check version">
+pip show replicate
+</CopyBlock>
+
+### Node.js Client (Alternative)
+
+If using Node.js:
+
+<CopyBlock language="bash" title="Install using npm">
+npm install replicate
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/replicate/step1-install-en.png"
+  alt="Install library"
+  caption="Run pip install replicate in terminal"
+  priority={true}
+/>
+
+<Callout type="success">
+✅ **Done!** Replicate library is installed.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Set Up API Key Environment Variable">
+
+### Set Environment Variable
+
+Set your API key as an environment variable. First, create a `.env` file.
+
+<CopyBlock language="bash" title="Create .env file from terminal">
+cat > .env << EOF
+REPLICATE_API_TOKEN=r8_YourActualApiKeyHere
+EOF
+</CopyBlock>
+
+### Load Environment Variable in Python
+
+<CopyBlock language="python" title="Load .env in Python">
+import os
+from dotenv import load_dotenv
+import replicate
+
+load_dotenv()
+</CopyBlock>
+
+### Load Environment Variable in Node.js
+
+<CopyBlock language="javascript" title="Load .env in Node.js">
+require('dotenv').config();
+const Replicate = require('replicate');
+
+const replicate = new Replicate({
+  auth: process.env.REPLICATE_API_TOKEN,
+});
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/replicate/step2-env-setup-en.png"
+  alt="Set environment variable"
+  caption="Create .env file and set API key"
+/>
+
+<Callout type="warning">
+⚠️ **Important**: Add `.env` to `.gitignore`. Your API key could be exposed!
+</Callout>
+
+<Checkpoint>
+Is the environment variable set up correctly?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={3} title="Run Image Generation Model">
+
+### Generate Images with Stable Diffusion
+
+Let's run Stable Diffusion, the most popular image generation model.
+
+#### Generate Images in Python
+
+<CopyBlock language="python" title="Python image generation script">
+import replicate
+
+output = replicate.run(
+  'stability-ai/stable-diffusion:ac732df83cea7fff18f8472768c88ad041f529f2d3d189f5af7c2157cb21f321',
+  input={
+    'prompt': 'a painting of a cat wearing a hat'
+  }
+)
+
+print('Generated images:')
+for image_url in output:
+  print(image_url)
+</CopyBlock>
+
+#### Generate Images in Node.js
+
+<CopyBlock language="javascript" title="Node.js image generation script">
+const output = await replicate.run(
+  'stability-ai/stable-diffusion:ac732df83cea7fff18f8472768c88ad041f529f2d3d189f5af7c2157cb21f321',
+  {
+    input: {
+      prompt: 'a painting of a cat wearing a hat'
+    }
+  }
+);
+
+console.log('Generated images:');
+output.forEach(url => console.log(url));
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/replicate/step3-image-generation-en.png"
+  alt="Image generation"
+  caption="Generate images using Stable Diffusion model"
+/>
+
+<Callout type="tip">
+💡 **Tip**: More detailed prompts produce better results. Example: 'a beautiful oil painting of a cat wearing a blue hat, 8k, highly detailed'
+</Callout>
+
+<Checkpoint>
+Was the image generated successfully?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={4} title="Run Text Processing Model">
+
+### Generate Text with Llama 2
+
+Run Llama 2, an open-source LLM model.
+
+#### Generate Text in Python
+
+<CopyBlock language="python" title="Python text generation script">
+import replicate
+
+output = replicate.run(
+  'meta/llama-2-7b-chat:58d7d5b5c80361fdf34f6731ca3ac3c0f82ebb01516683dfc9b501f15790bda7',
+  input={
+    'prompt': 'What is the capital of France?'
+  }
+)
+
+print('Response:')
+print(''.join(output))
+</CopyBlock>
+
+#### Generate Text in Node.js
+
+<CopyBlock language="javascript" title="Node.js text generation script">
+const output = await replicate.run(
+  'meta/llama-2-7b-chat:58d7d5b5c80361fdf34f6731ca3ac3c0f82ebb01516683dfc9b501f15790bda7',
+  {
+    input: {
+      prompt: 'What is the capital of France?'
+    }
+  }
+);
+
+console.log('Response:');
+console.log(output.join(''));
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/replicate/step4-text-generation-en.png"
+  alt="Text generation"
+  caption="Generate text using Llama 2 model"
+/>
+
+<DevTip>
+🔧 **Dev Tip**: Most models have multiple parameters. You can adjust temperature, max tokens, and more to control results.
+</DevTip>
+
+<Checkpoint>
+Was the text generated successfully?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={5} title="Async Operations and Progress Tracking">
+
+### Run Model Asynchronously
+
+For long-running tasks, execute asynchronously and track progress.
+
+#### Async Execution in Python
+
+<CopyBlock language="python" title="Python async script">
+import replicate
+
+prediction = replicate.predictions.create(
+  version='ac732df83cea7fff18f8472768c88ad041f529f2d3d189f5af7c2157cb21f321',
+  input={
+    'prompt': 'a beautiful landscape painting'
+  }
+)
+
+print(f'Prediction ID: {prediction.id}')
+print(f'Status: {prediction.status}')
+
+prediction = replicate.predictions.get(prediction.id)
+print(f'Updated status: {prediction.status}')
+print(f'Output: {prediction.output}')
+</CopyBlock>
+
+#### Async Execution in Node.js
+
+<CopyBlock language="javascript" title="Node.js async script">
+const prediction = await replicate.predictions.create({
+  version: 'ac732df83cea7fff18f8472768c88ad041f529f2d3d189f5af7c2157cb21f321',
+  input: {
+    prompt: 'a beautiful landscape painting'
+  }
+});
+
+console.log(`Prediction ID: ${prediction.id}`);
+console.log(`Status: ${prediction.status}`);
+
+const updatedPrediction = await replicate.predictions.get(prediction.id);
+console.log(`Updated status: ${updatedPrediction.status}`);
+console.log(`Output: ${updatedPrediction.output}`);
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/replicate/step5-async-en.png"
+  alt="Async operations"
+  caption="Track status of running jobs"
+/>
+
+<Callout type="info">
+ℹ️ **Info**: Most model runs take a few seconds to minutes. With async execution, you don't need to wait for completion.
+</Callout>
+
+</Step>
+
+---
+
+## Next Steps
+
+- [Replicate Model Library](https://replicate.com/explore) - Explore other models
+- [Replicate Documentation](https://replicate.com/docs)
+- [API Reference](https://replicate.com/docs/api/rest)
+
+## Popular Models to Try
+
+### Image Processing
+- Stable Diffusion - Image generation
+- Real-ESRGAN - Image upscaling
+- Codeformer - Face restoration
+
+### Text Processing
+- Llama 2 - Text generation
+- GPT-2 - Text completion
+- OpenAI Whisper - Speech recognition
+
+### Voice Processing
+- Vall-E - Voice generation
+- TTS - Text to speech
+- Wave2Lip - Voice synchronization
+
+## Manage Costs
+
+### Monitor Usage
+
+<CopyBlock language="python" title="Check usage">
+import replicate
+
+predictions = replicate.predictions.list()
+for pred in predictions:
+  print(f'Model: {pred.model}')
+  print(f'Status: {pred.status}')
+  print(f'Created: {pred.created_at}')
+</CopyBlock>
+
+### Cost Reduction Tips
+
+1. **Batch Processing**: Process multiple requests at once
+2. **Choose Appropriate Models**: Smaller models may be sufficient and cheaper
+3. **Use Caching**: Avoid repeating the same inputs
+4. **Set Budget**: Limit monthly spending in Replicate dashboard
+
+---
+
+## Troubleshooting
+
+### API Key Error
+
+<CopyBlock language="bash" title="Check environment variable">
+echo $REPLICATE_API_TOKEN
+</CopyBlock>
+
+Verify the environment variable is set.
+
+### Model Execution Fails
+
+1. Verify API key is valid
+2. Check credits are sufficient
+3. Confirm model ID is correct
+4. Check network connection
+
+### No Output
+
+For async jobs, wait for completion. Check `prediction.status`.
+
+### Out of Credits
+
+1. Add payment info in dashboard
+2. Set up auto-recharge
+3. Test with smaller models

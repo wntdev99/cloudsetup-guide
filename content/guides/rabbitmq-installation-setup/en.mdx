@@ -1,0 +1,298 @@
+# Install and Run RabbitMQ Message Broker
+
+**RabbitMQ** is an open-source message broker. Reliably delivers messages between applications. Used for asynchronous task processing, work queues, and inter-service communication. Install RabbitMQ with Docker and access the management interface.
+
+<FreeTierInfo
+  service="RabbitMQ"
+  limit="Open source, free to self-host"
+  period="one-time"
+  status="free"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Docker installed", required: true },
+  { text: "Docker Compose", required: true },
+  { text: "Minimum 1GB RAM", required: true },
+  { text: "Web browser", required: true }
+]} />
+
+<Callout type="info">
+📬 **What is RabbitMQ?** RabbitMQ delivers messages from producers to consumers. Stores messages in queues so messages aren't lost even during network failures.
+</Callout>
+
+---
+
+<Step number={1} title="Set Up RabbitMQ with Docker Compose">
+
+### Create docker-compose.yml File
+
+<CopyBlock language="bash" title="Create docker-compose.yml file">
+cat > docker-compose.yml << EOF
+version: '3.8'
+services:
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  rabbitmq_data:
+EOF
+</CopyBlock>
+
+### Port Explanation
+
+- **5672**: AMQP protocol port (client connection)
+- **15672**: Management interface port (web UI)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/rabbitmq/step1-compose-setup-en.png"
+  alt="Docker Compose setup"
+  caption="Create docker-compose.yml file"
+  priority={true}
+/>
+
+<Callout type="success">
+✅ **Ready!** Configuration file is prepared.
+</Callout>
+
+<Checkpoint>
+Was docker-compose.yml file created?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={2} title="Start RabbitMQ">
+
+### Run Docker Compose
+
+<CopyBlock language="bash" title="Start RabbitMQ">
+docker-compose up -d
+</CopyBlock>
+
+### Verify Running
+
+<CopyBlock language="bash" title="Check container status">
+docker-compose ps
+</CopyBlock>
+
+Verify all containers are in healthy state.
+
+### View Logs
+
+<CopyBlock language="bash" title="View logs">
+docker-compose logs -f rabbitmq
+</CopyBlock>
+
+Look for "Ready to accept connections" message.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/rabbitmq/step2-start-en.png"
+  alt="Start RabbitMQ"
+  caption="Run docker-compose up -d to start RabbitMQ"
+/>
+
+<Callout type="success">
+✅ **Done!** RabbitMQ is running.
+</Callout>
+
+<Checkpoint>
+Did RabbitMQ start successfully?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={3} title="Access Management Console">
+
+### Open in Web Browser
+
+1. Visit this URL in your browser:
+   [http://localhost:15672](http://localhost:15672)
+
+2. Login screen appears
+
+### Default Login Credentials
+
+- **Username**: guest
+- **Password**: guest
+
+### Management Console Features
+
+After login, you can access:
+
+1. **Connections**: Currently connected clients
+2. **Channels**: Communication channels
+3. **Queues**: Message queues
+4. **Exchanges**: Message routing rules
+5. **Admin**: User and permission management
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/rabbitmq/step3-management-en.png"
+  alt="Management console"
+  caption="Access RabbitMQ management console"
+/>
+
+<Callout type="warning">
+⚠️ **Important**: Change default username and password in production.
+</Callout>
+
+<Checkpoint>
+Did you successfully access the management console?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={4} title="Install Client Libraries">
+
+### Install Python Client
+
+<CopyBlock language="bash" title="Install pika">
+pip install pika
+</CopyBlock>
+
+### Connect in Python
+
+<CopyBlock language="python" title="Python connection test">
+import pika
+
+try:
+  connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+  channel = connection.channel()
+  print('Connected to RabbitMQ!')
+  connection.close()
+except Exception as e:
+  print(f'Connection failed: {e}')
+</CopyBlock>
+
+### Install Node.js Client
+
+<CopyBlock language="bash" title="Install amqplib">
+npm install amqplib
+</CopyBlock>
+
+### Connect in Node.js
+
+<CopyBlock language="javascript" title="Node.js connection test">
+const amqp = require('amqplib');
+
+async function connect() {
+  try {
+    const connection = await amqp.connect('amqp://localhost');
+    console.log('Connected to RabbitMQ!');
+    await connection.close();
+  } catch (error) {
+    console.error('Connection failed:', error);
+  }
+}
+
+connect();
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/rabbitmq/step4-client-install-en.png"
+  alt="Client installation"
+  caption="Install Python or Node.js client"
+/>
+
+<Callout type="success">
+✅ **Done!** Client installed and connected.
+</Callout>
+
+<Checkpoint>
+Did client connection succeed?
+</Checkpoint>
+
+</Step>
+
+---
+
+## Next Steps
+
+- [RabbitMQ Message Queue](/guides/rabbitmq-message-queue) - Publish and process messages
+- [RabbitMQ Documentation](https://www.rabbitmq.com/documentation.html)
+- [Python pika Guide](https://pika.readthedocs.io/)
+
+## RabbitMQ Concepts
+
+### Exchange
+
+Defines message routing rules:
+
+- **Direct**: Deliver if routing key matches exactly
+- **Topic**: Route using wildcard patterns
+- **Fanout**: Broadcast message to all queues
+- **Headers**: Route using header attributes
+
+### Queue
+
+Buffer that stores messages.
+
+### Binding
+
+Connects Exchange and Queue.
+
+### Message
+
+Data passed from producer to consumer.
+
+## Port Information
+
+- **5672**: AMQP protocol
+- **15672**: Management console (HTTP)
+
+## Container Management
+
+### Stop
+
+<CopyBlock language="bash" title="Stop RabbitMQ">
+docker-compose stop
+</CopyBlock>
+
+### Start
+
+<CopyBlock language="bash" title="Start RabbitMQ">
+docker-compose start
+</CopyBlock>
+
+### Remove Completely
+
+<CopyBlock language="bash" title="Remove">
+docker-compose down -v
+</CopyBlock>
+
+---
+
+## Troubleshooting
+
+### Port Conflict
+
+If port is in use, change port in docker-compose.yml.
+
+### Connection Failed
+
+1. Verify all containers are running
+2. Check port is correct
+3. Review logs for error messages
+
+### Out of Memory
+
+Increase Docker memory allocation.

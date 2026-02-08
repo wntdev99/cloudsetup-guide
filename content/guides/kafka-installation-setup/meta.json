@@ -1,0 +1,60 @@
+{
+  "slug": "kafka-installation-setup",
+  "platform": "kafka",
+  "service": "Apache Kafka",
+  "category": "messaging",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 20,
+  "totalSteps": 4,
+  "freeTier": {
+    "service": "Apache Kafka",
+    "limit": "Open source, free to self-host",
+    "period": "one-time",
+    "amount": "Free with Docker",
+    "status": "free",
+    "conditions": [
+      "Open source Apache license",
+      "Free with Docker installation",
+      "No usage fees",
+      "Community support available",
+      "Self-hosted deployment",
+      "Managed services available with cost"
+    ]
+  },
+  "prerequisites": [],
+  "nextGuides": [
+    "kafka-event-streaming"
+  ],
+  "seo": {
+    "ko": {
+      "title": "Apache Kafka 설치 및 실행 | CloudSetup.guide",
+      "description": "Docker를 사용하여 Apache Kafka를 설치하고 브로커를 실행하는 방법을 배웁니다.",
+      "keywords": [
+        "Kafka",
+        "메시지 큐",
+        "이벤트 스트리밍",
+        "도커",
+        "브로커",
+        "토픽",
+        "실시간 데이터"
+      ]
+    },
+    "en": {
+      "title": "Install and Run Apache Kafka | CloudSetup.guide",
+      "description": "Learn how to install and run Apache Kafka using Docker. Set up a message broker in minutes.",
+      "keywords": [
+        "Kafka",
+        "message queue",
+        "event streaming",
+        "Docker",
+        "broker",
+        "topics",
+        "real-time data"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z",
+  "published": false
+}

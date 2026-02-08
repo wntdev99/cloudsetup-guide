@@ -1,0 +1,518 @@
+# Weaviate 벡터 검색하기
+
+Weaviate에서 벡터 임베딩을 저장하고 시맨틱 검색을 수행합니다. 스키마를 생성하고 벡터 데이터를 추가하며 유사 항목을 찾는 방법을 배웁니다.
+
+<FreeTierInfo
+  service="Weaviate"
+  limit="오픈소스, 무료 자체 호스팅"
+  period="one-time"
+  status="free"
+/>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "Weaviate 설치됨", required: true },
+  { text: "Python 또는 Node.js", required: true },
+  { text: "임베딩 모델 (OpenAI, HuggingFace 등)", required: false },
+  { text: "Weaviate 클라이언트 라이브러리", required: true }
+]} />
+
+<Callout type="info">
+🔍 **벡터 검색이란?** 벡터 검색은 데이터 간의 의미적 유사성을 찾습니다. 예를 들어 "귀여운 고양이"와 "장난스러운 새끼 고양이"는 서로 다른 단어이지만 유사한 의미를 가지므로 검색 결과에 함께 나타날 수 있습니다.
+</Callout>
+
+---
+
+<Step number={1} title="스키마 생성">
+
+### Python에서 스키마 생성
+
+<CopyBlock language="python" title="스키마 정의 및 생성">
+import weaviate
+
+client = weaviate.Client('http://localhost:8080')
+
+class_obj = {
+  'class': 'Article',
+  'description': 'A news article with title and content',
+  'properties': [
+    {
+      'name': 'title',
+      'description': 'The title of the article',
+      'dataType': ['text']
+    },
+    {
+      'name': 'content',
+      'description': 'The full content of the article',
+      'dataType': ['text']
+    },
+    {
+      'name': 'source',
+      'description': 'The source of the article',
+      'dataType': ['text']
+    }
+  ]
+}
+
+client.schema.create_class(class_obj)
+print('Schema created successfully')
+</CopyBlock>
+
+### Node.js에서 스키마 생성
+
+<CopyBlock language="javascript" title="Node.js 스키마 생성">
+const weaviate = require('weaviate-client');
+
+const client = weaviate.client({
+  scheme: 'http',
+  host: 'localhost:8080'
+});
+
+const classObj = {
+  class: 'Article',
+  description: 'A news article with title and content',
+  properties: [
+    {
+      name: 'title',
+      description: 'The title of the article',
+      dataType: ['text']
+    },
+    {
+      name: 'content',
+      description: 'The full content of the article',
+      dataType: ['text']
+    },
+    {
+      name: 'source',
+      description: 'The source of the article',
+      dataType: ['text']
+    }
+  ]
+};
+
+client.schema.classCreator()
+  .withClass(classObj)
+  .do()
+  .then(res => console.log('Schema created'))
+  .catch(err => console.error('Error:', err));
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/weaviate/step1-schema-creation-ko.png"
+  alt="스키마 생성"
+  caption="Python 또는 Node.js에서 스키마를 정의하고 생성합니다"
+  priority={true}
+/>
+
+<Callout type="success">
+✅ **완료!** Article 스키마가 생성되었습니다.
+</Callout>
+
+<Checkpoint>
+스키마가 성공적으로 생성되었나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={2} title="벡터 데이터 추가">
+
+### 벡터 생성 및 추가
+
+먼저 임베딩 모델을 사용하여 텍스트를 벡터로 변환합니다.
+
+#### Python에서 데이터 추가
+
+<CopyBlock language="python" title="Python 데이터 추가">
+import weaviate
+import numpy as np
+
+client = weaviate.Client('http://localhost:8080')
+
+articles = [
+  {
+    'title': 'AI 기술의 미래',
+    'content': '인공지능은 우리의 삶을 크게 변화시킬 것입니다',
+    'source': 'TechNews'
+  },
+  {
+    'title': '머신러닝 기초',
+    'content': '머신러닝은 데이터로부터 학습하는 기술입니다',
+    'source': 'DataBlog'
+  },
+  {
+    'title': '딥러닝 개입',
+    'content': '신경망을 사용한 딥러닝은 이미지와 음성 인식에 효과적입니다',
+    'source': 'AIDaily'
+  }
+]
+
+for article in articles:
+  vector = np.random.rand(384)
+
+  client.data_object.create(
+    data_object=article,
+    class_name='Article',
+    vector=vector.tolist()
+  )
+
+print(f'Added {len(articles)} articles')
+</CopyBlock>
+
+#### Node.js에서 데이터 추가
+
+<CopyBlock language="javascript" title="Node.js 데이터 추가">
+const weaviate = require('weaviate-client');
+
+const client = weaviate.client({
+  scheme: 'http',
+  host: 'localhost:8080'
+});
+
+const articles = [
+  {
+    title: 'AI 기술의 미래',
+    content: '인공지능은 우리의 삶을 크게 변화시킬 것입니다',
+    source: 'TechNews'
+  },
+  {
+    title: '머신러닝 기초',
+    content: '머신러닝은 데이터로부터 학습하는 기술입니다',
+    source: 'DataBlog'
+  }
+];
+
+articles.forEach(article => {
+  const vector = Array(384).fill(0).map(() => Math.random());
+
+  client.data.creator()
+    .withClassName('Article')
+    .withProperties(article)
+    .withVector(vector)
+    .do()
+    .then(res => console.log('Article added:', res.id))
+    .catch(err => console.error('Error:', err));
+});
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/weaviate/step2-add-data-ko.png"
+  alt="데이터 추가"
+  caption="벡터 데이터를 Weaviate에 추가합니다"
+/>
+
+<Callout type="tip">
+💡 **팁**: 실제 임베딩을 위해서는 OpenAI, HuggingFace 등의 임베딩 모델을 사용하세요. 여기서는 예제용으로 무작위 벡터를 사용했습니다.
+</Callout>
+
+<Checkpoint>
+데이터가 성공적으로 추가되었나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={3} title="벡터 검색 수행">
+
+### 유사성 검색
+
+저장된 벡터와 유사한 항목을 찾습니다.
+
+#### Python에서 벡터 검색
+
+<CopyBlock language="python" title="Python 벡터 검색">
+import weaviate
+import numpy as np
+
+client = weaviate.Client('http://localhost:8080')
+
+query_vector = np.random.rand(384).tolist()
+
+result = client.query.get('Article', ['title', 'content', 'source']) \
+  .with_near_vector({'vector': query_vector}) \
+  .with_limit(5) \
+  .do()
+
+print('Search Results:')
+for article in result['data']['Get']['Article']:
+  print(f"- {article['title']}")
+  print(f"  Source: {article['source']}")
+</CopyBlock>
+
+#### Node.js에서 벡터 검색
+
+<CopyBlock language="javascript" title="Node.js 벡터 검색">
+const weaviate = require('weaviate-client');
+
+const client = weaviate.client({
+  scheme: 'http',
+  host: 'localhost:8080'
+});
+
+const queryVector = Array(384).fill(0).map(() => Math.random());
+
+client.graphql.get()
+  .withClassName('Article')
+  .withFields('title content source _additional { distance }')
+  .withNearVector({ vector: queryVector })
+  .withLimit(5)
+  .do()
+  .then(res => {
+    console.log('Search Results:');
+    res.data.Get.Article.forEach(article => {
+      console.log(`- ${article.title}`);
+      console.log(`  Distance: ${article._additional.distance}`);
+    });
+  })
+  .catch(err => console.error('Error:', err));
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/weaviate/step3-vector-search-ko.png"
+  alt="벡터 검색"
+  caption="쿼리 벡터와 유사한 항목을 검색합니다"
+/>
+
+<DevTip>
+🔧 **개발팁**: 거리(distance) 값이 작을수록 더 유사한 항목입니다. 일반적으로 0에 가까울수록 더 유사합니다.
+</DevTip>
+
+<Checkpoint>
+검색 결과가 반환되었나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={4} title="텍스트 검색">
+
+### 텍스트 기반 검색
+
+텍스트를 사용하여 검색합니다.
+
+#### Python에서 텍스트 검색
+
+<CopyBlock language="python" title="Python 텍스트 검색">
+import weaviate
+
+client = weaviate.Client('http://localhost:8080')
+
+result = client.query.get('Article', ['title', 'content', 'source']) \
+  .with_where({
+    'path': ['content'],
+    'operator': 'ContainsAll',
+    'valueText': '머신러닝'
+  }) \
+  .with_limit(10) \
+  .do()
+
+print('Search Results for "머신러닝":')
+for article in result['data']['Get']['Article']:
+  print(f"- {article['title']}")
+</CopyBlock>
+
+#### Node.js에서 텍스트 검색
+
+<CopyBlock language="javascript" title="Node.js 텍스트 검색">
+const weaviate = require('weaviate-client');
+
+const client = weaviate.client({
+  scheme: 'http',
+  host: 'localhost:8080'
+});
+
+client.graphql.get()
+  .withClassName('Article')
+  .withFields('title content source')
+  .withWhere({
+    path: ['content'],
+    operator: 'ContainsAll',
+    valueText: '머신러닝'
+  })
+  .withLimit(10)
+  .do()
+  .then(res => {
+    console.log('Search Results:');
+    res.data.Get.Article.forEach(article => {
+      console.log(`- ${article.title}`);
+    });
+  })
+  .catch(err => console.error('Error:', err));
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/weaviate/step4-text-search-ko.png"
+  alt="텍스트 검색"
+  caption="텍스트 필터를 사용하여 검색합니다"
+/>
+
+<Callout type="success">
+✅ **완료!** 벡터 검색과 텍스트 검색 모두 성공했습니다.
+</Callout>
+
+<Checkpoint>
+텍스트 검색이 작동했나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={5} title="고급 쿼리">
+
+### 복합 조건 검색
+
+여러 조건을 조합하여 검색합니다.
+
+#### Python에서 복합 검색
+
+<CopyBlock language="python" title="Python 복합 검색">
+import weaviate
+
+client = weaviate.Client('http://localhost:8080')
+
+result = client.query.get('Article', ['title', 'content', 'source']) \
+  .with_where({
+    'operator': 'And',
+    'operands': [
+      {
+        'path': ['content'],
+        'operator': 'ContainsAll',
+        'valueText': 'AI'
+      },
+      {
+        'path': ['source'],
+        'operator': 'Equal',
+        'valueText': 'TechNews'
+      }
+    ]
+  }) \
+  .with_limit(10) \
+  .do()
+
+print('Search Results:')
+for article in result['data']['Get']['Article']:
+  print(f"- {article['title']} ({article['source']})")
+</CopyBlock>
+
+#### Node.js에서 복합 검색
+
+<CopyBlock language="javascript" title="Node.js 복합 검색">
+const weaviate = require('weaviate-client');
+
+const client = weaviate.client({
+  scheme: 'http',
+  host: 'localhost:8080'
+});
+
+client.graphql.get()
+  .withClassName('Article')
+  .withFields('title content source')
+  .withWhere({
+    operator: 'And',
+    operands: [
+      {
+        path: ['content'],
+        operator: 'ContainsAll',
+        valueText: 'AI'
+      },
+      {
+        path: ['source'],
+        operator: 'Equal',
+        valueText: 'TechNews'
+      }
+    ]
+  })
+  .withLimit(10)
+  .do()
+  .then(res => {
+    console.log('Search Results:');
+    res.data.Get.Article.forEach(article => {
+      console.log(`- ${article.title} (${article.source})`);
+    });
+  })
+  .catch(err => console.error('Error:', err));
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/weaviate/step5-advanced-search-ko.png"
+  alt="고급 검색"
+  caption="복합 조건을 사용한 고급 검색"
+/>
+
+<DevTip>
+🔧 **개발팁**: And, Or 같은 연산자를 사용하여 복잡한 쿼리를 만들 수 있습니다. Not 연산자로 제외 조건도 설정할 수 있습니다.
+</DevTip>
+
+</Step>
+
+---
+
+## 다음 단계
+
+- [Weaviate 공식 문서](https://weaviate.io/developers/weaviate)
+- [GraphQL API](https://weaviate.io/developers/weaviate/api/graphql)
+- [임베딩 모델 통합](https://weaviate.io/developers/weaviate/modules/retriever-vectorizer-modules)
+
+## 임베딩 모델 옵션
+
+### OpenAI 임베딩
+
+<CopyBlock language="python" title="OpenAI 임베딩 사용">
+import openai
+
+openai.api_key = 'sk-...'
+
+response = openai.Embedding.create(
+  input='The quick brown fox',
+  model='text-embedding-ada-002'
+)
+
+vector = response['data'][0]['embedding']
+</CopyBlock>
+
+### HuggingFace 임베딩
+
+<CopyBlock language="python" title="HuggingFace 임베딩">
+from sentence_transformers import SentenceTransformer
+
+model = SentenceTransformer('all-MiniLM-L6-v2')
+vector = model.encode('The quick brown fox')
+</CopyBlock>
+
+## 성능 최적화
+
+### 인덱싱
+
+대량의 데이터를 다루는 경우 인덱싱이 중요합니다:
+
+<CopyBlock language="python" title="인덱싱 설정">
+class_obj = {
+  'class': 'Article',
+  'vectorIndexConfig': {
+    'distance': 'cosine',
+    'ef': 128,
+    'efConstruction': 200,
+    'maxConnections': 30
+  },
+  'properties': [...]
+}
+</CopyBlock>
+
+## 문제 해결
+
+### 쿼리가 결과를 반환하지 않음
+
+1. 데이터가 실제로 추가되었는지 확인
+2. 벡터 차원이 일치하는지 확인
+3. 필터 조건이 너무 엄격하지는 않은지 확인
+
+### 검색 속도가 느림
+
+1. 인덱싱 파라미터 최적화
+2. 데이터 정규화
+3. 불필요한 필드 제거

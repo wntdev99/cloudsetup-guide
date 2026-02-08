@@ -1,0 +1,357 @@
+# Kafka 이벤트 스트리밍하기
+
+Kafka 프로듀서와 컨슈머를 사용하여 메시지를 발행하고 구독합니다. 실시간 데이터 처리 파이프라인을 구축하고 여러 애플리케이션 간 통신을 수행합니다.
+
+<FreeTierInfo
+  service="Apache Kafka"
+  limit="오픈소스, 무료 자체 호스팅"
+  period="one-time"
+  status="free"
+/>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "Kafka 설치됨", required: true },
+  { text: "kafka-python 또는 kafkajs", required: true },
+  { text: "터미널", required: true },
+  { text: "Python 또는 Node.js", required: true }
+]} />
+
+<Callout type="info">
+📊 **이벤트 스트리밍이란?** 애플리케이션이 이벤트를 발행하고 다른 애플리케이션이 구독하는 방식입니다. 느슨한 결합(loosely coupled)으로 마이크로서비스 아키텍처를 구성할 수 있습니다.
+</Callout>
+
+---
+
+<Step number={1} title="Python 프로듀서 작성">
+
+### 기본 프로듀서
+
+메시지를 발행하는 프로듀서를 작성합니다.
+
+<CopyBlock language="python" title="Python 프로듀서">
+from kafka import KafkaProducer
+import json
+import time
+
+producer = KafkaProducer(
+  bootstrap_servers='localhost:9092',
+  value_serializer=lambda v: json.dumps(v).encode('utf-8')
+)
+
+for i in range(5):
+  message = {'id': i, 'data': f'Event {i}'}
+  producer.send('test-topic', value=message)
+  print(f'Sent: {message}')
+  time.sleep(1)
+
+producer.close()
+</CopyBlock>
+
+### 콜백 함수 사용
+
+전송 결과를 처리합니다.
+
+<CopyBlock language="python" title="콜백 함수">
+def on_send_success(record_metadata):
+  print(f'Topic: {record_metadata.topic}')
+  print(f'Partition: {record_metadata.partition}')
+  print(f'Offset: {record_metadata.offset}')
+
+def on_send_error(exc):
+  print(f'Error: {exc}')
+
+producer.send('test-topic', value=message).add_callbacks(
+  on_success=on_send_success,
+  on_error=on_send_error
+)
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/kafka/step1-producer-ko.png"
+  alt="프로듀서"
+  caption="Python 프로듀서를 작성하여 메시지를 발행합니다"
+  priority={true}
+/>
+
+<Callout type="success">
+✅ **완료!** 프로듀서가 메시지를 발행했습니다.
+</Callout>
+
+<Checkpoint>
+메시지가 성공적으로 발행되었나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={2} title="Python 컨슈머 작성">
+
+### 기본 컨슈머
+
+메시지를 구독하는 컨슈머를 작성합니다.
+
+<CopyBlock language="python" title="Python 컨슈머">
+from kafka import KafkaConsumer
+import json
+
+consumer = KafkaConsumer(
+  'test-topic',
+  bootstrap_servers='localhost:9092',
+  auto_offset_reset='earliest',
+  value_deserializer=lambda m: json.loads(m.decode('utf-8')),
+  group_id='my-group'
+)
+
+print('Waiting for messages...')
+for message in consumer:
+  print(f'Received: {message.value}')
+  print(f'Partition: {message.partition}')
+  print(f'Offset: {message.offset}')
+</CopyBlock>
+
+### 컨슈머 그룹
+
+여러 컨슈머가 메시지를 분담합니다.
+
+<CopyBlock language="python" title="컨슈머 그룹">
+consumer = KafkaConsumer(
+  'test-topic',
+  bootstrap_servers='localhost:9092',
+  group_id='my-consumer-group',
+  auto_offset_reset='earliest'
+)
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/kafka/step2-consumer-ko.png"
+  alt="컨슈머"
+  caption="Python 컨슈머를 작성하여 메시지를 구독합니다"
+/>
+
+<Callout type="tip">
+💡 **팁**: `auto_offset_reset='earliest'`는 처음부터 메시지를 받습니다. `'latest'`는 새 메시지만 받습니다.
+</Callout>
+
+<Checkpoint>
+컨슈머가 메시지를 성공적으로 받았나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={3} title="Node.js 프로듀서">
+
+### Node.js 프로듀서 작성
+
+<CopyBlock language="javascript" title="Node.js 프로듀서">
+const { Kafka } = require('kafkajs');
+
+const kafka = new Kafka({
+  clientId: 'producer-app',
+  brokers: ['localhost:9092']
+});
+
+const producer = kafka.producer();
+
+async function sendMessages() {
+  await producer.connect();
+
+  for (let i = 0; i < 5; i++) {
+    await producer.send({
+      topic: 'test-topic',
+      messages: [
+        {
+          value: JSON.stringify({
+            id: i,
+            data: `Event ${i}`,
+            timestamp: new Date()
+          })
+        }
+      ]
+    });
+    console.log(`Sent message ${i}`);
+  }
+
+  await producer.disconnect();
+}
+
+sendMessages().catch(console.error);
+</CopyBlock>
+
+<DevTip>
+🔧 **개발팁**: `kafkajs`는 자동으로 JSON 직렬화를 처리하지 않으므로 수동으로 `JSON.stringify`를 사용해야 합니다.
+</DevTip>
+
+<Checkpoint>
+Node.js 프로듀서가 작동했나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={4} title="Node.js 컨슈머">
+
+### Node.js 컨슈머 작성
+
+<CopyBlock language="javascript" title="Node.js 컨슈머">
+const { Kafka } = require('kafkajs');
+
+const kafka = new Kafka({
+  clientId: 'consumer-app',
+  brokers: ['localhost:9092']
+});
+
+const consumer = kafka.consumer({ groupId: 'my-group' });
+
+async function consumeMessages() {
+  await consumer.connect();
+  await consumer.subscribe({ topic: 'test-topic', fromBeginning: true });
+
+  await consumer.run({
+    eachMessage: async ({ topic, partition, message }) => {
+      console.log(`Topic: ${topic}`);
+      console.log(`Partition: ${partition}`);
+      console.log(`Message: ${message.value.toString()}`);
+    }
+  });
+}
+
+consumeMessages().catch(console.error);
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/kafka/step4-nodejs-consumer-ko.png"
+  alt="Node.js 컨슈머"
+  caption="Node.js로 메시지를 구독합니다"
+/>
+
+<Callout type="success">
+✅ **완료!** Node.js 컨슈머가 메시지를 수신하고 있습니다.
+</Callout>
+
+<Checkpoint>
+Node.js 컨슈머가 메시지를 받았나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={5} title="고급 기능">
+
+### 트랜잭션
+
+여러 메시지를 원자적으로 전송합니다.
+
+<CopyBlock language="python" title="트랜잭션">
+from kafka.errors import KafkaError
+
+try:
+  result = producer.send('test-topic', value=message)
+  metadata = result.get(timeout=10)
+except KafkaError as e:
+  print(f'Send failed: {e}')
+</CopyBlock>
+
+### 배치 처리
+
+여러 메시지를 한 번에 발행합니다.
+
+<CopyBlock language="python" title="배치 발행">
+messages = [
+  {'id': i, 'data': f'Event {i}'}
+  for i in range(100)
+]
+
+for msg in messages:
+  producer.send('test-topic', value=msg)
+
+producer.flush()
+</CopyBlock>
+
+<CopyBlock language="javascript" title="Node.js 배치">
+const messages = Array.from({length: 100}, (_, i) => ({
+  value: JSON.stringify({id: i, data: `Event ${i}`})
+}));
+
+await producer.send({
+  topic: 'test-topic',
+  messages: messages
+});
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/kafka/step5-advanced-ko.png"
+  alt="고급 기능"
+  caption="트랜잭션과 배치 처리를 사용합니다"
+/>
+
+<DevTip>
+🔧 **개발팁**: `flush()` 메서드로 모든 메시지가 전송될 때까지 대기할 수 있습니다.
+</DevTip>
+
+</Step>
+
+---
+
+## 다음 단계
+
+- [Kafka 공식 문서](https://kafka.apache.org/documentation/)
+- [데이터 파이프라인 구축](https://kafka.apache.org/documentation/#quickstart)
+- [모니터링](https://kafka.apache.org/documentation/#monitoring)
+
+## 일반적인 패턴
+
+### 요청-응답 패턴
+
+<CopyBlock language="python" title="요청-응답">
+request_topic = 'requests'
+response_topic = 'responses'
+
+producer.send(request_topic, value={'request_id': 1, 'data': 'hello'})
+</CopyBlock>
+
+### 이벤트 로그
+
+모든 변경 사항을 기록합니다.
+
+<CopyBlock language="python" title="이벤트 로그">
+event_log = {
+  'event_type': 'user_created',
+  'user_id': 123,
+  'timestamp': datetime.now().isoformat()
+}
+producer.send('events', value=event_log)
+</CopyBlock>
+
+## 모니터링
+
+### 오프셋 확인
+
+<CopyBlock language="bash" title="오프셋 확인">
+docker-compose exec kafka kafka-consumer-groups \
+  --bootstrap-server localhost:9092 \
+  --group my-group \
+  --describe
+</CopyBlock>
+
+---
+
+## 문제 해결
+
+### 메시지를 받지 못함
+
+1. 토픽이 존재하는지 확인
+2. 컨슈머 그룹이 맞는지 확인
+3. `auto_offset_reset` 설정 확인
+
+### 느린 처리
+
+1. 파티션 수를 증가
+2. 컨슈머 수를 증가
+3. 배치 처리 크기 조정

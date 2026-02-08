@@ -1,0 +1,60 @@
+{
+  "slug": "weaviate-vector-search",
+  "platform": "weaviate",
+  "service": "Weaviate Vector Database",
+  "category": "database",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 25,
+  "totalSteps": 5,
+  "freeTier": {
+    "service": "Weaviate",
+    "limit": "Open source, free to self-host",
+    "period": "one-time",
+    "amount": "Free with Docker",
+    "status": "free",
+    "conditions": [
+      "Open source license",
+      "Free with Docker installation",
+      "No usage fees",
+      "Community support available",
+      "Self-hosted deployment required",
+      "Cloud version available with paid tier"
+    ]
+  },
+  "prerequisites": [
+    "weaviate-installation-setup"
+  ],
+  "nextGuides": [],
+  "seo": {
+    "ko": {
+      "title": "Weaviate 벡터 검색 - 스키마 생성 및 시맨틱 검색 | CloudSetup.guide",
+      "description": "Weaviate에서 스키마를 생성하고 벡터 데이터를 저장하며 시맨틱 검색을 수행하는 방법을 배웁니다.",
+      "keywords": [
+        "Weaviate",
+        "벡터 검색",
+        "시맨틱 검색",
+        "스키마",
+        "임베딩",
+        "벡터 데이터베이스",
+        "유사도 검색"
+      ]
+    },
+    "en": {
+      "title": "Weaviate Vector Search - Create Schema and Semantic Search | CloudSetup.guide",
+      "description": "Learn how to create schema, store vector data, and perform semantic search in Weaviate.",
+      "keywords": [
+        "Weaviate",
+        "vector search",
+        "semantic search",
+        "schema",
+        "embeddings",
+        "vector database",
+        "similarity search"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z",
+  "published": false
+}

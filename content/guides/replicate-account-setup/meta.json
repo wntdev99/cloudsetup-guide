@@ -1,0 +1,59 @@
+{
+  "slug": "replicate-account-setup",
+  "platform": "replicate",
+  "service": "Replicate API",
+  "category": "ai-ml",
+  "difficulty": "beginner",
+  "estimatedMinutes": 10,
+  "totalSteps": 4,
+  "freeTier": {
+    "service": "Replicate",
+    "limit": "Free credits for new users",
+    "period": "monthly",
+    "amount": "$20 free credits on sign-up",
+    "status": "free",
+    "conditions": [
+      "Free $20 credits for new users",
+      "Pay-as-you-go pricing after credits",
+      "No credit card required initially",
+      "API access to hundreds of models",
+      "Suitable for experimentation"
+    ]
+  },
+  "prerequisites": [],
+  "nextGuides": [
+    "replicate-model-deployment"
+  ],
+  "seo": {
+    "ko": {
+      "title": "Replicate 계정 설정 및 API 키 발급 | CloudSetup.guide",
+      "description": "Replicate 계정을 생성하고 AI 모델 API에 접근하기 위한 API 키를 얻는 방법을 배웁니다.",
+      "keywords": [
+        "Replicate",
+        "AI API",
+        "모델 배포",
+        "머신러닝",
+        "API 키",
+        "이미지 생성",
+        "텍스트 생성"
+      ]
+    },
+    "en": {
+      "title": "Set Up Replicate Account and Get API Key | CloudSetup.guide",
+      "description": "Learn how to create a Replicate account and get an API key to access AI models. Get started in minutes.",
+      "keywords": [
+        "Replicate",
+        "AI API",
+        "model deployment",
+        "machine learning",
+        "API key",
+        "image generation",
+        "text generation"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z",
+  "published": false
+}

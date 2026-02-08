@@ -1,0 +1,60 @@
+{
+  "slug": "rabbitmq-installation-setup",
+  "platform": "rabbitmq",
+  "service": "RabbitMQ Message Broker",
+  "category": "messaging",
+  "difficulty": "beginner",
+  "estimatedMinutes": 15,
+  "totalSteps": 4,
+  "freeTier": {
+    "service": "RabbitMQ",
+    "limit": "Open source, free to self-host",
+    "period": "one-time",
+    "amount": "Free with Docker",
+    "status": "free",
+    "conditions": [
+      "Open source Mozilla Public License",
+      "Free with Docker installation",
+      "No usage fees",
+      "Community support available",
+      "Self-hosted deployment",
+      "Cloud hosted services available with cost"
+    ]
+  },
+  "prerequisites": [],
+  "nextGuides": [
+    "rabbitmq-message-queue"
+  ],
+  "seo": {
+    "ko": {
+      "title": "RabbitMQ 메시지 브로커 설치 및 실행 | CloudSetup.guide",
+      "description": "Docker를 사용하여 RabbitMQ 메시지 브로커를 설치하고 실행하는 방법을 배웁니다.",
+      "keywords": [
+        "RabbitMQ",
+        "메시지 브로커",
+        "메시지 큐",
+        "Docker",
+        "Exchange",
+        "Queue",
+        "비동기 통신"
+      ]
+    },
+    "en": {
+      "title": "Install and Run RabbitMQ Message Broker | CloudSetup.guide",
+      "description": "Learn how to install and run RabbitMQ message broker using Docker.",
+      "keywords": [
+        "RabbitMQ",
+        "message broker",
+        "message queue",
+        "Docker",
+        "Exchange",
+        "Queue",
+        "asynchronous communication"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z",
+  "published": false
+}

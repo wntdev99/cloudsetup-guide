@@ -1,0 +1,357 @@
+# Kafka Event Streaming
+
+Publish and subscribe to messages using Kafka producers and consumers. Build real-time data processing pipelines and enable communication between multiple applications.
+
+<FreeTierInfo
+  service="Apache Kafka"
+  limit="Open source, free to self-host"
+  period="one-time"
+  status="free"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Kafka installed", required: true },
+  { text: "kafka-python or kafkajs", required: true },
+  { text: "Terminal", required: true },
+  { text: "Python or Node.js", required: true }
+]} />
+
+<Callout type="info">
+📊 **What is Event Streaming?** Applications publish events and other applications subscribe. Enable loosely coupled microservice architecture.
+</Callout>
+
+---
+
+<Step number={1} title="Write Python Producer">
+
+### Basic Producer
+
+Write a producer to publish messages.
+
+<CopyBlock language="python" title="Python producer">
+from kafka import KafkaProducer
+import json
+import time
+
+producer = KafkaProducer(
+  bootstrap_servers='localhost:9092',
+  value_serializer=lambda v: json.dumps(v).encode('utf-8')
+)
+
+for i in range(5):
+  message = {'id': i, 'data': f'Event {i}'}
+  producer.send('test-topic', value=message)
+  print(f'Sent: {message}')
+  time.sleep(1)
+
+producer.close()
+</CopyBlock>
+
+### Use Callbacks
+
+Handle send results.
+
+<CopyBlock language="python" title="Callbacks">
+def on_send_success(record_metadata):
+  print(f'Topic: {record_metadata.topic}')
+  print(f'Partition: {record_metadata.partition}')
+  print(f'Offset: {record_metadata.offset}')
+
+def on_send_error(exc):
+  print(f'Error: {exc}')
+
+producer.send('test-topic', value=message).add_callbacks(
+  on_success=on_send_success,
+  on_error=on_send_error
+)
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/kafka/step1-producer-en.png"
+  alt="Producer"
+  caption="Write Python producer to publish messages"
+  priority={true}
+/>
+
+<Callout type="success">
+✅ **Done!** Producer published messages.
+</Callout>
+
+<Checkpoint>
+Were messages published successfully?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={2} title="Write Python Consumer">
+
+### Basic Consumer
+
+Write a consumer to subscribe to messages.
+
+<CopyBlock language="python" title="Python consumer">
+from kafka import KafkaConsumer
+import json
+
+consumer = KafkaConsumer(
+  'test-topic',
+  bootstrap_servers='localhost:9092',
+  auto_offset_reset='earliest',
+  value_deserializer=lambda m: json.loads(m.decode('utf-8')),
+  group_id='my-group'
+)
+
+print('Waiting for messages...')
+for message in consumer:
+  print(f'Received: {message.value}')
+  print(f'Partition: {message.partition}')
+  print(f'Offset: {message.offset}')
+</CopyBlock>
+
+### Consumer Groups
+
+Multiple consumers share messages.
+
+<CopyBlock language="python" title="Consumer groups">
+consumer = KafkaConsumer(
+  'test-topic',
+  bootstrap_servers='localhost:9092',
+  group_id='my-consumer-group',
+  auto_offset_reset='earliest'
+)
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/kafka/step2-consumer-en.png"
+  alt="Consumer"
+  caption="Write Python consumer to subscribe messages"
+/>
+
+<Callout type="tip">
+💡 **Tip**: `auto_offset_reset='earliest'` gets messages from start. `'latest'` gets only new messages.
+</Callout>
+
+<Checkpoint>
+Did consumer successfully receive messages?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={3} title="Node.js Producer">
+
+### Write Node.js Producer
+
+<CopyBlock language="javascript" title="Node.js producer">
+const { Kafka } = require('kafkajs');
+
+const kafka = new Kafka({
+  clientId: 'producer-app',
+  brokers: ['localhost:9092']
+});
+
+const producer = kafka.producer();
+
+async function sendMessages() {
+  await producer.connect();
+
+  for (let i = 0; i < 5; i++) {
+    await producer.send({
+      topic: 'test-topic',
+      messages: [
+        {
+          value: JSON.stringify({
+            id: i,
+            data: `Event ${i}`,
+            timestamp: new Date()
+          })
+        }
+      ]
+    });
+    console.log(`Sent message ${i}`);
+  }
+
+  await producer.disconnect();
+}
+
+sendMessages().catch(console.error);
+</CopyBlock>
+
+<DevTip>
+🔧 **Dev Tip**: `kafkajs` doesn't auto-serialize JSON, so manually use `JSON.stringify`.
+</DevTip>
+
+<Checkpoint>
+Did Node.js producer work?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={4} title="Node.js Consumer">
+
+### Write Node.js Consumer
+
+<CopyBlock language="javascript" title="Node.js consumer">
+const { Kafka } = require('kafkajs');
+
+const kafka = new Kafka({
+  clientId: 'consumer-app',
+  brokers: ['localhost:9092']
+});
+
+const consumer = kafka.consumer({ groupId: 'my-group' });
+
+async function consumeMessages() {
+  await consumer.connect();
+  await consumer.subscribe({ topic: 'test-topic', fromBeginning: true });
+
+  await consumer.run({
+    eachMessage: async ({ topic, partition, message }) => {
+      console.log(`Topic: ${topic}`);
+      console.log(`Partition: ${partition}`);
+      console.log(`Message: ${message.value.toString()}`);
+    }
+  });
+}
+
+consumeMessages().catch(console.error);
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/kafka/step4-nodejs-consumer-en.png"
+  alt="Node.js consumer"
+  caption="Subscribe messages with Node.js"
+/>
+
+<Callout type="success">
+✅ **Done!** Node.js consumer is receiving messages.
+</Callout>
+
+<Checkpoint>
+Did Node.js consumer receive messages?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={5} title="Advanced Features">
+
+### Transactions
+
+Send multiple messages atomically.
+
+<CopyBlock language="python" title="Transactions">
+from kafka.errors import KafkaError
+
+try:
+  result = producer.send('test-topic', value=message)
+  metadata = result.get(timeout=10)
+except KafkaError as e:
+  print(f'Send failed: {e}')
+</CopyBlock>
+
+### Batch Processing
+
+Publish multiple messages at once.
+
+<CopyBlock language="python" title="Batch publish">
+messages = [
+  {'id': i, 'data': f'Event {i}'}
+  for i in range(100)
+]
+
+for msg in messages:
+  producer.send('test-topic', value=msg)
+
+producer.flush()
+</CopyBlock>
+
+<CopyBlock language="javascript" title="Node.js batch">
+const messages = Array.from({length: 100}, (_, i) => ({
+  value: JSON.stringify({id: i, data: `Event ${i}`})
+}));
+
+await producer.send({
+  topic: 'test-topic',
+  messages: messages
+});
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/kafka/step5-advanced-en.png"
+  alt="Advanced features"
+  caption="Use transactions and batch processing"
+/>
+
+<DevTip>
+🔧 **Dev Tip**: `flush()` method waits for all messages to be sent.
+</DevTip>
+
+</Step>
+
+---
+
+## Next Steps
+
+- [Kafka Documentation](https://kafka.apache.org/documentation/)
+- [Build Data Pipelines](https://kafka.apache.org/documentation/#quickstart)
+- [Monitoring](https://kafka.apache.org/documentation/#monitoring)
+
+## Common Patterns
+
+### Request-Response Pattern
+
+<CopyBlock language="python" title="Request-response">
+request_topic = 'requests'
+response_topic = 'responses'
+
+producer.send(request_topic, value={'request_id': 1, 'data': 'hello'})
+</CopyBlock>
+
+### Event Log
+
+Record all changes.
+
+<CopyBlock language="python" title="Event log">
+event_log = {
+  'event_type': 'user_created',
+  'user_id': 123,
+  'timestamp': datetime.now().isoformat()
+}
+producer.send('events', value=event_log)
+</CopyBlock>
+
+## Monitoring
+
+### Check Offsets
+
+<CopyBlock language="bash" title="Check offset">
+docker-compose exec kafka kafka-consumer-groups \
+  --bootstrap-server localhost:9092 \
+  --group my-group \
+  --describe
+</CopyBlock>
+
+---
+
+## Troubleshooting
+
+### Not receiving messages
+
+1. Verify topic exists
+2. Check consumer group is correct
+3. Verify `auto_offset_reset` setting
+
+### Slow processing
+
+1. Increase partition count
+2. Increase consumer count
+3. Adjust batch size

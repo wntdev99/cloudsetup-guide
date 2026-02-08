@@ -1,0 +1,60 @@
+{
+  "slug": "kafka-event-streaming",
+  "platform": "kafka",
+  "service": "Apache Kafka",
+  "category": "messaging",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 25,
+  "totalSteps": 5,
+  "freeTier": {
+    "service": "Apache Kafka",
+    "limit": "Open source, free to self-host",
+    "period": "one-time",
+    "amount": "Free with Docker",
+    "status": "free",
+    "conditions": [
+      "Open source Apache license",
+      "Free with Docker installation",
+      "No usage fees",
+      "Community support available",
+      "Self-hosted deployment",
+      "Managed services available with cost"
+    ]
+  },
+  "prerequisites": [
+    "kafka-installation-setup"
+  ],
+  "nextGuides": [],
+  "seo": {
+    "ko": {
+      "title": "Kafka 이벤트 스트리밍 - 메시지 발행 및 구독 | CloudSetup.guide",
+      "description": "Kafka 프로듀서와 컨슈머를 사용하여 메시지를 발행하고 구독하는 방법을 배웁니다.",
+      "keywords": [
+        "Kafka",
+        "이벤트 스트리밍",
+        "프로듀서",
+        "컨슈머",
+        "메시지",
+        "토픽",
+        "실시간 데이터"
+      ]
+    },
+    "en": {
+      "title": "Kafka Event Streaming - Publish and Subscribe Messages | CloudSetup.guide",
+      "description": "Learn how to publish and subscribe messages using Kafka producers and consumers.",
+      "keywords": [
+        "Kafka",
+        "event streaming",
+        "producer",
+        "consumer",
+        "messages",
+        "topics",
+        "real-time data"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z",
+  "published": false
+}

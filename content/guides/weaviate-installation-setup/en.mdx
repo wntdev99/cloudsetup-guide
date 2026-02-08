@@ -1,0 +1,378 @@
+# Install and Run Weaviate Vector Database
+
+**Weaviate** is an open-source vector database that stores and searches vector embeddings. You can store vectors generated from machine learning models and perform semantic search. Follow this guide to install and run Weaviate using Docker.
+
+<FreeTierInfo
+  service="Weaviate"
+  limit="Open source, free to self-host"
+  period="one-time"
+  status="free"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Docker installed", required: true },
+  { text: "Docker Compose (optional)", required: false },
+  { text: "Terminal or command prompt", required: true },
+  { text: "Minimum 4GB RAM", required: true }
+]} />
+
+<Callout type="info">
+🔍 **What is a Vector Database?** A vector database stores and searches data represented as numeric vectors. You can convert text, images, and audio to embeddings, store them, and search by semantic similarity.
+</Callout>
+
+---
+
+<Step number={1} title="Verify Docker Installation">
+
+### Check Docker
+
+First, verify Docker is installed.
+
+<CopyBlock language="bash" title="Check Docker version">
+docker --version
+</CopyBlock>
+
+### Install Docker
+
+If Docker is not installed, download from [Docker official site](https://www.docker.com).
+
+macOS/Linux:
+<CopyBlock language="bash" title="Install Docker (macOS Homebrew)">
+brew install docker
+</CopyBlock>
+
+Windows:
+[Download Docker Desktop](https://www.docker.com/products/docker-desktop)
+
+### Start Docker Daemon
+
+Verify Docker is running. Open Docker Desktop or:
+
+<CopyBlock language="bash" title="Check Docker daemon status">
+docker ps
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/weaviate/step1-docker-check-en.png"
+  alt="Verify Docker installation"
+  caption="Run docker --version in terminal"
+  priority={true}
+/>
+
+<Callout type="warning">
+⚠️ **Important**: If above command fails, Docker is not running. Start Docker Desktop or Docker daemon.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Run Weaviate Docker Image">
+
+### Simple Docker Run
+
+Run Weaviate the simplest way.
+
+<CopyBlock language="bash" title="Start Weaviate container">
+docker run -d \
+  -p 8080:8080 \
+  -p 50051:50051 \
+  --name weaviate \
+  semitechnologies/weaviate:latest
+</CopyBlock>
+
+### Use Docker Compose (Recommended)
+
+For easier management, create a docker-compose.yml file.
+
+<CopyBlock language="bash" title="Create docker-compose.yml file">
+cat > docker-compose.yml << EOF
+version: '3.4'
+services:
+  weaviate:
+    image: semitechnologies/weaviate:latest
+    ports:
+      - "8080:8080"
+      - "50051:50051"
+    environment:
+      QUERY_DEFAULTS_LIMIT: 25
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
+      PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
+    volumes:
+      - weaviate_data:/var/lib/weaviate
+
+volumes:
+  weaviate_data:
+EOF
+</CopyBlock>
+
+### Start with Docker Compose
+
+<CopyBlock language="bash" title="Run Docker Compose">
+docker-compose up -d
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/weaviate/step2-docker-run-en.png"
+  alt="Docker run"
+  caption="Run docker-compose up -d to start Weaviate"
+/>
+
+<Callout type="success">
+✅ **Done!** Weaviate is running in background.
+</Callout>
+
+<Checkpoint>
+Is Weaviate container running?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={3} title="Verify Weaviate is Running">
+
+### Health Check
+
+Verify Weaviate is running correctly.
+
+<CopyBlock language="bash" title="Health check request">
+curl http://localhost:8080/v1/.well-known/ready
+</CopyBlock>
+
+### Check Web Interface
+
+Visit in browser:
+- [http://localhost:8080/v1/objects](http://localhost:8080/v1/objects)
+
+If response is successful, Weaviate is running properly.
+
+### Check Container Status
+
+<CopyBlock language="bash" title="Check running containers">
+docker ps | grep weaviate
+</CopyBlock>
+
+Or:
+
+<CopyBlock language="bash" title="Check Docker Compose status">
+docker-compose ps
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/weaviate/step3-health-check-en.png"
+  alt="Health check"
+  caption="Use curl to check Weaviate health"
+/>
+
+<Callout type="tip">
+💡 **Tip**: If port 8080 is already in use, change port in docker-compose.yml.
+</Callout>
+
+<Checkpoint>
+Did health check pass?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={4} title="Install Python Client and Connect">
+
+### Install Python Client Library
+
+<CopyBlock language="bash" title="Install Weaviate client">
+pip install weaviate-client
+</CopyBlock>
+
+### Connect in Python
+
+<CopyBlock language="python" title="Python connection script">
+import weaviate
+
+client = weaviate.Client('http://localhost:8080')
+
+print(client.is_ready())
+</CopyBlock>
+
+### Install Node.js Client
+
+<CopyBlock language="bash" title="Install Node.js client">
+npm install weaviate-client
+</CopyBlock>
+
+### Connect in Node.js
+
+<CopyBlock language="javascript" title="Node.js connection script">
+const weaviate = require('weaviate-client');
+
+const client = weaviate.client({
+  scheme: 'http',
+  host: 'localhost:8080',
+});
+
+client.misc.readyChecker()
+  .then(ready => console.log(ready ? 'Ready!' : 'Not ready'))
+  .catch(err => console.error('Error:', err));
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/weaviate/step4-client-install-en.png"
+  alt="Install client"
+  caption="Run pip install weaviate-client"
+/>
+
+<Callout type="success">
+✅ **Done!** Client installed and connected to Weaviate.
+</Callout>
+
+<Checkpoint>
+Did client connection succeed?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={5} title="Manage Container">
+
+### Stop Container
+
+To stop execution:
+
+<CopyBlock language="bash" title="Stop Docker container">
+docker stop weaviate
+</CopyBlock>
+
+Or with Docker Compose:
+
+<CopyBlock language="bash" title="Stop Docker Compose">
+docker-compose down
+</CopyBlock>
+
+### Restart Container
+
+<CopyBlock language="bash" title="Restart Docker container">
+docker restart weaviate
+</CopyBlock>
+
+Or:
+
+<CopyBlock language="bash" title="Restart Docker Compose">
+docker-compose restart
+</CopyBlock>
+
+### View Logs
+
+<CopyBlock language="bash" title="View Docker logs">
+docker logs -f weaviate
+</CopyBlock>
+
+Or:
+
+<CopyBlock language="bash" title="View Docker Compose logs">
+docker-compose logs -f
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/weaviate/step5-management-en.png"
+  alt="Manage container"
+  caption="Manage Weaviate container with Docker commands"
+/>
+
+<DevTip>
+🔧 **Dev Tip**: During development, use `docker-compose up` to see logs in terminal for easier debugging. For production, use `-d` flag for background execution.
+</DevTip>
+
+</Step>
+
+---
+
+## Next Steps
+
+- [Search with Weaviate Vectors](/guides/weaviate-vector-search) - Store and search vectors
+- [Weaviate Documentation](https://weaviate.io/developers/weaviate)
+- [Python Client Documentation](https://python-client-v3.readthedocs.io/)
+
+## Weaviate Basics
+
+### Vector Embeddings
+
+Vector embeddings convert text, images, etc. to numeric arrays:
+
+<CopyBlock language="text" title="Embedding Example">
+Text: "dog" -> [0.234, 0.546, 0.123, ...]
+Text: "puppy" -> [0.245, 0.567, 0.134, ...]
+</CopyBlock>
+
+Similar meanings have similar vectors.
+
+### Schema
+
+Define data structure (schema) in Weaviate first:
+
+<CopyBlock language="python" title="Define schema">
+class_obj = {
+  'class': 'Article',
+  'description': 'A blog post article',
+  'properties': [
+    {
+      'name': 'title',
+      'dataType': ['text']
+    },
+    {
+      'name': 'content',
+      'dataType': ['text']
+    }
+  ]
+}
+</CopyBlock>
+
+## Port Information
+
+- **8080**: REST API port
+- **50051**: gRPC port (faster communication)
+
+## System Requirements
+
+| Requirement | Minimum | Recommended |
+|-----------|---------|-------------|
+| RAM | 2GB | 8GB+ |
+| Disk | 5GB | 50GB+ |
+| CPU | 2 cores | 4+ cores |
+
+---
+
+## Troubleshooting
+
+### Port Conflict
+
+If port 8080 is in use:
+
+<CopyBlock language="bash" title="Use different port">
+docker run -d -p 9000:8080 --name weaviate semitechnologies/weaviate:latest
+</CopyBlock>
+
+Then access at `http://localhost:9000`.
+
+### Out of Memory Error
+
+Increase Docker memory allocation:
+
+In Docker Desktop Settings > Resources, set memory to 4GB or more.
+
+### Container fails to start
+
+Check logs:
+
+<CopyBlock language="bash" title="Check logs">
+docker logs weaviate
+</CopyBlock>
+
+### Client connection fails
+
+1. Verify Weaviate is running
+2. Confirm URL is correct
+3. Check firewall/network settings

@@ -1,0 +1,315 @@
+# Neo4j 그래프 데이터베이스 - 노드와 관계 쿼리
+
+Neo4j에서 그래프 데이터를 생성하고 Cypher 쿼리 언어를 사용하여 노드, 관계, 데이터를 효율적으로 관리합니다. 복잡한 그래프 관계를 쿼리하는 방법을 배웁니다.
+
+<FreeTierInfo
+  service="Neo4j"
+  limit="커뮤니티 에디션 무료 또는 Aura 무료 티어"
+  period="monthly"
+  status="free"
+/>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "Neo4j 설치됨", required: true },
+  { text: "Neo4j Browser 접근", required: true },
+  { text: "Python 또는 Node.js (선택사항)", required: false },
+  { text: "기본 SQL 지식", required: false }
+]} />
+
+<Callout type="info">
+📊 **Cypher란?** Cypher는 Neo4j의 쿼리 언어입니다. SQL과 유사하지만 그래프 패턴을 중심으로 설계되었습니다.
+</Callout>
+
+---
+
+<Step number={1} title="그래프 스키마 설계 및 데이터 생성">
+
+### 소셜 네트워크 그래프 생성
+
+Neo4j Browser에서 다음을 실행합니다:
+
+<CopyBlock language="text" title="사람 노드 생성">
+CREATE (alice:Person {name: 'Alice', age: 30, city: 'Seoul'})
+CREATE (bob:Person {name: 'Bob', age: 25, city: 'Busan'})
+CREATE (carol:Person {name: 'Carol', age: 28, city: 'Seoul'})
+RETURN alice, bob, carol
+</CopyBlock>
+
+### 회사 및 다른 노드 생성
+
+<CopyBlock language="text" title="회사와 도시 노드 생성">
+CREATE (techcorp:Company {name: 'TechCorp', industry: 'Technology'})
+CREATE (seoul:City {name: 'Seoul', country: 'South Korea'})
+RETURN techcorp, seoul
+</CopyBlock>
+
+### 관계 생성
+
+<CopyBlock language="text" title="관계 생성">
+MATCH (alice:Person {name: 'Alice'})
+MATCH (bob:Person {name: 'Bob'})
+MATCH (techcorp:Company {name: 'TechCorp'})
+CREATE (alice)-[:KNOWS]->(bob)
+CREATE (alice)-[:WORKS_AT]->(techcorp)
+CREATE (bob)-[:WORKS_AT]->(techcorp)
+RETURN alice, bob, techcorp
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/neo4j/step1-graph-creation-ko.png"
+  alt="그래프 생성"
+  caption="Neo4j에서 노드와 관계를 생성합니다"
+  priority={true}
+/>
+
+<Callout type="success">
+✅ **완료!** 그래프 구조가 생성되었습니다.
+</Callout>
+
+<Checkpoint>
+노드와 관계가 성공적으로 생성되었나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={2} title="기본 Cypher 쿼리">
+
+### 모든 Person 노드 조회
+
+<CopyBlock language="text" title="모든 사람 조회">
+MATCH (p:Person)
+RETURN p.name, p.age, p.city
+</CopyBlock>
+
+### 조건부 쿼리
+
+<CopyBlock language="text" title="특정 도시의 사람 찾기">
+MATCH (p:Person {city: 'Seoul'})
+RETURN p.name, p.age
+ORDER BY p.age DESC
+</CopyBlock>
+
+### 노드 개수 세기
+
+<CopyBlock language="text" title="노드 개수">
+MATCH (p:Person)
+RETURN COUNT(p) as person_count
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/neo4j/step2-basic-query-ko.png"
+  alt="기본 쿼리"
+  caption="Cypher로 기본 쿼리를 실행합니다"
+/>
+
+<Callout type="tip">
+💡 **팁**: MATCH는 패턴을 정의합니다. WHERE를 사용하여 더 복잡한 필터를 적용할 수 있습니다.
+</Callout>
+
+<Checkpoint>
+쿼리가 올바른 결과를 반환했나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={3} title="관계 쿼리">
+
+### 직접 연결 찾기
+
+<CopyBlock language="text" title="특정 사람이 아는 사람 찾기">
+MATCH (alice:Person {name: 'Alice'})-[:KNOWS]->(friend)
+RETURN friend.name, friend.age
+</CopyBlock>
+
+### 양방향 관계
+
+<CopyBlock language="text" title="모든 KNOWS 관계 조회">
+MATCH (p1:Person)-[:KNOWS]->(p2:Person)
+RETURN p1.name, p2.name
+</CopyBlock>
+
+### 같은 회사에 다니는 사람들
+
+<CopyBlock language="text" title="같은 회사 동료 찾기">
+MATCH (p1:Person)-[:WORKS_AT]->(company:Company),
+      (p2:Person)-[:WORKS_AT]->(company)
+WHERE p1.name < p2.name
+RETURN p1.name, p2.name, company.name
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/neo4j/step3-relationship-query-ko.png"
+  alt="관계 쿼리"
+  caption="관계를 통해 데이터를 쿼리합니다"
+/>
+
+<DevTip>
+🔧 **개발팁**: 화살표 방향이 중요합니다. `(a)-[:KNOWS]->(b)`는 a가 b를 알고 있음을 의미합니다.
+</DevTip>
+
+<Checkpoint>
+관계 쿼리가 작동했나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={4} title="경로 및 패턴 쿼리">
+
+### 최단 경로 찾기
+
+<CopyBlock language="text" title="두 사람 사이의 경로">
+MATCH path = shortestPath((alice:Person {name: 'Alice'})-[*..5]-(carol:Person {name: 'Carol'}))
+RETURN path
+</CopyBlock>
+
+### 간접 연결
+
+<CopyBlock language="text" title="2단계 떨어진 연결">
+MATCH (alice:Person {name: 'Alice'})-[:KNOWS]->(intermediate:Person)-[:KNOWS]->(distant:Person)
+RETURN alice.name, intermediate.name, distant.name
+</CopyBlock>
+
+### 다중 홉 쿼리
+
+<CopyBlock language="text" title="모든 관계 타입 순회">
+MATCH (alice:Person {name: 'Alice'})-[*1..3]-(other)
+RETURN DISTINCT other.name
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/neo4j/step4-path-query-ko.png"
+  alt="경로 쿼리"
+  caption="경로를 통해 간접 연결을 찾습니다"
+/>
+
+<Callout type="info">
+ℹ️ **정보**: `[*1..3]`은 1~3개의 관계를 순회합니다. 별 기호는 모든 관계 타입을 의미합니다.
+</Callout>
+
+<Checkpoint>
+경로 쿼리가 결과를 반환했나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={5} title="데이터 수정 및 삭제">
+
+### 노드 속성 업데이트
+
+<CopyBlock language="text" title="나이 업데이트">
+MATCH (alice:Person {name: 'Alice'})
+SET alice.age = 31
+RETURN alice
+</CopyBlock>
+
+### 새로운 관계 추가
+
+<CopyBlock language="text" title="관계 추가">
+MATCH (carol:Person {name: 'Carol'})
+MATCH (techcorp:Company {name: 'TechCorp'})
+CREATE (carol)-[:WORKS_AT]->(techcorp)
+RETURN carol, techcorp
+</CopyBlock>
+
+### 데이터 삭제
+
+<CopyBlock language="text" title="관계 삭제">
+MATCH (alice:Person {name: 'Alice'})-[r:KNOWS]->(bob:Person {name: 'Bob'})
+DELETE r
+RETURN alice, bob
+</CopyBlock>
+
+### 노드 삭제
+
+<CopyBlock language="text" title="노드 및 관계 삭제">
+MATCH (n:Person {name: 'Carol'})
+DETACH DELETE n
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/neo4j/step5-modify-delete-ko.png"
+  alt="데이터 수정"
+  caption="데이터를 업데이트하고 삭제합니다"
+/>
+
+<DevTip>
+🔧 **개발팁**: DETACH DELETE는 노드와 모든 관련 관계를 삭제합니다. 정말 필요한 경우에만 사용하세요.
+</DevTip>
+
+</Step>
+
+---
+
+## 다음 단계
+
+- [Neo4j 공식 문서](https://neo4j.com/docs/)
+- [Cypher 상세 가이드](https://neo4j.com/docs/cypher-manual/current/)
+- [성능 최적화](https://neo4j.com/docs/operations-manual/current/)
+
+## Cypher 문법 요약
+
+### 기본 구조
+
+<CopyBlock language="text" title="Cypher 문법">
+MATCH (pattern)
+WHERE (conditions)
+RETURN (results)
+ORDER BY (field)
+LIMIT (number)
+</CopyBlock>
+
+### 일반적인 연산자
+
+- `=` : 같음
+- `<>` : 다름
+- `>`, `<`, `>=`, `<=` : 비교
+- `AND`, `OR`, `NOT` : 논리
+
+### 함수
+
+<CopyBlock language="text" title="유용한 함수">
+COUNT(), DISTINCT, COLLECT(), AVG(), MAX(), MIN()
+</CopyBlock>
+
+## 성능 팁
+
+### 인덱스 생성
+
+<CopyBlock language="text" title="인덱스 생성">
+CREATE INDEX ON :Person(name)
+CREATE INDEX ON :Person(age)
+</CopyBlock>
+
+### 큰 데이터 쿼리
+
+많은 노드를 다룰 때는:
+
+<CopyBlock language="text" title="배치 처리">
+MATCH (n:Person)
+WITH n LIMIT 1000
+SET n.processed = true
+</CopyBlock>
+
+## 문제 해결
+
+### 쿼리가 반응하지 않음
+
+시간 초과 설정을 확인하세요. 불필요한 관계는 제외하세요.
+
+### 예기치 않은 결과
+
+패턴이 정확한지 확인하세요. 원하지 않는 노드를 필터링하세요.
+
+### 메모리 부족
+
+대량 데이터 작업 시 배치 처리를 사용하세요.

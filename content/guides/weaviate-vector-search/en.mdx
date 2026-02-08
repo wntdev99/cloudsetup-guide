@@ -1,0 +1,518 @@
+# Weaviate Vector Search
+
+Store vector embeddings and perform semantic search in Weaviate. Learn how to create schema, add vector data, and find similar items.
+
+<FreeTierInfo
+  service="Weaviate"
+  limit="Open source, free to self-host"
+  period="one-time"
+  status="free"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Weaviate installed", required: true },
+  { text: "Python or Node.js", required: true },
+  { text: "Embedding model (OpenAI, HuggingFace, etc.)", required: false },
+  { text: "Weaviate client library", required: true }
+]} />
+
+<Callout type="info">
+🔍 **What is Vector Search?** Vector search finds semantic similarity between data. For example, "cute cat" and "playful kitten" have different words but similar meaning, so they may appear together in search results.
+</Callout>
+
+---
+
+<Step number={1} title="Create Schema">
+
+### Create Schema in Python
+
+<CopyBlock language="python" title="Define and create schema">
+import weaviate
+
+client = weaviate.Client('http://localhost:8080')
+
+class_obj = {
+  'class': 'Article',
+  'description': 'A news article with title and content',
+  'properties': [
+    {
+      'name': 'title',
+      'description': 'The title of the article',
+      'dataType': ['text']
+    },
+    {
+      'name': 'content',
+      'description': 'The full content of the article',
+      'dataType': ['text']
+    },
+    {
+      'name': 'source',
+      'description': 'The source of the article',
+      'dataType': ['text']
+    }
+  ]
+}
+
+client.schema.create_class(class_obj)
+print('Schema created successfully')
+</CopyBlock>
+
+### Create Schema in Node.js
+
+<CopyBlock language="javascript" title="Node.js create schema">
+const weaviate = require('weaviate-client');
+
+const client = weaviate.client({
+  scheme: 'http',
+  host: 'localhost:8080'
+});
+
+const classObj = {
+  class: 'Article',
+  description: 'A news article with title and content',
+  properties: [
+    {
+      name: 'title',
+      description: 'The title of the article',
+      dataType: ['text']
+    },
+    {
+      name: 'content',
+      description: 'The full content of the article',
+      dataType: ['text']
+    },
+    {
+      name: 'source',
+      description: 'The source of the article',
+      dataType: ['text']
+    }
+  ]
+};
+
+client.schema.classCreator()
+  .withClass(classObj)
+  .do()
+  .then(res => console.log('Schema created'))
+  .catch(err => console.error('Error:', err));
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/weaviate/step1-schema-creation-en.png"
+  alt="Create schema"
+  caption="Define and create schema in Python or Node.js"
+  priority={true}
+/>
+
+<Callout type="success">
+✅ **Done!** Article schema created.
+</Callout>
+
+<Checkpoint>
+Was schema created successfully?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={2} title="Add Vector Data">
+
+### Generate and Add Vectors
+
+First, use an embedding model to convert text to vectors.
+
+#### Add Data in Python
+
+<CopyBlock language="python" title="Python add data">
+import weaviate
+import numpy as np
+
+client = weaviate.Client('http://localhost:8080')
+
+articles = [
+  {
+    'title': 'Future of AI Technology',
+    'content': 'Artificial intelligence will greatly change our lives',
+    'source': 'TechNews'
+  },
+  {
+    'title': 'Machine Learning Basics',
+    'content': 'Machine learning is the technology to learn from data',
+    'source': 'DataBlog'
+  },
+  {
+    'title': 'Deep Learning Introduction',
+    'content': 'Deep learning using neural networks is effective for image and speech recognition',
+    'source': 'AIDaily'
+  }
+]
+
+for article in articles:
+  vector = np.random.rand(384)
+
+  client.data_object.create(
+    data_object=article,
+    class_name='Article',
+    vector=vector.tolist()
+  )
+
+print(f'Added {len(articles)} articles')
+</CopyBlock>
+
+#### Add Data in Node.js
+
+<CopyBlock language="javascript" title="Node.js add data">
+const weaviate = require('weaviate-client');
+
+const client = weaviate.client({
+  scheme: 'http',
+  host: 'localhost:8080'
+});
+
+const articles = [
+  {
+    title: 'Future of AI Technology',
+    content: 'Artificial intelligence will greatly change our lives',
+    source: 'TechNews'
+  },
+  {
+    title: 'Machine Learning Basics',
+    content: 'Machine learning is the technology to learn from data',
+    source: 'DataBlog'
+  }
+];
+
+articles.forEach(article => {
+  const vector = Array(384).fill(0).map(() => Math.random());
+
+  client.data.creator()
+    .withClassName('Article')
+    .withProperties(article)
+    .withVector(vector)
+    .do()
+    .then(res => console.log('Article added:', res.id))
+    .catch(err => console.error('Error:', err));
+});
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/weaviate/step2-add-data-en.png"
+  alt="Add data"
+  caption="Add vector data to Weaviate"
+/>
+
+<Callout type="tip">
+💡 **Tip**: For actual embeddings, use OpenAI, HuggingFace, etc. Here we use random vectors for demonstration.
+</Callout>
+
+<Checkpoint>
+Was data added successfully?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={3} title="Perform Vector Search">
+
+### Similarity Search
+
+Find items similar to stored vectors.
+
+#### Vector Search in Python
+
+<CopyBlock language="python" title="Python vector search">
+import weaviate
+import numpy as np
+
+client = weaviate.Client('http://localhost:8080')
+
+query_vector = np.random.rand(384).tolist()
+
+result = client.query.get('Article', ['title', 'content', 'source']) \
+  .with_near_vector({'vector': query_vector}) \
+  .with_limit(5) \
+  .do()
+
+print('Search Results:')
+for article in result['data']['Get']['Article']:
+  print(f"- {article['title']}")
+  print(f"  Source: {article['source']}")
+</CopyBlock>
+
+#### Vector Search in Node.js
+
+<CopyBlock language="javascript" title="Node.js vector search">
+const weaviate = require('weaviate-client');
+
+const client = weaviate.client({
+  scheme: 'http',
+  host: 'localhost:8080'
+});
+
+const queryVector = Array(384).fill(0).map(() => Math.random());
+
+client.graphql.get()
+  .withClassName('Article')
+  .withFields('title content source _additional { distance }')
+  .withNearVector({ vector: queryVector })
+  .withLimit(5)
+  .do()
+  .then(res => {
+    console.log('Search Results:');
+    res.data.Get.Article.forEach(article => {
+      console.log(`- ${article.title}`);
+      console.log(`  Distance: ${article._additional.distance}`);
+    });
+  })
+  .catch(err => console.error('Error:', err));
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/weaviate/step3-vector-search-en.png"
+  alt="Vector search"
+  caption="Search for items similar to query vector"
+/>
+
+<DevTip>
+🔧 **Dev Tip**: Smaller distance values indicate more similar items. Values closer to 0 are more similar.
+</DevTip>
+
+<Checkpoint>
+Were search results returned?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={4} title="Text Search">
+
+### Text-based Search
+
+Search using text.
+
+#### Text Search in Python
+
+<CopyBlock language="python" title="Python text search">
+import weaviate
+
+client = weaviate.Client('http://localhost:8080')
+
+result = client.query.get('Article', ['title', 'content', 'source']) \
+  .with_where({
+    'path': ['content'],
+    'operator': 'ContainsAll',
+    'valueText': 'machine learning'
+  }) \
+  .with_limit(10) \
+  .do()
+
+print('Search Results for "machine learning":')
+for article in result['data']['Get']['Article']:
+  print(f"- {article['title']}")
+</CopyBlock>
+
+#### Text Search in Node.js
+
+<CopyBlock language="javascript" title="Node.js text search">
+const weaviate = require('weaviate-client');
+
+const client = weaviate.client({
+  scheme: 'http',
+  host: 'localhost:8080'
+});
+
+client.graphql.get()
+  .withClassName('Article')
+  .withFields('title content source')
+  .withWhere({
+    path: ['content'],
+    operator: 'ContainsAll',
+    valueText: 'machine learning'
+  })
+  .withLimit(10)
+  .do()
+  .then(res => {
+    console.log('Search Results:');
+    res.data.Get.Article.forEach(article => {
+      console.log(`- ${article.title}`);
+    });
+  })
+  .catch(err => console.error('Error:', err));
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/weaviate/step4-text-search-en.png"
+  alt="Text search"
+  caption="Search using text filters"
+/>
+
+<Callout type="success">
+✅ **Done!** Both vector and text search working.
+</Callout>
+
+<Checkpoint>
+Did text search work?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={5} title="Advanced Queries">
+
+### Complex Condition Search
+
+Combine multiple conditions for search.
+
+#### Complex Search in Python
+
+<CopyBlock language="python" title="Python complex search">
+import weaviate
+
+client = weaviate.Client('http://localhost:8080')
+
+result = client.query.get('Article', ['title', 'content', 'source']) \
+  .with_where({
+    'operator': 'And',
+    'operands': [
+      {
+        'path': ['content'],
+        'operator': 'ContainsAll',
+        'valueText': 'AI'
+      },
+      {
+        'path': ['source'],
+        'operator': 'Equal',
+        'valueText': 'TechNews'
+      }
+    ]
+  }) \
+  .with_limit(10) \
+  .do()
+
+print('Search Results:')
+for article in result['data']['Get']['Article']:
+  print(f"- {article['title']} ({article['source']})")
+</CopyBlock>
+
+#### Complex Search in Node.js
+
+<CopyBlock language="javascript" title="Node.js complex search">
+const weaviate = require('weaviate-client');
+
+const client = weaviate.client({
+  scheme: 'http',
+  host: 'localhost:8080'
+});
+
+client.graphql.get()
+  .withClassName('Article')
+  .withFields('title content source')
+  .withWhere({
+    operator: 'And',
+    operands: [
+      {
+        path: ['content'],
+        operator: 'ContainsAll',
+        valueText: 'AI'
+      },
+      {
+        path: ['source'],
+        operator: 'Equal',
+        valueText: 'TechNews'
+      }
+    ]
+  })
+  .withLimit(10)
+  .do()
+  .then(res => {
+    console.log('Search Results:');
+    res.data.Get.Article.forEach(article => {
+      console.log(`- ${article.title} (${article.source})`);
+    });
+  })
+  .catch(err => console.error('Error:', err));
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/weaviate/step5-advanced-search-en.png"
+  alt="Advanced search"
+  caption="Advanced search with complex conditions"
+/>
+
+<DevTip>
+🔧 **Dev Tip**: Use And, Or operators to build complex queries. Use Not operator to exclude conditions.
+</DevTip>
+
+</Step>
+
+---
+
+## Next Steps
+
+- [Weaviate Documentation](https://weaviate.io/developers/weaviate)
+- [GraphQL API](https://weaviate.io/developers/weaviate/api/graphql)
+- [Embedding Model Integration](https://weaviate.io/developers/weaviate/modules/retriever-vectorizer-modules)
+
+## Embedding Model Options
+
+### OpenAI Embeddings
+
+<CopyBlock language="python" title="Use OpenAI embeddings">
+import openai
+
+openai.api_key = 'sk-...'
+
+response = openai.Embedding.create(
+  input='The quick brown fox',
+  model='text-embedding-ada-002'
+)
+
+vector = response['data'][0]['embedding']
+</CopyBlock>
+
+### HuggingFace Embeddings
+
+<CopyBlock language="python" title="HuggingFace embeddings">
+from sentence_transformers import SentenceTransformer
+
+model = SentenceTransformer('all-MiniLM-L6-v2')
+vector = model.encode('The quick brown fox')
+</CopyBlock>
+
+## Performance Optimization
+
+### Indexing
+
+Indexing is important when handling large amounts of data:
+
+<CopyBlock language="python" title="Set indexing">
+class_obj = {
+  'class': 'Article',
+  'vectorIndexConfig': {
+    'distance': 'cosine',
+    'ef': 128,
+    'efConstruction': 200,
+    'maxConnections': 30
+  },
+  'properties': [...]
+}
+</CopyBlock>
+
+## Troubleshooting
+
+### Query returns no results
+
+1. Verify data was actually added
+2. Check vector dimensions match
+3. Verify filter conditions are not too strict
+
+### Search is slow
+
+1. Optimize indexing parameters
+2. Normalize data
+3. Remove unnecessary fields

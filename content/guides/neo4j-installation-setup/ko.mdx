@@ -1,0 +1,385 @@
+# Neo4j 그래프 데이터베이스 설치 및 실행하기
+
+**Neo4j**는 관계형 데이터를 저장하고 쿼리할 수 있는 그래프 데이터베이스입니다. 소셜 네트워크, 추천 시스템, 지식 그래프 등에서 강력한 성능을 발휘합니다. 이 가이드를 따라 Neo4j를 설치하고 시작하세요.
+
+<FreeTierInfo
+  service="Neo4j"
+  limit="커뮤니티 에디션 무료 또는 Aura 무료 티어"
+  period="monthly"
+  status="free"
+/>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "Docker (선택사항)", required: false },
+  { text: "Java 11 이상 (직접 설치 시)", required: false },
+  { text: "최소 2GB RAM", required: true },
+  { text: "웹 브라우저", required: true }
+]} />
+
+<Callout type="info">
+📊 **그래프 데이터베이스란?** 그래프 데이터베이스는 노드(Node)와 관계(Relationship)로 데이터를 저장합니다. 관계를 중심으로 데이터를 표현하므로 복잡한 관계를 효율적으로 다룰 수 있습니다.
+</Callout>
+
+---
+
+<Step number={1} title="Docker를 사용한 설치">
+
+### Docker로 Neo4j 실행
+
+가장 쉬운 방법은 Docker를 사용하는 것입니다.
+
+<CopyBlock language="bash" title="Neo4j Docker 컨테이너 실행">
+docker run -d \
+  --name neo4j \
+  -p 7474:7474 \
+  -p 7687:7687 \
+  -e NEO4J_AUTH=neo4j/password123 \
+  neo4j:latest
+</CopyBlock>
+
+### Docker Compose를 사용한 설치 (권장)
+
+더 쉬운 관리를 위해 docker-compose.yml을 생성합니다.
+
+<CopyBlock language="bash" title="docker-compose.yml 파일 생성">
+cat > docker-compose.yml << EOF
+version: '3.8'
+services:
+  neo4j:
+    image: neo4j:latest
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      NEO4J_AUTH: neo4j/password123
+      NEO4J_apoc_export_allow_all_databases: 'true'
+    volumes:
+      - neo4j_data:/var/lib/neo4j/data
+      - neo4j_logs:/var/lib/neo4j/logs
+
+volumes:
+  neo4j_data:
+  neo4j_logs:
+EOF
+</CopyBlock>
+
+### Docker Compose로 시작
+
+<CopyBlock language="bash" title="Docker Compose 실행">
+docker-compose up -d
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/neo4j/step1-docker-install-ko.png"
+  alt="Docker 설치"
+  caption="docker-compose up -d를 실행하여 Neo4j를 시작합니다"
+  priority={true}
+/>
+
+<Callout type="success">
+✅ **완료!** Neo4j가 백그라운드에서 실행 중입니다.
+</Callout>
+
+<Checkpoint>
+Neo4j 컨테이너가 실행 중인가요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={2} title="Neo4j Browser 접속">
+
+### 웹 브라우저에서 접속
+
+1. 브라우저에서 다음 URL 방문:
+   [http://localhost:7474](http://localhost:7474)
+
+2. 로그인 창이 표시됩니다
+
+### 기본 로그인 정보
+
+- **사용자명**: neo4j
+- **비밀번호**: password123 (docker-compose에서 설정한 비밀번호)
+
+### 처음 로그인 시
+
+1. 기본 비밀번호로 로그인
+2. 새 비밀번호 설정 프롬프트 표시
+3. 새 비밀번호 입력 및 확인
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/neo4j/step2-browser-login-ko.png"
+  alt="Browser 로그인"
+  caption="Neo4j Browser에 로그인합니다"
+/>
+
+<Callout type="warning">
+⚠️ **중요**: 프로덕션 환경에서는 강력한 비밀번호를 사용하세요.
+</Callout>
+
+<Checkpoint>
+Neo4j Browser에 성공적으로 로그인했나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={3} title="첫 번째 Cypher 쿼리 실행">
+
+### 간단한 노드 생성
+
+Neo4j Browser의 쿼리 입력창에서 다음을 입력하고 실행합니다.
+
+<CopyBlock language="text" title="첫 번째 Cypher 쿼리">
+CREATE (alice:Person {name: 'Alice', age: 30})
+RETURN alice
+</CopyBlock>
+
+### 여러 노드와 관계 생성
+
+<CopyBlock language="text" title="노드와 관계 생성">
+CREATE
+  (alice:Person {name: 'Alice', age: 30}),
+  (bob:Person {name: 'Bob', age: 25}),
+  (alice)-[:KNOWS]->(bob)
+RETURN alice, bob
+</CopyBlock>
+
+### 데이터 조회
+
+<CopyBlock language="text" title="데이터 조회">
+MATCH (p:Person)
+RETURN p.name, p.age
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/neo4j/step3-cypher-query-ko.png"
+  alt="Cypher 쿼리"
+  caption="Neo4j Browser에서 Cypher 쿼리를 실행합니다"
+/>
+
+<Callout type="tip">
+💡 **팁**: Cypher는 SQL과 유사하지만 그래프 구조를 중심으로 설계된 쿼리 언어입니다.
+</Callout>
+
+<Checkpoint>
+쿼리가 성공적으로 실행되었나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={4} title="Python 클라이언트 설치">
+
+### Neo4j Python 드라이버 설치
+
+<CopyBlock language="bash" title="Neo4j 드라이버 설치">
+pip install neo4j
+</CopyBlock>
+
+### Python에서 연결
+
+<CopyBlock language="python" title="Python 연결 스크립트">
+from neo4j import GraphDatabase
+
+uri = 'neo4j://localhost:7687'
+username = 'neo4j'
+password = 'password123'
+
+driver = GraphDatabase.driver(uri, auth=(username, password))
+
+def verify_connection(tx):
+  result = tx.run('RETURN 1 as value')
+  return result.single()
+
+with driver.session() as session:
+  result = session.execute_read(verify_connection)
+  print('Connection successful!')
+</CopyBlock>
+
+### Node.js 클라이언트 설치
+
+<CopyBlock language="bash" title="Node.js 드라이버 설치">
+npm install neo4j-driver
+</CopyBlock>
+
+### Node.js에서 연결
+
+<CopyBlock language="javascript" title="Node.js 연결 스크립트">
+const neo4j = require('neo4j-driver');
+
+const uri = 'neo4j://localhost:7687';
+const username = 'neo4j';
+const password = 'password123';
+
+const driver = neo4j.driver(uri, neo4j.auth.basic(username, password));
+
+const session = driver.session();
+session.run('RETURN 1')
+  .then(result => {
+    console.log('Connection successful!');
+    session.close();
+    driver.close();
+  })
+  .catch(error => console.error(error));
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/neo4j/step4-python-client-ko.png"
+  alt="Python 클라이언트"
+  caption="Python 드라이버를 설치하고 연결합니다"
+/>
+
+<Callout type="success">
+✅ **완료!** 클라이언트가 설치되고 연결되었습니다.
+</Callout>
+
+<Checkpoint>
+클라이언트 연결이 성공했나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={5} title="컨테이너 관리 및 데이터 백업">
+
+### 컨테이너 중지 및 시작
+
+<CopyBlock language="bash" title="컨테이너 중지">
+docker-compose stop
+</CopyBlock>
+
+<CopyBlock language="bash" title="컨테이너 시작">
+docker-compose start
+</CopyBlock>
+
+### 로그 확인
+
+<CopyBlock language="bash" title="로그 보기">
+docker-compose logs -f neo4j
+</CopyBlock>
+
+### 데이터 백업
+
+Neo4j 데이터는 docker-compose.yml에서 정의한 volume에 저장됩니다.
+
+<CopyBlock language="bash" title="데이터 확인">
+docker volume ls | grep neo4j
+</CopyBlock>
+
+### 컨테이너 완전 제거
+
+<CopyBlock language="bash" title="컨테이너 및 volume 제거">
+docker-compose down -v
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/neo4j/step5-container-management-ko.png"
+  alt="컨테이너 관리"
+  caption="Docker 명령으로 Neo4j를 관리합니다"
+/>
+
+<DevTip>
+🔧 **개발팁**: 개발 중에는 `docker-compose up`으로 실행하여 로그를 모니터링하세요. 프로덕션에서는 자동 재시작 정책을 설정하세요.
+</DevTip>
+
+</Step>
+
+---
+
+## 다음 단계
+
+- [Neo4j 그래프 데이터베이스 쿼리하기](/guides/neo4j-graph-database) - 복잡한 쿼리 작성
+- [Neo4j 공식 문서](https://neo4j.com/docs/)
+- [Cypher 레퍼런스](https://neo4j.com/docs/cypher-manual/current/)
+
+## Neo4j 주요 개념
+
+### 노드 (Node)
+
+엔티티를 표현합니다:
+
+<CopyBlock language="text" title="노드 예시">
+(alice:Person {name: 'Alice', age: 30})
+(bob:Person {name: 'Bob', age: 25})
+</CopyBlock>
+
+### 관계 (Relationship)
+
+노드 간의 연결을 나타냅니다:
+
+<CopyBlock language="text" title="관계 예시">
+(alice)-[:KNOWS]->(bob)
+(alice)-[:WORKS_AT]->(company)
+</CopyBlock>
+
+### 레이블 (Label)
+
+노드의 유형을 표시합니다:
+
+<CopyBlock language="text" title="레이블 예시">
+:Person, :Company, :Movie, :User
+</CopyBlock>
+
+### 속성 (Property)
+
+노드와 관계의 데이터:
+
+<CopyBlock language="text" title="속성 예시">
+{name: 'Alice', age: 30, email: 'alice@example.com'}
+</CopyBlock>
+
+## 포트 정보
+
+- **7474**: Neo4j Browser (웹 UI)
+- **7687**: Bolt 프로토콜 (드라이버 연결)
+
+## 시스템 요구사항
+
+| 요구사항 | 최소값 | 권장값 |
+|---------|--------|-------|
+| RAM | 1GB | 4GB+ |
+| 디스크 | 1GB | 10GB+ |
+| CPU | 1 core | 2+ cores |
+
+---
+
+## 문제 해결
+
+### 연결 실패
+
+포트가 사용 중인지 확인하세요:
+
+<CopyBlock language="bash" title="포트 확인">
+lsof -i :7474
+lsof -i :7687
+</CopyBlock>
+
+다른 포트 사용:
+
+<CopyBlock language="bash" title="포트 변경">
+docker-compose.yml에서 ports를 변경하세요
+</CopyBlock>
+
+### 인증 실패
+
+비밀번호를 잊은 경우 컨테이너를 재설정하세요:
+
+<CopyBlock language="bash" title="컨테이너 초기화">
+docker-compose down -v
+docker-compose up -d
+</CopyBlock>
+
+### 성능 문제
+
+메모리 할당을 증가시키세요:
+
+<CopyBlock language="bash" title="메모리 증가">
+docker-compose.yml에 JAVA_OPTS 환경변수 추가
+</CopyBlock>

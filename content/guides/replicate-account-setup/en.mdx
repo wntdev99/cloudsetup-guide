@@ -1,0 +1,270 @@
+# Set Up Replicate Account
+
+**Replicate** is an API that provides easy access to hundreds of open-source AI models. You can use image generation, text processing, speech recognition, and more. Follow this guide to set up your account and get your first API key in 10 minutes.
+
+<FreeTierInfo
+  service="Replicate"
+  limit="Free credits for new users"
+  period="monthly"
+  status="free"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Email address", required: true },
+  { text: "Web browser", required: true },
+  { text: "GitHub account (optional)", required: false }
+]} />
+
+<Callout type="info">
+🤖 **What is Replicate?** Replicate is a platform that lets you run AI models in the cloud. You can use various models through the API including image generation, voice conversion, text processing, and more.
+</Callout>
+
+---
+
+<Step number={1} title="Visit Replicate Website">
+
+### Access Console
+
+1. Go to [replicate.com](https://replicate.com)
+2. Click **Sign up** button in the top right
+3. Review signup options
+
+### Choose Signup Method
+
+Replicate offers multiple signup methods:
+
+1. **Sign up with GitHub** - Fastest if you have a GitHub account
+2. **Sign up with Google** - Use your Google account
+3. **Sign up with Email** - Use email and password
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/replicate/step1-signup-en.png"
+  alt="Replicate signup page"
+  caption="Click Sign up on Replicate homepage"
+  priority={true}
+/>
+
+<Callout type="tip">
+💡 **Tip**: Signing up with GitHub gives you easier access to community models.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Enter Account Information">
+
+### Sign Up with GitHub (Recommended)
+
+1. Click **Sign up with GitHub** button
+2. Redirected to GitHub login page
+3. Log in with your GitHub account
+4. Click to authorize Replicate to access your GitHub profile
+
+### Sign Up with Email
+
+If you chose the email option:
+
+1. Enter email address
+2. Set a strong password
+3. Accept terms of service
+4. Click **Create account**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/replicate/step2-account-info-en.png"
+  alt="Enter account information"
+  caption="Create account with email or GitHub"
+/>
+
+<Callout type="warning">
+⚠️ **Important**: Double-check the information you enter. Especially the email, as you'll need it to recover your API key later.
+</Callout>
+
+<Checkpoint>
+Was your account created successfully?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={3} title="Verify Email">
+
+### Email Verification
+
+1. Check the inbox of the email you used for signup
+2. Find the verification email from Replicate
+3. Click the **Verify** button or link in the email
+4. Automatically redirected to Replicate dashboard
+
+### Verification Complete
+
+Once verified:
+
+1. Replicate dashboard displays
+2. Free credit information shown
+3. Profile setup completed
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/replicate/step3-email-verify-en.png"
+  alt="Email verification"
+  caption="Click the link in the account verification email"
+/>
+
+<Callout type="success">
+✅ **Done!** Your account is verified. Now you are ready to create your API key.
+</Callout>
+
+<Checkpoint>
+Is email verification complete?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={4} title="Generate API Key">
+
+### Access API Key Page
+
+1. Click your **Account** in the top right of the dashboard
+2. Select **Settings** or **API tokens**
+3. Navigate to **API tokens** or **API keys** section
+
+### Create API Key
+
+1. Click **Create API token** or **New API token** button
+2. Enter token name (optional, e.g., "My Application")
+3. Click **Generate** or **Create**
+4. Your new API key displays
+
+<CopyBlock language="text" title="API Key Example">
+r8_Abc1XyZqWvT2FgHiJkL3MnOpQrStU4VwX5YzA6BcDeF7
+</CopyBlock>
+
+**Critical**: Save this key in a secure location. It will not be displayed again.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/replicate/step4-api-key-en.png"
+  alt="Generate API key"
+  caption="Create a new API token in settings"
+/>
+
+<Callout type="danger">
+🔐 **Security**: Never publicly share your API key or commit it to Git!
+</Callout>
+
+<Checkpoint>
+Have you securely saved your API key?
+</Checkpoint>
+
+</Step>
+
+---
+
+## Next Steps
+
+- [Deploy Replicate Models](/guides/replicate-model-deployment) - Run your first AI model
+- [Replicate Documentation](https://replicate.com/docs)
+- [Model Library](https://replicate.com/explore)
+
+## Replicate Free Credits Information
+
+### New User Credits
+
+- Receive $20 free credits upon signup
+- Credits valid for 30 days
+- Payment info required after credits expire
+
+### Check Credit Balance
+
+1. Go to **Credits** or **Billing** section in dashboard
+2. View current credits and usage
+3. Track monthly expenses
+
+### Pricing Examples
+
+Estimated costs for popular models:
+
+<CopyBlock language="text" title="Model Pricing Estimates">
+Image generation (Stable Diffusion): about 0.0015 USD
+Voice conversion: about 0.00025 USD
+Text analysis: about 0.001 USD
+</CopyBlock>
+
+## Set Up API Key as Environment Variable
+
+### Local Development
+
+#### Create .env File
+
+<CopyBlock language="bash" title=".env file">
+REPLICATE_API_TOKEN=r8_Abc1XyZqWvT2FgHiJkL3MnOpQrStU4VwX5YzA6BcDeF7
+</CopyBlock>
+
+#### Use in Python
+
+<CopyBlock language="python" title="Python Example">
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+api_token = os.getenv('REPLICATE_API_TOKEN')
+</CopyBlock>
+
+#### Use in Node.js
+
+<CopyBlock language="javascript" title="Node.js Example">
+const token = process.env.REPLICATE_API_TOKEN;
+const replicate = new Replicate({
+  auth: token,
+});
+</CopyBlock>
+
+### Set Environment Variable (macOS/Linux)
+
+<CopyBlock language="bash" title="Set Permanent Environment Variable">
+echo 'export REPLICATE_API_TOKEN="r8_Abc1XyZqWvT2FgHiJkL3MnOpQrStU4VwX5YzA6BcDeF7"' >> ~/.bashrc
+source ~/.bashrc
+</CopyBlock>
+
+### Set Environment Variable (Windows PowerShell)
+
+<CopyBlock language="powershell" title="PowerShell Environment Variable">
+[System.Environment]::SetEnvironmentVariable(
+  'REPLICATE_API_TOKEN',
+  'r8_Abc1XyZqWvT2FgHiJkL3MnOpQrStU4VwX5YzA6BcDeF7',
+  'User'
+)
+</CopyBlock>
+
+<DevTip>
+🔧 **Dev Tip**: Add `.env` to your `.gitignore` to prevent accidental commits. When working in teams, use separate keys for each environment.
+</DevTip>
+
+---
+
+## Troubleshooting
+
+### API Key is not working
+
+1. Verify API key was copied correctly
+2. Check environment variable is set properly
+3. Ensure no whitespace was included when copying
+4. Confirm token is enabled in dashboard
+
+### Credits exhausted
+
+1. Add payment information
+2. Go to **Billing** section in dashboard
+3. Register a payment method
+4. Set up auto-recharge (optional)
+
+### Cannot access model
+
+1. Double-check API key is correct
+2. Confirm model is public
+3. Check network connection
+4. Check Replicate status page

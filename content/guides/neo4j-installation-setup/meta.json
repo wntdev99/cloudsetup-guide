@@ -1,0 +1,60 @@
+{
+  "slug": "neo4j-installation-setup",
+  "platform": "neo4j",
+  "service": "Neo4j Graph Database",
+  "category": "database",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 25,
+  "totalSteps": 5,
+  "freeTier": {
+    "service": "Neo4j",
+    "limit": "Neo4j Community Edition free, Aura free tier",
+    "period": "monthly",
+    "amount": "Free with 4GB storage limit",
+    "status": "free",
+    "conditions": [
+      "Community Edition open source and free",
+      "Neo4j Aura free tier with limits",
+      "4GB storage on free tier",
+      "Full graph capabilities",
+      "No usage fees for Community Edition",
+      "Cloud version available with paid tier"
+    ]
+  },
+  "prerequisites": [],
+  "nextGuides": [
+    "neo4j-graph-database"
+  ],
+  "seo": {
+    "ko": {
+      "title": "Neo4j 그래프 데이터베이스 설치 및 실행 | CloudSetup.guide",
+      "description": "Neo4j 그래프 데이터베이스를 설치하고 실행하는 방법을 배웁니다. Docker 또는 직접 설치 가능합니다.",
+      "keywords": [
+        "Neo4j",
+        "그래프 데이터베이스",
+        "그래프",
+        "데이터베이스",
+        "Docker",
+        "Cypher",
+        "관계 데이터"
+      ]
+    },
+    "en": {
+      "title": "Install and Run Neo4j Graph Database | CloudSetup.guide",
+      "description": "Learn how to install and run Neo4j graph database. Available via Docker or direct installation.",
+      "keywords": [
+        "Neo4j",
+        "graph database",
+        "graph",
+        "database",
+        "Docker",
+        "Cypher",
+        "relationship data"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z",
+  "published": false
+}

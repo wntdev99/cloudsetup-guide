@@ -1,0 +1,317 @@
+# Apache Kafka 설치 및 실행하기
+
+**Apache Kafka**는 오픈소스 이벤트 스트리밍 플랫폼입니다. 대량의 실시간 데이터를 처리하고 여러 애플리케이션 간에 메시지를 전달할 수 있습니다. 이 가이드를 따라 Docker로 Kafka를 설치하고 실행하세요.
+
+<FreeTierInfo
+  service="Apache Kafka"
+  limit="오픈소스, 무료 자체 호스팅"
+  period="one-time"
+  status="free"
+/>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "Docker 설치", required: true },
+  { text: "Docker Compose", required: true },
+  { text: "최소 4GB RAM", required: true },
+  { text: "터미널", required: true }
+]} />
+
+<Callout type="info">
+📨 **Kafka란?** Kafka는 프로듀서가 메시지를 발행하고 컨슈머가 구독하는 메시지 브로커입니다. 토픽을 통해 메시지를 구분하고 복수의 컨슈머가 같은 메시지를 받을 수 있습니다.
+</Callout>
+
+---
+
+<Step number={1} title="Docker Compose로 Kafka 설정">
+
+### docker-compose.yml 파일 생성
+
+<CopyBlock language="bash" title="docker-compose.yml 파일 생성">
+cat > docker-compose.yml << EOF
+version: '3.8'
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+EOF
+</CopyBlock>
+
+### 설명
+
+- **Zookeeper**: Kafka 클러스터 관리
+- **Kafka**: 메시지 브로커
+- 포트 9092: 외부 클라이언트 연결
+- 포트 29092: 내부 컨테이너 통신
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/kafka/step1-compose-setup-ko.png"
+  alt="Docker Compose 설정"
+  caption="docker-compose.yml 파일을 생성합니다"
+  priority={true}
+/>
+
+<Callout type="success">
+✅ **준비 완료!** 설정 파일이 준비되었습니다.
+</Callout>
+
+<Checkpoint>
+docker-compose.yml 파일이 생성되었나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={2} title="Kafka 브로커 시작">
+
+### Docker Compose 실행
+
+<CopyBlock language="bash" title="Kafka 시작">
+docker-compose up -d
+</CopyBlock>
+
+### 실행 확인
+
+<CopyBlock language="bash" title="컨테이너 상태 확인">
+docker-compose ps
+</CopyBlock>
+
+### 로그 확인
+
+<CopyBlock language="bash" title="Kafka 로그 보기">
+docker-compose logs -f kafka
+</CopyBlock>
+
+정상적으로 시작되면 "started" 메시지를 확인할 수 있습니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/kafka/step2-broker-start-ko.png"
+  alt="브로커 시작"
+  caption="docker-compose up -d로 Kafka를 시작합니다"
+/>
+
+<Callout type="success">
+✅ **완료!** Kafka가 실행 중입니다.
+</Callout>
+
+<Checkpoint>
+Kafka가 정상적으로 시작되었나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={3} title="토픽 생성">
+
+### Kafka 토픽 생성
+
+Kafka 컨테이너에서 토픽을 생성합니다.
+
+<CopyBlock language="bash" title="토픽 생성">
+docker-compose exec kafka kafka-topics --create \
+  --bootstrap-server localhost:9092 \
+  --topic test-topic \
+  --partitions 1 \
+  --replication-factor 1
+</CopyBlock>
+
+### 토픽 목록 확인
+
+<CopyBlock language="bash" title="토픽 목록">
+docker-compose exec kafka kafka-topics --list \
+  --bootstrap-server localhost:9092
+</CopyBlock>
+
+### 토픽 상세 정보
+
+<CopyBlock language="bash" title="토픽 정보">
+docker-compose exec kafka kafka-topics --describe \
+  --bootstrap-server localhost:9092 \
+  --topic test-topic
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/kafka/step3-topic-creation-ko.png"
+  alt="토픽 생성"
+  caption="kafka-topics 명령으로 토픽을 생성합니다"
+/>
+
+<Callout type="tip">
+💡 **팁**: `partitions`은 병렬 처리를 위해 데이터를 분산합니다. `replication-factor`는 데이터 복제를 위해 사용합니다.
+</Callout>
+
+<Checkpoint>
+토픽이 성공적으로 생성되었나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={4} title="Python 클라이언트 설치">
+
+### Kafka Python 라이브러리 설치
+
+<CopyBlock language="bash" title="kafka-python 설치">
+pip install kafka-python
+</CopyBlock>
+
+### Python에서 연결 테스트
+
+<CopyBlock language="python" title="Python 연결 테스트">
+from kafka import KafkaProducer
+
+try:
+  producer = KafkaProducer(bootstrap_servers='localhost:9092')
+  print('Connected to Kafka!')
+  producer.close()
+except Exception as e:
+  print(f'Connection failed: {e}')
+</CopyBlock>
+
+### Node.js 클라이언트 설치
+
+<CopyBlock language="bash" title="kafkajs 설치">
+npm install kafkajs
+</CopyBlock>
+
+### Node.js에서 연결 테스트
+
+<CopyBlock language="javascript" title="Node.js 연결 테스트">
+const { Kafka } = require('kafkajs');
+
+const kafka = new Kafka({
+  clientId: 'test-client',
+  brokers: ['localhost:9092']
+});
+
+kafka.admin().connect()
+  .then(() => {
+    console.log('Connected to Kafka!');
+    return kafka.admin().disconnect();
+  })
+  .catch(err => console.error('Connection failed:', err));
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/kafka/step4-client-install-ko.png"
+  alt="클라이언트 설치"
+  caption="Python 또는 Node.js 클라이언트를 설치합니다"
+/>
+
+<Callout type="success">
+✅ **완료!** 클라이언트가 설치되고 연결되었습니다.
+</Callout>
+
+<Checkpoint>
+클라이언트 연결이 성공했나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+## 다음 단계
+
+- [Kafka 이벤트 스트리밍](/guides/kafka-event-streaming) - 메시지 발행 및 구독
+- [Kafka 공식 문서](https://kafka.apache.org/documentation/)
+- [Python 클라이언트](https://kafka-python.readthedocs.io/)
+
+## Kafka 기본 개념
+
+### 프로듀서 (Producer)
+
+메시지를 발행합니다:
+
+<CopyBlock language="python" title="프로듀서 예시">
+from kafka import KafkaProducer
+
+producer = KafkaProducer(bootstrap_servers='localhost:9092')
+producer.send('test-topic', b'Hello Kafka')
+</CopyBlock>
+
+### 컨슈머 (Consumer)
+
+메시지를 구독합니다:
+
+<CopyBlock language="python" title="컨슈머 예시">
+from kafka import KafkaConsumer
+
+consumer = KafkaConsumer('test-topic', bootstrap_servers='localhost:9092')
+for message in consumer:
+  print(message.value)
+</CopyBlock>
+
+### 토픽 (Topic)
+
+메시지를 구분하는 채널입니다.
+
+### 파티션 (Partition)
+
+토픽 내의 데이터 분할입니다.
+
+## 포트 정보
+
+- **2181**: Zookeeper
+- **9092**: Kafka 외부 리스너
+- **29092**: Kafka 내부 리스너
+
+## 컨테이너 관리
+
+### 중지
+
+<CopyBlock language="bash" title="Kafka 중지">
+docker-compose stop
+</CopyBlock>
+
+### 시작
+
+<CopyBlock language="bash" title="Kafka 시작">
+docker-compose start
+</CopyBlock>
+
+### 완전 제거
+
+<CopyBlock language="bash" title="제거">
+docker-compose down -v
+</CopyBlock>
+
+---
+
+## 문제 해결
+
+### 포트 충돌
+
+포트 9092가 이미 사용 중이면 docker-compose.yml에서 포트를 변경하세요.
+
+### 메모리 부족
+
+Docker의 메모리 할당을 증가시키세요.
+
+### 연결 실패
+
+1. 모든 컨테이너가 실행 중인지 확인
+2. 포트가 올바른지 확인
+3. 로그에서 에러 메시지 확인

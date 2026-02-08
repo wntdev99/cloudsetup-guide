@@ -1,0 +1,269 @@
+# Replicate 계정 설정하기
+
+**Replicate**는 수백 개의 오픈소스 AI 모델에 쉽게 접근할 수 있는 API입니다. 이미지 생성, 텍스트 처리, 음성 인식 등 다양한 AI 기능을 사용할 수 있습니다. 이 가이드를 따라 10분 안에 계정을 설정하고 첫 번째 API 키를 발급받으세요.
+
+<FreeTierInfo
+  service="Replicate"
+  limit="신규 사용자 무료 크레딧"
+  period="monthly"
+  status="free"
+/>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "이메일 주소", required: true },
+  { text: "웹 브라우저", required: true },
+  { text: "GitHub 계정 (선택사항)", required: false }
+]} />
+
+<Callout type="info">
+🤖 **Replicate이란 무엇인가요?** Replicate는 AI 모델을 클라우드에서 실행할 수 있는 플랫폼입니다. 이미지 생성 모델, 음성 변환, 텍스트 처리 등 다양한 모델을 API를 통해 사용할 수 있습니다.
+</Callout>
+
+---
+
+<Step number={1} title="Replicate 웹사이트 방문">
+
+### 콘솔 접근
+
+1. [replicate.com](https://replicate.com)을 방문합니다
+2. 우측 상단의 **Sign up** 버튼을 클릭합니다
+3. 회원가입 옵션을 확인합니다
+
+### 회원가입 방법 선택
+
+Replicate은 다음 방법으로 가입할 수 있습니다:
+
+1. **GitHub로 가입** - GitHub 계정이 있으면 가장 빠릅니다
+2. **Google로 가입** - Google 계정 사용
+3. **이메일로 가입** - 이메일 주소와 비밀번호 사용
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/replicate/step1-signup-ko.png"
+  alt="Replicate 가입 페이지"
+  caption="Replicate 홈페이지에서 Sign up 클릭"
+  priority={true}
+/>
+
+<Callout type="tip">
+💡 **팁**: GitHub 계정으로 가입하면 커뮤니티 모델에 더 쉽게 접근할 수 있습니다.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="계정 정보 입력">
+
+### GitHub으로 가입하기 (추천)
+
+1. **Sign up with GitHub** 버튼 클릭
+2. GitHub 로그인 페이지로 이동
+3. GitHub 계정으로 로그인
+4. Replicate이 GitHub 프로필에 접근하는 것을 승인 클릭
+
+### 이메일로 가입하기
+
+이메일 옵션을 선택한 경우:
+
+1. 이메일 주소 입력
+2. 강력한 비밀번호 설정
+3. 이용약관 동의
+4. **Create account** 클릭
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/replicate/step2-account-info-ko.png"
+  alt="계정 정보 입력"
+  caption="이메일 또는 GitHub으로 계정을 생성합니다"
+/>
+
+<Callout type="warning">
+⚠️ **주의**: 입력하는 정보가 정확한지 다시 확인하세요. 특히 이메일은 나중에 API 키 복구에 필요합니다.
+</Callout>
+
+<Checkpoint>
+계정이 성공적으로 생성되었나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={3} title="이메일 확인">
+
+### 이메일 인증
+
+1. 가입에 사용한 이메일 받은편지함 확인
+2. Replicate 확인 이메일 찾기
+3. 이메일의 **확인[Verify]** 버튼 또는 링크 클릭
+4. 자동으로 Replicate 대시보드로 이동
+
+### 확인 완료
+
+성공적으로 인증되면:
+
+1. Replicate 대시보드가 표시됩니다
+2. 무료 크레딧 정보가 표시됩니다
+3. 프로필 설정이 완료됩니다
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/replicate/step3-email-verify-ko.png"
+  alt="이메일 인증"
+  caption="계정 인증 이메일의 링크를 클릭합니다"
+/>
+
+<Callout type="success">
+✅ **완료!** 계정이 확인되었습니다. 이제 API 키를 생성할 준비가 되었습니다.
+</Callout>
+
+<Checkpoint>
+이메일 인증이 완료되었나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={4} title="API 키 생성">
+
+### API 키 페이지 접근
+
+1. Replicate 대시보드에서 우측 상단의 **계정[Account]** 클릭
+2. **설정[Settings]** 또는 **API tokens** 선택
+3. **API tokens** 또는 **API keys** 섹션으로 이동
+
+### API 키 생성
+
+1. **Create API token** 또는 **New API token** 버튼 클릭
+2. 토큰 이름 입력 (선택사항, 예: "My Application")
+3. **Generate** 또는 **Create** 클릭
+4. 생성된 API 키가 표시됩니다
+
+<CopyBlock language="text" title="API 키 예시">
+r8_Abc1XyZqWvT2FgHiJkL3MnOpQrStU4VwX5YzA6BcDeF7
+</CopyBlock>
+
+**매우 중요**: 이 키를 안전한 곳에 저장하세요. 다시 표시되지 않습니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/replicate/step4-api-key-ko.png"
+  alt="API 키 생성"
+  caption="설정에서 새 API 토큰을 생성합니다"
+/>
+
+<Callout type="danger">
+🔐 **보안**: API 키를 절대로 공개적으로 공유하거나 Git에 커밋하지 마세요!
+</Callout>
+
+<Checkpoint>
+API 키를 안전하게 저장했나요?
+</Checkpoint>
+
+</Step>
+
+---
+
+## 다음 단계
+
+- [Replicate 모델 배포하기](/guides/replicate-model-deployment) - 첫 번째 AI 모델 실행
+- [Replicate 공식 문서](https://replicate.com/docs)
+- [모델 라이브러리](https://replicate.com/explore)
+
+## Replicate 무료 크레딧 정보
+
+### 신규 사용자 크레딧
+
+- 가입 시 $20 무료 크레딧 제공
+- 크레딧 사용 기간: 30일
+- 크레딧 소진 후 결제 정보가 필요합니다
+
+### 크레딧 확인 방법
+
+1. 대시보드의 **Credits** 또는 **Billing** 섹션
+2. 사용 중인 크레딧과 남은 크레딧 확인
+3. 월별 사용 내역 추적
+
+### 가격 예시
+
+일부 인기 모델의 예상 비용:
+
+<CopyBlock language="text" title="모델별 추정 비용">
+이미지 생성 (Stable Diffusion): 약 0.0015 달러
+음성 변환: 약 0.00025 달러
+텍스트 분석: 약 0.001 달러
+</CopyBlock>
+
+## API 키 환경 변수 설정
+
+### 로컬 개발 환경
+
+#### .env 파일 생성
+
+<CopyBlock language="bash" title=".env 파일">
+REPLICATE_API_TOKEN=r8_Abc1XyZqWvT2FgHiJkL3MnOpQrStU4VwX5YzA6BcDeF7
+</CopyBlock>
+
+#### Python에서 사용
+
+<CopyBlock language="python" title="Python 예시">
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+api_token = os.getenv('REPLICATE_API_TOKEN')
+</CopyBlock>
+
+#### Node.js에서 사용
+
+<CopyBlock language="javascript" title="Node.js 예시">
+const token = process.env.REPLICATE_API_TOKEN;
+const replicate = new Replicate({
+  auth: token,
+});
+</CopyBlock>
+
+### 환경 변수 설정 (macOS/Linux)
+
+<CopyBlock language="bash" title="영구 환경 변수 설정">
+echo 'export REPLICATE_API_TOKEN="r8_Abc1XyZqWvT2FgHiJkL3MnOpQrStU4VwX5YzA6BcDeF7"' >> ~/.bashrc
+source ~/.bashrc
+</CopyBlock>
+
+### 환경 변수 설정 (Windows PowerShell)
+
+<CopyBlock language="powershell" title="PowerShell 환경 변수">
+[System.Environment]::SetEnvironmentVariable(
+  'REPLICATE_API_TOKEN',
+  'r8_Abc1XyZqWvT2FgHiJkL3MnOpQrStU4VwX5YzA6BcDeF7',
+  'User'
+)
+</CopyBlock>
+
+<DevTip>
+🔧 **개발팁**: `.env` 파일을 `.gitignore`에 추가하여 실수로 커밋되지 않도록 하세요. 팀 작업 시 별도의 키를 사용하는 것이 좋습니다.
+</DevTip>
+
+---
+
+## 문제 해결
+
+### API 키가 작동하지 않습니다
+
+1. API 키가 올바르게 복사되었는지 확인
+2. 환경 변수가 올바르게 설정되었는지 확인
+3. API 키 복사 시 공백이 포함되지 않았는지 확인
+4. 대시보드에서 토큰이 활성화되어 있는지 확인
+
+### 크레딧이 모두 소진되었습니다
+
+1. 결제 정보 추가하기
+2. 대시보드의 **Billing** 섹션에서 결제 방법 등록
+3. 자동 충전 설정 (선택사항)
+
+### 모델에 접근할 수 없습니다
+
+1. API 키가 올바른지 다시 확인
+2. 모델이 공개 모델인지 확인
+3. 네트워크 연결 확인
+4. Replicate 상태 페이지 확인

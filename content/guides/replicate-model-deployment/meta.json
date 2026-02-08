@@ -1,0 +1,59 @@
+{
+  "slug": "replicate-model-deployment",
+  "platform": "replicate",
+  "service": "Replicate API",
+  "category": "ai-ml",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 20,
+  "totalSteps": 5,
+  "freeTier": {
+    "service": "Replicate",
+    "limit": "Free credits for new users",
+    "period": "monthly",
+    "amount": "$20 free credits on sign-up",
+    "status": "free",
+    "conditions": [
+      "Free $20 credits for new users",
+      "Pay-as-you-go pricing after credits",
+      "No credit card required initially",
+      "API access to hundreds of models",
+      "Suitable for experimentation"
+    ]
+  },
+  "prerequisites": [
+    "replicate-account-setup"
+  ],
+  "nextGuides": [],
+  "seo": {
+    "ko": {
+      "title": "Replicate 모델 배포 및 실행하기 | CloudSetup.guide",
+      "description": "Replicate API를 사용하여 이미지 생성, 텍스트 처리 등 AI 모델을 배포하고 실행하는 방법을 배웁니다.",
+      "keywords": [
+        "Replicate",
+        "모델 배포",
+        "AI API",
+        "이미지 생성",
+        "텍스트 생성",
+        "음성 변환",
+        "머신러닝"
+      ]
+    },
+    "en": {
+      "title": "Deploy and Run Replicate Models | CloudSetup.guide",
+      "description": "Learn how to deploy and run AI models using Replicate API including image generation, text processing, and more.",
+      "keywords": [
+        "Replicate",
+        "model deployment",
+        "AI API",
+        "image generation",
+        "text generation",
+        "voice conversion",
+        "machine learning"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z",
+  "published": false
+}

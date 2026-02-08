@@ -1,0 +1,315 @@
+# Neo4j Graph Database - Query Nodes and Relationships
+
+Create graph data in Neo4j and use Cypher query language to efficiently manage nodes, relationships, and data. Learn how to query complex graph relationships.
+
+<FreeTierInfo
+  service="Neo4j"
+  limit="Community Edition free or Aura free tier"
+  period="monthly"
+  status="free"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Neo4j installed", required: true },
+  { text: "Neo4j Browser access", required: true },
+  { text: "Python or Node.js (optional)", required: false },
+  { text: "Basic SQL knowledge", required: false }
+]} />
+
+<Callout type="info">
+📊 **What is Cypher?** Cypher is Neo4j's query language. Similar to SQL but designed for graph patterns.
+</Callout>
+
+---
+
+<Step number={1} title="Design Schema and Create Data">
+
+### Create Social Network Graph
+
+Run this in Neo4j Browser:
+
+<CopyBlock language="text" title="Create Person nodes">
+CREATE (alice:Person {name: 'Alice', age: 30, city: 'Seoul'})
+CREATE (bob:Person {name: 'Bob', age: 25, city: 'Busan'})
+CREATE (carol:Person {name: 'Carol', age: 28, city: 'Seoul'})
+RETURN alice, bob, carol
+</CopyBlock>
+
+### Create Company and Other Nodes
+
+<CopyBlock language="text" title="Create Company and City nodes">
+CREATE (techcorp:Company {name: 'TechCorp', industry: 'Technology'})
+CREATE (seoul:City {name: 'Seoul', country: 'South Korea'})
+RETURN techcorp, seoul
+</CopyBlock>
+
+### Create Relationships
+
+<CopyBlock language="text" title="Create relationships">
+MATCH (alice:Person {name: 'Alice'})
+MATCH (bob:Person {name: 'Bob'})
+MATCH (techcorp:Company {name: 'TechCorp'})
+CREATE (alice)-[:KNOWS]->(bob)
+CREATE (alice)-[:WORKS_AT]->(techcorp)
+CREATE (bob)-[:WORKS_AT]->(techcorp)
+RETURN alice, bob, techcorp
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/neo4j/step1-graph-creation-en.png"
+  alt="Create graph"
+  caption="Create nodes and relationships in Neo4j"
+  priority={true}
+/>
+
+<Callout type="success">
+✅ **Done!** Graph structure created.
+</Callout>
+
+<Checkpoint>
+Were nodes and relationships created successfully?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={2} title="Basic Cypher Queries">
+
+### Query All Person Nodes
+
+<CopyBlock language="text" title="Query all people">
+MATCH (p:Person)
+RETURN p.name, p.age, p.city
+</CopyBlock>
+
+### Conditional Queries
+
+<CopyBlock language="text" title="Find people in specific city">
+MATCH (p:Person {city: 'Seoul'})
+RETURN p.name, p.age
+ORDER BY p.age DESC
+</CopyBlock>
+
+### Count Nodes
+
+<CopyBlock language="text" title="Count nodes">
+MATCH (p:Person)
+RETURN COUNT(p) as person_count
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/neo4j/step2-basic-query-en.png"
+  alt="Basic queries"
+  caption="Run basic Cypher queries"
+/>
+
+<Callout type="tip">
+💡 **Tip**: MATCH defines pattern. Use WHERE for more complex filters.
+</Callout>
+
+<Checkpoint>
+Did query return correct results?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={3} title="Relationship Queries">
+
+### Find Direct Connections
+
+<CopyBlock language="text" title="Find people someone knows">
+MATCH (alice:Person {name: 'Alice'})-[:KNOWS]->(friend)
+RETURN friend.name, friend.age
+</CopyBlock>
+
+### Bidirectional Relationships
+
+<CopyBlock language="text" title="Query all KNOWS relationships">
+MATCH (p1:Person)-[:KNOWS]->(p2:Person)
+RETURN p1.name, p2.name
+</CopyBlock>
+
+### Find Colleagues
+
+<CopyBlock language="text" title="Find people at same company">
+MATCH (p1:Person)-[:WORKS_AT]->(company:Company),
+      (p2:Person)-[:WORKS_AT]->(company)
+WHERE p1.name < p2.name
+RETURN p1.name, p2.name, company.name
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/neo4j/step3-relationship-query-en.png"
+  alt="Relationship queries"
+  caption="Query data through relationships"
+/>
+
+<DevTip>
+🔧 **Dev Tip**: Arrow direction matters. `(a)-[:KNOWS]->(b)` means a knows b.
+</DevTip>
+
+<Checkpoint>
+Did relationship queries work?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={4} title="Path and Pattern Queries">
+
+### Find Shortest Path
+
+<CopyBlock language="text" title="Find path between people">
+MATCH path = shortestPath((alice:Person {name: 'Alice'})-[*..5]-(carol:Person {name: 'Carol'}))
+RETURN path
+</CopyBlock>
+
+### Indirect Connections
+
+<CopyBlock language="text" title="Find 2-step away connections">
+MATCH (alice:Person {name: 'Alice'})-[:KNOWS]->(intermediate:Person)-[:KNOWS]->(distant:Person)
+RETURN alice.name, intermediate.name, distant.name
+</CopyBlock>
+
+### Multi-hop Queries
+
+<CopyBlock language="text" title="Traverse all relationship types">
+MATCH (alice:Person {name: 'Alice'})-[*1..3]-(other)
+RETURN DISTINCT other.name
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/neo4j/step4-path-query-en.png"
+  alt="Path queries"
+  caption="Find indirect connections through paths"
+/>
+
+<Callout type="info">
+ℹ️ **Info**: `[*1..3]` traverses 1-3 relationships. Asterisk means any relationship type.
+</Callout>
+
+<Checkpoint>
+Did path queries return results?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={5} title="Modify and Delete Data">
+
+### Update Node Properties
+
+<CopyBlock language="text" title="Update age">
+MATCH (alice:Person {name: 'Alice'})
+SET alice.age = 31
+RETURN alice
+</CopyBlock>
+
+### Add New Relationships
+
+<CopyBlock language="text" title="Add relationship">
+MATCH (carol:Person {name: 'Carol'})
+MATCH (techcorp:Company {name: 'TechCorp'})
+CREATE (carol)-[:WORKS_AT]->(techcorp)
+RETURN carol, techcorp
+</CopyBlock>
+
+### Delete Relationships
+
+<CopyBlock language="text" title="Delete relationship">
+MATCH (alice:Person {name: 'Alice'})-[r:KNOWS]->(bob:Person {name: 'Bob'})
+DELETE r
+RETURN alice, bob
+</CopyBlock>
+
+### Delete Nodes
+
+<CopyBlock language="text" title="Delete node and relationships">
+MATCH (n:Person {name: 'Carol'})
+DETACH DELETE n
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/neo4j/step5-modify-delete-en.png"
+  alt="Modify data"
+  caption="Update and delete data"
+/>
+
+<DevTip>
+🔧 **Dev Tip**: DETACH DELETE removes node and all relationships. Use only when necessary.
+</DevTip>
+
+</Step>
+
+---
+
+## Next Steps
+
+- [Neo4j Documentation](https://neo4j.com/docs/)
+- [Cypher Detailed Guide](https://neo4j.com/docs/cypher-manual/current/)
+- [Performance Optimization](https://neo4j.com/docs/operations-manual/current/)
+
+## Cypher Syntax Summary
+
+### Basic Structure
+
+<CopyBlock language="text" title="Cypher syntax">
+MATCH (pattern)
+WHERE (conditions)
+RETURN (results)
+ORDER BY (field)
+LIMIT (number)
+</CopyBlock>
+
+### Common Operators
+
+- `=` : equals
+- `<>` : not equals
+- `>`, `<`, `>=`, `<=` : comparisons
+- `AND`, `OR`, `NOT` : logical
+
+### Functions
+
+<CopyBlock language="text" title="Useful functions">
+COUNT(), DISTINCT, COLLECT(), AVG(), MAX(), MIN()
+</CopyBlock>
+
+## Performance Tips
+
+### Create Indexes
+
+<CopyBlock language="text" title="Create indexes">
+CREATE INDEX ON :Person(name)
+CREATE INDEX ON :Person(age)
+</CopyBlock>
+
+### Query Large Datasets
+
+For large amounts of nodes:
+
+<CopyBlock language="text" title="Batch processing">
+MATCH (n:Person)
+WITH n LIMIT 1000
+SET n.processed = true
+</CopyBlock>
+
+## Troubleshooting
+
+### Query is unresponsive
+
+Check timeout settings. Exclude unnecessary relationships.
+
+### Unexpected results
+
+Verify pattern is correct. Filter unwanted nodes.
+
+### Out of memory
+
+Use batch processing for large data operations.

@@ -1,0 +1,385 @@
+# Install and Run Neo4j Graph Database
+
+**Neo4j** is a graph database that stores and queries relationship data. It delivers powerful performance in social networks, recommendation systems, knowledge graphs, and more. Follow this guide to install and get started with Neo4j.
+
+<FreeTierInfo
+  service="Neo4j"
+  limit="Community Edition free or Aura free tier"
+  period="monthly"
+  status="free"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Docker (optional)", required: false },
+  { text: "Java 11 or later (for direct installation)", required: false },
+  { text: "Minimum 2GB RAM", required: true },
+  { text: "Web browser", required: true }
+]} />
+
+<Callout type="info">
+📊 **What is a Graph Database?** A graph database stores data with nodes and relationships. By focusing on relationships, it efficiently handles complex data connections.
+</Callout>
+
+---
+
+<Step number={1} title="Install Using Docker">
+
+### Run Neo4j with Docker
+
+The easiest way is using Docker.
+
+<CopyBlock language="bash" title="Run Neo4j Docker container">
+docker run -d \
+  --name neo4j \
+  -p 7474:7474 \
+  -p 7687:7687 \
+  -e NEO4J_AUTH=neo4j/password123 \
+  neo4j:latest
+</CopyBlock>
+
+### Using Docker Compose (Recommended)
+
+For easier management, create a docker-compose.yml file.
+
+<CopyBlock language="bash" title="Create docker-compose.yml file">
+cat > docker-compose.yml << EOF
+version: '3.8'
+services:
+  neo4j:
+    image: neo4j:latest
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      NEO4J_AUTH: neo4j/password123
+      NEO4J_apoc_export_allow_all_databases: 'true'
+    volumes:
+      - neo4j_data:/var/lib/neo4j/data
+      - neo4j_logs:/var/lib/neo4j/logs
+
+volumes:
+  neo4j_data:
+  neo4j_logs:
+EOF
+</CopyBlock>
+
+### Start with Docker Compose
+
+<CopyBlock language="bash" title="Run Docker Compose">
+docker-compose up -d
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/neo4j/step1-docker-install-en.png"
+  alt="Docker installation"
+  caption="Run docker-compose up -d to start Neo4j"
+  priority={true}
+/>
+
+<Callout type="success">
+✅ **Done!** Neo4j is running in background.
+</Callout>
+
+<Checkpoint>
+Is Neo4j container running?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={2} title="Access Neo4j Browser">
+
+### Open in Web Browser
+
+1. Visit this URL in your browser:
+   [http://localhost:7474](http://localhost:7474)
+
+2. Login screen appears
+
+### Default Login Credentials
+
+- **Username**: neo4j
+- **Password**: password123 (set in docker-compose)
+
+### First Login
+
+1. Log in with default password
+2. Set new password when prompted
+3. Enter new password and confirm
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/neo4j/step2-browser-login-en.png"
+  alt="Browser login"
+  caption="Log in to Neo4j Browser"
+/>
+
+<Callout type="warning">
+⚠️ **Important**: Use a strong password in production environments.
+</Callout>
+
+<Checkpoint>
+Did you successfully log in to Neo4j Browser?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={3} title="Run First Cypher Query">
+
+### Create Simple Node
+
+Enter and run this in Neo4j Browser query input field:
+
+<CopyBlock language="text" title="First Cypher query">
+CREATE (alice:Person {name: 'Alice', age: 30})
+RETURN alice
+</CopyBlock>
+
+### Create Multiple Nodes and Relationships
+
+<CopyBlock language="text" title="Create nodes and relationships">
+CREATE
+  (alice:Person {name: 'Alice', age: 30}),
+  (bob:Person {name: 'Bob', age: 25}),
+  (alice)-[:KNOWS]->(bob)
+RETURN alice, bob
+</CopyBlock>
+
+### Query Data
+
+<CopyBlock language="text" title="Query data">
+MATCH (p:Person)
+RETURN p.name, p.age
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/neo4j/step3-cypher-query-en.png"
+  alt="Cypher query"
+  caption="Run Cypher queries in Neo4j Browser"
+/>
+
+<Callout type="tip">
+💡 **Tip**: Cypher is similar to SQL but designed for graph structures.
+</Callout>
+
+<Checkpoint>
+Did the query execute successfully?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={4} title="Install Python Client">
+
+### Install Neo4j Python Driver
+
+<CopyBlock language="bash" title="Install Neo4j driver">
+pip install neo4j
+</CopyBlock>
+
+### Connect in Python
+
+<CopyBlock language="python" title="Python connection script">
+from neo4j import GraphDatabase
+
+uri = 'neo4j://localhost:7687'
+username = 'neo4j'
+password = 'password123'
+
+driver = GraphDatabase.driver(uri, auth=(username, password))
+
+def verify_connection(tx):
+  result = tx.run('RETURN 1 as value')
+  return result.single()
+
+with driver.session() as session:
+  result = session.execute_read(verify_connection)
+  print('Connection successful!')
+</CopyBlock>
+
+### Install Node.js Driver
+
+<CopyBlock language="bash" title="Install Node.js driver">
+npm install neo4j-driver
+</CopyBlock>
+
+### Connect in Node.js
+
+<CopyBlock language="javascript" title="Node.js connection script">
+const neo4j = require('neo4j-driver');
+
+const uri = 'neo4j://localhost:7687';
+const username = 'neo4j';
+const password = 'password123';
+
+const driver = neo4j.driver(uri, neo4j.auth.basic(username, password));
+
+const session = driver.session();
+session.run('RETURN 1')
+  .then(result => {
+    console.log('Connection successful!');
+    session.close();
+    driver.close();
+  })
+  .catch(error => console.error(error));
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/neo4j/step4-python-client-en.png"
+  alt="Python client"
+  caption="Install and connect Python driver"
+/>
+
+<Callout type="success">
+✅ **Done!** Client installed and connected.
+</Callout>
+
+<Checkpoint>
+Did client connection succeed?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={5} title="Manage Container and Backup">
+
+### Stop and Start Container
+
+<CopyBlock language="bash" title="Stop container">
+docker-compose stop
+</CopyBlock>
+
+<CopyBlock language="bash" title="Start container">
+docker-compose start
+</CopyBlock>
+
+### View Logs
+
+<CopyBlock language="bash" title="View logs">
+docker-compose logs -f neo4j
+</CopyBlock>
+
+### Backup Data
+
+Neo4j data is stored in the volume defined in docker-compose.yml.
+
+<CopyBlock language="bash" title="Check data volume">
+docker volume ls | grep neo4j
+</CopyBlock>
+
+### Remove Container Completely
+
+<CopyBlock language="bash" title="Remove container and volume">
+docker-compose down -v
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/neo4j/step5-container-management-en.png"
+  alt="Container management"
+  caption="Manage Neo4j with Docker commands"
+/>
+
+<DevTip>
+🔧 **Dev Tip**: During development, run `docker-compose up` to monitor logs. In production, set auto-restart policies.
+</DevTip>
+
+</Step>
+
+---
+
+## Next Steps
+
+- [Query Neo4j Graph Database](/guides/neo4j-graph-database) - Write complex queries
+- [Neo4j Documentation](https://neo4j.com/docs/)
+- [Cypher Reference](https://neo4j.com/docs/cypher-manual/current/)
+
+## Neo4j Key Concepts
+
+### Nodes
+
+Represent entities:
+
+<CopyBlock language="text" title="Node examples">
+(alice:Person {name: 'Alice', age: 30})
+(bob:Person {name: 'Bob', age: 25})
+</CopyBlock>
+
+### Relationships
+
+Connections between nodes:
+
+<CopyBlock language="text" title="Relationship examples">
+(alice)-[:KNOWS]->(bob)
+(alice)-[:WORKS_AT]->(company)
+</CopyBlock>
+
+### Labels
+
+Types of nodes:
+
+<CopyBlock language="text" title="Label examples">
+:Person, :Company, :Movie, :User
+</CopyBlock>
+
+### Properties
+
+Data in nodes and relationships:
+
+<CopyBlock language="text" title="Property examples">
+{name: 'Alice', age: 30, email: 'alice@example.com'}
+</CopyBlock>
+
+## Port Information
+
+- **7474**: Neo4j Browser (web UI)
+- **7687**: Bolt protocol (driver connection)
+
+## System Requirements
+
+| Requirement | Minimum | Recommended |
+|-----------|---------|-------------|
+| RAM | 1GB | 4GB+ |
+| Disk | 1GB | 10GB+ |
+| CPU | 1 core | 2+ cores |
+
+---
+
+## Troubleshooting
+
+### Connection Failed
+
+Check if ports are in use:
+
+<CopyBlock language="bash" title="Check ports">
+lsof -i :7474
+lsof -i :7687
+</CopyBlock>
+
+Use different ports:
+
+<CopyBlock language="bash" title="Change ports">
+Edit ports in docker-compose.yml
+</CopyBlock>
+
+### Authentication Failed
+
+Reset container if you forgot password:
+
+<CopyBlock language="bash" title="Reset container">
+docker-compose down -v
+docker-compose up -d
+</CopyBlock>
+
+### Performance Issues
+
+Increase memory allocation:
+
+<CopyBlock language="bash" title="Increase memory">
+Add JAVA_OPTS environment variable in docker-compose.yml
+</CopyBlock>

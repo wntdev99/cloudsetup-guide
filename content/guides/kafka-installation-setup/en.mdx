@@ -1,0 +1,317 @@
+# Install and Run Apache Kafka
+
+**Apache Kafka** is an open-source event streaming platform. Handle large amounts of real-time data and pass messages between multiple applications. Follow this guide to install and run Kafka with Docker.
+
+<FreeTierInfo
+  service="Apache Kafka"
+  limit="Open source, free to self-host"
+  period="one-time"
+  status="free"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Docker installed", required: true },
+  { text: "Docker Compose", required: true },
+  { text: "Minimum 4GB RAM", required: true },
+  { text: "Terminal", required: true }
+]} />
+
+<Callout type="info">
+📨 **What is Kafka?** Kafka is a message broker where producers publish messages and consumers subscribe. Topics separate messages, and multiple consumers can receive the same message.
+</Callout>
+
+---
+
+<Step number={1} title="Set Up Kafka with Docker Compose">
+
+### Create docker-compose.yml File
+
+<CopyBlock language="bash" title="Create docker-compose.yml file">
+cat > docker-compose.yml << EOF
+version: '3.8'
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+EOF
+</CopyBlock>
+
+### Explanation
+
+- **Zookeeper**: Manages Kafka cluster
+- **Kafka**: Message broker
+- Port 9092: External client connection
+- Port 29092: Internal container communication
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/kafka/step1-compose-setup-en.png"
+  alt="Docker Compose setup"
+  caption="Create docker-compose.yml file"
+  priority={true}
+/>
+
+<Callout type="success">
+✅ **Ready!** Configuration file is prepared.
+</Callout>
+
+<Checkpoint>
+Was docker-compose.yml file created?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={2} title="Start Kafka Broker">
+
+### Run Docker Compose
+
+<CopyBlock language="bash" title="Start Kafka">
+docker-compose up -d
+</CopyBlock>
+
+### Verify Running
+
+<CopyBlock language="bash" title="Check container status">
+docker-compose ps
+</CopyBlock>
+
+### View Logs
+
+<CopyBlock language="bash" title="View Kafka logs">
+docker-compose logs -f kafka
+</CopyBlock>
+
+You should see "started" message for normal startup.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/kafka/step2-broker-start-en.png"
+  alt="Start broker"
+  caption="Run docker-compose up -d to start Kafka"
+/>
+
+<Callout type="success">
+✅ **Done!** Kafka is running.
+</Callout>
+
+<Checkpoint>
+Did Kafka start successfully?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={3} title="Create Topic">
+
+### Create Kafka Topic
+
+Create topic from Kafka container.
+
+<CopyBlock language="bash" title="Create topic">
+docker-compose exec kafka kafka-topics --create \
+  --bootstrap-server localhost:9092 \
+  --topic test-topic \
+  --partitions 1 \
+  --replication-factor 1
+</CopyBlock>
+
+### List Topics
+
+<CopyBlock language="bash" title="List topics">
+docker-compose exec kafka kafka-topics --list \
+  --bootstrap-server localhost:9092
+</CopyBlock>
+
+### Describe Topic
+
+<CopyBlock language="bash" title="Topic info">
+docker-compose exec kafka kafka-topics --describe \
+  --bootstrap-server localhost:9092 \
+  --topic test-topic
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/kafka/step3-topic-creation-en.png"
+  alt="Create topic"
+  caption="Use kafka-topics command to create topic"
+/>
+
+<Callout type="tip">
+💡 **Tip**: `partitions` distribute data for parallel processing. `replication-factor` is for data replication.
+</Callout>
+
+<Checkpoint>
+Was topic created successfully?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={4} title="Install Python Client">
+
+### Install Kafka Python Library
+
+<CopyBlock language="bash" title="Install kafka-python">
+pip install kafka-python
+</CopyBlock>
+
+### Test Connection in Python
+
+<CopyBlock language="python" title="Python connection test">
+from kafka import KafkaProducer
+
+try:
+  producer = KafkaProducer(bootstrap_servers='localhost:9092')
+  print('Connected to Kafka!')
+  producer.close()
+except Exception as e:
+  print(f'Connection failed: {e}')
+</CopyBlock>
+
+### Install Node.js Client
+
+<CopyBlock language="bash" title="Install kafkajs">
+npm install kafkajs
+</CopyBlock>
+
+### Test Connection in Node.js
+
+<CopyBlock language="javascript" title="Node.js connection test">
+const { Kafka } = require('kafkajs');
+
+const kafka = new Kafka({
+  clientId: 'test-client',
+  brokers: ['localhost:9092']
+});
+
+kafka.admin().connect()
+  .then(() => {
+    console.log('Connected to Kafka!');
+    return kafka.admin().disconnect();
+  })
+  .catch(err => console.error('Connection failed:', err));
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/kafka/step4-client-install-en.png"
+  alt="Client installation"
+  caption="Install Python or Node.js client"
+/>
+
+<Callout type="success">
+✅ **Done!** Client installed and connected.
+</Callout>
+
+<Checkpoint>
+Did client connection succeed?
+</Checkpoint>
+
+</Step>
+
+---
+
+## Next Steps
+
+- [Kafka Event Streaming](/guides/kafka-event-streaming) - Publish and subscribe messages
+- [Kafka Documentation](https://kafka.apache.org/documentation/)
+- [Python Client](https://kafka-python.readthedocs.io/)
+
+## Kafka Basics
+
+### Producer
+
+Publishes messages:
+
+<CopyBlock language="python" title="Producer example">
+from kafka import KafkaProducer
+
+producer = KafkaProducer(bootstrap_servers='localhost:9092')
+producer.send('test-topic', b'Hello Kafka')
+</CopyBlock>
+
+### Consumer
+
+Subscribes to messages:
+
+<CopyBlock language="python" title="Consumer example">
+from kafka import KafkaConsumer
+
+consumer = KafkaConsumer('test-topic', bootstrap_servers='localhost:9092')
+for message in consumer:
+  print(message.value)
+</CopyBlock>
+
+### Topic
+
+Channel that separates messages.
+
+### Partition
+
+Data split within topic.
+
+## Port Information
+
+- **2181**: Zookeeper
+- **9092**: Kafka external listener
+- **29092**: Kafka internal listener
+
+## Container Management
+
+### Stop
+
+<CopyBlock language="bash" title="Stop Kafka">
+docker-compose stop
+</CopyBlock>
+
+### Start
+
+<CopyBlock language="bash" title="Start Kafka">
+docker-compose start
+</CopyBlock>
+
+### Remove Completely
+
+<CopyBlock language="bash" title="Remove">
+docker-compose down -v
+</CopyBlock>
+
+---
+
+## Troubleshooting
+
+### Port Conflict
+
+If port 9092 is in use, change port in docker-compose.yml.
+
+### Out of Memory
+
+Increase Docker memory allocation.
+
+### Connection Failed
+
+1. Verify all containers are running
+2. Check port is correct
+3. Review logs for error messages

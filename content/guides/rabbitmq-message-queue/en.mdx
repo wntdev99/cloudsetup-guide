@@ -1,0 +1,338 @@
+# RabbitMQ Message Queue - Publish and Process Messages
+
+Publish and process messages in RabbitMQ. Create queues and implement publishers and consumers for asynchronous message processing.
+
+<FreeTierInfo
+  service="RabbitMQ"
+  limit="Open source, free to self-host"
+  period="one-time"
+  status="free"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "RabbitMQ installed", required: true },
+  { text: "pika or amqplib", required: true },
+  { text: "Python or Node.js", required: true },
+  { text: "Terminal", required: true }
+]} />
+
+<Callout type="info">
+📬 **Benefits of Message Queues** Publishers and consumers work independently. If consumer goes down, messages are stored in queue, and processed when consumer recovers.
+</Callout>
+
+---
+
+<Step number={1} title="Write Python Publisher">
+
+### Publish Basic Message
+
+Publish message to RabbitMQ from Python.
+
+<CopyBlock language="python" title="Python publisher">
+import pika
+import json
+
+connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+channel = connection.channel()
+
+channel.queue_declare(queue='hello', durable=True)
+
+message = {'text': 'Hello RabbitMQ!', 'id': 1}
+
+channel.basic_publish(
+  exchange='',
+  routing_key='hello',
+  body=json.dumps(message),
+  properties=pika.BasicProperties(
+    delivery_mode=pika.DeliveryMode.Persistent
+  )
+)
+
+print(f'Message sent: {message}')
+connection.close()
+</CopyBlock>
+
+### Publish Multiple Messages
+
+<CopyBlock language="python" title="Batch publish">
+for i in range(10):
+  message = {'id': i, 'data': f'Message {i}'}
+  channel.basic_publish(
+    exchange='',
+    routing_key='hello',
+    body=json.dumps(message)
+  )
+  print(f'Sent message {i}')
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/rabbitmq/step1-publisher-en.png"
+  alt="Publisher"
+  caption="Write Python publisher to send messages"
+  priority={true}
+/>
+
+<Callout type="success">
+✅ **Done!** Messages stored in queue.
+</Callout>
+
+<Checkpoint>
+Were messages published successfully?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={2} title="Write Python Consumer">
+
+### Process Basic Message
+
+<CopyBlock language="python" title="Python consumer">
+import pika
+import json
+
+connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+channel = connection.channel()
+
+channel.queue_declare(queue='hello', durable=True)
+
+def callback(ch, method, properties, body):
+  message = json.loads(body)
+  print(f'Received: {message}')
+  ch.basic_ack(delivery_tag=method.delivery_tag)
+
+channel.basic_consume(queue='hello', on_message_callback=callback)
+
+print('Waiting for messages...')
+try:
+  channel.start_consuming()
+except KeyboardInterrupt:
+  channel.stop_consuming()
+  connection.close()
+</CopyBlock>
+
+### Handle Multiple Consumers
+
+<CopyBlock language="python" title="Fair dispatch">
+channel.basic_qos(prefetch_count=1)
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/rabbitmq/step2-consumer-en.png"
+  alt="Consumer"
+  caption="Write Python consumer to process messages"
+/>
+
+<Callout type="tip">
+💡 **Tip**: `basic_ack` notifies RabbitMQ that message processing is complete. Without it, message returns to queue.
+</Callout>
+
+<Checkpoint>
+Did consumer receive messages?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={3} title="Node.js Publisher">
+
+### Publish Message from Node.js
+
+<CopyBlock language="javascript" title="Node.js publisher">
+const amqp = require('amqplib');
+
+async function publishMessage() {
+  const connection = await amqp.connect('amqp://localhost');
+  const channel = await connection.createChannel();
+
+  const queue = 'hello';
+  const message = JSON.stringify({
+    text: 'Hello RabbitMQ!',
+    id: 1,
+    timestamp: new Date()
+  });
+
+  await channel.assertQueue(queue, { durable: true });
+  channel.sendToQueue(queue, Buffer.from(message), { persistent: true });
+
+  console.log('Message sent:', message);
+
+  setTimeout(() => {
+    channel.close();
+    connection.close();
+  }, 500);
+}
+
+publishMessage().catch(console.error);
+</CopyBlock>
+
+<DevTip>
+🔧 **Dev Tip**: `persistent: true` saves message to disk for preservation across RabbitMQ restarts.
+</DevTip>
+
+<Checkpoint>
+Did Node.js publisher work?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={4} title="Node.js Consumer">
+
+### Process Message from Node.js
+
+<CopyBlock language="javascript" title="Node.js consumer">
+const amqp = require('amqplib');
+
+async function consumeMessage() {
+  const connection = await amqp.connect('amqp://localhost');
+  const channel = await connection.createChannel();
+
+  const queue = 'hello';
+  await channel.assertQueue(queue, { durable: true });
+
+  console.log('Waiting for messages...');
+
+  channel.consume(queue, (message) => {
+    if (message) {
+      console.log('Received:', message.content.toString());
+      channel.ack(message);
+    }
+  });
+}
+
+consumeMessage().catch(console.error);
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/rabbitmq/step4-nodejs-consumer-en.png"
+  alt="Node.js consumer"
+  caption="Write Node.js consumer"
+/>
+
+<Callout type="success">
+✅ **Done!** Node.js consumer processes messages.
+</Callout>
+
+<Checkpoint>
+Did Node.js consumer receive messages?
+</Checkpoint>
+
+</Step>
+
+---
+
+<Step number={5} title="Advanced Patterns">
+
+### Exchange and Binding
+
+<CopyBlock language="python" title="Fanout Exchange">
+channel.exchange_declare(exchange='logs', exchange_type='fanout')
+
+channel.queue_declare(queue='logs_queue1')
+channel.queue_declare(queue='logs_queue2')
+
+channel.queue_bind(exchange='logs', queue='logs_queue1')
+channel.queue_bind(exchange='logs', queue='logs_queue2')
+
+channel.basic_publish(exchange='logs', routing_key='', body=b'Log message')
+</CopyBlock>
+
+### Topic Exchange
+
+<CopyBlock language="python" title="Topic Exchange">
+channel.exchange_declare(exchange='events', exchange_type='topic')
+
+channel.queue_declare(queue='user_events')
+channel.queue_declare(queue='order_events')
+
+channel.queue_bind(exchange='events', queue='user_events', routing_key='user.*')
+channel.queue_bind(exchange='events', queue='order_events', routing_key='order.*')
+
+channel.basic_publish(exchange='events', routing_key='user.created', body=b'New user')
+channel.basic_publish(exchange='events', routing_key='order.placed', body=b'Order placed')
+</CopyBlock>
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/rabbitmq/step5-advanced-en.png"
+  alt="Advanced patterns"
+  caption="Message routing with Exchange and Binding"
+/>
+
+<DevTip>
+🔧 **Dev Tip**: Topic exchange supports wildcards (`*` one word, `#` multiple words).
+</DevTip>
+
+</Step>
+
+---
+
+## Next Steps
+
+- [RabbitMQ Documentation](https://www.rabbitmq.com/documentation.html)
+- [RPC Pattern](https://www.rabbitmq.com/tutorials/tutorial-six-python.html)
+- [Performance Optimization](https://www.rabbitmq.com/blog/2021/07/07/high-performance-publishing/)
+
+## Exchange Types
+
+### Direct
+
+Deliver to queues with exact routing key match.
+
+<CopyBlock language="text" title="Direct example">
+channel.queue_bind(exchange='tasks', routing_key='task.urgent')
+</CopyBlock>
+
+### Topic
+
+Route using wildcard patterns.
+
+<CopyBlock language="text" title="Topic example">
+routing_key='logs.error.*'
+routing_key='*.critical'
+</CopyBlock>
+
+### Fanout
+
+Broadcast message to all bound queues.
+
+<CopyBlock language="text" title="Fanout example">
+channel.basic_publish(exchange='broadcast', routing_key='')
+</CopyBlock>
+
+## Monitoring
+
+### Check in Management Console
+
+In RabbitMQ management console (http://localhost:15672):
+
+1. **Queues** tab to check queue status
+2. **Connections** tab to see active connections
+3. **Channels** tab for channel info
+
+---
+
+## Troubleshooting
+
+### Not receiving messages
+
+1. Verify queue exists
+2. Check consumer is connected
+3. Check message count in management console
+
+### Message loss
+
+1. Set queue with `durable=True`
+2. Set message with `persistent=True`
+3. Process acknowledgments with `basic_ack`
+
+### Performance degradation
+
+1. Adjust `prefetch_count`
+2. Increase consumer count
+3. Batch process messages

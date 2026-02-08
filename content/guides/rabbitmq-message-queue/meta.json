@@ -1,0 +1,60 @@
+{
+  "slug": "rabbitmq-message-queue",
+  "platform": "rabbitmq",
+  "service": "RabbitMQ Message Broker",
+  "category": "messaging",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 25,
+  "totalSteps": 5,
+  "freeTier": {
+    "service": "RabbitMQ",
+    "limit": "Open source, free to self-host",
+    "period": "one-time",
+    "amount": "Free with Docker",
+    "status": "free",
+    "conditions": [
+      "Open source Mozilla Public License",
+      "Free with Docker installation",
+      "No usage fees",
+      "Community support available",
+      "Self-hosted deployment",
+      "Cloud hosted services available with cost"
+    ]
+  },
+  "prerequisites": [
+    "rabbitmq-installation-setup"
+  ],
+  "nextGuides": [],
+  "seo": {
+    "ko": {
+      "title": "RabbitMQ 메시지 큐 - 메시지 발행 및 처리 | CloudSetup.guide",
+      "description": "RabbitMQ에서 메시지를 발행하고 처리하는 방법을 배웁니다. 큐 생성, 발행자, 소비자 구현.",
+      "keywords": [
+        "RabbitMQ",
+        "메시지 큐",
+        "발행자",
+        "소비자",
+        "Exchange",
+        "Binding",
+        "비동기 처리"
+      ]
+    },
+    "en": {
+      "title": "RabbitMQ Message Queue - Publish and Process Messages | CloudSetup.guide",
+      "description": "Learn how to publish and process messages in RabbitMQ. Create queues, implement producers and consumers.",
+      "keywords": [
+        "RabbitMQ",
+        "message queue",
+        "producer",
+        "consumer",
+        "Exchange",
+        "Binding",
+        "asynchronous processing"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z",
+  "published": false
+}
