@@ -1,0 +1,246 @@
+# Firebase Cloud Firestore Setup - NoSQL Database
+
+Cloud Firestore is Firebase's **cloud-hosted NoSQL database**. It organizes data into documents and collections, providing real-time synchronization and powerful querying capabilities. This guide shows you how to set up Firestore and store your first data.
+
+<FreeTierInfo
+  service="Cloud Firestore"
+  limit="50,000 reads, 20,000 writes/day"
+  period="daily"
+  status="available"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Firebase project created", required: true },
+  { text: "Access to Firebase Console", required: true },
+  { text: "Basic understanding of data structures", required: false }
+]} />
+
+<Callout type="info">
+📚 **Firestore Data Structure**
+
+Firestore uses the following hierarchical structure:
+- **Collections**: Groups of documents (e.g., "users", "products")
+- **Documents**: Smallest unit of data (e.g., user1, product1)
+- **Fields**: Attributes within documents (e.g., name, age, email)
+</Callout>
+
+---
+
+<Step number={1} title="Create Firestore Database">
+
+Enable Firestore in the Firebase Console.
+
+1. In the Firebase Console left menu, select **"Firestore Database"**
+2. Click **"Create Database"** or **"Get Started"** button
+3. Choose your **startup mode**:
+   - **Production mode**: Enable security rules (recommended)
+   - **Test mode**: Allow all requests (testing only)
+4. For beginners, select **Test mode** (you can change it later)
+5. Select your **region** (Asia-Pacific: `asia-northeast1` - Tokyo recommended)
+6. Click **Create Database**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/firebase/firebase-firestore-setup-step1-en.png"
+  alt="Firestore database creation screen"
+  caption="Select startup mode and region, then create your database"
+/>
+
+<Callout type="warning">
+⚠️ **Test Mode Important Notes**
+
+Test mode automatically disables after 30 days. For production, you must set up security rules:
+```
+match /databases/{database}/documents {
+  match /{document=**} {
+    allow read, write: if request.auth != null;
+  }
+}
+```
+</Callout>
+
+<DevTip>
+Selecting an Asia-Pacific region provides faster response times for users in that area. The region cannot be changed after creation, so choose carefully.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={2} title="Create Your First Collection">
+
+Create a collection to store your data.
+
+1. Click **"Start Collection"** or **"+ Add Collection"** button
+2. Enter your **Collection ID** (e.g., "users", "posts", "products")
+   - Lowercase with hyphens recommended
+   - Spaces are not allowed
+3. Click **"Next"**
+4. Enter a **Document ID** (auto-generated or custom)
+   - Auto-generated creates a unique ID automatically
+5. Click **"Continue"**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/firebase/firebase-firestore-setup-step2-en.png"
+  alt="Collection creation screen"
+  caption="Enter your collection ID and add your first document"
+/>
+
+<Callout type="info">
+ℹ️ **Collection Naming Conventions**
+
+By convention, collection names should:
+- Use lowercase letters
+- Use plural names (e.g., "users" instead of "user")
+- Separate words with hyphens (e.g., "user-profiles")
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="Add Data to Documents">
+
+Add fields (attributes) and values to documents.
+
+1. Click **"Add Field"** in the document
+2. Enter **field name** (e.g., "name", "email", "age")
+3. Select **field type**:
+   - **String**: Text content
+   - **Number**: Integers or decimals
+   - **Boolean**: true/false values
+   - **Timestamp**: Date and time
+   - **Array**: Lists
+   - **Map**: Nested objects
+   - **Geo point**: Latitude/longitude
+4. Enter the **field value**
+5. Click **Save**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/firebase/firebase-firestore-setup-step3-en.png"
+  alt="Field addition screen"
+  caption="Specify field name, type, and value to store data"
+/>
+
+<CopyBlock
+  code="// Example Firestore document structure
+{
+  name: 'John Doe',
+  email: 'john@example.com',
+  age: 30,
+  isActive: true,
+  joinDate: 2026-02-08,
+  tags: ['admin', 'user'],
+  address: {
+    city: 'Seoul',
+    country: 'Korea'
+  }
+}"
+  language="javascript"
+/>
+
+</Step>
+
+---
+
+<Step number={4} title="Create Additional Documents">
+
+Add more documents to the same collection.
+
+1. On the collection page, click **"Add Document"** or **"+"** button
+2. Enter a new **Document ID** (auto-generated or custom)
+3. Add fields and values
+4. Click **Save**
+
+You can add multiple documents to build out your collection.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/firebase/firebase-firestore-setup-step4-en.png"
+  alt="Additional document creation screen"
+  caption="Add multiple documents to the same collection"
+/>
+
+<DevTip>
+To import or export large amounts of data, use Firebase Console's "Import" feature or Firebase CLI. You can upload multiple documents at once from CSV or JSON files.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={5} title="Understand Queries and Indexes">
+
+Learn about Firestore's querying capabilities.
+
+1. Check the **Indexes** tab for automatically created indexes
+2. Complex queries may require specific indexes
+3. Firestore automatically suggests needed indexes
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/firebase/firebase-firestore-setup-step5-en.png"
+  alt="Indexes and queries screen"
+  caption="Review auto-generated indexes and optimize complex queries"
+/>
+
+<Checkpoint
+  title="Verify Firestore Setup"
+  items={[
+    "Is your Firestore database created?",
+    "Can you see your collection and documents?",
+    "Are the fields saved correctly?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **Complete!** Cloud Firestore is now set up. You can now access this database from your web app. In the next guide, set up Firebase Authentication to add user authentication.
+</Callout>
+
+</Step>
+
+---
+
+## Next Steps
+
+Continue with these related guides:
+
+- **[Firebase Authentication Setup](/guides/firebase-auth-setup)**: Add user authentication
+- **[Firebase Storage Setup](/guides/firebase-storage-setup)**: Set up file storage
+
+---
+
+## Troubleshooting
+
+<Callout type="warning">
+⚠️ **"Permission Denied" Error Appears**
+
+If you cannot read or write data:
+1. Check your Firestore security rules
+2. Verify that Test mode is enabled
+3. Confirm that required indexes are created
+4. Update rules if you've set up Firebase Authentication
+</Callout>
+
+<DevTip>
+**Differences Between Firestore and Realtime Database**
+
+| Feature | Firestore | Realtime Database |
+|---------|-----------|-------------------|
+| Structure | Collections/Documents | JSON tree |
+| Querying | Powerful | Limited |
+| Indexing | Automatic | Manual |
+| Offline | Supported | Limited |
+| Recommended | Medium+ apps | Small apps |
+</DevTip>
+
+---
+
+## Firestore Tips and Best Practices
+
+**Data Structure Design Tips:**
+
+1. **Organize Collections**: Keep users, posts, comments, etc. clearly separated
+2. **Document Size**: Keep each document under 1MB (performance optimization)
+3. **Subcollections**: Use nested structures like users/[userId]/orders
+4. **Avoid Large Arrays**: Split 1000+ item lists into separate collections
+5. **Timestamps**: Store creation/modification times in separate fields

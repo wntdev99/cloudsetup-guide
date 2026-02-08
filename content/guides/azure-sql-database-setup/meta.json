@@ -1,0 +1,62 @@
+{
+  "slug": "azure-sql-database-setup",
+  "platform": "azure",
+  "service": "SQL Database",
+  "category": "database",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 25,
+  "totalSteps": 5,
+  "freeTier": {
+    "service": "Azure SQL Database",
+    "limit": "250GB 저장소, 12개월 무료",
+    "period": "monthly",
+    "amount": "무료",
+    "status": "available",
+    "conditions": [
+      "12개월 동안 월간 250GB 무료",
+      "단일 데이터베이스 (DTU 기반)",
+      "기본 성능 수준",
+      "자동 백업 포함",
+      "Geo-복제 지원",
+      "방화벽 및 보안 기능"
+    ]
+  },
+  "prerequisites": ["azure-account-setup"],
+  "nextGuides": [
+    "azure-vm-setup",
+    "azure-app-service-setup"
+  ],
+  "tags": ["azure", "sql-database", "database", "relational-database", "data"],
+  "seo": {
+    "ko": {
+      "title": "Azure SQL Database 설정 가이드 - 관계형 데이터베이스 | CloudSetup.guide",
+      "description": "Microsoft Azure SQL Database를 생성하고 설정하는 방법을 단계별로 안내합니다. 서버 생성, 데이터베이스 설정, 방화벽 규칙, 연결 문자열을 구성하세요.",
+      "keywords": [
+        "Azure SQL Database",
+        "SQL Database 설정",
+        "관계형 데이터베이스",
+        "Azure 데이터베이스",
+        "SQL Server",
+        "클라우드 데이터베이스",
+        "데이터베이스 생성"
+      ]
+    },
+    "en": {
+      "title": "Azure SQL Database Setup Guide - Relational Database | CloudSetup.guide",
+      "description": "Step-by-step guide to creating and configuring Microsoft Azure SQL Database. Set up server, configure database, firewall rules, and connection strings.",
+      "keywords": [
+        "Azure SQL Database",
+        "SQL Database setup",
+        "relational database",
+        "Azure database",
+        "SQL Server",
+        "cloud database",
+        "create database"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z",
+  "published": true
+}

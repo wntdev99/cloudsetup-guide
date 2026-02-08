@@ -1,0 +1,61 @@
+{
+  "slug": "github-actions-workflow-setup",
+  "platform": "github",
+  "service": "GitHub Actions",
+  "category": "general",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 25,
+  "totalSteps": 5,
+  "freeTier": {
+    "service": "GitHub Actions",
+    "limit": "월간 2,000분, 저장소당 동시 6개 작업",
+    "period": "monthly",
+    "amount": "무료",
+    "status": "generous",
+    "conditions": [
+      "월간 2,000분 실행 시간",
+      "저장소당 최대 6개 동시 작업",
+      "Linux, Windows, macOS 러너 지원",
+      "자체 호스팅 러너 무제한",
+      "Artifact 저장소 무제한",
+      "Action 재사용 지원"
+    ]
+  },
+  "prerequisites": [],
+  "nextGuides": [
+    "github-actions-deploy-setup"
+  ],
+  "tags": ["github", "actions", "ci-cd", "automation", "workflow", "testing"],
+  "seo": {
+    "ko": {
+      "title": "GitHub Actions 워크플로우 설정 가이드 - CI/CD 자동화 | CloudSetup.guide",
+      "description": "GitHub Actions를 사용하여 CI/CD 워크플로우를 생성하고 테스트, 빌드, 배포를 자동화하는 방법을 단계별로 안내합니다.",
+      "keywords": [
+        "GitHub Actions",
+        "워크플로우 생성",
+        "CI/CD",
+        "자동화",
+        "테스트 자동화",
+        "빌드 자동화",
+        "지속적 통합"
+      ]
+    },
+    "en": {
+      "title": "GitHub Actions Workflow Setup Guide - Automate CI/CD | CloudSetup.guide",
+      "description": "Step-by-step guide to creating GitHub Actions CI/CD workflows and automating testing, building, and deployment.",
+      "keywords": [
+        "GitHub Actions",
+        "workflow creation",
+        "CI/CD",
+        "automation",
+        "test automation",
+        "build automation",
+        "continuous integration"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z",
+  "published": true
+}

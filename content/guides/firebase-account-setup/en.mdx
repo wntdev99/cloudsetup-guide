@@ -1,0 +1,225 @@
+# Firebase Project Setup - Get Started for Free
+
+Firebase is a **backend service platform** provided by Google that allows app developers to use databases, authentication, storage, and more without managing their own servers. Follow this guide to create a Firebase project and start with the free Spark Plan in just 15 minutes.
+
+<FreeTierInfo
+  service="Firebase Spark Plan"
+  limit="Free limits"
+  period="unlimited"
+  status="generous"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Google Account (Gmail)", required: true },
+  { text: "Web browser", required: true },
+  { text: "Credit card (optional - Spark Plan is free)", required: false }
+]} />
+
+<Callout type="info">
+💡 **Benefits of Firebase Spark Plan**
+
+Firebase's free plan (Spark Plan) doesn't require a credit card to get started. It includes sufficient limits for small projects or learning purposes, and you can upgrade to a paid plan whenever needed.
+</Callout>
+
+---
+
+<Step number={1} title="Access Firebase Console">
+
+1. Open your web browser and go to [Firebase Console](https://console.firebase.google.com).
+2. Sign in with your Google account.
+3. When you first access, you'll see a "Get Started" or "Create Project" screen.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/firebase/firebase-account-setup-step1-en.png"
+  alt="Firebase Console initial screen"
+  caption="Sign in with your Google account to access the Firebase Console"
+/>
+
+<Callout type="tip">
+💡 **Tip**: Don't have a Google account? Create one at [Gmail signup](https://accounts.google.com/signup) first.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Create a New Project">
+
+1. Click the **"Create a project"** button
+2. Enter your **project name** (e.g., "My App", "Blog Project", etc.)
+3. Click **Next**
+4. Configure Google Analytics (optional)
+   - Check "Enable Google Analytics for this project"
+   - Enable this if you want Firebase analytics
+5. Click **Create project**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/firebase/firebase-account-setup-step2-en.png"
+  alt="Project creation screen"
+  caption="Enter your project name and choose Google Analytics option"
+/>
+
+<Callout type="info">
+ℹ️ **About Project Name**
+
+The project name is the display name you see in the Firebase Console. The actual Project ID is generated automatically and can be changed later.
+</Callout>
+
+<CopyBlock
+  code="// Firebase project structure
+// projects/
+//   my-firebase-project/
+//     databases/
+//     storage/
+//     authentication/
+//     functions/"
+  language="text"
+/>
+
+</Step>
+
+---
+
+<Step number={3} title="Configure Google Analytics (Optional)">
+
+If you enabled Google Analytics, select an analytics account:
+
+1. **Select an existing analytics account** or **create a new one**
+2. Review **data sharing settings**
+3. Click **Create project**
+4. Wait for Firebase to set up your project (1-2 minutes)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/firebase/firebase-account-setup-step3-en.png"
+  alt="Google Analytics configuration screen"
+  caption="Select or create a Google Analytics account for your project"
+/>
+
+<DevTip>
+You can add or remove Google Analytics later, so you don't need to set it up right now. You can change it anytime in the project settings.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={4} title="Firebase Project Setup Complete">
+
+Congratulations! 🎉 Your Firebase project has been successfully created.
+
+1. The Firebase Console main screen is now displayed
+2. In the left menu, you'll see various service options:
+   - **Realtime Database**: Real-time data synchronization
+   - **Firestore Database**: NoSQL document database
+   - **Authentication**: User authentication and sign-in
+   - **Storage**: File storage and uploads
+   - **Hosting**: Web app hosting
+   - **Functions**: Serverless functions
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/firebase/firebase-account-setup-step4-en.png"
+  alt="Firebase Console main screen"
+  caption="Your project is ready and all Firebase services are available"
+/>
+
+<Checkpoint
+  title="Verify Project Creation"
+  items={[
+    "Is the Firebase Console main screen displayed?",
+    "Can you see 'Realtime Database', 'Firestore', 'Authentication' in the left menu?",
+    "Is your project name shown at the top?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={5} title="Add App and Get Configuration Code">
+
+Now you can add a web, iOS, or Android app and get the Firebase SDK configuration code.
+
+1. Go to the **Project Overview** page in Firebase Console
+2. Click the **"Add app"** button
+3. Select **Web platform** (or iOS/Android)
+4. Enter your **app nickname** (e.g., "My Web App")
+5. Choose **Firebase Hosting setup** (optional)
+6. Click **Register app**
+7. Copy the **Firebase SDK configuration** code
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/firebase/firebase-account-setup-step5-en.png"
+  alt="App addition and SDK setup screen"
+  caption="Copy the app configuration code and add it to your project"
+/>
+
+<CopyBlock
+  code="// Firebase SDK Configuration Code
+const firebaseConfig = {
+  apiKey: 'YOUR_API_KEY',
+  authDomain: 'your-project.firebaseapp.com',
+  projectId: 'your-project-id',
+  storageBucket: 'your-project.appspot.com',
+  messagingSenderId: 'your-id',
+  appId: 'your-app-id'
+};"
+  language="javascript"
+/>
+
+<Callout type="success">
+✅ **Complete!** Your Firebase project is ready. You can now set up Cloud Firestore, Authentication, Storage, and other services. Check out the next guide to set up Cloud Firestore database.
+</Callout>
+
+</Step>
+
+---
+
+## Next Steps
+
+Continue with these guides:
+
+- **[Firebase Firestore Setup](/guides/firebase-firestore-setup)**: Set up NoSQL database
+- **[Firebase Authentication Setup](/guides/firebase-auth-setup)**: Add user authentication
+- **[Firebase Storage Setup](/guides/firebase-storage-setup)**: Enable file upload/download
+
+---
+
+## Troubleshooting
+
+<DevTip>
+**"Project creation failed"**
+
+If you see this error:
+1. Verify your Google account is in good standing
+2. Try a different browser or incognito mode
+3. Clear browser cache and try again
+4. Check the Firebase status page (https://status.firebase.google.com) for any outages
+</DevTip>
+
+<Callout type="warning">
+⚠️ **Project ID Considerations**
+
+- Project ID cannot be changed after creation
+- It's included in your Firebase app configuration code, so handle it securely
+- API keys are safe to make public, but always secure your database with proper rules
+</Callout>
+
+---
+
+## Firebase Services Overview
+
+**Realtime Database vs Firestore - Which one to choose?**
+
+| Feature | Realtime Database | Firestore |
+|---------|-------------------|-----------|
+| Data Structure | JSON | Collections + Documents |
+| Querying | Limited | Powerful queries |
+| Scalability | Lower | Higher |
+| Recommended For | Simple apps | Medium to large apps |
+
+Spark Plan Limits:
+- Realtime Database: 100 concurrent connections, 100 operations/hour
+- Firestore: 50,000 reads/day, 20,000 writes/day
+- Storage: 5GB limit

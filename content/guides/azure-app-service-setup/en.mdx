@@ -1,0 +1,250 @@
+# Azure App Service Setup - Deploy Web Apps
+
+Azure App Service is a **fully managed web hosting service** supporting Node.js, Python, .NET, Java, PHP, and more. It offers multiple deployment methods (GitHub, Local Git, Docker) and guarantees automatic scaling and high availability. This guide shows how to create and deploy a web app.
+
+<FreeTierInfo
+  service="Azure App Service"
+  limit="60 minutes/month free"
+  period="monthly"
+  status="limited"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Azure account created", required: true },
+  { text: "Access to Azure Portal", required: true },
+  { text: "Web app code to deploy (GitHub or local)", required: false }
+]} />
+
+<Callout type="info">
+🌐 **Azure App Service Features**
+
+- **Multi-language**: Node.js, Python, .NET, Java, PHP, etc.
+- **Auto deployment**: GitHub and Azure DevOps integration
+- **Auto scaling**: Automatically expands with traffic
+- **Security**: SSL/TLS, firewall, authentication support
+- **Monitoring**: Application Insights integration
+</Callout>
+
+---
+
+<Step number={1} title="Create App Service">
+
+Create a web app in Azure Portal.
+
+1. Sign in to [Azure Portal](https://portal.azure.com)
+2. Click **"Create a resource"**
+3. Search for **"App Service"**
+4. Select **"App Service"** (Microsoft publisher)
+5. Click **"Create"**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/azure/azure-app-service-setup-step1-en.png"
+  alt="App Service creation start"
+  caption="Start App Service creation in Azure Portal"
+/>
+
+<Callout type="tip">
+💡 **Tip**: Use the "Quick create" option to quickly create a web app.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Configure Basic Settings">
+
+Set up web app basic information.
+
+1. Select your **Subscription** (keep default)
+2. Create or select **Resource Group**
+3. Enter **Name**:
+   - Example: "mywebapp-2026"
+   - Must be globally unique (".azurewebsites.net" auto-added)
+4. Select **Publish** method:
+   - **"Code"**: Deploy source code
+   - **"Docker Container"**: Deploy container image
+5. Choose **Runtime Stack**:
+   - **Node.js**: JavaScript web app
+   - **Python**: Python application
+   - **.NET**: C# application
+   - **PHP**: PHP application
+   - **Java**: Java application
+6. Select **Version** (latest recommended)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/azure/azure-app-service-setup-step2-en.png"
+  alt="Basic settings screen"
+  caption="Configure web app basic info and runtime stack"
+/>
+
+<DevTip>
+Your app name becomes the URL, so choose a memorable, project-representative name.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="Configure App Service Plan">
+
+Select the App Service plan allocating computing resources.
+
+1. Select **App Service Plan**:
+   - Click **"Create new"** (create new plan)
+   - Or select existing plan
+2. Enter **Plan name** (e.g., "myappserviceplan")
+3. Select **Sku and size**:
+   - **Free tier (F1)**: 60 minutes/month (testing only)
+   - **Shared (D1)**: 24 hours (small apps)
+   - **Basic (B1)**: Basic performance (production recommended)
+4. For free tier, select "Change size" > "F1 Free"
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/azure/azure-app-service-setup-step3-en.png"
+  alt="App Service plan configuration screen"
+  caption="Select App Service plan and pricing tier"
+/>
+
+<Callout type="warning">
+⚠️ **Free Tier Limitations**
+
+- **60-minute limit**: Only 60 minutes monthly compute time
+- **Shared resources**: Server shared with other apps
+- **Limited features**: No custom domain, SSL, auto-scale
+- **Recommended**: For development/testing (B1+ for production)
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="Configure Deployment">
+
+Set up deployment source and continuous deployment.
+
+1. Go to **"Deployment"** tab
+2. Select **Deployment source**:
+   - **GitHub**: Auto-deploy from GitHub repo
+   - **Azure DevOps**: Azure DevOps pipelines
+   - **Local Git**: Deploy via local Git push
+   - **FTP**: Upload files via FTP
+3. If **GitHub** selected:
+   - Authenticate GitHub account
+   - Select repository to deploy
+   - Choose branch (e.g., "main")
+4. Enable **Continuous deployment** (if desired)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/azure/azure-app-service-setup-step4-en.png"
+  alt="Deployment configuration screen"
+  caption="Select deployment source and enable auto-deployment"
+/>
+
+<CopyBlock
+  code="// Azure App Service deployment methods
+// 1. GitHub auto-deployment (recommended)
+//    - Auto-deploy on GitHub push
+//    - CI/CD pipeline
+
+// 2. Local Git deployment
+//    git remote add azure <app-url>.git
+//    git push azure main
+
+// 3. Docker container
+//    docker build -t myapp .
+//    docker tag myapp:latest <registry>.azurecr.io/myapp
+//    docker push <registry>.azurecr.io/myapp
+
+// 4. FTP
+//    Use FileZilla or FTP client to upload files"
+  language="text"
+/>
+
+</Step>
+
+---
+
+<Step number={5} title="Deploy Web App and Access">
+
+Deploy the web app and access it.
+
+1. Click **"Create"** to complete App Service creation
+2. Click **"Go to resource"**
+3. In **App Service dashboard**:
+   - Click **"Browse"** in Essentials to view web app
+   - Or copy **URL** and access in browser
+4. **Check deployment status**:
+   - Go to **"Deployments"** menu to view history
+   - Go to **"Logs"** menu to view deployment logs
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/azure/azure-app-service-setup-step5-en.png"
+  alt="Web app deployment and access screen"
+  caption="Web app is deployed and accessible via URL"
+/>
+
+<Checkpoint
+  title="Verify App Service Deployment"
+  items={[
+    "Can you access the web app URL?",
+    "Is the web app running correctly?",
+    "Is deployment status 'Succeeded'?",
+    "Is the application working properly?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **Complete!** Your web app is deployed on Azure App Service. GitHub pushes now auto-deploy, and your application runs in the cloud. Next, set up custom domains, SSL, and monitoring.
+</Callout>
+
+</Step>
+
+---
+
+## Next Steps
+
+Expand web app features:
+
+- **[Azure SQL Database Setup](/guides/azure-sql-database-setup)**: Connect database
+- **[GitHub Actions Workflow Setup](/guides/github-actions-workflow-setup)**: Automate CI/CD
+
+---
+
+## Troubleshooting
+
+<DevTip>
+**"502 Bad Gateway or error page"**
+
+Check the following:
+1. View application logs (**"Log stream"** menu)
+2. Verify runtime version matches application
+3. Check required environment variables are set
+4. Confirm port is 80 or 8080
+5. Verify dependencies are installed properly
+</DevTip>
+
+<Callout type="warning">
+⚠️ **Free Tier Usage Notes**
+
+- **60-minute limit**: Only 60 minutes/month operation (auto-stops after)
+- **Periodic restart**: Auto-stops after 20 minutes inactivity
+- **Performance**: Shared resources cause slower performance
+- **Downtime**: Scheduled maintenance causes outages
+- **Upgrade**: B1+ tier recommended for better experience
+</Callout>
+
+---
+
+## App Service Plan Comparison
+
+| Feature | Free (F1) | Shared (D1) | Basic (B1) | Standard (S1) |
+|---------|----------|-----------|-----------|---------------|
+| Monthly hours | 60 min | Unlimited | Unlimited | Unlimited |
+| Memory | 1GB | 1GB | 1.75GB | 1.75GB |
+| Storage | 1GB | 1GB | 10GB | 50GB |
+| Auto-scale | No | No | No | Yes |
+| Custom domain | No | Yes | Yes | Yes |
+| SSL | No | No | Yes | Yes |
+| Cost | Free | $9.49 | $54.75 | $73 |

@@ -1,0 +1,337 @@
+# GitHub Actions 배포 설정 - 자동 배포 파이프라인
+
+GitHub Actions를 사용하여 **자동 배포 파이프라인**을 구성하면, 코드가 main 브랜치에 푸시될 때 자동으로 Azure, AWS, Docker 레지스트리 등으로 배포됩니다. 이는 수동 배포 과정을 없애고 개발 속도를 크게 향상시킵니다. 이 가이드에서는 실제 배포 워크플로우를 구성합니다.
+
+<FreeTierInfo
+  service="GitHub Actions"
+  limit="월간 2,000분 무료"
+  period="monthly"
+  status="generous"
+/>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "GitHub Actions 워크플로우 설정 완료", required: true },
+  { text: "클라우드 플랫폼 계정 (Azure, AWS 등)", required: true },
+  { text: "배포 플랫폼의 API 자격증명", required: true }
+]} />
+
+<Callout type="info">
+📦 **배포 자동화의 이점**
+
+- **속도**: 수동 배포 제거로 더 빠른 릴리스
+- **신뢰성**: 일관된 배포 프로세스
+- **오류 감소**: 자동 검증 및 테스트
+- **추적성**: 모든 배포 히스토리 기록
+- **롤백**: 필요시 이전 버전으로 복원 용이
+</Callout>
+
+---
+
+<Step number={1} title="배포 자격증명 등록">
+
+배포 플랫폼의 자격증명을 GitHub Secrets에 등록합니다.
+
+1. GitHub 리포지토리 **"Settings"** 탭 이동
+2. **"Secrets and variables"** > **"Actions"** 클릭
+3. **"New repository secret"** 클릭
+4. **배포 플랫폼별 자격증명 추가**:
+
+**Azure 배포 시:**
+- **AZURE_CREDENTIALS**: Azure Service Principal JSON
+- Azure CLI: `az ad sp create-for-rbac`
+
+**Docker Hub 배포 시:**
+- **DOCKER_USERNAME**: Docker Hub 사용자명
+- **DOCKER_PASSWORD**: Docker Hub 액세스 토큰
+
+**AWS 배포 시:**
+- **AWS_ACCESS_KEY_ID**: AWS 액세스 키
+- **AWS_SECRET_ACCESS_KEY**: AWS 시크릿 키
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/github/github-actions-deploy-setup-step1-ko.png"
+  alt="GitHub Secrets 등록 화면"
+  caption="GitHub Secrets에 배포 자격증명을 등록합니다"
+/>
+
+<Callout type="warning">
+⚠️ **보안 주의사항**
+
+- Secrets는 로그에 표시되지 않음
+- 절대 hardcode하거나 로그에 출력하지 마세요
+- 정기적으로 자격증명 로테이션
+- 최소 권한 원칙 적용 (필요한 권한만)
+- 배포 자격증명은 별도 계정 사용 권장
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="배포 워크플로우 작성">
+
+테스트 성공 후 배포하는 워크플로우를 작성합니다.
+
+<CopyBlock
+  code="name: CI/CD Deployment
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run tests
+      run: npm test
+
+    - name: Build project
+      run: npm run build
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Deploy to Azure
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: my-app-name
+        publish-profile: \${{ secrets.AZURE_PUBLISH_PROFILE }}
+        package: ."
+  language="yaml"
+/>
+
+주요 특징:
+- **build-and-test 작업**: 테스트와 빌드 수행
+- **deploy 작업**: 성공 후에만 배포 (needs: build-and-test)
+- **조건부 실행**: main 브랜치 푸시 시에만 배포 (if: 조건)
+- **Secrets 참조**: secrets.AZURE_PUBLISH_PROFILE
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/github/github-actions-deploy-setup-step2-ko.png"
+  alt="배포 워크플로우 작성"
+  caption="테스트 후 배포하는 워크플로우를 작성합니다"
+/>
+
+<DevTip>
+배포는 main 브랜치에만 하고, develop이나 feature 브랜치는 테스트만 수행하도록 하는 것이 안전합니다.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="배포 환경 설정">
+
+배포 환경을 구분하여 관리합니다.
+
+<CopyBlock
+  code="# GitHub Actions에서 배포 환경 설정
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+    environment: staging
+    if: github.ref == 'refs/heads/develop'
+    steps:
+      - uses: actions/checkout@v3
+      - name: Deploy to Staging
+        run: |
+          echo 'Deploying to staging environment'
+          # Staging 배포 스크립트
+
+  deploy-production:
+    runs-on: ubuntu-latest
+    environment: production
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v3
+      - name: Deploy to Production
+        run: |
+          echo 'Deploying to production'
+          # Production 배포 스크립트"
+  language="yaml"
+/>
+
+배포 환경 설정 방법:
+1. **Settings** > **Environments** 에서 환경 생성
+2. 환경별 보호 규칙 설정 (승인 필요 등)
+3. 환경별 Secrets 설정
+4. 워크플로우에서 `environment: production` 지정
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/github/github-actions-deploy-setup-step3-ko.png"
+  alt="배포 환경 설정 화면"
+  caption="Staging과 Production 환경을 분리하여 관리합니다"
+/>
+
+<Callout type="info">
+ℹ️ **배포 환경 구분의 이점**
+
+- **Staging**: 프로덕션 전 테스트
+- **Production**: 실제 사용자 서비스
+- **환경별 Secrets**: 다른 자격증명 사용
+- **보호 규칙**: 프로덕션 배포 전 승인 필요
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="배포 상태 모니터링">
+
+배포 실행 상태를 모니터링하고 문제를 해결합니다.
+
+1. 코드를 main 브랜치에 푸시
+2. GitHub **"Actions"** 탭 확인
+3. 워크플로우 실행 상태:
+   - **build-and-test**: 테스트/빌드 단계
+   - **deploy**: 배포 단계 (성공 시)
+4. **배포 로그 확인**:
+   - 각 단계별 로그 확인
+   - 배포 URL 및 상태 확인
+5. **배포 실패 시**:
+   - 로그에서 오류 메시지 확인
+   - 자격증명 유효성 재확인
+   - 배포 스크립트 수정 후 재시도
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/github/github-actions-deploy-setup-step4-ko.png"
+  alt="배포 상태 모니터링"
+  caption="Actions 탭에서 배포 상태를 실시간으로 모니터링합니다"
+/>
+
+<CopyBlock
+  code="# 배포 완료 후 상태 확인
+# 1. Azure Portal: App Service 확인
+# 2. 웹앱 URL 접속: https://myapp.azurewebsites.net
+# 3. GitHub Actions 로그: 배포 완료 메시지 확인
+# 4. Application Insights: 성능 및 오류 모니터링
+
+echo 'Check deployment at:'
+echo 'URL: \${{ steps.deploy.outputs.webapp-url }}'
+echo 'Status: Success or Failed'"
+  language="bash"
+/>
+
+</Step>
+
+---
+
+<Step number={5} title="고급 배포 기능">
+
+배포 파이프라인을 확장하고 최적화합니다.
+
+**Blue-Green 배포:**
+```yaml
+- name: Deploy Blue-Green
+  run: |
+    # 새 버전을 green 환경에 배포
+    # 트래픽을 green으로 전환
+    # 이전 버전 유지 (롤백 용이)
+```
+
+**배포 후 테스트:**
+```yaml
+- name: Run Smoke Tests
+  run: |
+    curl -f https://myapp.azurewebsites.net || exit 1
+    echo 'Deployment successful'
+```
+
+**Slack 알림:**
+```yaml
+- name: Notify Slack
+  uses: slackapi/slack-github-action@v1
+  with:
+    webhook-url: \${{ secrets.SLACK_WEBHOOK }}
+    payload: |
+      text: 'Deployment completed successfully'
+```
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/github/github-actions-deploy-setup-step5-ko.png"
+  alt="고급 배포 기능"
+  caption="배포 파이프라인에 고급 기능들을 추가합니다"
+/>
+
+<Checkpoint
+  title="배포 파이프라인 완료 확인"
+  items={[
+    "워크플로우가 실행되고 테스트를 통과했나요?",
+    "배포 단계가 완료되었나요?",
+    "배포된 앱에 접근할 수 있나요?",
+    "배포 로그에 오류가 없나요?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **완료!** GitHub Actions 자동 배포 파이프라인이 설정되었습니다. 이제 main 브랜치에 푸시하면 자동으로 테스트되고 배포됩니다. 개발 속도와 배포 안정성이 크게 향상됩니다.
+</Callout>
+
+</Step>
+
+---
+
+## 다음 단계
+
+배포 파이프라인을 더욱 고도화하세요:
+
+- **Azure App Service 모니터링**: Application Insights로 성능 추적
+- **로드 테스트**: 배포 후 성능 검증
+- **롤백 자동화**: 배포 실패 시 자동 롤백
+
+---
+
+## 문제 해결
+
+<DevTip>
+**"배포 실패 - 인증 오류"**
+
+다음을 확인하세요:
+1. GitHub Secrets에 자격증명이 정확히 등록되었는지 확인
+2. 자격증명의 유효 기간 확인
+3. 클라우드 플랫폼 계정 상태 확인 (활성화, 결제 등)
+4. 배포 대상 리소스가 존재하는지 확인
+5. 자격증명 권한이 충분한지 확인
+</DevTip>
+
+<Callout type="warning">
+⚠️ **배포 안전성 주의사항**
+
+1. **백업**: 배포 전 데이터 백업
+2. **스테이징**: 프로덕션 전 스테이징에서 테스트
+3. **롤백 계획**: 문제 발생 시 이전 버전으로 복구
+4. **모니터링**: 배포 후 에러 로그 모니터링
+5. **점진적 배포**: 사용자에게 영향 최소화
+</Callout>
+
+---
+
+## 배포 전략 비교
+
+| 전략 | 장점 | 단점 | 추천 상황 |
+|------|------|------|----------|
+| Rolling | 무중단 배포 | 복잡함 | 장시간 서비스 |
+| Blue-Green | 빠른 롤백 | 리소스 2배 | 중요 서비스 |
+| Canary | 위험 최소화 | 추적 복잡 | 대규모 서비스 |
+| Shadow | 영향 없음 | 리소스 낭비 | 위험 테스트 |

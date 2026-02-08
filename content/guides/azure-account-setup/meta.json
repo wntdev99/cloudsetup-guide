@@ -1,0 +1,61 @@
+{
+  "slug": "azure-account-setup",
+  "platform": "azure",
+  "service": "Azure Subscription",
+  "category": "general",
+  "difficulty": "beginner",
+  "estimatedMinutes": 15,
+  "totalSteps": 5,
+  "freeTier": {
+    "service": "Azure Free Account",
+    "limit": "200 달러 크레딧, 12개월 무료 서비스",
+    "period": "trial",
+    "amount": "무료",
+    "status": "generous",
+    "conditions": [
+      "가입 후 30일간 $200 크레딧",
+      "12개월 무료 서비스 (Virtual Machines, SQL Database, App Service)",
+      "25개 이상 서비스 항상 무료",
+      "신용카드 등록 필수 (자동 결제 없음)",
+      "크레딧 소진 후 사용자 동의 없이 자동 결제 안 함"
+    ]
+  },
+  "prerequisites": [],
+  "nextGuides": [
+    "azure-vm-setup",
+    "azure-app-service-setup"
+  ],
+  "tags": ["azure", "cloud", "microsoft", "account", "subscription", "free"],
+  "seo": {
+    "ko": {
+      "title": "Azure 계정 만들기 가이드 - $200 무료 크레딧 받기 | CloudSetup.guide",
+      "description": "Microsoft Azure 계정을 만들고 $200 무료 크레딧을 받는 방법을 단계별로 안내합니다. 12개월 무료 서비스와 함께 클라우드 개발을 시작하세요.",
+      "keywords": [
+        "Azure 계정 만들기",
+        "Azure 무료",
+        "$200 크레딧",
+        "Microsoft Azure",
+        "Azure 가입",
+        "Azure 시작하기",
+        "클라우드 플랫폼"
+      ]
+    },
+    "en": {
+      "title": "Create Azure Account - Get $200 Free Credits | CloudSetup.guide",
+      "description": "Step-by-step guide to creating a Microsoft Azure account and claiming $200 in free credits. Start cloud development with 12 months of free services.",
+      "keywords": [
+        "create Azure account",
+        "Azure free",
+        "$200 credits",
+        "Microsoft Azure",
+        "Azure signup",
+        "getting started Azure",
+        "cloud platform"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z",
+  "published": true
+}

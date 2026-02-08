@@ -1,0 +1,62 @@
+{
+  "slug": "firebase-account-setup",
+  "platform": "firebase",
+  "service": "Firebase Project",
+  "category": "general",
+  "difficulty": "beginner",
+  "estimatedMinutes": 15,
+  "totalSteps": 5,
+  "freeTier": {
+    "service": "Firebase Spark Plan",
+    "limit": "무료 제한 (스토리지 1GB, 연결 100명)",
+    "period": "unlimited",
+    "amount": "무료",
+    "status": "generous",
+    "conditions": [
+      "월간 무료 제한 포함",
+      "무제한 프로젝트 생성",
+      "5GB Cloud Storage",
+      "동시 연결 100명",
+      "100개의 Realtime Database 작업",
+      "신용카드 등록 불필요"
+    ]
+  },
+  "prerequisites": [],
+  "nextGuides": [
+    "firebase-firestore-setup",
+    "firebase-auth-setup"
+  ],
+  "tags": ["firebase", "project", "setup", "account", "backend", "realtime"],
+  "seo": {
+    "ko": {
+      "title": "Firebase 프로젝트 생성 가이드 - 무료로 시작하기 | CloudSetup.guide",
+      "description": "Google Firebase 프로젝트를 무료로 생성하는 방법을 단계별로 안내합니다. 신용카드 없이 Spark Plan으로 시작하고 Cloud Firestore와 Authentication을 사용할 수 있습니다.",
+      "keywords": [
+        "Firebase 프로젝트 생성",
+        "Firebase 무료",
+        "Firebase 설정",
+        "Google Firebase",
+        "Firebase 가입",
+        "실시간 데이터베이스",
+        "Firebase 시작하기"
+      ]
+    },
+    "en": {
+      "title": "Firebase Project Setup Guide - Get Started for Free | CloudSetup.guide",
+      "description": "Step-by-step guide to creating a Firebase project for free. Start with the Spark Plan without a credit card and use Cloud Firestore and Authentication.",
+      "keywords": [
+        "create Firebase project",
+        "Firebase free",
+        "Firebase setup",
+        "Google Firebase",
+        "Firebase signup",
+        "realtime database",
+        "getting started Firebase"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z",
+  "published": true
+}

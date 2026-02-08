@@ -1,0 +1,337 @@
+# GitHub Actions Deploy Setup - Automatic Deployment Pipeline
+
+Using GitHub Actions, you can create **automatic deployment pipelines** that deploy to Azure, AWS, Docker registries, and more when code is pushed to the main branch. This eliminates manual deployment and dramatically speeds up development. This guide configures a real deployment workflow.
+
+<FreeTierInfo
+  service="GitHub Actions"
+  limit="2,000 minutes/month free"
+  period="monthly"
+  status="generous"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "GitHub Actions workflow setup completed", required: true },
+  { text: "Cloud platform account (Azure, AWS, etc.)", required: true },
+  { text: "Deployment platform API credentials", required: true }
+]} />
+
+<Callout type="info">
+📦 **Benefits of Deployment Automation**
+
+- **Speed**: Faster releases without manual deployment
+- **Reliability**: Consistent deployment process
+- **Error reduction**: Automated validation and testing
+- **Traceability**: All deployment history recorded
+- **Rollback**: Easy revert to previous version if needed
+</Callout>
+
+---
+
+<Step number={1} title="Register Deployment Credentials">
+
+Register deployment platform credentials in GitHub Secrets.
+
+1. Go to **"Settings"** tab in GitHub repository
+2. Click **"Secrets and variables"** > **"Actions"**
+3. Click **"New repository secret"**
+4. **Add credentials by deployment platform**:
+
+**For Azure deployment:**
+- **AZURE_CREDENTIALS**: Azure Service Principal JSON
+- Use Azure CLI: `az ad sp create-for-rbac`
+
+**For Docker Hub deployment:**
+- **DOCKER_USERNAME**: Docker Hub username
+- **DOCKER_PASSWORD**: Docker Hub access token
+
+**For AWS deployment:**
+- **AWS_ACCESS_KEY_ID**: AWS access key
+- **AWS_SECRET_ACCESS_KEY**: AWS secret key
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/github/github-actions-deploy-setup-step1-en.png"
+  alt="GitHub Secrets registration screen"
+  caption="Register deployment credentials in GitHub Secrets"
+/>
+
+<Callout type="warning">
+⚠️ **Security Considerations**
+
+- Secrets are not shown in logs
+- Never hardcode or print to logs
+- Rotate credentials regularly
+- Apply least privilege principle (only necessary permissions)
+- Use separate account for deployment credentials
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Write Deployment Workflow">
+
+Write a workflow that deploys after successful testing.
+
+<CopyBlock
+  code="name: CI/CD Deployment
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run tests
+      run: npm test
+
+    - name: Build project
+      run: npm run build
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Deploy to Azure
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: my-app-name
+        publish-profile: \${{ secrets.AZURE_PUBLISH_PROFILE }}
+        package: ."
+  language="yaml"
+/>
+
+Key features:
+- **build-and-test job**: Performs testing and building
+- **deploy job**: Runs only after success (needs: build-and-test)
+- **Conditional execution**: Only deploys on main branch push
+- **Secrets reference**: secrets.AZURE_PUBLISH_PROFILE
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/github/github-actions-deploy-setup-step2-en.png"
+  alt="Write deployment workflow"
+  caption="Write workflow that deploys after testing"
+/>
+
+<DevTip>
+Deploy only to main branch and test-only for develop/feature branches—this is safer.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="Configure Deployment Environments">
+
+Manage separate deployment environments.
+
+<CopyBlock
+  code="# Set up deployment environments in GitHub Actions
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+    environment: staging
+    if: github.ref == 'refs/heads/develop'
+    steps:
+      - uses: actions/checkout@v3
+      - name: Deploy to Staging
+        run: |
+          echo 'Deploying to staging environment'
+          # Staging deployment script
+
+  deploy-production:
+    runs-on: ubuntu-latest
+    environment: production
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v3
+      - name: Deploy to Production
+        run: |
+          echo 'Deploying to production'
+          # Production deployment script"
+  language="yaml"
+/>
+
+How to set up deployment environments:
+1. Create environments in **Settings** > **Environments**
+2. Set protection rules per environment (require approval, etc.)
+3. Set environment-specific Secrets
+4. Specify `environment: production` in workflow
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/github/github-actions-deploy-setup-step3-en.png"
+  alt="Deployment environment setup screen"
+  caption="Separate Staging and Production environments"
+/>
+
+<Callout type="info">
+ℹ️ **Benefits of Separating Environments**
+
+- **Staging**: Test before production
+- **Production**: Real user service
+- **Environment-specific Secrets**: Different credentials per environment
+- **Protection rules**: Require approval before production deployment
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="Monitor Deployment Status">
+
+Monitor deployment execution and troubleshoot issues.
+
+1. Push code to main branch
+2. Check GitHub **"Actions"** tab
+3. Workflow execution status:
+   - **build-and-test**: Testing/building phase
+   - **deploy**: Deployment phase (if successful)
+4. **Check deployment logs**:
+   - Review logs for each step
+   - Check deployment URL and status
+5. **If deployment fails**:
+   - Find error messages in logs
+   - Re-verify credentials
+   - Modify deployment script and retry
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/github/github-actions-deploy-setup-step4-en.png"
+  alt="Monitor deployment status"
+  caption="Monitor deployment status in real-time in Actions tab"
+/>
+
+<CopyBlock
+  code="# Check status after deployment completion
+# 1. Azure Portal: Verify App Service
+# 2. Access web app URL: https://myapp.azurewebsites.net
+# 3. GitHub Actions logs: Check deployment complete message
+# 4. Application Insights: Monitor performance and errors
+
+echo 'Check deployment at:'
+echo 'URL: \${{ steps.deploy.outputs.webapp-url }}'
+echo 'Status: Success or Failed'"
+  language="bash"
+/>
+
+</Step>
+
+---
+
+<Step number={5} title="Advanced Deployment Features">
+
+Extend and optimize your deployment pipeline.
+
+**Blue-Green Deployment:**
+```yaml
+- name: Deploy Blue-Green
+  run: |
+    # Deploy new version to green environment
+    # Switch traffic to green
+    # Maintain previous version (easy rollback)
+```
+
+**Post-deployment testing:**
+```yaml
+- name: Run Smoke Tests
+  run: |
+    curl -f https://myapp.azurewebsites.net || exit 1
+    echo 'Deployment successful'
+```
+
+**Slack notifications:**
+```yaml
+- name: Notify Slack
+  uses: slackapi/slack-github-action@v1
+  with:
+    webhook-url: \${{ secrets.SLACK_WEBHOOK }}
+    payload: |
+      text: 'Deployment completed successfully'
+```
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/github/github-actions-deploy-setup-step5-en.png"
+  alt="Advanced deployment features"
+  caption="Add advanced features to your deployment pipeline"
+/>
+
+<Checkpoint
+  title="Verify Deployment Pipeline"
+  items={[
+    "Does workflow run and pass tests?",
+    "Does deployment phase complete?",
+    "Can you access deployed app?",
+    "Are there no errors in deployment logs?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **Complete!** GitHub Actions automatic deployment pipeline is set up. Now pushes to main branch automatically test and deploy. Development speed and deployment reliability greatly improve.
+</Callout>
+
+</Step>
+
+---
+
+## Next Steps
+
+Further enhance your deployment pipeline:
+
+- **Azure App Service Monitoring**: Track performance with Application Insights
+- **Load Testing**: Validate performance after deployment
+- **Automatic Rollback**: Auto-rollback on deployment failure
+
+---
+
+## Troubleshooting
+
+<DevTip>
+**"Deployment failed - authentication error"**
+
+Check the following:
+1. Verify credentials are correctly registered in GitHub Secrets
+2. Verify credential expiration date
+3. Check cloud platform account status (active, billing, etc.)
+4. Verify deployment target resource exists
+5. Verify credential permissions are sufficient
+</DevTip>
+
+<Callout type="warning">
+⚠️ **Deployment Safety Considerations**
+
+1. **Backup**: Backup data before deployment
+2. **Staging**: Test on staging before production
+3. **Rollback plan**: Plan to revert to previous version if issues occur
+4. **Monitoring**: Monitor error logs after deployment
+5. **Gradual deployment**: Minimize user impact
+</Callout>
+
+---
+
+## Deployment Strategy Comparison
+
+| Strategy | Advantages | Disadvantages | Recommended For |
+|----------|-----------|--------------|-----------------|
+| Rolling | Zero downtime | Complex | Long-running services |
+| Blue-Green | Quick rollback | 2x resources | Critical services |
+| Canary | Minimize risk | Complex tracking | Large-scale services |
+| Shadow | No impact | Resource waste | Risky testing |

@@ -1,0 +1,225 @@
+# Firebase 프로젝트 생성 - 무료로 시작하기
+
+Firebase는 Google이 제공하는 **백엔드 서비스** 플랫폼으로, 앱 개발자가 별도의 서버 없이도 데이터베이스, 인증, 스토리지 등을 사용할 수 있습니다. 이 가이드를 따라하면 15분 안에 Firebase 프로젝트를 생성하고 무료 Spark Plan으로 시작할 수 있습니다.
+
+<FreeTierInfo
+  service="Firebase Spark Plan"
+  limit="무료 제한"
+  period="무제한"
+  status="generous"
+/>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "Google 계정 (Gmail)", required: true },
+  { text: "웹 브라우저", required: true },
+  { text: "신용카드 (선택사항 - Spark Plan은 무료)", required: false }
+]} />
+
+<Callout type="info">
+💡 **Firebase Spark Plan의 장점**
+
+Firebase의 무료 플랜(Spark Plan)은 신용카드 등록 없이 바로 시작할 수 있습니다. 소규모 프로젝트나 학습 목적으로 충분한 제한이 포함되어 있으며, 필요할 때 유료 플랜으로 업그레이드할 수 있습니다.
+</Callout>
+
+---
+
+<Step number={1} title="Firebase 콘솔 접속">
+
+1. 웹브라우저에서 [Firebase 콘솔](https://console.firebase.google.com)에 접속합니다.
+2. Google 계정으로 로그인합니다.
+3. 처음 접속하면 "시작하기" 또는 "프로젝트 만들기" 화면이 나타납니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/firebase/firebase-account-setup-step1-ko.png"
+  alt="Firebase 콘솔 첫 화면"
+  caption="Google 계정으로 로그인하면 Firebase 콘솔에 접속됩니다"
+/>
+
+<Callout type="tip">
+💡 **팁**: Google 계정이 없다면 [Gmail 가입](https://accounts.google.com/signup)에서 먼저 만드세요.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="새 프로젝트 생성">
+
+1. **"프로젝트 만들기"** 버튼 클릭
+2. **프로젝트 이름** 입력 (예: "My App", "Blog Project" 등)
+3. **다음** 버튼 클릭
+4. Google Analytics 설정 (선택사항)
+   - "이 프로젝트에 Google Analytics 사용" 체크박스
+   - Firebase 데이터 분석이 필요하면 활성화하세요
+5. **프로젝트 만들기** 클릭
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/firebase/firebase-account-setup-step2-ko.png"
+  alt="프로젝트 생성 화면"
+  caption="프로젝트 이름을 입력하고 Google Analytics 옵션을 선택합니다"
+/>
+
+<Callout type="info">
+ℹ️ **프로젝트 이름에 대해**
+
+프로젝트 이름은 Firebase 콘솔에서 보는 표시명입니다. 실제 프로젝트 ID는 자동으로 생성되며, 나중에 변경할 수 있습니다.
+</Callout>
+
+<CopyBlock
+  code="// Firebase 프로젝트 구조
+// projects/
+//   my-firebase-project/
+//     databases/
+//     storage/
+//     authentication/
+//     functions/"
+  language="text"
+/>
+
+</Step>
+
+---
+
+<Step number={3} title="Google Analytics 설정 (선택사항)">
+
+Google Analytics를 활성화했다면 분석 계정을 선택합니다.
+
+1. **기존 분석 계정 선택** 또는 **새 계정 만들기**
+2. **데이터 공유 설정** 검토
+3. **프로젝트 만들기** 클릭
+4. Firebase가 프로젝트를 설정할 때까지 기다립니다 (1-2분)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/firebase/firebase-account-setup-step3-ko.png"
+  alt="Google Analytics 설정 화면"
+  caption="Google Analytics 계정을 선택하거나 새로 만듭니다"
+/>
+
+<DevTip>
+Google Analytics를 나중에 추가하거나 제거할 수 있으므로, 지금 바로 설정할 필요는 없습니다. 프로젝트 설정에서 언제든 변경 가능합니다.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={4} title="Firebase 프로젝트 설정 완료">
+
+축하합니다! 🎉 Firebase 프로젝트가 성공적으로 생성되었습니다.
+
+1. Firebase 콘솔 메인 화면이 표시됩니다
+2. 좌측 메뉴에서 다양한 서비스 항목이 보입니다:
+   - **Realtime Database**: 실시간 데이터베이스
+   - **Firestore Database**: NoSQL 데이터베이스
+   - **Authentication**: 사용자 인증
+   - **Storage**: 파일 저장소
+   - **Hosting**: 웹 앱 호스팅
+   - **Functions**: 서버리스 함수
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/firebase/firebase-account-setup-step4-ko.png"
+  alt="Firebase 콘솔 메인 화면"
+  caption="프로젝트가 생성되고 모든 Firebase 서비스를 사용할 수 있습니다"
+/>
+
+<Checkpoint
+  title="프로젝트 생성 완료 확인"
+  items={[
+    "Firebase 콘솔 메인 화면이 표시되나요?",
+    "좌측 메뉴에 'Realtime Database', 'Firestore', 'Authentication' 등이 보이나요?",
+    "프로젝트 이름이 상단에 표시되나요?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={5} title="앱 추가 및 설정 코드 받기">
+
+이제 웹, iOS, Android 앱을 추가하고 Firebase SDK 설정 코드를 받을 수 있습니다.
+
+1. Firebase 콘솔에서 **프로젝트 개요** 페이지로 이동
+2. **앱 추가** 버튼 클릭
+3. **웹 플랫폼** 선택 (또는 iOS/Android)
+4. **앱 애칭** 입력 (예: "My Web App")
+5. **Firebase 호스팅 설정** 옵션 (선택사항)
+6. **앱 등록** 클릭
+7. **Firebase SDK 추가** 코드 복사
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/firebase/firebase-account-setup-step5-ko.png"
+  alt="앱 추가 및 SDK 설정 화면"
+  caption="앱 설정 코드를 복사하여 프로젝트에 추가합니다"
+/>
+
+<CopyBlock
+  code="// Firebase SDK 설정 코드
+const firebaseConfig = {
+  apiKey: 'YOUR_API_KEY',
+  authDomain: 'your-project.firebaseapp.com',
+  projectId: 'your-project-id',
+  storageBucket: 'your-project.appspot.com',
+  messagingSenderId: 'your-id',
+  appId: 'your-app-id'
+};"
+  language="javascript"
+/>
+
+<Callout type="success">
+✅ **완료!** Firebase 프로젝트가 준비되었습니다. 이제 Cloud Firestore, Authentication, Storage 등의 서비스를 설정할 수 있습니다. 다음 가이드에서 Cloud Firestore 데이터베이스를 설정해보세요.
+</Callout>
+
+</Step>
+
+---
+
+## 다음 단계
+
+다음 가이드에서 계속 진행하세요:
+
+- **[Firebase Firestore 설정](/guides/firebase-firestore-setup)**: NoSQL 데이터베이스 설정
+- **[Firebase Authentication 설정](/guides/firebase-auth-setup)**: 사용자 인증 추가
+- **[Firebase Storage 설정](/guides/firebase-storage-setup)**: 파일 업로드/다운로드
+
+---
+
+## 문제 해결
+
+<DevTip>
+**"프로젝트 생성에 실패했습니다"**
+
+이 오류가 나타나면:
+1. Google 계정이 정상 상태인지 확인하세요
+2. 다른 브라우저 또는 시크릿 모드로 시도하세요
+3. 브라우저 캐시를 삭제하고 다시 시도하세요
+4. Firebase 상태 페이지(https://status.firebase.google.com)에서 장애 여부 확인
+</DevTip>
+
+<Callout type="warning">
+⚠️ **프로젝트 ID 주의사항**
+
+- 프로젝트 ID는 생성 후 변경할 수 없습니다
+- Firebase 앱 설정 코드에 포함되므로 보안상 주의가 필요합니다
+- API 키는 공개해도 되지만, 데이터베이스 규칙을 적절히 설정하여 보호하세요
+</Callout>
+
+---
+
+## Firebase 서비스 개요
+
+**Realtime Database vs Firestore - 어떤 것을 선택할까요?**
+
+| 항목 | Realtime Database | Firestore |
+|------|-------------------|-----------|
+| 데이터 구조 | JSON | 컬렉션 + 문서 |
+| 쿼리 | 제한적 | 강력한 쿼리 |
+| 확장성 | 낮음 | 높음 |
+| 추천 | 간단한 앱 | 중규모 이상 앱 |
+
+Spark Plan 제한사항:
+- Realtime Database: 100명 동시 연결, 100개 작업/시간
+- Firestore: 50,000개 읽기/일, 20,000개 쓰기/일
+- Storage: 5GB 제한

@@ -1,0 +1,61 @@
+{
+  "slug": "azure-vm-setup",
+  "platform": "azure",
+  "service": "Virtual Machines",
+  "category": "compute",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 30,
+  "totalSteps": 5,
+  "freeTier": {
+    "service": "Azure Virtual Machines",
+    "limit": "월간 750시간, 1vCPU, 1GB RAM",
+    "period": "monthly",
+    "amount": "무료",
+    "status": "available",
+    "conditions": [
+      "월간 750시간 무료 (약 1개 VM 계속 실행)",
+      "표준 B1s 인스턴스 (1vCPU, 1GB RAM)",
+      "Windows, Linux 모두 지원",
+      "네트워크 추가 요금 없음",
+      "12개월 동안 제공"
+    ]
+  },
+  "prerequisites": ["azure-account-setup"],
+  "nextGuides": [
+    "azure-app-service-setup",
+    "azure-sql-database-setup"
+  ],
+  "tags": ["azure", "virtual-machine", "vm", "windows", "linux", "compute"],
+  "seo": {
+    "ko": {
+      "title": "Azure 가상 머신 생성 및 관리 가이드 - VM 설정 | CloudSetup.guide",
+      "description": "Microsoft Azure에서 Windows/Linux 가상 머신을 생성하고 관리하는 방법을 단계별로 안내합니다. 무료 티어로 VM 실행 비용을 절감하세요.",
+      "keywords": [
+        "Azure Virtual Machine",
+        "Azure VM 생성",
+        "가상 머신",
+        "Azure 계산",
+        "Windows VM",
+        "Linux VM",
+        "클라우드 서버"
+      ]
+    },
+    "en": {
+      "title": "Azure Virtual Machine Creation and Management Guide - VM Setup | CloudSetup.guide",
+      "description": "Step-by-step guide to creating and managing Windows/Linux virtual machines on Microsoft Azure. Reduce VM running costs with the free tier.",
+      "keywords": [
+        "Azure Virtual Machine",
+        "create Azure VM",
+        "virtual machine",
+        "Azure compute",
+        "Windows VM",
+        "Linux VM",
+        "cloud server"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z",
+  "published": true
+}

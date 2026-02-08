@@ -1,0 +1,270 @@
+# Firebase Cloud Storage 설정 - 파일 업로드/다운로드
+
+Cloud Storage for Firebase는 **사용자 생성 콘텐츠를 저장**하는 클라우드 서비스입니다. 이미지, 동영상, 문서 등 모든 종류의 파일을 업로드하고 관리할 수 있으며, CDN을 통해 빠른 다운로드 속도를 제공합니다. 이 가이드에서는 Cloud Storage를 설정하고 파일을 업로드/다운로드하는 방법을 배웁니다.
+
+<FreeTierInfo
+  service="Cloud Storage for Firebase"
+  limit="5GB 저장공간"
+  period="unlimited"
+  status="generous"
+/>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "Firebase 프로젝트 생성 완료", required: true },
+  { text: "Firebase Authentication 설정 완료 (권장)", required: false },
+  { text: "파일 관리 기초 이해", required: false }
+]} />
+
+<Callout type="info">
+💾 **Cloud Storage의 특징**
+
+- **확장 가능**: 무제한 스토리지 (요금 기반)
+- **보안**: Firebase Security Rules로 접근 제어
+- **성능**: Google Cloud CDN으로 전 세계 빠른 배송
+- **구조화**: 폴더처럼 파일 구조 관리
+- **자동 스케일링**: 트래픽에 따라 자동으로 확장
+</Callout>
+
+---
+
+<Step number={1} title="Cloud Storage 활성화">
+
+Firebase 콘솔에서 Cloud Storage를 활성화합니다.
+
+1. Firebase 콘솔 좌측 메뉴에서 **"Storage"** 선택
+2. **"시작"** 또는 **"버킷 만들기"** 클릭
+3. **저장소 위치** 선택
+   - 한국: **"asia-northeast1 (도쿄)"** 권장
+   - 선택한 위치는 나중에 변경할 수 없음
+4. **보안 규칙** 선택:
+   - **테스트 모드**: 모든 요청 허용 (테스트 전용, 30일 후 자동 비활성화)
+   - **프로덕션 모드**: 보안 규칙 필요 (권장)
+5. **"완료"** 클릭
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/firebase/firebase-storage-setup-step1-ko.png"
+  alt="Cloud Storage 활성화 화면"
+  caption="저장소 위치와 보안 규칙을 선택하고 Cloud Storage를 활성화합니다"
+/>
+
+<DevTip>
+아시아 태평양 지역을 선택하면 한국 사용자에게 더 빠른 다운로드 속도를 제공합니다. 국제 서비스를 예상한다면 미국(us-central1) 지역을 선택하세요.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={2} title="Storage 규칙 설정">
+
+파일 접근 권한을 관리하는 보안 규칙을 설정합니다.
+
+1. **"Rules"** 탭으로 이동
+2. 기본 규칙 검토:
+   - 테스트 모드: `allow read, write: if true;` (모두 허용)
+   - 프로덕션 모드: `allow read, write: if false;` (모두 거부)
+3. 필요에 따라 규칙 수정:
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/firebase/firebase-storage-setup-step2-ko.png"
+  alt="Storage 보안 규칙 설정 화면"
+  caption="Firebase Security Rules로 파일 접근 권한을 관리합니다"
+/>
+
+<CopyBlock
+  code="// 기본 Storage 규칙 예시
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // 인증된 사용자만 읽기 허용
+    match /{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null
+        && request.auth.uid == resource.metadata.uid;
+    }
+  }
+}"
+  language="text"
+/>
+
+<Callout type="warning">
+⚠️ **프로덕션 환경 보안**
+
+기본 규칙은 매우 허용적이므로, 프로덕션 환경에서는 반드시 다음을 설정하세요:
+- 인증된 사용자만 접근 허용
+- 사용자는 자신의 파일만 접근 가능
+- 파일 크기 제한 설정
+- MIME 타입 검증
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="폴더 구조 생성 (콘솔 사용)">
+
+파일을 조직적으로 관리하기 위해 폴더를 생성합니다.
+
+1. **"Files"** 탭에서 파일 목록 확인
+2. **"폴더 만들기"** 또는 파일 업로드 시 폴더명 입력
+3. 권장 폴더 구조:
+   - `/uploads/` - 사용자 업로드 파일
+   - `/images/` - 이미지 리소스
+   - `/documents/` - 문서 파일
+   - `/users/{userId}/` - 사용자별 파일
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/firebase/firebase-storage-setup-step3-ko.png"
+  alt="폴더 구조 생성 화면"
+  caption="파일을 조직적으로 관리하기 위해 폴더 구조를 생성합니다"
+/>
+
+<DevTip>
+폴더 구조는 URL 경로와 동일하므로, 일관된 명명 규칙을 사용하세요. 소문자, 하이픈 또는 언더스코어를 권장합니다.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={4} title="파일 업로드 및 관리">
+
+콘솔을 통해 파일을 업로드하고 관리합니다.
+
+1. **"파일 업로드"** 또는 드래그앤드롭으로 파일 추가
+2. 파일 업로드 진행률 표시
+3. 업로드된 파일 목록:
+   - 파일 이름
+   - 파일 크기
+   - 업로드 날짜
+   - 다운로드 링크
+4. 파일 우측 메뉴 **"..."** 에서:
+   - **삭제**: 파일 삭제
+   - **복사 경로**: 파일 경로 복사
+   - **복사 공개 URL**: 공개 링크 복사 (규칙 확인 필요)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/firebase/firebase-storage-setup-step4-ko.png"
+  alt="파일 업로드 및 관리 화면"
+  caption="파일을 업로드하고 다운로드 링크 및 경로를 관리합니다"
+/>
+
+<CopyBlock
+  code="// Firebase Storage 파일 업로드 예시 (웹)
+import { getStorage, ref, uploadBytes } from 'firebase/storage';
+
+const storage = getStorage();
+const fileInput = document.getElementById('file-input');
+
+fileInput.addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  const storageRef = ref(storage, 'uploads/' + file.name);
+
+  await uploadBytes(storageRef, file);
+  console.log('파일 업로드 완료');
+});"
+  language="javascript"
+/>
+
+</Step>
+
+---
+
+<Step number={5} title="다운로드 URL 생성 및 사용">
+
+업로드된 파일의 다운로드 URL을 생성하고 공유합니다.
+
+1. 파일을 선택하고 **"..."** > **"공개 URL 복사"** (공개 파일인 경우)
+2. 또는 프로그래밍 방식으로 다운로드 URL 생성:
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/firebase/firebase-storage-setup-step5-ko.png"
+  alt="다운로드 URL 생성 화면"
+  caption="업로드된 파일의 공개 URL을 생성하고 공유합니다"
+/>
+
+<CopyBlock
+  code="// Firebase Storage 다운로드 URL 생성 예시
+import { getStorage, ref, getDownloadURL } from 'firebase/storage';
+
+const storage = getStorage();
+const fileRef = ref(storage, 'uploads/myfile.pdf');
+
+getDownloadURL(fileRef)
+  .then(url => {
+    console.log('다운로드 URL:', url);
+    // 링크에 사용하거나 API 응답에 포함
+  })
+  .catch(error => {
+    console.log('URL 생성 오류:', error.message);
+  });"
+  language="javascript"
+/>
+
+<Checkpoint
+  title="Cloud Storage 설정 완료 확인"
+  items={[
+    "Cloud Storage 버킷이 생성되었나요?",
+    "보안 규칙이 설정되었나요?",
+    "파일을 업로드할 수 있나요?",
+    "다운로드 URL을 생성할 수 있나요?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **완료!** Firebase Cloud Storage가 설정되었습니다. 이제 웹 앱에서 사용자가 파일을 업로드하고 다운로드할 수 있습니다. 다음 단계에서 복합 기능들을 구현하고 성능을 최적화하세요.
+</Callout>
+
+</Step>
+
+---
+
+## 다음 단계
+
+관련 기능을 더 배워보세요:
+
+- **[Firebase Firestore 설정](/guides/firebase-firestore-setup)**: 파일 메타데이터를 데이터베이스에 저장
+- **[Firebase Authentication 설정](/guides/firebase-auth-setup)**: 사용자별 파일 관리
+
+---
+
+## 문제 해결
+
+<DevTip>
+**"파일 업로드 실패 - 권한 없음"**
+
+이 오류가 나타나면:
+1. Storage 보안 규칙 확인 (테스트 모드 활성화?)
+2. 사용자가 인증되었는지 확인
+3. 파일 경로와 규칙이 일치하는지 확인
+4. 파일 크기가 제한을 초과하지 않는지 확인
+5. 브라우저 콘솔에서 상세 오류 메시지 확인
+</DevTip>
+
+<Callout type="warning">
+⚠️ **용량 및 비용 주의사항**
+
+무료 제한:
+- 5GB 저장 공간 (초과 시 유료)
+- 월간 1GB 다운로드 (초과 시 $0.12/GB)
+- 무료 업로드 (무제한)
+
+비용을 줄이려면:
+- 사용하지 않는 파일 정기적으로 삭제
+- 이미지 압축 및 최적화
+- CDN 캐싱 활용
+</Callout>
+
+---
+
+## Cloud Storage vs Firestore 저장소
+
+| 항목 | Cloud Storage | Firestore |
+|------|--------------|-----------|
+| 용도 | 파일/미디어 | 구조화된 데이터 |
+| 파일 타입 | 모든 형식 | JSON 형식 |
+| 쿼리 | 제한적 | 강력함 |
+| 가격 | 저장량 기반 | 읽기/쓰기 기반 |
+| 추천 | 이미지, 동영상 | 메타데이터, 설정 |

@@ -1,0 +1,62 @@
+{
+  "slug": "firebase-firestore-setup",
+  "platform": "firebase",
+  "service": "Cloud Firestore",
+  "category": "database",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 25,
+  "totalSteps": 5,
+  "freeTier": {
+    "service": "Cloud Firestore",
+    "limit": "50,000 읽기, 20,000 쓰기, 20,000 삭제/일",
+    "period": "daily",
+    "amount": "무료",
+    "status": "available",
+    "conditions": [
+      "월간 50,000개 문서 읽기",
+      "월간 20,000개 문서 쓰기",
+      "월간 20,000개 문서 삭제",
+      "저장 데이터: 첫 1GB 무료",
+      "네트워크: 월간 10GB 다운로드 무료",
+      "모바일 SDK 오프라인 영속성 지원"
+    ]
+  },
+  "prerequisites": ["firebase-account-setup"],
+  "nextGuides": [
+    "firebase-auth-setup",
+    "firebase-storage-setup"
+  ],
+  "tags": ["firebase", "firestore", "database", "nosql", "realtime", "data"],
+  "seo": {
+    "ko": {
+      "title": "Firebase Cloud Firestore 설정 가이드 - NoSQL 데이터베이스 시작 | CloudSetup.guide",
+      "description": "Firebase Cloud Firestore를 설정하고 컬렉션, 문서, 필드를 생성하는 방법을 단계별로 안내합니다. 무료 제한 범위 내에서 NoSQL 데이터베이스를 운영하세요.",
+      "keywords": [
+        "Firebase Firestore",
+        "Cloud Firestore 설정",
+        "NoSQL 데이터베이스",
+        "Firebase 데이터베이스",
+        "Firestore 컬렉션",
+        "문서 데이터베이스",
+        "Firebase 데이터 저장"
+      ]
+    },
+    "en": {
+      "title": "Firebase Cloud Firestore Setup Guide - NoSQL Database Basics | CloudSetup.guide",
+      "description": "Step-by-step guide to setting up Firebase Cloud Firestore and creating collections, documents, and fields. Manage your NoSQL database within free tier limits.",
+      "keywords": [
+        "Firebase Firestore",
+        "Cloud Firestore setup",
+        "NoSQL database",
+        "Firebase database",
+        "Firestore collections",
+        "document database",
+        "Firebase data storage"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z",
+  "published": true
+}

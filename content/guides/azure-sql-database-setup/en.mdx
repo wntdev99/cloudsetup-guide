@@ -1,0 +1,259 @@
+# Azure SQL Database Setup - Relational Database
+
+Azure SQL Database is a **fully managed relational database service** based on Microsoft SQL Server. It provides enterprise-grade features like automatic backups, security updates, and high availability while keeping setup and management simple. This guide shows how to create an Azure SQL Database and configure basic settings.
+
+<FreeTierInfo
+  service="Azure SQL Database"
+  limit="250GB storage, 12 months"
+  period="monthly"
+  status="available"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Azure account created", required: true },
+  { text: "Access to Azure Portal", required: true },
+  { text: "Basic SQL knowledge", required: false }
+]} />
+
+<Callout type="info">
+🗄️ **Azure SQL Database Features**
+
+- **Fully Managed**: Automatic patching, backups, security
+- **High Availability**: 99.99% SLA guaranteed
+- **Security**: Encryption, firewalls, auditing
+- **Scalability**: Adjust performance as needed
+- **Cost Effective**: Pay only for resources consumed
+</Callout>
+
+---
+
+<Step number={1} title="Create SQL Database Server">
+
+Create a SQL Database server in Azure Portal.
+
+1. Sign in to [Azure Portal](https://portal.azure.com)
+2. Click **"Create a resource"**
+3. Search for **"SQL Database"**
+4. Select **"SQL Database"**
+5. Click **"Create"**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/azure/azure-sql-database-setup-step1-en.png"
+  alt="SQL Database creation start"
+  caption="Start SQL Database creation in Azure Portal"
+/>
+
+<Callout type="tip">
+💡 **Tip**: Select the "Quick create" option to set up with default configuration quickly.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Configure Database Basics">
+
+Set up basic database information.
+
+1. Select your **Subscription** (keep default)
+2. Create or select **Resource Group**
+3. Enter **Database name**
+   - Example: "myappdb"
+   - Lowercase, numbers, hyphens only
+4. Create **Server**:
+   - Click **"Create new"**
+   - Enter **Server name** (must be globally unique)
+     - Example: "mysqlserver20260208"
+   - Select **Location** (recommended: East Asia)
+   - Enter **Server admin login** (e.g., sqladmin)
+   - Set **Password** (meeting complexity requirements)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/azure/azure-sql-database-setup-step2-en.png"
+  alt="Database basic settings screen"
+  caption="Configure database and server information"
+/>
+
+<DevTip>
+Server name must be globally unique, so including the current date or project name is recommended.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="Configure Compute and Storage">
+
+Set up database performance and storage.
+
+1. Select **Compute + Storage**:
+   - **Compute tier**: "Serverless" or "Provisioned"
+   - For free users: "Serverless" (auto-pause, cheaper)
+   - **Service tier**: Basic (B)
+   - **vCores**: 2 vCores (within free tier)
+   - **Storage**: 50GB (within free tier)
+
+2. **Backup Storage**:
+   - **Redundancy**: Local redundant storage (LRS)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/azure/azure-sql-database-setup-step3-en.png"
+  alt="Compute and storage configuration screen"
+  caption="Configure database performance and storage"
+/>
+
+<CopyBlock
+  code="// Azure SQL Database pricing calculation
+// Serverless compute tier:
+// - Auto-pause for cost savings
+// - Per vCore hourly cost
+// - Storage: monthly cost per GB
+// - Backup storage: 100% of database size free
+
+// Provisioned compute tier:
+// - Always running (higher performance)
+// - Fixed monthly cost
+// - Backups charged separately"
+  language="text"
+/>
+
+</Step>
+
+---
+
+<Step number={4} title="Configure Firewall Rules">
+
+Set up firewall rules to manage database access permissions.
+
+1. Go to **"Networking"** tab
+2. Select **"Public endpoint"** (access from current IP)
+3. **Add firewall rules**:
+   - Click **"Add current client IP address"**
+   - Your IP is automatically added
+4. Toggle **"Allow Azure services and resources to access this server"**
+   - Needed if accessing from Azure VM or App Service
+5. Click **"Save"**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/azure/azure-sql-database-setup-step4-en.png"
+  alt="Firewall rules configuration screen"
+  caption="Configure firewall rules to control database access"
+/>
+
+<Callout type="warning">
+⚠️ **Security Considerations**
+
+- Allow only necessary IPs
+- 0.0.0.0 - 255.255.255.255 rule allows all access (dangerous)
+- VNet integration recommended for production
+- Regularly review and remove unnecessary rules
+</Callout>
+
+</Step>
+
+---
+
+<Step number={5} title="Database Connection and Queries">
+
+Connect to the created database and run basic queries.
+
+1. Go to **SQL Database page**
+2. Check **Connection strings**:
+   - **ADO.NET**: For .NET applications
+   - **JDBC**: For Java applications
+   - **ODBC**: For Python/Node.js applications
+   - **PHP**: For PHP applications
+
+3. Use **Query Editor**:
+   - Click "Query editor" in Azure Portal
+   - Sign in with server admin account and password
+   - Execute SQL queries
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/azure/azure-sql-database-setup-step5-en.png"
+  alt="Database connection and query screen"
+  caption="Check connection strings and run queries in Query editor"
+/>
+
+<CopyBlock
+  code="// Azure SQL Database basic query examples
+-- Create table
+CREATE TABLE Users (
+  UserID INT PRIMARY KEY IDENTITY(1,1),
+  Username NVARCHAR(100) NOT NULL,
+  Email NVARCHAR(100) NOT NULL,
+  CreatedDate DATETIME DEFAULT GETDATE()
+);
+
+-- Insert data
+INSERT INTO Users (Username, Email)
+VALUES ('john_doe', 'john@example.com');
+
+-- Query data
+SELECT * FROM Users;"
+  language="sql"
+/>
+
+<Checkpoint
+  title="Verify SQL Database Setup"
+  items={[
+    "Is SQL Database created?",
+    "Is server admin account configured?",
+    "Are firewall rules set up?",
+    "Can you run queries in Query editor?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **Complete!** Azure SQL Database is configured. You can now connect applications to this database to store and query data. Next, deploy a web app using Azure App Service.
+</Callout>
+
+</Step>
+
+---
+
+## Next Steps
+
+Set up related Azure services:
+
+- **[Azure App Service Setup](/guides/azure-app-service-setup)**: Deploy web applications
+- **[Azure Virtual Machine Setup](/guides/azure-vm-setup)**: Configure virtual machines
+
+---
+
+## Troubleshooting
+
+<DevTip>
+**"Database connection failed"**
+
+Check the following:
+1. Verify firewall rules allow your current IP
+2. Confirm server name and database name are correct
+3. Verify admin username and password are correct
+4. Check connection string format is correct
+5. Test in "Query editor" in Azure Portal
+</DevTip>
+
+<Callout type="warning">
+⚠️ **Performance and Cost Optimization**
+
+- **Serverless compute**: Auto-pause saves costs
+- **Backup policy**: Auto backups retained 7 days (default)
+- **Storage optimization**: Clean up unnecessary data
+- **Indexing**: Improve query performance
+- **Scaling**: Adjust performance based on traffic
+</Callout>
+
+---
+
+## SQL Database vs Other Database Services
+
+| Feature | SQL Database | Cosmos DB | PostgreSQL |
+|---------|-------------|-----------|-----------|
+| Type | Relational | NoSQL | Relational |
+| Schema | Fixed | Flexible | Fixed |
+| Query | SQL | Document API | SQL |
+| Recommended For | Traditional apps | Scaling apps | Open source preference |
+| Performance | High | Ultra-fast | Medium |

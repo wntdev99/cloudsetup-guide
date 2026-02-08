@@ -1,0 +1,62 @@
+{
+  "slug": "firebase-auth-setup",
+  "platform": "firebase",
+  "service": "Firebase Authentication",
+  "category": "auth",
+  "difficulty": "intermediate",
+  "estimatedMinutes": 25,
+  "totalSteps": 5,
+  "freeTier": {
+    "service": "Firebase Authentication",
+    "limit": "월간 50,000 활성 사용자",
+    "period": "monthly",
+    "amount": "무료",
+    "status": "generous",
+    "conditions": [
+      "월간 50,000개 활성 사용자",
+      "모든 제공자(Email, Google, Facebook 등) 지원",
+      "SMS 인증 포함",
+      "다중 인증 지원",
+      "커스텀 클레임 지원",
+      "사용자 관리 API 포함"
+    ]
+  },
+  "prerequisites": ["firebase-account-setup"],
+  "nextGuides": [
+    "firebase-firestore-setup",
+    "firebase-storage-setup"
+  ],
+  "tags": ["firebase", "authentication", "auth", "signin", "security", "users"],
+  "seo": {
+    "ko": {
+      "title": "Firebase Authentication 설정 가이드 - 사용자 인증 구현 | CloudSetup.guide",
+      "description": "Firebase Authentication을 설정하고 이메일/비밀번호 인증, Google 로그인, Facebook 로그인 등을 구현하는 방법을 단계별로 안내합니다.",
+      "keywords": [
+        "Firebase Authentication",
+        "Firebase 인증",
+        "사용자 로그인",
+        "Google 로그인",
+        "Facebook 로그인",
+        "이메일 인증",
+        "Firebase 보안"
+      ]
+    },
+    "en": {
+      "title": "Firebase Authentication Setup Guide - Implement User Authentication | CloudSetup.guide",
+      "description": "Step-by-step guide to setting up Firebase Authentication and implementing email/password, Google Sign-In, Facebook Login, and other sign-in methods.",
+      "keywords": [
+        "Firebase Authentication",
+        "Firebase auth",
+        "user signin",
+        "Google signin",
+        "Facebook login",
+        "email authentication",
+        "Firebase security"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T00:00:00.000Z",
+  "updatedAt": "2026-02-08T00:00:00.000Z",
+  "lastVerified": "2026-02-08T00:00:00.000Z",
+  "published": true
+}

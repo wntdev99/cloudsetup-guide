@@ -1,0 +1,261 @@
+# Azure Virtual Machine 생성 및 관리
+
+Azure Virtual Machines(VMs)는 **클라우드 기반 컴퓨팅 리소스**로, Windows 또는 Linux 서버를 온디맨드로 제공합니다. 개발, 테스팅, 프로덕션 애플리케이션 실행에 이상적이며, 유연한 스케일링과 관리 기능을 제공합니다. 이 가이드에서는 Azure VM을 생성하고 기본 설정을 구성합니다.
+
+<FreeTierInfo
+  service="Azure Virtual Machines"
+  limit="월간 750시간 무료"
+  period="monthly"
+  status="available"
+/>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "Azure 계정 생성 완료", required: true },
+  { text: "Azure Portal 접속 가능", required: true },
+  { text: "Linux/Windows 기본 이해", required: false }
+]} />
+
+<Callout type="info">
+💻 **Azure VM의 특징**
+
+- **유연성**: Windows와 Linux OS 선택 가능
+- **스케일링**: 필요에 따라 크기 조정 (보장된 가동시간)
+- **관리형 디스크**: 안전한 데이터 저장
+- **네트워킹**: VNet, 로드 밸런싱, 방화벽
+- **보안**: 암호화, 방화벽, 가상 네트워크
+</Callout>
+
+---
+
+<Step number={1} title="Azure Portal에서 Virtual Machine 생성">
+
+Azure Portal을 통해 새로운 VM을 생성합니다.
+
+1. [Azure Portal](https://portal.azure.com)에 로그인
+2. 좌측 메뉴에서 **"리소스 만들기"** 클릭
+3. 검색 상자에 **"Virtual Machine"** 입력
+4. 결과에서 **"Virtual Machines"** 선택 (Microsoft 게시자)
+5. **"만들기"** 클릭
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/azure/azure-vm-setup-step1-ko.png"
+  alt="VM 생성 시작 화면"
+  caption="Azure Portal에서 Virtual Machine 생성을 시작합니다"
+/>
+
+<Callout type="tip">
+💡 **팁**: 빠른 생성을 위해 **"간단한 만들기"** 옵션을 선택하면 기본 설정으로 VM을 빠르게 만들 수 있습니다.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="기본 설정 구성">
+
+VM의 기본 정보를 설정합니다.
+
+1. **구독** 선택 (기본값 유지)
+2. **리소스 그룹** 새로 생성 또는 선택
+   - 예: "my-resource-group"
+3. **가상 머신 이름** 입력
+   - 예: "myvm001"
+4. **지역** 선택 (권장: East Asia - 홍콩 또는 Southeast Asia - 싱가포르)
+5. **이미지** 선택:
+   - **Windows Server 2022**: Windows 기반
+   - **Ubuntu 22.04 LTS**: Linux 기반 (무료 옵션)
+6. **크기** 선택:
+   - 무료: **Standard_B1s** (1vCPU, 1GB RAM)
+   - 유료: 다양한 옵션 available
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/azure/azure-vm-setup-step2-ko.png"
+  alt="기본 설정 화면"
+  caption="VM의 기본 정보를 설정합니다"
+/>
+
+<DevTip>
+무료 서비스로 VM을 실행하려면 Standard_B1s 크기를 선택하고, 월간 750시간을 초과하지 않도록 주의하세요.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="관리자 계정 설정">
+
+VM에 로그인할 관리자 계정을 설정합니다.
+
+**Windows VM의 경우:**
+1. **인증 타입**: "비밀번호" 선택
+2. **사용자 이름** 입력 (예: "azureuser")
+3. **비밀번호** 설정 (최소 12자, 복잡도 요구사항 충족)
+4. **비밀번호 확인**
+
+**Linux VM의 경우:**
+1. **인증 타입** 선택:
+   - **SSH 공개 키**: 더 안전함
+   - **비밀번호**: 더 간단함
+2. 선택한 인증 방식에 따라 설정
+3. **사용자 이름** (보통 "azureuser")
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/azure/azure-vm-setup-step3-ko.png"
+  alt="관리자 계정 설정 화면"
+  caption="VM 접근을 위한 관리자 계정을 설정합니다"
+/>
+
+<Callout type="warning">
+⚠️ **보안 주의사항**
+
+- 강력한 비밀번호 사용 (최소 12자, 문자, 숫자, 특수문자 포함)
+- SSH 공개 키를 권장 (Linux)
+- 비밀번호를 안전한 곳에 보관
+- 정기적으로 비밀번호 변경
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="네트워킹 및 방화벽 설정">
+
+VM의 네트워크 설정과 공개 접근 규칙을 구성합니다.
+
+1. **가상 네트워크** 생성 또는 선택 (기본값 생성)
+2. **서브넷** 확인 (기본값 유지)
+3. **공용 IP** 할당:
+   - "새로 만들기" 선택 (원격 접근 필요 시)
+   - "없음" 선택 (프라이빗 사용 시)
+4. **NIC 네트워크 보안 그룹** (NSG):
+   - **기본**: 기본 규칙만
+   - **고급**: 커스텀 규칙
+5. **RDP 선택 포트** (Windows): 기본 포트 3389
+6. **SSH 선택 포트** (Linux): 기본 포트 22
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/azure/azure-vm-setup-step4-ko.png"
+  alt="네트워킹 설정 화면"
+  caption="공개 IP, 가상 네트워크, 보안 규칙을 설정합니다"
+/>
+
+<CopyBlock
+  code="// Azure VM 네트워킹 기본 설정
+// 가상 네트워크(VNet): 192.168.0.0/16
+// 서브넷: 192.168.1.0/24
+// 공용 IP: 자동 할당
+// NSG 규칙:
+//   - RDP (3389): 원격 데스크톱
+//   - SSH (22): Secure Shell
+//   - HTTP (80): 웹 트래픽
+//   - HTTPS (443): 보안 웹 트래픽"
+  language="text"
+/>
+
+</Step>
+
+---
+
+<Step number={5} title="VM 생성 및 연결">
+
+VM을 생성하고 원격으로 연결합니다.
+
+1. **검토 + 만들기** 탭에서 설정 확인
+2. **만들기** 클릭
+3. 배포 완료 대기 (2-5분)
+4. **리소스로 이동** 클릭
+5. VM 대시보드에서:
+   - **공용 IP** 주소 확인
+   - **상태**: "실행 중" 확인
+
+**VM 연결:**
+
+**Windows - RDP 사용:**
+1. **연결** 버튼 클릭
+2. RDP 파일 다운로드
+3. 원격 데스크톱 클라이언트로 열기
+4. 관리자 계정과 비밀번호로 로그인
+
+**Linux - SSH 사용:**
+1. **연결** 버튼 클릭
+2. SSH 명령어 복사
+3. 터미널에서 실행: `ssh -i <key> azureuser@<public-ip>`
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/azure/azure-vm-setup-step5-ko.png"
+  alt="VM 생성 완료 및 연결 화면"
+  caption="VM이 생성되고 공용 IP로 원격 연결할 수 있습니다"
+/>
+
+<Checkpoint
+  title="Azure VM 생성 완료 확인"
+  items={[
+    "VM의 상태가 '실행 중'인가요?",
+    "공용 IP 주소가 할당되었나요?",
+    "RDP 또는 SSH로 연결할 수 있나요?",
+    "관리자 계정으로 로그인했나요?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **완료!** Azure Virtual Machine이 생성되고 실행 중입니다. 이제 웹서버, 개발 환경, 애플리케이션 등을 설치하고 실행할 수 있습니다. 다음 가이드에서 Azure App Service나 SQL Database 설정으로 진행하세요.
+</Callout>
+
+</Step>
+
+---
+
+## 다음 단계
+
+관련 Azure 서비스를 설정하세요:
+
+- **[Azure App Service 설정](/guides/azure-app-service-setup)**: 웹앱 배포
+- **[Azure SQL Database 설정](/guides/azure-sql-database-setup)**: 데이터베이스 구성
+
+---
+
+## 문제 해결
+
+<DevTip>
+**"VM 연결 실패 - 시간 초과"**
+
+다음을 확인하세요:
+1. VM의 상태가 "실행 중"인지 확인
+2. 네트워크 보안 그룹(NSG)에서 RDP(3389) 또는 SSH(22) 포트가 열려있는지 확인
+3. 방화벽 설정 확인 (Windows 방화벽)
+4. 공용 IP 주소가 올바른지 확인
+5. 비밀번호가 올바른지 재확인
+</DevTip>
+
+<Callout type="warning">
+⚠️ **무료 제한 주의사항**
+
+- **월간 750시간**: 약 1개 VM을 지속적으로 실행하는 양
+- 초과 시 시간당 요금 청구
+- 우주 크기: Standard_B1s만 무료
+- 데이터 전송: 100GB 이상 시 요금
+- 저장소: 관리형 디스크 요금 발생
+</Callout>
+
+---
+
+## 일반적인 VM 설정 및 구성
+
+**웹서버 설정:**
+```
+Linux (Ubuntu):
+sudo apt update && sudo apt install nginx
+sudo systemctl start nginx
+sudo systemctl enable nginx
+
+Windows:
+IIS 설치 (서버 관리자)
+```
+
+**방화벽 규칙 추가:**
+1. Azure Portal > NSG > 인바운드 보안 규칙
+2. "추가" 클릭
+3. 포트 범위, 프로토콜, 원본 지정
+4. "추가" 클릭

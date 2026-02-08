@@ -1,0 +1,261 @@
+# Azure Virtual Machine Creation and Management
+
+Azure Virtual Machines (VMs) are **cloud-based computing resources** that provide on-demand Windows or Linux servers. Perfect for development, testing, and production applications with flexible scaling and management capabilities. This guide shows you how to create an Azure VM and configure basic settings.
+
+<FreeTierInfo
+  service="Azure Virtual Machines"
+  limit="750 hours/month free"
+  period="monthly"
+  status="available"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Azure account created", required: true },
+  { text: "Access to Azure Portal", required: true },
+  { text: "Basic Linux/Windows knowledge", required: false }
+]} />
+
+<Callout type="info">
+💻 **Azure VM Features**
+
+- **Flexibility**: Choose Windows or Linux OS
+- **Scaling**: Resize as needed (guaranteed uptime)
+- **Managed Disks**: Secure data storage
+- **Networking**: VNet, load balancing, firewalls
+- **Security**: Encryption, firewalls, virtual networks
+</Callout>
+
+---
+
+<Step number={1} title="Create Virtual Machine in Azure Portal">
+
+Create a new VM through the Azure Portal.
+
+1. Sign in to [Azure Portal](https://portal.azure.com)
+2. Click **"Create a resource"** in the left menu
+3. Type **"Virtual Machine"** in the search box
+4. Select **"Virtual Machines"** (Microsoft publisher)
+5. Click **"Create"**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/azure/azure-vm-setup-step1-en.png"
+  alt="VM creation start screen"
+  caption="Start Virtual Machine creation in Azure Portal"
+/>
+
+<Callout type="tip">
+💡 **Tip**: For quick creation, select the **"Quick create"** option to create a VM with default settings.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Configure Basic Settings">
+
+Set up basic VM information.
+
+1. Select your **Subscription** (keep default)
+2. Create new or select existing **Resource Group**
+   - Example: "my-resource-group"
+3. Enter **Virtual Machine name**
+   - Example: "myvm001"
+4. Select **Region** (recommended: East Asia - Hong Kong or Southeast Asia - Singapore)
+5. Select **Image**:
+   - **Windows Server 2022**: Windows-based
+   - **Ubuntu 22.04 LTS**: Linux-based (free option)
+6. Choose **Size**:
+   - Free: **Standard_B1s** (1vCPU, 1GB RAM)
+   - Paid: Various options available
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/azure/azure-vm-setup-step2-en.png"
+  alt="Basic settings screen"
+  caption="Configure VM basic information"
+/>
+
+<DevTip>
+To run a VM for free, select Standard_B1s size and keep usage under 750 hours per month.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="Configure Administrator Account">
+
+Set up the admin account for VM login.
+
+**For Windows VM:**
+1. **Authentication type**: Select "Password"
+2. Enter **Username** (e.g., "azureuser")
+3. Set **Password** (min 12 chars, meeting complexity requirements)
+4. **Confirm Password**
+
+**For Linux VM:**
+1. Select **Authentication type**:
+   - **SSH public key**: More secure
+   - **Password**: Simpler
+2. Configure based on chosen method
+3. **Username** (usually "azureuser")
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/azure/azure-vm-setup-step3-en.png"
+  alt="Administrator account setup screen"
+  caption="Set up admin account for VM access"
+/>
+
+<Callout type="warning">
+⚠️ **Security Considerations**
+
+- Use strong passwords (min 12 chars, letters, numbers, special chars)
+- SSH public keys recommended (Linux)
+- Store passwords securely
+- Change passwords regularly
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="Configure Networking and Firewall">
+
+Set up VM network settings and public access rules.
+
+1. Create new or select existing **Virtual Network**
+2. Confirm **Subnet** (keep default)
+3. Allocate **Public IP**:
+   - "Create new" (if remote access needed)
+   - "None" (for private use)
+4. **Network Security Group** (NSG):
+   - **Basic**: Default rules only
+   - **Advanced**: Custom rules
+5. **RDP Select Port** (Windows): Default 3389
+6. **SSH Select Port** (Linux): Default 22
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/azure/azure-vm-setup-step4-en.png"
+  alt="Networking settings screen"
+  caption="Configure public IP, virtual network, and security rules"
+/>
+
+<CopyBlock
+  code="// Azure VM basic networking setup
+// Virtual Network (VNet): 192.168.0.0/16
+// Subnet: 192.168.1.0/24
+// Public IP: Auto-assigned
+// NSG Rules:
+//   - RDP (3389): Remote Desktop
+//   - SSH (22): Secure Shell
+//   - HTTP (80): Web traffic
+//   - HTTPS (443): Secure web traffic"
+  language="text"
+/>
+
+</Step>
+
+---
+
+<Step number={5} title="Create VM and Connect">
+
+Create the VM and connect remotely.
+
+1. In **Review + create** tab, verify settings
+2. Click **Create**
+3. Wait for deployment (2-5 minutes)
+4. Click **Go to resource**
+5. On VM dashboard:
+   - Note the **Public IP** address
+   - Verify **Status**: "Running"
+
+**Connect to VM:**
+
+**Windows - Using RDP:**
+1. Click **Connect** button
+2. Download RDP file
+3. Open with Remote Desktop client
+4. Sign in with admin account and password
+
+**Linux - Using SSH:**
+1. Click **Connect** button
+2. Copy SSH command
+3. Run in terminal: `ssh -i <key> azureuser@<public-ip>`
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/azure/azure-vm-setup-step5-en.png"
+  alt="VM creation complete and connection screen"
+  caption="VM is created and can be accessed remotely via public IP"
+/>
+
+<Checkpoint
+  title="Verify Azure VM Creation"
+  items={[
+    "Is VM status 'Running'?",
+    "Is public IP address assigned?",
+    "Can you connect via RDP or SSH?",
+    "Can you sign in with admin account?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **Complete!** Your Azure Virtual Machine is created and running. You can now install web servers, development environments, applications, and more. Next, proceed with Azure App Service or SQL Database setup.
+</Callout>
+
+</Step>
+
+---
+
+## Next Steps
+
+Set up related Azure services:
+
+- **[Azure App Service Setup](/guides/azure-app-service-setup)**: Deploy web apps
+- **[Azure SQL Database Setup](/guides/azure-sql-database-setup)**: Configure database
+
+---
+
+## Troubleshooting
+
+<DevTip>
+**"VM connection failed - timeout"**
+
+Check the following:
+1. Verify VM status is "Running"
+2. Check Network Security Group (NSG) allows RDP (3389) or SSH (22)
+3. Verify firewall settings (Windows Firewall)
+4. Confirm public IP address is correct
+5. Double-check password is correct
+</DevTip>
+
+<Callout type="warning">
+⚠️ **Free Tier Limitations**
+
+- **750 hours/month**: Roughly continuous operation of 1 VM
+- Excess usage charged hourly
+- Only Standard_B1s size is free
+- Data transfer: Charged above 100GB
+- Storage: Managed disk charges apply
+</Callout>
+
+---
+
+## Common VM Setup and Configuration
+
+**Web Server Setup:**
+```
+Linux (Ubuntu):
+sudo apt update && sudo apt install nginx
+sudo systemctl start nginx
+sudo systemctl enable nginx
+
+Windows:
+Install IIS (Server Manager)
+```
+
+**Add Firewall Rules:**
+1. Azure Portal > NSG > Inbound security rules
+2. Click "Add"
+3. Specify port range, protocol, source
+4. Click "Add"

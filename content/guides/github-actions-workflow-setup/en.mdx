@@ -1,0 +1,286 @@
+# GitHub Actions Workflow Setup - Automate CI/CD
+
+GitHub Actions is a **CI/CD platform built into GitHub** that automatically runs tests, builds, and deploys on code push. Manage everything without external tools—directly within your GitHub repository. The free plan offers 2,000 minutes monthly. This guide creates your first GitHub Actions workflow.
+
+<FreeTierInfo
+  service="GitHub Actions"
+  limit="2,000 minutes/month free"
+  period="monthly"
+  status="generous"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "GitHub account and repository", required: true },
+  { text: "Basic YAML syntax understanding", required: false },
+  { text: "Node.js or Python project (optional)", required: false }
+]} />
+
+<Callout type="info">
+⚡ **GitHub Actions Benefits**
+
+- **Integrated**: Fully integrated within GitHub
+- **Free**: 2,000 minutes/month free (includes private repos)
+- **Flexible**: Supports all languages and frameworks
+- **Fast**: Cloud runners for quick execution
+- **Reusable**: Use pre-built actions from marketplace
+</Callout>
+
+---
+
+<Step number={1} title="Prepare GitHub Repository">
+
+Prepare your GitHub repository for GitHub Actions setup.
+
+1. Sign in to [GitHub](https://github.com)
+2. Navigate to your repository
+3. Verify repository structure:
+   - Source code (src/, app/, etc.)
+   - Package manager files (package.json, requirements.txt, etc.)
+4. Prepare to create `.github/workflows` directory if needed
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/github/github-actions-workflow-setup-step1-en.png"
+  alt="GitHub repository preparation"
+  caption="Verify your GitHub repository is ready"
+/>
+
+<Callout type="tip">
+💡 **Tip**: Use an existing repository. If you don't have one, create a new or test repository.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Create Workflow File">
+
+Create a YAML file that defines your GitHub Actions workflow.
+
+1. On your repository page, click the **"Actions"** tab
+2. Click the **"New workflow"** button
+3. Click **"set up a workflow yourself"**
+4. Set the file name to `ci.yml` or your preferred name
+5. The workflow template editor opens
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/github/github-actions-workflow-setup-step2-en.png"
+  alt="Workflow file creation screen"
+  caption="Create a new workflow in GitHub Actions editor"
+/>
+
+<DevTip>
+Start by modifying a basic template rather than writing from scratch to avoid syntax complexity.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={3} title="Write Basic Workflow YAML">
+
+Write a basic workflow for a Node.js project.
+
+<CopyBlock
+  code="name: CI Workflow
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run linter
+      run: npm run lint
+
+    - name: Run tests
+      run: npm test
+
+    - name: Build project
+      run: npm run build"
+  language="yaml"
+/>
+
+Workflow structure:
+- **name**: Workflow name
+- **on**: Trigger conditions (push, pull_request, etc.)
+- **jobs**: List of jobs to run
+- **runs-on**: Execution environment (ubuntu-latest, windows-latest, etc.)
+- **steps**: Individual job steps (checkout, setup, test, etc.)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/github/github-actions-workflow-setup-step3-en.png"
+  alt="YAML workflow writing screen"
+  caption="Write workflow YAML in the editor"
+/>
+
+<Callout type="warning">
+⚠️ **YAML Syntax Notes**
+
+- **Indentation**: 2 or 4 spaces (no tabs)
+- **Colon**: Space required between key and value (key: value)
+- **Arrays**: Lines starting with "-" (- item)
+- **Quotes**: Wrap strings with special characters in quotes
+</Callout>
+
+</Step>
+
+---
+
+<Step number={4} title="Commit and Run Workflow">
+
+Save your workflow and test it.
+
+1. In the editor, click **"Commit changes"**
+2. Enter your **Commit message**:
+   - Example: "Add GitHub Actions CI workflow"
+3. Click **"Commit changes"** to save to repository
+4. Workflow runs automatically
+5. Check execution status in **"Actions"** tab:
+   - Yellow dot: Running
+   - Green check: Success
+   - Red X: Failed
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/github/github-actions-workflow-setup-step4-en.png"
+  alt="Workflow execution status check"
+  caption="Monitor workflow execution status in Actions tab"
+/>
+
+<Callout type="info">
+ℹ️ **Workflow Triggers**
+
+With default settings:
+- **Automatic on push** to main or develop branches
+- **Automatic on Pull Request** creation
+- Other events (release, schedule, etc.) can be configured
+</Callout>
+
+</Step>
+
+---
+
+<Step number={5} title="Monitor and Debug Workflow">
+
+Check workflow results and fix issues if needed.
+
+1. Click the executed workflow
+2. **Review logs**:
+   - View detailed logs for each step
+   - Identify failure reasons
+3. If failed, fix and rerun:
+   - Test locally
+   - Modify workflow YAML
+   - Commit again to re-execute
+4. **Add Status Badge** (optional):
+   - Add workflow status badge to README.md
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/github/github-actions-workflow-setup-step5-en.png"
+  alt="Workflow log review"
+  caption="Review workflow logs and troubleshoot issues"
+/>
+
+<CopyBlock
+  code="# Add status badge to README.md
+![CI](https://github.com/username/repo/actions/workflows/ci.yml/badge.svg)
+
+# Or show specific branch only
+![CI](https://github.com/username/repo/actions/workflows/ci.yml/badge.svg?branch=main)"
+  language="markdown"
+/>
+
+<Checkpoint
+  title="Verify GitHub Actions Workflow"
+  items={[
+    "Is workflow file in .github/workflows/?",
+    "Does workflow run successfully?",
+    "Do test and build steps succeed?",
+    "Can you see execution history in Actions tab?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **Complete!** GitHub Actions workflow is set up. Tests and builds now run automatically on code push. Next, expand the workflow to add deployment steps.
+</Callout>
+
+</Step>
+
+---
+
+## Next Steps
+
+Expand GitHub Actions usage:
+
+- **[GitHub Actions Deploy Setup](/guides/github-actions-deploy-setup)**: Add automatic deployment
+- **[Azure App Service Setup](/guides/azure-app-service-setup)**: Deploy to cloud
+
+---
+
+## Troubleshooting
+
+<DevTip>
+**"Workflow failed - npm ERR!"**
+
+Check the following:
+1. Verify package.json is in repository root
+2. Verify required commands in package.json scripts
+3. Check dependency versions are compatible
+4. Explicitly set Node.js version
+5. Test `npm install && npm test` locally
+</DevTip>
+
+<Callout type="warning">
+⚠️ **Usage Time Considerations**
+
+- **2,000 min/month limit**: Workflow fails if exceeded
+- **Time calculation**: Only actual execution time counted (not waiting)
+- **Private repos**: 3,000 minutes provided
+- **Self-hosted runners**: No time limits
+- **Prevent overuse**: Limit schedule trigger frequency
+</Callout>
+
+---
+
+## Common Workflow Patterns
+
+**Python Project:**
+```yaml
+- uses: actions/setup-python@v4
+  with:
+    python-version: '3.10'
+- run: pip install -r requirements.txt
+- run: python -m pytest
+```
+
+**Docker Build:**
+```yaml
+- uses: docker/build-push-action@v4
+  with:
+    context: .
+    push: false
+    tags: myapp:latest
+```
+
+**Environment Variables:**
+```yaml
+env:
+  NODE_ENV: test
+  API_KEY: \${{ secrets.API_KEY }}
+```

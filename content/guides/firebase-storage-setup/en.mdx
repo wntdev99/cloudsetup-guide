@@ -1,0 +1,270 @@
+# Firebase Cloud Storage Setup - File Upload/Download
+
+Cloud Storage for Firebase is a **cloud service for storing user-generated content**. You can upload and manage all types of files including images, videos, and documents, with fast download speeds through CDN. This guide shows you how to set up Cloud Storage and upload/download files.
+
+<FreeTierInfo
+  service="Cloud Storage for Firebase"
+  limit="5GB storage"
+  period="unlimited"
+  status="generous"
+/>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "Firebase project created", required: true },
+  { text: "Firebase Authentication configured (recommended)", required: false },
+  { text: "Basic file management understanding", required: false }
+]} />
+
+<Callout type="info">
+💾 **Cloud Storage Features**
+
+- **Scalable**: Unlimited storage (pay-as-you-go)
+- **Secure**: Access control with Firebase Security Rules
+- **Fast**: Worldwide delivery via Google Cloud CDN
+- **Organized**: Folder-like file structure
+- **Auto-scaling**: Automatically scales with traffic
+</Callout>
+
+---
+
+<Step number={1} title="Enable Cloud Storage">
+
+Activate Cloud Storage in the Firebase Console.
+
+1. In the Firebase Console left menu, select **"Storage"**
+2. Click **"Get Started"** or **"Create Bucket"**
+3. Select your **storage location**:
+   - Asia-Pacific: **"asia-northeast1 (Tokyo)"** recommended
+   - The selected region cannot be changed later
+4. Choose **Security Rules**:
+   - **Test mode**: Allow all requests (testing only, auto-disables after 30 days)
+   - **Production mode**: Requires security rules (recommended)
+5. Click **"Done"**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/firebase/firebase-storage-setup-step1-en.png"
+  alt="Enable Cloud Storage screen"
+  caption="Select storage location and security rules, then enable Cloud Storage"
+/>
+
+<DevTip>
+Selecting an Asia-Pacific region provides faster download speeds for users in that region. For international services, consider the US (us-central1) region.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={2} title="Configure Storage Rules">
+
+Set up security rules to manage file access permissions.
+
+1. Go to the **"Rules"** tab
+2. Review default rules:
+   - Test mode: `allow read, write: if true;` (allow all)
+   - Production mode: `allow read, write: if false;` (deny all)
+3. Modify rules as needed:
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/firebase/firebase-storage-setup-step2-en.png"
+  alt="Storage security rules configuration screen"
+  caption="Manage file access permissions with Firebase Security Rules"
+/>
+
+<CopyBlock
+  code="// Example basic Storage rules
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Allow authenticated users to read
+    match /{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null
+        && request.auth.uid == resource.metadata.uid;
+    }
+  }
+}"
+  language="text"
+/>
+
+<Callout type="warning">
+⚠️ **Production Environment Security**
+
+Default rules are very permissive. In production, always set:
+- Only authenticated users can access
+- Users can only access their own files
+- File size limits
+- MIME type validation
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="Create Folder Structure (Via Console)">
+
+Create folders to organize files logically.
+
+1. In the **"Files"** tab, view your file list
+2. Create folders by uploading files with folder paths
+3. Recommended folder structure:
+   - `/uploads/` - User-uploaded files
+   - `/images/` - Image resources
+   - `/documents/` - Document files
+   - `/users/{userId}/` - Per-user files
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/firebase/firebase-storage-setup-step3-en.png"
+  alt="Create folder structure screen"
+  caption="Create folder structure to organize files logically"
+/>
+
+<DevTip>
+Folder structure maps to URL paths, so use consistent naming conventions. Lowercase with hyphens or underscores recommended.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={4} title="Upload and Manage Files">
+
+Upload and manage files through the console.
+
+1. **Upload files** or drag-and-drop files to add
+2. View upload progress
+3. Uploaded file list shows:
+   - File name
+   - File size
+   - Upload date
+   - Download link
+4. Click file menu **"..."** to:
+   - **Delete**: Remove file
+   - **Copy path**: Copy file path
+   - **Copy public URL**: Copy public link (check rules first)
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/firebase/firebase-storage-setup-step4-en.png"
+  alt="File upload and management screen"
+  caption="Upload files and manage download links and paths"
+/>
+
+<CopyBlock
+  code="// Firebase Storage file upload example (web)
+import { getStorage, ref, uploadBytes } from 'firebase/storage';
+
+const storage = getStorage();
+const fileInput = document.getElementById('file-input');
+
+fileInput.addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  const storageRef = ref(storage, 'uploads/' + file.name);
+
+  await uploadBytes(storageRef, file);
+  console.log('File upload completed');
+});"
+  language="javascript"
+/>
+
+</Step>
+
+---
+
+<Step number={5} title="Generate and Use Download URLs">
+
+Generate download URLs for uploaded files and share them.
+
+1. Select a file and click **"..."** > **"Copy public URL"** (for public files)
+2. Or generate download URLs programmatically:
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/v1/firebase/firebase-storage-setup-step5-en.png"
+  alt="Generate download URL screen"
+  caption="Generate public URLs for uploaded files and share them"
+/>
+
+<CopyBlock
+  code="// Firebase Storage download URL generation example
+import { getStorage, ref, getDownloadURL } from 'firebase/storage';
+
+const storage = getStorage();
+const fileRef = ref(storage, 'uploads/myfile.pdf');
+
+getDownloadURL(fileRef)
+  .then(url => {
+    console.log('Download URL:', url);
+    // Use in links or include in API response
+  })
+  .catch(error => {
+    console.log('URL generation error:', error.message);
+  });"
+  language="javascript"
+/>
+
+<Checkpoint
+  title="Verify Cloud Storage Setup"
+  items={[
+    "Is your Cloud Storage bucket created?",
+    "Are security rules configured?",
+    "Can you upload files?",
+    "Can you generate download URLs?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **Complete!** Firebase Cloud Storage is now set up. Users in your web app can now upload and download files. Next, implement advanced features and optimize performance.
+</Callout>
+
+</Step>
+
+---
+
+## Next Steps
+
+Learn more related features:
+
+- **[Firebase Firestore Setup](/guides/firebase-firestore-setup)**: Store file metadata in database
+- **[Firebase Authentication Setup](/guides/firebase-auth-setup)**: Manage per-user files
+
+---
+
+## Troubleshooting
+
+<DevTip>
+**"File upload failed - Permission denied"**
+
+If you see this error:
+1. Check Storage security rules (Test mode enabled?)
+2. Verify user is authenticated
+3. Confirm file path matches rules
+4. Check file size doesn't exceed limits
+5. Check browser console for detailed error message
+</DevTip>
+
+<Callout type="warning">
+⚠️ **Storage and Cost Considerations**
+
+Free limits:
+- 5GB storage (overage is paid)
+- 1GB download/month (overage is $0.12/GB)
+- Unlimited free uploads
+
+To reduce costs:
+- Regularly delete unused files
+- Compress and optimize images
+- Leverage CDN caching
+</Callout>
+
+---
+
+## Cloud Storage vs Firestore Storage
+
+| Feature | Cloud Storage | Firestore |
+|---------|--------------|-----------|
+| Purpose | Files/media | Structured data |
+| File types | All formats | JSON format |
+| Querying | Limited | Powerful |
+| Pricing | Storage-based | Read/write-based |
+| Recommended | Images, videos | Metadata, settings |
