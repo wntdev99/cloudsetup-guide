@@ -1,0 +1,443 @@
+# Setup GCP Firestore - Start NoSQL Database
+
+Google Cloud Firestore provides **scalable NoSQL document database**, **realtime synchronization**, and **offline support**. Follow this guide to enable Firestore and store your first data in just 15 minutes!
+
+<FreeTierInfo
+  service="Cloud Firestore"
+  limit="1GB storage/month"
+  period="Monthly"
+  status="generous"
+/>
+
+## What Can Firestore Do?
+
+<Callout type="info">
+🔥 **Key Firestore Features**
+
+- **NoSQL Document Database**: Store data in JSON-like document format
+- **Realtime Synchronization**: Changes instantly reflected on clients
+- **Offline Support**: App works without internet
+- **Powerful Queries**: Complex queries and indexing support
+- **Auto Scaling**: Automatically scales with traffic
+- **Security Rules**: Data access control
+
+**Use Cases**:
+- Realtime chat apps
+- Collaboration tools
+- E-commerce product catalogs
+- User profile storage
+</Callout>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "GCP account and project created", required: true },
+  { text: "Billing account linked", required: false }
+]} />
+
+<Callout type="tip">
+💡 **Free Tier**: 1GB storage, 50,000 reads, 20,000 writes per month for free!
+</Callout>
+
+---
+
+<Step number={1} title="Enable Firestore">
+
+1. Log in to [Google Cloud Console](https://console.cloud.google.com).
+2. Click **Firestore** in the left menu.
+3. Click **CREATE DATABASE** button.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-firestore-step1-en.png"
+  alt="Create Firestore database"
+  caption="Click the Create Database button"
+/>
+
+### Choose Mode
+
+Select **Native mode** or **Datastore mode**:
+
+- **Native mode** (recommended):
+  - Realtime synchronization support
+  - Optimized for mobile and web apps
+  - Powerful query features
+
+- **Datastore mode**:
+  - For server-centric applications
+  - Compatible with existing Datastore
+
+Choose **Native mode**.
+
+### Select Location
+
+1. Select **us-central1** (recommended for US)
+2. Choose **Production mode** or **Test mode**:
+   - **Test mode**: 30-day public read/write (for development)
+   - **Production mode**: Security rules required (recommended)
+
+3. Click **CREATE**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-firestore-step1b-en.png"
+  alt="Select Firestore mode"
+  caption="Choose Native mode"
+/>
+
+<Checkpoint
+  title="Verify Firestore Enabled"
+  items={[
+    "Is Firestore enabled?",
+    "Does the database console display?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="Create First Document">
+
+Firestore stores data in **Collections** > **Documents** structure.
+
+### Create Collection
+
+1. Click **START COLLECTION** button
+2. Enter **Collection ID**: `users`
+3. Click **Next**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-firestore-step2-en.png"
+  alt="Create collection"
+  caption="Create users collection"
+/>
+
+### Add Document
+
+1. **Document ID**: Enter `user1` (or auto-generate)
+2. **Add fields**:
+   - Field: `name`, Type: `string`, Value: `John Doe`
+   - Field: `email`, Type: `string`, Value: `john@example.com`
+   - Field: `age`, Type: `number`, Value: `30`
+
+3. Click **Save**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-firestore-step2b-en.png"
+  alt="Add document"
+  caption="Enter user information"
+/>
+
+<Callout type="success">
+✅ **Success!** You've created your first Firestore document!
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="Use Firestore in Code">
+
+### Create Service Account Key
+
+1. Click **IAM & Admin** > **Service Accounts**
+2. Click **CREATE SERVICE ACCOUNT**
+3. Name: `firestore-service-account`
+4. Role: Select `Cloud Datastore User`
+5. Download JSON key
+
+### Python Example
+
+<CopyBlock
+  code='from google.cloud import firestore
+import os
+
+# Set service account key
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "path/to/service-account-key.json"
+
+# Create Firestore client
+db = firestore.Client()
+
+# Add document
+doc_ref = db.collection("users").document("user2")
+doc_ref.set({
+    "name": "Jane Smith",
+    "email": "jane@example.com",
+    "age": 25
+})
+print("Document added!")
+
+# Read document
+doc = db.collection("users").document("user2").get()
+if doc.exists:
+    print(f"Data: {doc.to_dict()}")
+
+# Query collection
+users_ref = db.collection("users")
+docs = users_ref.where("age", ">=", 25).stream()
+
+for doc in docs:
+    print(f"{doc.id}: {doc.to_dict()}")'
+  language="python"
+/>
+
+Install:
+```bash
+pip install google-cloud-firestore
+```
+
+### Node.js Example
+
+<CopyBlock
+  code='const admin = require("firebase-admin");
+
+// Initialize with service account key
+const serviceAccount = require("./service-account-key.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
+
+const db = admin.firestore();
+
+// Add document
+async function addUser() {
+  await db.collection("users").doc("user3").set({
+    name: "Bob Johnson",
+    email: "bob@example.com",
+    age: 28
+  });
+  console.log("Document added!");
+}
+
+// Read document
+async function getUser() {
+  const doc = await db.collection("users").doc("user3").get();
+  if (doc.exists) {
+    console.log("Data:", doc.data());
+  }
+}
+
+// Query
+async function queryUsers() {
+  const snapshot = await db.collection("users")
+    .where("age", ">=", 25)
+    .get();
+
+  snapshot.forEach(doc => {
+    console.log(doc.id, "=>", doc.data());
+  });
+}
+
+addUser();'
+  language="javascript"
+/>
+
+Install:
+```bash
+npm install firebase-admin
+```
+
+</Step>
+
+---
+
+<Step number={4} title="Use Realtime Listeners">
+
+Firestore's powerful feature is **realtime synchronization**.
+
+### Python Realtime Listener
+
+<CopyBlock
+  code='def on_snapshot(doc_snapshot, changes, read_time):
+    for doc in doc_snapshot:
+        print(f"Realtime update: {doc.id} => {doc.to_dict()}")
+
+# Connect realtime listener
+doc_ref = db.collection("users").document("user1")
+doc_watch = doc_ref.on_snapshot(on_snapshot)
+
+# Keep program running
+import time
+time.sleep(60)  # Wait 60 seconds'
+  language="python"
+/>
+
+### JavaScript Realtime Listener
+
+<CopyBlock
+  code='// Detect document changes
+db.collection("users").doc("user1")
+  .onSnapshot((doc) => {
+    console.log("Realtime update:", doc.data());
+  });
+
+// Detect collection changes
+db.collection("users")
+  .where("age", ">=", 25)
+  .onSnapshot((snapshot) => {
+    snapshot.docChanges().forEach((change) => {
+      if (change.type === "added") {
+        console.log("New user:", change.doc.data());
+      }
+      if (change.type === "modified") {
+        console.log("Modified user:", change.doc.data());
+      }
+      if (change.type === "removed") {
+        console.log("Removed user:", change.doc.data());
+      }
+    });
+  });'
+  language="javascript"
+/>
+
+<Checkpoint
+  title="Verify Realtime Listener"
+  items={[
+    "Does the listener work properly?",
+    "Are changes reflected immediately?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={5} title="Set Security Rules">
+
+In production, you must set **security rules**.
+
+### Basic Security Rules
+
+Click **Rules** tab in Firestore console:
+
+<CopyBlock
+  code='rules_version = "2";
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Authenticated users only
+    match /users/{userId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Public read, authenticated write
+    match /posts/{postId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Owner only read/write
+    match /users/{userId}/private/{document=**} {
+      allow read, write: if request.auth.uid == userId;
+    }
+  }
+}'
+  language="javascript"
+/>
+
+<Callout type="warning">
+⚠️ **Security Rules Caution**
+
+- Test mode automatically blocks read/write after 30 days
+- `allow read, write: if true;` is public to everyone (be careful!)
+- Always verify authentication in production
+- Recommended to use with Firebase Authentication
+</Callout>
+
+<Callout type="success">
+🎉 **Complete!** You've enabled Firestore and successfully stored data!
+</Callout>
+
+</Step>
+
+---
+
+## Cost Management
+
+<Callout type="info">
+💰 **Firestore Pricing**
+
+- **Free tier** (monthly):
+  - Storage: 1GB
+  - Reads: 50,000
+  - Writes: 20,000
+  - Deletes: 20,000
+
+- **Overage pricing**:
+  - Storage: $0.18/GB/month
+  - Reads: $0.06 per 100,000
+  - Writes: $0.18 per 100,000
+  - Deletes: $0.02 per 100,000
+
+**Example**: 100,000 reads/month
+- Free: 50,000 reads
+- Paid: 50,000 × ($0.06 / 100,000) = **$0.03**
+</Callout>
+
+---
+
+## Next Steps
+
+Now that you've mastered Firestore, move on to:
+
+1. **Firebase Authentication** - Add user authentication
+2. **Cloud Functions** - Serverless backend logic
+3. **Firebase Hosting** - Deploy web apps
+
+---
+
+## Frequently Asked Questions
+
+<Callout type="info">
+**Q. Native mode vs Datastore mode difference?**
+
+A. 
+- **Native mode**: Realtime sync, for mobile/web apps, powerful queries
+- **Datastore mode**: Server-centric, for large-scale backends, Datastore compatible
+
+Most cases: **Native mode** is recommended.
+</Callout>
+
+<Callout type="info">
+**Q. Firestore vs Realtime Database?**
+
+A. 
+- **Firestore**: Structured queries, excellent scalability, recommended for new projects
+- **Realtime Database**: Simple JSON tree, low latency
+
+New projects: Use **Firestore**.
+</Callout>
+
+<Callout type="info">
+**Q. Does it work offline?**
+
+A. Yes! Firestore automatically maintains local cache:
+- Read/write possible offline
+- Auto-sync when connected
+- Very useful for mobile apps
+</Callout>
+
+---
+
+## Troubleshooting
+
+### "Missing or insufficient permissions"
+
+- Check security rules
+- Firebase Authentication setup needed
+- Can temporarily switch to test mode
+
+### Queries are slow
+
+- Composite index creation needed
+- Firestore console auto-recommends indexes
+- Consider query optimization
+
+### High costs
+
+- Remove unnecessary realtime listeners
+- Reduce reads with pagination
+- Utilize local cache
+
+---
+
+**Firestore Setup Complete!** 🎊 Now freely use your NoSQL database!

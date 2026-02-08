@@ -1,0 +1,443 @@
+# GCP Firestore 설정 - NoSQL 데이터베이스 시작하기
+
+Google Cloud Firestore는 **확장 가능한 NoSQL 문서 데이터베이스**, **실시간 동기화**, **오프라인 지원**을 제공하는 강력한 데이터베이스 서비스입니다. 이 가이드를 따라 Firestore를 활성화하고 15분 안에 첫 번째 데이터를 저장해보세요!
+
+<FreeTierInfo
+  service="Cloud Firestore"
+  limit="월 1GB 저장소"
+  period="월간"
+  status="generous"
+/>
+
+## Firestore로 무엇을 할 수 있나요?
+
+<Callout type="info">
+🔥 **주요 Firestore 기능**
+
+- **NoSQL 문서 데이터베이스**: JSON과 유사한 문서 형식으로 데이터 저장
+- **실시간 동기화**: 데이터 변경 시 즉시 클라이언트에 반영
+- **오프라인 지원**: 인터넷 없이도 앱 사용 가능
+- **강력한 쿼리**: 복잡한 쿼리와 인덱싱 지원
+- **자동 스케일링**: 트래픽에 따라 자동 확장
+- **보안 규칙**: 데이터 접근 제어
+
+**사용 사례**:
+- 실시간 채팅 앱
+- 협업 도구
+- 전자상거래 제품 카탈로그
+- 사용자 프로필 저장
+</Callout>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "GCP 계정 및 프로젝트 생성 완료", required: true },
+  { text: "결제 계정 연결 완료", required: false }
+]} />
+
+<Callout type="tip">
+💡 **무료 티어**: 월 1GB 저장소, 50,000회 읽기, 20,000회 쓰기 무료입니다!
+</Callout>
+
+---
+
+<Step number={1} title="Firestore 활성화">
+
+1. [Google Cloud Console](https://console.cloud.google.com)에 로그인합니다.
+2. 왼쪽 메뉴에서 **Firestore** 클릭합니다.
+3. **데이터베이스 만들기(CREATE DATABASE)** 버튼을 클릭합니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-firestore-step1-ko.png"
+  alt="Firestore 데이터베이스 만들기"
+  caption="데이터베이스 만들기 버튼을 클릭하세요"
+/>
+
+### 모드 선택
+
+**Native 모드** 또는 **Datastore 모드** 중 선택:
+
+- **Native 모드** (권장):
+  - 실시간 동기화 지원
+  - 모바일 및 웹 앱에 최적
+  - 강력한 쿼리 기능
+
+- **Datastore 모드**:
+  - 서버 중심 애플리케이션용
+  - 기존 Datastore와 호환
+
+**Native 모드**를 선택하세요.
+
+### 위치 선택
+
+1. **asia-northeast3** (서울) 선택 권장
+2. **프로덕션 모드** 또는 **테스트 모드** 선택:
+   - **테스트 모드**: 30일간 공개 읽기/쓰기 (개발용)
+   - **프로덕션 모드**: 보안 규칙 필요 (권장)
+
+3. **만들기** 클릭
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-firestore-step1b-ko.png"
+  alt="Firestore 모드 선택"
+  caption="Native 모드를 선택하세요"
+/>
+
+<Checkpoint
+  title="Firestore 활성화 확인"
+  items={[
+    "Firestore가 활성화되었나요?",
+    "데이터베이스 콘솔이 표시되나요?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="첫 번째 문서 만들기">
+
+Firestore는 **컬렉션** > **문서** 구조로 데이터를 저장합니다.
+
+### 컬렉션 생성
+
+1. **컬렉션 시작(START COLLECTION)** 버튼 클릭
+2. **컬렉션 ID** 입력: `users`
+3. **다음** 클릭
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-firestore-step2-ko.png"
+  alt="컬렉션 만들기"
+  caption="users 컬렉션을 생성하세요"
+/>
+
+### 문서 추가
+
+1. **문서 ID**: `user1` 입력 (또는 자동 생성)
+2. **필드 추가**:
+   - 필드: `name`, 유형: `string`, 값: `홍길동`
+   - 필드: `email`, 유형: `string`, 값: `hong@example.com`
+   - 필드: `age`, 유형: `number`, 값: `30`
+
+3. **저장** 클릭
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-firestore-step2b-ko.png"
+  alt="문서 추가"
+  caption="사용자 정보를 입력하세요"
+/>
+
+<Callout type="success">
+✅ **성공!** 첫 번째 Firestore 문서를 만들었습니다!
+</Callout>
+
+</Step>
+
+---
+
+<Step number={3} title="코드에서 Firestore 사용하기">
+
+### 서비스 계정 키 생성
+
+1. **IAM 및 관리자** > **서비스 계정** 클릭
+2. **서비스 계정 만들기**
+3. 이름: `firestore-service-account`
+4. 역할: `Cloud Datastore 사용자` 선택
+5. JSON 키 다운로드
+
+### Python 예제
+
+<CopyBlock
+  code='from google.cloud import firestore
+import os
+
+# 서비스 계정 키 설정
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "path/to/service-account-key.json"
+
+# Firestore 클라이언트 생성
+db = firestore.Client()
+
+# 문서 추가
+doc_ref = db.collection("users").document("user2")
+doc_ref.set({
+    "name": "김철수",
+    "email": "kim@example.com",
+    "age": 25
+})
+print("문서 추가 완료!")
+
+# 문서 읽기
+doc = db.collection("users").document("user2").get()
+if doc.exists:
+    print(f"데이터: {doc.to_dict()}")
+
+# 컬렉션 쿼리
+users_ref = db.collection("users")
+docs = users_ref.where("age", ">=", 25).stream()
+
+for doc in docs:
+    print(f"{doc.id}: {doc.to_dict()}")'
+  language="python"
+/>
+
+설치:
+```bash
+pip install google-cloud-firestore
+```
+
+### Node.js 예제
+
+<CopyBlock
+  code='const admin = require("firebase-admin");
+
+// 서비스 계정 키로 초기화
+const serviceAccount = require("./service-account-key.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
+
+const db = admin.firestore();
+
+// 문서 추가
+async function addUser() {
+  await db.collection("users").doc("user3").set({
+    name: "이영희",
+    email: "lee@example.com",
+    age: 28
+  });
+  console.log("문서 추가 완료!");
+}
+
+// 문서 읽기
+async function getUser() {
+  const doc = await db.collection("users").doc("user3").get();
+  if (doc.exists) {
+    console.log("데이터:", doc.data());
+  }
+}
+
+// 쿼리
+async function queryUsers() {
+  const snapshot = await db.collection("users")
+    .where("age", ">=", 25)
+    .get();
+
+  snapshot.forEach(doc => {
+    console.log(doc.id, "=>", doc.data());
+  });
+}
+
+addUser();'
+  language="javascript"
+/>
+
+설치:
+```bash
+npm install firebase-admin
+```
+
+</Step>
+
+---
+
+<Step number={4} title="실시간 리스너 사용하기">
+
+Firestore의 강력한 기능은 **실시간 동기화**입니다.
+
+### Python 실시간 리스너
+
+<CopyBlock
+  code='def on_snapshot(doc_snapshot, changes, read_time):
+    for doc in doc_snapshot:
+        print(f"실시간 업데이트: {doc.id} => {doc.to_dict()}")
+
+# 실시간 리스너 연결
+doc_ref = db.collection("users").document("user1")
+doc_watch = doc_ref.on_snapshot(on_snapshot)
+
+# 프로그램 실행 유지
+import time
+time.sleep(60)  # 60초 동안 대기'
+  language="python"
+/>
+
+### JavaScript 실시간 리스너
+
+<CopyBlock
+  code='// 문서 변경 감지
+db.collection("users").doc("user1")
+  .onSnapshot((doc) => {
+    console.log("실시간 업데이트:", doc.data());
+  });
+
+// 컬렉션 변경 감지
+db.collection("users")
+  .where("age", ">=", 25)
+  .onSnapshot((snapshot) => {
+    snapshot.docChanges().forEach((change) => {
+      if (change.type === "added") {
+        console.log("새 사용자:", change.doc.data());
+      }
+      if (change.type === "modified") {
+        console.log("수정된 사용자:", change.doc.data());
+      }
+      if (change.type === "removed") {
+        console.log("삭제된 사용자:", change.doc.data());
+      }
+    });
+  });'
+  language="javascript"
+/>
+
+<Checkpoint
+  title="실시간 리스너 확인"
+  items={[
+    "리스너가 정상적으로 작동하나요?",
+    "문서 변경 시 즉시 반영되나요?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={5} title="보안 규칙 설정하기">
+
+프로덕션에서는 **보안 규칙**을 설정해야 합니다.
+
+### 기본 보안 규칙
+
+Firestore 콘솔에서 **규칙(Rules)** 탭 클릭:
+
+<CopyBlock
+  code='rules_version = "2";
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 인증된 사용자만 읽기/쓰기
+    match /users/{userId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // 공개 읽기, 인증된 사용자만 쓰기
+    match /posts/{postId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // 소유자만 읽기/쓰기
+    match /users/{userId}/private/{document=**} {
+      allow read, write: if request.auth.uid == userId;
+    }
+  }
+}'
+  language="javascript"
+/>
+
+<Callout type="warning">
+⚠️ **보안 규칙 주의사항**
+
+- 테스트 모드는 30일 후 자동으로 읽기/쓰기 차단됨
+- `allow read, write: if true;`는 모든 사용자에게 공개 (주의!)
+- 프로덕션에서는 반드시 인증 확인
+- Firebase Authentication과 함께 사용 권장
+</Callout>
+
+<Callout type="success">
+🎉 **완료!** Firestore를 활성화하고 성공적으로 데이터를 저장했습니다!
+</Callout>
+
+</Step>
+
+---
+
+## 비용 관리
+
+<Callout type="info">
+💰 **Firestore 가격 정책**
+
+- **무료 티어** (매월):
+  - 저장소: 1GB
+  - 읽기: 50,000회
+  - 쓰기: 20,000회
+  - 삭제: 20,000회
+
+- **초과 시 요금**:
+  - 저장소: GB당 $0.18/월
+  - 읽기: 100,000회당 $0.06
+  - 쓰기: 100,000회당 $0.18
+  - 삭제: 100,000회당 $0.02
+
+**예시**: 월 100,000회 읽기
+- 무료: 50,000회
+- 유료: 50,000회 × ($0.06 / 100,000) = **$0.03**
+</Callout>
+
+---
+
+## 다음 단계
+
+Firestore를 마스터했으니, 다음 단계로 넘어가세요:
+
+1. **Firebase Authentication** - 사용자 인증 추가
+2. **Cloud Functions** - 서버리스 백엔드 로직
+3. **Firebase Hosting** - 웹 앱 배포
+
+---
+
+## 자주 묻는 질문
+
+<Callout type="info">
+**Q. Native 모드 vs Datastore 모드 차이는?**
+
+A. 
+- **Native 모드**: 실시간 동기화, 모바일/웹 앱용, 강력한 쿼리
+- **Datastore 모드**: 서버 중심, 대규모 백엔드용, 기존 Datastore 호환
+
+대부분의 경우 **Native 모드**를 권장합니다.
+</Callout>
+
+<Callout type="info">
+**Q. Firestore vs Realtime Database?**
+
+A. 
+- **Firestore**: 구조화된 쿼리, 확장성 우수, 신규 프로젝트 권장
+- **Realtime Database**: 간단한 JSON 트리, 낮은 지연시간
+
+신규 프로젝트는 **Firestore**를 사용하세요.
+</Callout>
+
+<Callout type="info">
+**Q. 오프라인에서도 작동하나요?**
+
+A. 네! Firestore는 자동으로 로컬 캐시를 유지하여:
+- 오프라인에서도 읽기/쓰기 가능
+- 인터넷 연결 시 자동 동기화
+- 모바일 앱에 매우 유용
+</Callout>
+
+---
+
+## 문제 해결
+
+### "Missing or insufficient permissions"
+
+- 보안 규칙 확인
+- Firebase Authentication 설정 필요
+- 테스트 모드로 임시 전환 가능
+
+### 쿼리가 느려요
+
+- 복합 인덱스 생성 필요
+- Firestore 콘솔에서 자동으로 인덱스 추천
+- 쿼리 최적화 고려
+
+### 비용이 많이 나와요
+
+- 불필요한 실시간 리스너 제거
+- 페이지네이션으로 읽기 횟수 줄이기
+- 로컬 캐시 활용
+
+---
+
+**Firestore 설정 완료!** 🎊 이제 자유롭게 NoSQL 데이터베이스를 활용하세요!

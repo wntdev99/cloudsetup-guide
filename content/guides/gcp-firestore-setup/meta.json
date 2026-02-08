@@ -1,0 +1,62 @@
+{
+  "slug": "gcp-firestore-setup",
+  "platform": "gcp",
+  "service": "Cloud Firestore",
+  "category": "database",
+  "difficulty": "beginner",
+  "estimatedMinutes": 15,
+  "totalSteps": 5,
+  "freeTier": {
+    "service": "Cloud Firestore",
+    "limit": "월 1GB 저장소",
+    "period": "month",
+    "amount": "무료",
+    "status": "generous",
+    "conditions": [
+      "1GB 저장소 무료",
+      "50,000회 읽기 무료",
+      "20,000회 쓰기 무료",
+      "20,000회 삭제 무료"
+    ]
+  },
+  "prerequisites": [
+    "gcp-account-setup",
+    "gcp-project-create"
+  ],
+  "nextGuides": [
+    "gcp-cloud-functions-setup",
+    "gcp-cloud-run-setup"
+  ],
+  "seo": {
+    "ko": {
+      "title": "GCP Firestore 설정 - NoSQL 데이터베이스 시작하기 | CloudSetup.guide",
+      "description": "Google Cloud Firestore를 활성화하고 첫 번째 데이터를 저장하는 방법을 5단계로 배워보세요. 문서 생성부터 실시간 쿼리까지 완벽 가이드.",
+      "keywords": [
+        "GCP Firestore",
+        "Google Cloud Firestore",
+        "NoSQL 데이터베이스",
+        "Firestore 설정",
+        "실시간 데이터베이스",
+        "문서 데이터베이스",
+        "클라우드 DB"
+      ]
+    },
+    "en": {
+      "title": "Setup GCP Firestore - Start NoSQL Database | CloudSetup.guide",
+      "description": "Learn how to enable Google Cloud Firestore and store your first data in 5 easy steps. Complete guide from document creation to realtime queries.",
+      "keywords": [
+        "GCP Firestore",
+        "Google Cloud Firestore",
+        "NoSQL database",
+        "Firestore setup",
+        "realtime database",
+        "document database",
+        "cloud database"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T06:00:00.000Z",
+  "updatedAt": "2026-02-08T06:00:00.000Z",
+  "lastVerified": "2026-02-08T06:00:00.000Z",
+  "published": true
+}
