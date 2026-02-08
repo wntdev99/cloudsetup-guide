@@ -1,0 +1,278 @@
+# Set Up GCP Budget Alerts - Prevent Credit Overuse
+
+After claiming your $300 free credits, it's essential to set up **budget alerts** to prevent unexpected depletion. Follow this guide to create your safety net in just 10 minutes.
+
+<FreeTierInfo
+  service="Google Cloud Billing"
+  limit="Free (alerts)"
+  period="Unlimited"
+  status="generous"
+/>
+
+## Why Do You Need Budget Alerts?
+
+<Callout type="warning">
+⚠️ **Accidental costs can add up quickly**
+
+GCP is a powerful cloud platform, but mistakes like leaving resources running or misconfiguration can drain your credits rapidly. Budget alerts help you:
+- Get automatic email notifications at 50%, 80%, and 100% credit usage
+- Detect unexpected spending early
+- Take action before credits are exhausted
+</Callout>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "GCP account created", required: true },
+  { text: "$300 free credits claimed", required: true },
+  { text: "Email address for alerts", required: true }
+]} />
+
+---
+
+<Step number={1} title="Access Billing Page">
+
+1. Log in to [Google Cloud Console](https://console.cloud.google.com).
+2. Click the **≡** (hamburger menu) on the left.
+3. Click **Billing**.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-billing-setup-step1-en.png"
+  alt="Finding Billing menu in GCP Console"
+  caption="Select Billing from the left menu"
+/>
+
+<Callout type="tip">
+💡 **Tip**: Can't find Billing? Use the search bar at the top and type "billing" for quick access.
+</Callout>
+
+</Step>
+
+---
+
+<Step number={2} title="Navigate to Budgets & Alerts">
+
+1. In the Billing page, click **Budgets & alerts** in the left sidebar.
+2. Click the **CREATE BUDGET** button at the top.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-billing-setup-step2-en.png"
+  alt="Budgets and alerts page"
+  caption="Click CREATE BUDGET to begin"
+/>
+
+</Step>
+
+---
+
+<Step number={3} title="Configure Budget">
+
+### 3-1. Set Scope
+
+1. **Billing account**: Your current account is automatically selected.
+2. **Projects**:
+   - Select "All projects" (recommended)
+   - Or choose specific projects
+3. **Services**: Select "All services" (recommended)
+4. Click **Continue**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-billing-setup-step3a-en.png"
+  alt="Budget scope configuration"
+  caption="Include all projects and services for comprehensive monitoring"
+/>
+
+### 3-2. Set Budget Amount
+
+1. **Budget type**: Select "Specified amount"
+2. **Target amount**: Enter **$300**
+   - Set budget equal to your free credits
+3. Click **Continue**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-billing-setup-step3b-en.png"
+  alt="Budget amount configuration"
+  caption="Set $300 to monitor all your free credits"
+/>
+
+<DevTip>
+**Why $300?**
+
+Since your free credits are $300, setting the budget to $300 allows you to track credit usage percentage accurately.
+</DevTip>
+
+</Step>
+
+---
+
+<Step number={4} title="Set Alert Thresholds">
+
+### 4-1. Configure Alert Rules
+
+By default, alerts are sent at these thresholds:
+- ✅ **50%** (when you've spent $150)
+- ✅ **90%** (when you've spent $270)
+- ✅ **100%** (when you've spent $300)
+
+To add more alerts:
+1. Click **Add alert threshold rule**
+2. Enter desired percentage (e.g., 80%)
+3. Repeat as needed
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-billing-setup-step4a-en.png"
+  alt="Alert threshold configuration"
+  caption="We recommend alerts at 50%, 80%, 90%, and 100%"
+/>
+
+### 4-2. Set Notification Channels
+
+1. In the **Email alerts to** section:
+   - "Billing account administrators and users" is checked by default
+   - You can add additional email addresses
+
+2. Click **Finish**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-billing-setup-step4b-en.png"
+  alt="Notification channel configuration"
+  caption="Verify your email address for alerts"
+/>
+
+<Checkpoint
+  title="Verify Budget Alert Setup"
+  items={[
+    "Is your new budget visible in the budget list?",
+    "Are alert thresholds configured correctly?",
+    "Is your email address correct?"
+  ]}
+/>
+
+<Callout type="success">
+✅ **Complete!** You'll now receive automatic email alerts when your credit usage reaches the configured thresholds.
+</Callout>
+
+</Step>
+
+---
+
+## Sample Alert Email
+
+When you reach a budget threshold, you'll receive an email like this:
+
+<CopyBlock
+  code="Subject: [Google Cloud] Budget alert: My Billing Account has exceeded 50% of budget
+
+Hello,
+
+Your Google Cloud billing account 'My Billing Account'
+has exceeded 50% of your budget.
+
+Current spend: $150.45
+Budget: $300.00
+Progress: 50.15%
+
+View details in Google Cloud Console.
+"
+  language="text"
+/>
+
+<Callout type="info">
+📧 **Email might go to spam**
+
+Since this is your first alert email, check your spam folder. We recommend adding `noreply@google.com` to your safe senders list.
+</Callout>
+
+---
+
+## Additional Security Settings (Optional)
+
+### Cloud Pub/Sub Notifications (Advanced)
+
+For faster notifications, you can set up Pub/Sub:
+1. In budget edit page, select "Connect to a Pub/Sub topic"
+2. Create and connect a topic
+3. Integrate with Cloud Functions or other services
+
+<DevTip>
+This method is for advanced users. Email alerts are sufficient for most cases.
+</DevTip>
+
+---
+
+## Next Steps
+
+With budget alerts configured, you can now safely use GCP services:
+
+1. **[Create GCP Project](../gcp-project-create)** - Create your first project
+2. **[Vision API Setup](../gcp-vision-api-setup)** - Start with AI image analysis
+3. **[Cloud Storage Setup](../gcp-cloud-storage-setup)** - Create file storage
+
+---
+
+## Frequently Asked Questions
+
+<Callout type="info">
+**Q. Do services automatically stop when I get an alert?**
+
+A. No. Alerts only provide **warnings**. Services continue running, and you must manually stop or delete resources. Free trial accounts automatically stop when credits are exhausted.
+</Callout>
+
+<Callout type="info">
+**Q. Can I create multiple budgets?**
+
+A. Yes! You can create multiple budgets per project or service. For example:
+- Entire account: $300
+- Vision API only: $50
+- Compute Engine only: $100
+</Callout>
+
+<Callout type="info">
+**Q. Can I modify alert thresholds later?**
+
+A. Yes! Click on your budget in the budget list and click edit to change settings anytime.
+</Callout>
+
+---
+
+## Troubleshooting
+
+### Not receiving alert emails
+
+1. **Check spam folder**: Look in Gmail spam
+2. **Verify email**: Confirm email registered in billing account
+3. **Wait**: First alert may take up to 24 hours
+4. **Test**: Create a small resource to generate costs
+
+### Can't create budget
+
+- Verify you have billing account permissions
+- Clear browser cache and retry
+- Try a different browser or incognito mode
+
+### Credit usage not updating
+
+- Credit usage can be **delayed up to 24 hours**
+- It's not real-time, so set budgets with buffer
+
+---
+
+## Cost Management Tips
+
+<Callout type="tip">
+💰 **How to Save Credits**
+
+1. **Delete unused resources**: VMs, disks, load balancers, etc.
+2. **Start small**: Use minimum specs for development
+3. **Set auto-shutdown**: Schedule Compute Engine instances
+4. **Use free tier**: Many services offer monthly free quotas
+5. **Check regularly**: Review billing dashboard weekly
+</Callout>
+
+---
+
+**Budget Alerts Configured!** Now explore GCP with confidence! 🎯
+
+<Callout type="success">
+🎉 **Congratulations!** You're ready to safely manage your free credits. Create your first project in the next guide.
+</Callout>

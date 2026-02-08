@@ -1,0 +1,59 @@
+{
+  "slug": "gcp-billing-setup",
+  "platform": "gcp",
+  "service": "Google Cloud Billing",
+  "category": "general",
+  "difficulty": "beginner",
+  "estimatedMinutes": 10,
+  "totalSteps": 4,
+  "freeTier": {
+    "service": "Google Cloud Billing",
+    "limit": "무료 (알림 설정)",
+    "period": "forever",
+    "status": "generous",
+    "conditions": [
+      "예산 알림은 무료로 무제한 설정 가능",
+      "크레딧 사용량 모니터링 무료",
+      "이메일 알림 무료"
+    ]
+  },
+  "prerequisites": ["gcp-account-setup"],
+  "nextGuides": [
+    "gcp-project-create",
+    "gcp-vision-api-setup"
+  ],
+  "seo": {
+    "ko": {
+      "title": "GCP 예산 알림 설정 - 무료 크레딧 초과 방지 방법 | CloudSetup.guide",
+      "description": "Google Cloud Platform(GCP) 예산 알림을 설정하여 $300 무료 크레딧이 예상치 못하게 소진되는 것을 방지하세요. 4단계로 쉽게 설정하는 방법을 스크린샷과 함께 안내합니다.",
+      "keywords": [
+        "GCP 예산 알림",
+        "GCP 결제 알림",
+        "Google Cloud 예산",
+        "GCP 크레딧 관리",
+        "GCP 비용 관리",
+        "GCP 결제 설정",
+        "클라우드 예산",
+        "GCP 초과 방지"
+      ]
+    },
+    "en": {
+      "title": "Set Up GCP Budget Alerts - Prevent Credit Overuse | CloudSetup.guide",
+      "description": "Configure Google Cloud Platform (GCP) budget alerts to prevent unexpected depletion of your $300 free credits. Easy 4-step setup guide with screenshots.",
+      "keywords": [
+        "GCP budget alerts",
+        "GCP billing alerts",
+        "Google Cloud budget",
+        "GCP credit management",
+        "GCP cost management",
+        "GCP billing setup",
+        "cloud budget",
+        "prevent GCP overcharge"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T01:00:00.000Z",
+  "updatedAt": "2026-02-08T01:00:00.000Z",
+  "lastVerified": "2026-02-08T01:00:00.000Z",
+  "published": true
+}
