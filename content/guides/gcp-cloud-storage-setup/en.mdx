@@ -1,0 +1,518 @@
+# Setup GCP Cloud Storage - Create File Storage
+
+Google Cloud Storage is a powerful object storage service for **large file storage**, **static website hosting**, and **backup and archival**. Follow this guide to create a Cloud Storage bucket and upload/download files in just 15 minutes!
+
+<FreeTierInfo
+  service="Cloud Storage"
+  limit="5GB/month"
+  period="Monthly"
+  status="generous"
+/>
+
+## What Can Cloud Storage Do?
+
+<Callout type="info">
+💾 **Key Cloud Storage Features**
+
+- **File Storage**: Store images, videos, backups, and all file types
+- **Static Website Hosting**: Host websites with HTML/CSS/JS files
+- **CDN Integration**: Fast file delivery worldwide
+- **Versioning**: Automatically keep file change history
+- **Lifecycle Management**: Auto-delete/archive old files
+- **Access Control**: Fine-grained permission management
+
+**Use Cases**:
+- User-uploaded file storage
+- Static site hosting
+- Data backup and recovery
+- Media file CDN
+</Callout>
+
+## Before You Start
+
+<PrerequisiteCheck items={[
+  { text: "GCP account and project created", required: true },
+  { text: "Billing account linked", required: false },
+  { text: "Sample file to upload ready", required: false }
+]} />
+
+<Callout type="tip">
+💡 **Free Tier**: Up to 5GB Standard storage per month for free!
+</Callout>
+
+---
+
+<Step number={1} title="Create Cloud Storage Bucket">
+
+1. Log in to [Google Cloud Console](https://console.cloud.google.com).
+2. Click **Cloud Storage** > **Buckets** in the left menu.
+3. Click the **CREATE BUCKET** button.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-storage-step1-en.png"
+  alt="Create bucket"
+  caption="Click the Create Bucket button"
+/>
+
+### Enter Bucket Name
+
+1. Enter **bucket name**:
+   - Must be globally unique
+   - Only lowercase letters, numbers, hyphens (-), underscores (_)
+   - Example: `my-first-bucket-2024`
+
+<Callout type="info">
+**Bucket Name Rules**:
+- 3-63 characters
+- Globally unique
+- Can be used like domain names
+- Examples: `my-app-images`, `backup-2024-data`
+</Callout>
+
+### Choose Location
+
+1. **Location type**:
+   - **Region**: Single region (fast, cheap)
+   - **Multi-region**: Multiple regions (high availability)
+   - **Dual-region**: 2 regions (balanced)
+
+2. **Select location**:
+   - `us-central1` (Iowa) recommended for US
+   - Or `us` (multi-region) for high availability
+
+### Storage Class
+
+1. **Standard**: Frequently accessed data (default)
+2. **Nearline**: Accessed less than once per month
+3. **Coldline**: Accessed less than once per quarter
+4. **Archive**: Accessed less than once per year
+
+Choose **Standard** for starters.
+
+### Access Control
+
+1. Select **Uniform access control** (recommended)
+2. Click **CREATE**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-storage-step1b-en.png"
+  alt="Bucket settings"
+  caption="Configure bucket name and location"
+/>
+
+<Checkpoint
+  title="Verify Bucket Created"
+  items={[
+    "Is the bucket created?",
+    "Does the bucket name display correctly?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="Upload Files">
+
+### Upload via Web Console
+
+1. Click the created bucket.
+2. Click **UPLOAD FILES** button
+3. Select files to upload
+4. Files appear in the bucket.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-storage-step2-en.png"
+  alt="Upload files"
+  caption="Drag and drop or select files to upload"
+/>
+
+### Create Folders
+
+1. Click **CREATE FOLDER** button
+2. Enter folder name (e.g., `images/`, `documents/`)
+3. Upload files into folders
+
+<DevTip>
+Cloud Storage doesn't actually have "folders" - it uses `/` in object names to mimic hierarchy. But the console displays them as folders.
+</DevTip>
+
+### Make Files Public
+
+To make uploaded files accessible on the internet:
+
+1. Select the file.
+2. Click **PERMISSIONS** tab
+3. Click **ADD PRINCIPAL**
+4. **New principals**: Enter `allUsers`
+5. **Role**: Select `Storage Object Viewer`
+6. Click **SAVE**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-storage-step2b-en.png"
+  alt="Make file public"
+  caption="Grant viewer permission to allUsers"
+/>
+
+Public URL format:
+```
+https://storage.googleapis.com/BUCKET_NAME/FILE_NAME
+```
+
+</Step>
+
+---
+
+<Step number={3} title="Manage Files with gsutil">
+
+`gsutil` is a command-line tool for managing Cloud Storage.
+
+### Upload Files
+
+<CopyBlock
+  code='# Upload single file
+gsutil cp myfile.txt gs://my-bucket-name/
+
+# Upload entire folder
+gsutil cp -r my-folder/ gs://my-bucket-name/
+
+# Use wildcards
+gsutil cp *.jpg gs://my-bucket-name/images/'
+  language="bash"
+/>
+
+### Download Files
+
+<CopyBlock
+  code='# Download single file
+gsutil cp gs://my-bucket-name/myfile.txt ./
+
+# Download entire folder
+gsutil cp -r gs://my-bucket-name/my-folder/ ./'
+  language="bash"
+/>
+
+### List Files
+
+<CopyBlock
+  code='# List all files in bucket
+gsutil ls gs://my-bucket-name/
+
+# List files in specific folder
+gsutil ls gs://my-bucket-name/images/
+
+# Show file size and details
+gsutil ls -l gs://my-bucket-name/'
+  language="bash"
+/>
+
+### Delete Files
+
+<CopyBlock
+  code='# Delete single file
+gsutil rm gs://my-bucket-name/myfile.txt
+
+# Delete entire folder
+gsutil rm -r gs://my-bucket-name/my-folder/'
+  language="bash"
+/>
+
+<Checkpoint
+  title="Verify gsutil Usage"
+  items={[
+    "Did files upload successfully?",
+    "Does file listing display correctly?",
+    "Does download work properly?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={4} title="Use Cloud Storage in Code">
+
+### Create Service Account Key
+
+1. In GCP Console, click **IAM & Admin** > **Service Accounts**
+2. Click **CREATE SERVICE ACCOUNT**
+3. Enter name (e.g., `storage-service-account`)
+4. **Role**: Select `Storage Admin`
+5. Click **DONE**
+6. Click created service account > **Keys** tab > **ADD KEY** > Select **JSON**
+7. Download JSON file and store securely
+
+### Python Example
+
+<CopyBlock
+  code='from google.cloud import storage
+import os
+
+# Set service account key
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "path/to/service-account-key.json"
+
+# Create Storage client
+client = storage.Client()
+
+# Get bucket
+bucket = client.bucket("my-bucket-name")
+
+# Upload file
+blob = bucket.blob("uploaded-file.txt")
+blob.upload_from_filename("local-file.txt")
+print("File uploaded!")
+
+# Download file
+blob = bucket.blob("uploaded-file.txt")
+blob.download_to_filename("downloaded-file.txt")
+print("File downloaded!")
+
+# List all files in bucket
+blobs = bucket.list_blobs()
+for blob in blobs:
+    print(blob.name)'
+  language="python"
+/>
+
+Install:
+```bash
+pip install google-cloud-storage
+```
+
+### Node.js Example
+
+<CopyBlock
+  code='const {Storage} = require("@google-cloud/storage");
+
+// Set service account key
+const storage = new Storage({
+  keyFilename: "path/to/service-account-key.json"
+});
+
+const bucketName = "my-bucket-name";
+
+// Upload file
+async function uploadFile() {
+  await storage.bucket(bucketName).upload("local-file.txt", {
+    destination: "uploaded-file.txt",
+  });
+  console.log("File uploaded!");
+}
+
+// Download file
+async function downloadFile() {
+  await storage
+    .bucket(bucketName)
+    .file("uploaded-file.txt")
+    .download({destination: "downloaded-file.txt"});
+  console.log("File downloaded!");
+}
+
+// List files
+async function listFiles() {
+  const [files] = await storage.bucket(bucketName).getFiles();
+  files.forEach(file => console.log(file.name));
+}
+
+uploadFile();'
+  language="javascript"
+/>
+
+Install:
+```bash
+npm install @google-cloud/storage
+```
+
+</Step>
+
+---
+
+<Step number={5} title="Host Static Website">
+
+Host static websites with Cloud Storage.
+
+### Prepare Website Files
+
+Simple `index.html`:
+
+<CopyBlock
+  code='<!DOCTYPE html>
+<html>
+<head>
+  <title>My Static Website</title>
+</head>
+<body>
+  <h1>Welcome to Cloud Storage!</h1>
+  <p>This is a static website hosted on Google Cloud Storage.</p>
+</body>
+</html>'
+  language="html"
+/>
+
+### Configure Bucket as Website
+
+<CopyBlock
+  code='# Make bucket public
+gsutil iam ch allUsers:objectViewer gs://my-bucket-name
+
+# Set website configuration
+gsutil web set -m index.html -e 404.html gs://my-bucket-name
+
+# Upload files
+gsutil cp index.html gs://my-bucket-name/'
+  language="bash"
+/>
+
+### Access Website
+
+URL: `https://storage.googleapis.com/my-bucket-name/index.html`
+
+<Callout type="tip">
+**Custom Domain**: To use your own domain:
+1. Verify domain ownership
+2. Add DNS CNAME record: `c.storage.googleapis.com`
+3. Create bucket with name matching domain
+</Callout>
+
+</Step>
+
+---
+
+<Step number={6} title="Lifecycle Management">
+
+Automatically delete or archive old files.
+
+### Add Lifecycle Rule
+
+1. Click **LIFECYCLE** tab on bucket page
+2. Click **ADD A RULE**
+3. Select action:
+   - **Delete object**: Delete old files
+   - **Set storage class**: Move to Archive
+4. Set condition:
+   - **Age**: 30 days or older
+   - **Created before**: Specific date
+5. Click **CONTINUE** then **DONE**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-storage-step6-en.png"
+  alt="Lifecycle rule"
+  caption="Rule to auto-delete files older than 30 days"
+/>
+
+### Set Lifecycle with JSON
+
+<CopyBlock
+  code='{
+  "lifecycle": {
+    "rule": [
+      {
+        "action": {"type": "Delete"},
+        "condition": {"age": 30}
+      },
+      {
+        "action": {
+          "type": "SetStorageClass",
+          "storageClass": "ARCHIVE"
+        },
+        "condition": {"age": 90}
+      }
+    ]
+  }
+}'
+  language="json"
+/>
+
+<Callout type="success">
+🎉 **Complete!** You've enabled Cloud Storage and successfully managed files!
+</Callout>
+
+</Step>
+
+---
+
+## Cost Management
+
+<Callout type="info">
+💰 **Cloud Storage Pricing**
+
+- **Free tier** (monthly):
+  - Standard storage: 5GB
+  - Class A operations: 5,000
+  - Class B operations: 50,000
+  - Network egress: 100GB
+
+- **Overage pricing** (US regions):
+  - Standard storage: $0.020/GB/month
+  - Nearline: $0.010/GB/month
+  - Coldline: $0.004/GB/month
+  - Archive: $0.0012/GB/month
+
+**Example**: Store 20GB Standard
+- Free: 5GB
+- Paid: 15GB × $0.020 = **$0.30/month**
+</Callout>
+
+---
+
+## Next Steps
+
+Now that you've mastered Cloud Storage, try other GCP services:
+
+1. **[Firestore Setup](../gcp-firestore-setup)** - NoSQL database
+2. **[Cloud Functions Setup](../gcp-cloud-functions-setup)** - Serverless functions
+3. **[Cloud Run Setup](../gcp-cloud-run-setup)** - Run containers
+
+---
+
+## Frequently Asked Questions
+
+<Callout type="info">
+**Q. Standard vs Nearline vs Coldline?**
+
+A. Choose based on access frequency:
+- **Standard**: Frequent access (website images, active data)
+- **Nearline**: less than 1/month (backups, media archives)
+- **Coldline**: less than 1/quarter (disaster recovery)
+- **Archive**: less than 1/year (legal retention)
+
+Storage cost decreases, but access cost increases.
+</Callout>
+
+<Callout type="info">
+**Q. Can I rename a bucket?**
+
+A. No. Bucket names are **immutable**:
+- Must create new bucket and copy files
+- Use `gsutil rsync` to synchronize
+</Callout>
+
+<Callout type="info">
+**Q. What's the file upload size limit?**
+
+A. Single files up to **5TB** can be uploaded. Use Resumable Upload for large files.
+</Callout>
+
+---
+
+## Troubleshooting
+
+### "Bucket name already exists"
+
+- Bucket names must be globally unique
+- Try different name or add project ID
+
+### Files not public
+
+- Verify `allUsers:objectViewer` permission
+- Check permissions tab on bucket or file
+
+### Slow upload speed
+
+- Choose closer region (US: `us-central1`)
+- Use `gsutil -m` for multi-threaded uploads
+- Parallel uploads improve speed
+
+---
+
+**Cloud Storage Setup Complete!** 🎊 Now freely use file storage services!

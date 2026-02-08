@@ -1,0 +1,518 @@
+# GCP Cloud Storage 설정 - 파일 저장소 만들기
+
+Google Cloud Storage는 **대용량 파일 저장**, **정적 웹사이트 호스팅**, **백업 및 아카이브**를 위한 강력한 객체 스토리지 서비스입니다. 이 가이드를 따라 Cloud Storage 버킷을 생성하고 15분 안에 파일을 업로드/다운로드해보세요!
+
+<FreeTierInfo
+  service="Cloud Storage"
+  limit="월 5GB"
+  period="월간"
+  status="generous"
+/>
+
+## Cloud Storage로 무엇을 할 수 있나요?
+
+<Callout type="info">
+💾 **주요 Cloud Storage 기능**
+
+- **파일 저장**: 이미지, 동영상, 백업 등 모든 파일 저장
+- **정적 웹사이트 호스팅**: HTML/CSS/JS 파일로 웹사이트 호스팅
+- **CDN 통합**: 전 세계적으로 빠른 파일 전송
+- **버전 관리**: 파일 변경 이력 자동 보관
+- **수명 주기 관리**: 오래된 파일 자동 삭제/아카이브
+- **접근 제어**: 세밀한 권한 관리
+
+**사용 사례**:
+- 사용자 업로드 파일 저장
+- 정적 사이트 호스팅
+- 데이터 백업 및 복구
+- 미디어 파일 CDN
+</Callout>
+
+## 시작하기 전에
+
+<PrerequisiteCheck items={[
+  { text: "GCP 계정 및 프로젝트 생성 완료", required: true },
+  { text: "결제 계정 연결 완료", required: false },
+  { text: "업로드할 샘플 파일 준비", required: false }
+]} />
+
+<Callout type="tip">
+💡 **무료 티어**: 월 5GB Standard 스토리지까지 무료입니다!
+</Callout>
+
+---
+
+<Step number={1} title="Cloud Storage 버킷 만들기">
+
+1. [Google Cloud Console](https://console.cloud.google.com)에 로그인합니다.
+2. 왼쪽 메뉴에서 **Cloud Storage** > **버킷** 클릭합니다.
+3. **버킷 만들기(CREATE BUCKET)** 버튼을 클릭합니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-storage-step1-ko.png"
+  alt="버킷 만들기"
+  caption="버킷 만들기 버튼을 클릭하세요"
+/>
+
+### 버킷 이름 입력
+
+1. **버킷 이름** 입력:
+   - 전 세계적으로 고유해야 함
+   - 소문자, 숫자, 하이픈(-), 언더스코어(_)만 사용
+   - 예: `my-first-bucket-2024`
+
+<Callout type="info">
+**버킷 이름 규칙**:
+- 3~63자
+- 전 세계적으로 고유
+- 도메인 이름처럼 사용 가능
+- 예: `my-app-images`, `backup-2024-data`
+</Callout>
+
+### 위치 선택
+
+1. **위치 유형**:
+   - **Region**: 단일 리전 (빠름, 저렴)
+   - **Multi-region**: 여러 리전 (고가용성)
+   - **Dual-region**: 2개 리전 (균형)
+
+2. **위치 선택**:
+   - `asia-northeast3` (서울) 권장
+   - 또는 `asia` (아시아 전체)
+
+### 스토리지 클래스
+
+1. **Standard**: 자주 액세스하는 데이터 (기본값)
+2. **Nearline**: 월 1회 미만 액세스
+3. **Coldline**: 분기 1회 미만 액세스
+4. **Archive**: 연 1회 미만 액세스
+
+처음에는 **Standard**를 선택하세요.
+
+### 액세스 제어
+
+1. **균일한 액세스 제어** 선택 (권장)
+2. **버킷 만들기** 클릭
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-storage-step1b-ko.png"
+  alt="버킷 설정"
+  caption="버킷 이름과 위치를 설정하세요"
+/>
+
+<Checkpoint
+  title="버킷 생성 확인"
+  items={[
+    "버킷이 생성되었나요?",
+    "버킷 이름이 올바르게 표시되나요?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={2} title="파일 업로드하기">
+
+### 웹 콘솔에서 업로드
+
+1. 생성한 버킷을 클릭합니다.
+2. **파일 업로드(UPLOAD FILES)** 버튼 클릭
+3. 업로드할 파일 선택
+4. 파일이 버킷에 나타납니다.
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-storage-step2-ko.png"
+  alt="파일 업로드"
+  caption="파일을 드래그 앤 드롭하거나 선택하여 업로드하세요"
+/>
+
+### 폴더 만들기
+
+1. **폴더 만들기(CREATE FOLDER)** 버튼 클릭
+2. 폴더 이름 입력 (예: `images/`, `documents/`)
+3. 폴더 내에 파일 업로드 가능
+
+<DevTip>
+Cloud Storage는 실제로는 "폴더"가 없고 객체 이름에 `/`를 사용하여 계층 구조를 흉내냅니다. 하지만 콘솔에서는 폴더처럼 표시됩니다.
+</DevTip>
+
+### 파일 공개 설정
+
+업로드한 파일을 인터넷에서 접근 가능하게 하려면:
+
+1. 파일을 선택합니다.
+2. **권한(PERMISSIONS)** 탭 클릭
+3. **주 구성원 추가(ADD PRINCIPAL)** 클릭
+4. **새 주 구성원**: `allUsers` 입력
+5. **역할**: `Storage 객체 뷰어` 선택
+6. **저장** 클릭
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-storage-step2b-ko.png"
+  alt="파일 공개 설정"
+  caption="allUsers에게 뷰어 권한을 부여하세요"
+/>
+
+공개 URL 형식:
+```
+https://storage.googleapis.com/BUCKET_NAME/FILE_NAME
+```
+
+</Step>
+
+---
+
+<Step number={3} title="gsutil로 파일 관리하기">
+
+`gsutil`은 Cloud Storage를 명령줄에서 관리하는 도구입니다.
+
+### 파일 업로드
+
+<CopyBlock
+  code='# 단일 파일 업로드
+gsutil cp myfile.txt gs://my-bucket-name/
+
+# 폴더 전체 업로드
+gsutil cp -r my-folder/ gs://my-bucket-name/
+
+# 와일드카드 사용
+gsutil cp *.jpg gs://my-bucket-name/images/'
+  language="bash"
+/>
+
+### 파일 다운로드
+
+<CopyBlock
+  code='# 단일 파일 다운로드
+gsutil cp gs://my-bucket-name/myfile.txt ./
+
+# 폴더 전체 다운로드
+gsutil cp -r gs://my-bucket-name/my-folder/ ./'
+  language="bash"
+/>
+
+### 파일 목록 보기
+
+<CopyBlock
+  code='# 버킷의 모든 파일 나열
+gsutil ls gs://my-bucket-name/
+
+# 특정 폴더 내 파일 나열
+gsutil ls gs://my-bucket-name/images/
+
+# 파일 크기 및 상세 정보
+gsutil ls -l gs://my-bucket-name/'
+  language="bash"
+/>
+
+### 파일 삭제
+
+<CopyBlock
+  code='# 단일 파일 삭제
+gsutil rm gs://my-bucket-name/myfile.txt
+
+# 폴더 전체 삭제
+gsutil rm -r gs://my-bucket-name/my-folder/'
+  language="bash"
+/>
+
+<Checkpoint
+  title="gsutil 사용 확인"
+  items={[
+    "파일이 성공적으로 업로드되었나요?",
+    "파일 목록이 정상적으로 표시되나요?",
+    "다운로드가 정상적으로 작동하나요?"
+  ]}
+/>
+
+</Step>
+
+---
+
+<Step number={4} title="코드에서 Cloud Storage 사용하기">
+
+### 서비스 계정 키 생성
+
+1. GCP Console에서 **IAM 및 관리자** > **서비스 계정** 클릭
+2. **서비스 계정 만들기** 클릭
+3. 이름 입력 (예: `storage-service-account`)
+4. **역할**: `Storage 관리자` 선택
+5. **완료** 클릭
+6. 생성된 서비스 계정 클릭 > **키** 탭 > **키 추가** > **JSON** 선택
+7. JSON 파일 다운로드 및 안전하게 보관
+
+### Python 예제
+
+<CopyBlock
+  code='from google.cloud import storage
+import os
+
+# 서비스 계정 키 설정
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "path/to/service-account-key.json"
+
+# Storage 클라이언트 생성
+client = storage.Client()
+
+# 버킷 가져오기
+bucket = client.bucket("my-bucket-name")
+
+# 파일 업로드
+blob = bucket.blob("uploaded-file.txt")
+blob.upload_from_filename("local-file.txt")
+print("파일 업로드 완료!")
+
+# 파일 다운로드
+blob = bucket.blob("uploaded-file.txt")
+blob.download_to_filename("downloaded-file.txt")
+print("파일 다운로드 완료!")
+
+# 버킷의 모든 파일 나열
+blobs = bucket.list_blobs()
+for blob in blobs:
+    print(blob.name)'
+  language="python"
+/>
+
+설치:
+```bash
+pip install google-cloud-storage
+```
+
+### Node.js 예제
+
+<CopyBlock
+  code='const {Storage} = require("@google-cloud/storage");
+
+// 서비스 계정 키 설정
+const storage = new Storage({
+  keyFilename: "path/to/service-account-key.json"
+});
+
+const bucketName = "my-bucket-name";
+
+// 파일 업로드
+async function uploadFile() {
+  await storage.bucket(bucketName).upload("local-file.txt", {
+    destination: "uploaded-file.txt",
+  });
+  console.log("파일 업로드 완료!");
+}
+
+// 파일 다운로드
+async function downloadFile() {
+  await storage
+    .bucket(bucketName)
+    .file("uploaded-file.txt")
+    .download({destination: "downloaded-file.txt"});
+  console.log("파일 다운로드 완료!");
+}
+
+// 파일 목록
+async function listFiles() {
+  const [files] = await storage.bucket(bucketName).getFiles();
+  files.forEach(file => console.log(file.name));
+}
+
+uploadFile();'
+  language="javascript"
+/>
+
+설치:
+```bash
+npm install @google-cloud/storage
+```
+
+</Step>
+
+---
+
+<Step number={5} title="정적 웹사이트 호스팅">
+
+Cloud Storage로 정적 웹사이트를 호스팅할 수 있습니다.
+
+### 웹사이트 파일 준비
+
+간단한 `index.html`:
+
+<CopyBlock
+  code='<!DOCTYPE html>
+<html>
+<head>
+  <title>My Static Website</title>
+</head>
+<body>
+  <h1>Welcome to Cloud Storage!</h1>
+  <p>This is a static website hosted on Google Cloud Storage.</p>
+</body>
+</html>'
+  language="html"
+/>
+
+### 버킷 웹사이트 설정
+
+<CopyBlock
+  code='# 버킷을 공개로 설정
+gsutil iam ch allUsers:objectViewer gs://my-bucket-name
+
+# 웹사이트 설정
+gsutil web set -m index.html -e 404.html gs://my-bucket-name
+
+# 파일 업로드
+gsutil cp index.html gs://my-bucket-name/'
+  language="bash"
+/>
+
+### 웹사이트 접속
+
+URL: `https://storage.googleapis.com/my-bucket-name/index.html`
+
+<Callout type="tip">
+**커스텀 도메인**: 자신의 도메인을 사용하려면:
+1. 도메인 소유권 확인
+2. DNS CNAME 레코드 추가: `c.storage.googleapis.com`
+3. 버킷 이름을 도메인 이름과 동일하게 생성
+</Callout>
+
+</Step>
+
+---
+
+<Step number={6} title="수명 주기 관리">
+
+오래된 파일을 자동으로 삭제하거나 아카이브할 수 있습니다.
+
+### 수명 주기 규칙 추가
+
+1. 버킷 페이지에서 **수명 주기(LIFECYCLE)** 탭 클릭
+2. **규칙 추가(ADD A RULE)** 클릭
+3. 작업 선택:
+   - **객체 삭제**: 오래된 파일 삭제
+   - **스토리지 클래스 변경**: Archive로 이동
+4. 조건 설정:
+   - **나이**: 30일 이상
+   - **생성 날짜**: 특정 날짜 이전
+5. **계속** 클릭 후 **완료**
+
+<Screenshot
+  src="https://res.cloudinary.com/demo/image/upload/gcp-storage-step6-ko.png"
+  alt="수명 주기 규칙"
+  caption="30일 이상 된 파일을 자동 삭제하는 규칙"
+/>
+
+### JSON으로 수명 주기 설정
+
+<CopyBlock
+  code='{
+  "lifecycle": {
+    "rule": [
+      {
+        "action": {"type": "Delete"},
+        "condition": {"age": 30}
+      },
+      {
+        "action": {
+          "type": "SetStorageClass",
+          "storageClass": "ARCHIVE"
+        },
+        "condition": {"age": 90}
+      }
+    ]
+  }
+}'
+  language="json"
+/>
+
+<Callout type="success">
+🎉 **완료!** Cloud Storage를 활성화하고 파일을 성공적으로 관리했습니다!
+</Callout>
+
+</Step>
+
+---
+
+## 비용 관리
+
+<Callout type="info">
+💰 **Cloud Storage 가격 정책**
+
+- **무료 티어** (매월):
+  - Standard 스토리지: 5GB
+  - Class A 작업: 5,000회
+  - Class B 작업: 50,000회
+  - 네트워크 송신: 100GB
+
+- **초과 시 요금** (서울 리전):
+  - Standard 스토리지: GB당 $0.023/월
+  - Nearline: GB당 $0.013/월
+  - Coldline: GB당 $0.006/월
+  - Archive: GB당 $0.0025/월
+
+**예시**: Standard 20GB 저장
+- 무료: 5GB
+- 유료: 15GB × $0.023 = **$0.345/월**
+</Callout>
+
+---
+
+## 다음 단계
+
+Cloud Storage를 마스터했으니, 다른 GCP 서비스도 사용해보세요:
+
+1. **[Firestore 설정](../gcp-firestore-setup)** - NoSQL 데이터베이스
+2. **[Cloud Functions 설정](../gcp-cloud-functions-setup)** - 서버리스 함수
+3. **[Cloud Run 설정](../gcp-cloud-run-setup)** - 컨테이너 실행
+
+---
+
+## 자주 묻는 질문
+
+<Callout type="info">
+**Q. Standard vs Nearline vs Coldline?**
+
+A. 액세스 빈도에 따라 선택:
+- **Standard**: 자주 액세스 (웹사이트 이미지, 활성 데이터)
+- **Nearline**: 월 1회 이하 (백업, 미디어 아카이브)
+- **Coldline**: 분기 1회 이하 (재해 복구)
+- **Archive**: 연 1회 이하 (법적 보관)
+
+스토리지 비용은 낮아지지만, 액세스 비용은 높아집니다.
+</Callout>
+
+<Callout type="info">
+**Q. 버킷 이름을 변경할 수 있나요?**
+
+A. 아니요. 버킷 이름은 **변경 불가**입니다:
+- 새 버킷을 만들고 파일을 복사해야 함
+- `gsutil rsync` 사용하여 동기화 가능
+</Callout>
+
+<Callout type="info">
+**Q. 파일 업로드 크기 제한은?**
+
+A. 단일 파일 최대 **5TB**까지 업로드 가능합니다. 큰 파일은 Resumable Upload를 사용하세요.
+</Callout>
+
+---
+
+## 문제 해결
+
+### "Bucket name already exists"
+
+- 버킷 이름은 전 세계적으로 고유해야 함
+- 다른 이름 시도하거나 프로젝트 ID 추가
+
+### 파일이 공개되지 않아요
+
+- `allUsers:objectViewer` 권한 확인
+- 버킷 또는 파일의 권한 탭에서 설정
+
+### 업로드 속도가 느려요
+
+- 가까운 리전 선택 (서울: `asia-northeast3`)
+- `gsutil -m` 멀티스레드 업로드 사용
+- 병렬 업로드로 속도 향상
+
+---
+
+**Cloud Storage 설정 완료!** 🎊 이제 자유롭게 파일 저장소를 활용하세요!

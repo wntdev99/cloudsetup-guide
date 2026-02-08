@@ -1,0 +1,62 @@
+{
+  "slug": "gcp-cloud-storage-setup",
+  "platform": "gcp",
+  "service": "Cloud Storage",
+  "category": "storage",
+  "difficulty": "beginner",
+  "estimatedMinutes": 15,
+  "totalSteps": 6,
+  "freeTier": {
+    "service": "Cloud Storage",
+    "limit": "월 5GB",
+    "period": "month",
+    "amount": "무료",
+    "status": "generous",
+    "conditions": [
+      "Standard 스토리지 5GB 무료",
+      "5,000회 Class A 작업 무료",
+      "50,000회 Class B 작업 무료",
+      "100GB 무료 네트워크 송신"
+    ]
+  },
+  "prerequisites": [
+    "gcp-account-setup",
+    "gcp-project-create"
+  ],
+  "nextGuides": [
+    "gcp-firestore-setup",
+    "gcp-cloud-functions-setup"
+  ],
+  "seo": {
+    "ko": {
+      "title": "GCP Cloud Storage 설정 - 파일 저장소 만들기 | CloudSetup.guide",
+      "description": "Google Cloud Storage 버킷을 생성하고 파일을 업로드/다운로드하는 방법을 6단계로 배워보세요. 웹사이트 호스팅부터 API 사용까지 완벽 가이드.",
+      "keywords": [
+        "GCP Cloud Storage",
+        "Google Cloud Storage",
+        "GCS 버킷",
+        "파일 스토리지",
+        "Cloud Storage 설정",
+        "정적 웹사이트 호스팅",
+        "객체 스토리지"
+      ]
+    },
+    "en": {
+      "title": "Setup GCP Cloud Storage - Create File Storage | CloudSetup.guide",
+      "description": "Learn how to create Google Cloud Storage buckets and upload/download files in 6 easy steps. Complete guide from website hosting to API usage.",
+      "keywords": [
+        "GCP Cloud Storage",
+        "Google Cloud Storage",
+        "GCS bucket",
+        "file storage",
+        "Cloud Storage setup",
+        "static website hosting",
+        "object storage"
+      ]
+    }
+  },
+  "createdAt": "2026-02-08T05:30:00.000Z",
+  "updatedAt": "2026-02-08T05:30:00.000Z",
+  "lastVerified": "2026-02-08T05:30:00.000Z",
+  "published": true
+}
